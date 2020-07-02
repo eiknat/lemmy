@@ -363,7 +363,7 @@ export class Main extends Component<any, MainState> {
               <use xlinkHref="#icon-mouse">#</use>
             </svg>
             <a href={repoUrl}>
-              Lemmy<sup>beta</sup>
+              Lemmy
             </a>
           </h5>
           <p class="mb-0">
@@ -432,39 +432,31 @@ export class Main extends Component<any, MainState> {
 
   selects() {
     return (
-      <div className="mb-3">
-        <span class="mr-3">
-          <DataTypeSelect
-            type_={this.state.dataType}
-            onChange={this.handleDataTypeChange}
-          />
+      <div className="mb-3 filter-row">
+        <span className="listing-select-group">
+          <span class="mr-3 data-type-select">
+            <DataTypeSelect
+              type_={this.state.dataType}
+              onChange={this.handleDataTypeChange}
+            />
+          </span>
+          <span class="mr-3 listing-type-select">
+            <ListingTypeSelect
+              type_={this.state.listingType}
+              onChange={this.handleListingTypeChange}
+            />
+          </span>
         </span>
-        <span class="mr-3">
-          <ListingTypeSelect
-            type_={this.state.listingType}
-            onChange={this.handleListingTypeChange}
-          />
-        </span>
-        <span class="mr-2">
-          <SortSelect sort={this.state.sort} onChange={this.handleSortChange} />
-        </span>
-        {this.state.listingType == ListingType.All && (
-          <a
-            href={`/feeds/all.xml?sort=${SortType[this.state.sort]}`}
-            target="_blank"
-            title="RSS"
-          >
-            <svg class="icon text-muted small">
-              <use xlinkHref="#icon-rss">#</use>
-            </svg>
-          </a>
-        )}
-        {UserService.Instance.user &&
-          this.state.listingType == ListingType.Subscribed && (
+        <span>
+          <span class="mr-2 sort-select">
+            <SortSelect
+              sort={this.state.sort}
+              onChange={this.handleSortChange}
+            />
+          </span>
+          {this.state.listingType == ListingType.All && (
             <a
-              href={`/feeds/front/${UserService.Instance.auth}.xml?sort=${
-                SortType[this.state.sort]
-              }`}
+              href={`/feeds/all.xml?sort=${SortType[this.state.sort]}`}
               target="_blank"
               title="RSS"
             >
@@ -473,6 +465,21 @@ export class Main extends Component<any, MainState> {
               </svg>
             </a>
           )}
+          {UserService.Instance.user &&
+            this.state.listingType == ListingType.Subscribed && (
+              <a
+                href={`/feeds/front/${UserService.Instance.auth}.xml?sort=${
+                  SortType[this.state.sort]
+                }`}
+                target="_blank"
+                title="RSS"
+              >
+                <svg class="icon text-muted small">
+                  <use xlinkHref="#icon-rss">#</use>
+                </svg>
+              </a>
+            )}
+        </span>
       </div>
     );
   }
