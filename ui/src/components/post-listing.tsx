@@ -358,9 +358,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                   </small>
                 )}
                 {(isImage(post.url) ||
-                  isYoutubeVideo(post.url) ||
+                  post.embed_html !== null ||
                   this.props.post.thumbnail_url) && (
                   <>
+                    {console.log(post.embed_html)}
                     {!this.state.imageExpanded ? (
                       <span
                         class="text-monospace unselectable pointer ml-2 text-muted small"
@@ -389,18 +390,12 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                               this.handleImageExpandClick
                             )}
                           >
-                            {isYoutubeVideo(post.url) ? (
-                              <iframe
-                                style="max-width:100%"
-                                type="text/html"
-                                width="640"
-                                height="360"
-                                src={
-                                  'https://www.youtube.com/embed/' +
-                                  getYoutubeID(post.url)
-                                }
-                                frameborder="0"
-                              ></iframe>
+                            {post.embed_html !== null ? (
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: post.embed_html,
+                                }}
+                              />
                             ) : (
                               <img
                                 class="img-fluid img-expanded"
