@@ -274,10 +274,9 @@ export class Main extends Component<any, MainState> {
             <img
               className="img-fluid mb-2"
               src="/static/assets/logo.png"
-              alt="chapo.chat logo courtesy of {INSERT NAME HERE}"
+              alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
             />
-            {/* TODO: Find logo creator's name + website */}
-            {/* <sub>Logo courtesy of ...</sub> */}
+            <sub>Logo courtesy of ancestral potato</sub>
             <h5 class="mb-0">{`${this.state.siteRes.site.name}`}</h5>
             {this.canAdmin && (
               <ul class="list-inline mb-1 text-muted font-weight-bold">
