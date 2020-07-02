@@ -92,7 +92,12 @@ class Index extends Component<any, any> {
                 />
                 <Route
                   path={`/PPB`}
-                  component={() => <img src="https://i.imgur.com/5pXPI.jpg" />}
+                  component={() => (
+                    <img
+                      src="https://i.imgur.com/5pXPI.jpg"
+                      alt="a big that has pooped on its own balls"
+                    />
+                  )}
                 />
               </Switch>
               <Symbols />
