@@ -95,7 +95,7 @@ class Index extends Component<any, any> {
                   component={() => (
                     <img
                       src="https://i.imgur.com/5pXPI.jpg"
-                      alt="a big that has pooped on its own balls"
+                      alt="a pig that has pooped on its own balls"
                     />
                   )}
                 />
