@@ -28,6 +28,8 @@ import {
   isMod,
   isImage,
   isVideo,
+  isYoutubeVideo,
+  getYoutubeID,
   getUnixTime,
   pictrsImage,
   setupTippy,
@@ -160,6 +162,17 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     );
   }
 
+  youtubeThumb(src: string) {
+    let post = this.props.post;
+    let videoID = getYoutubeID(src);
+    return (
+      <img
+        className={`img-fluid thumbnail rounded`}
+        src={'https://img.youtube.com/vi/' + videoID + '/default.jpg'} //get thumb from youtube
+      />
+    );
+  }
+
   getImage(thumbnail: boolean = false) {
     let post = this.props.post;
     if (isImage(post.url)) {
@@ -186,6 +199,19 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
           onClick={linkEvent(this, this.handleImageExpandClick)}
         >
           {this.imgThumb(this.getImage(true))}
+          <svg class="icon mini-overlay">
+            <use xlinkHref="#icon-image"></use>
+          </svg>
+        </span>
+      );
+    } else if (isYoutubeVideo(post.url)) {
+      return (
+        <span
+          class="text-body pointer"
+          data-tippy-content={i18n.t('expand_here')}
+          onClick={linkEvent(this, this.handleImageExpandClick)}
+        >
+          {this.youtubeThumb(post.url)}
           <svg class="icon mini-overlay">
             <use xlinkHref="#icon-image"></use>
           </svg>
@@ -331,7 +357,9 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     </a>
                   </small>
                 )}
-                {(isImage(post.url) || this.props.post.thumbnail_url) && (
+                {(isImage(post.url) ||
+                  isYoutubeVideo(post.url) ||
+                  this.props.post.thumbnail_url) && (
                   <>
                     {!this.state.imageExpanded ? (
                       <span
@@ -361,10 +389,24 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                               this.handleImageExpandClick
                             )}
                           >
-                            <img
-                              class="img-fluid img-expanded"
-                              src={this.getImage()}
-                            />
+                            {isYoutubeVideo(post.url) ? (
+                              <iframe
+                                style="max-width:100%"
+                                type="text/html"
+                                width="640"
+                                height="360"
+                                src={
+                                  'https://www.youtube.com/embed/' +
+                                  getYoutubeID(post.url)
+                                }
+                                frameborder="0"
+                              ></iframe>
+                            ) : (
+                              <img
+                                class="img-fluid img-expanded"
+                                src={this.getImage()}
+                              />
+                            )}
                           </span>
                         </div>
                       </span>
