@@ -28,6 +28,8 @@ import {
   isMod,
   isImage,
   isVideo,
+  isYoutubeVideo,
+  getYoutubeID,
   getUnixTime,
   pictrsImage,
   setupTippy,
@@ -160,6 +162,17 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     );
   }
 
+  youtubeThumb(src: string) {
+    let post = this.props.post;
+    let videoID = getYoutubeID(src);
+    return (
+      <img
+        className={`img-fluid thumbnail rounded`}
+        src={'https://img.youtube.com/vi/' + videoID + '/default.jpg'} //get thumb from youtube
+      />
+    );
+  }
+
   getImage(thumbnail: boolean = false) {
     let post = this.props.post;
     if (isImage(post.url)) {
@@ -190,6 +203,15 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             <use xlinkHref="#icon-image"></use>
           </svg>
         </span>
+      );
+    } else if (isYoutubeVideo(post.url)) {
+      return (
+        <a className="text-body" href={post.url} title={post.url}>
+          {this.youtubeThumb(post.url)}
+          <svg class="icon mini-overlay">
+            <use xlinkHref="#icon-image"></use>
+          </svg>
+        </a>
       );
     } else if (post.thumbnail_url) {
       return (
