@@ -206,12 +206,16 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
       );
     } else if (isYoutubeVideo(post.url)) {
       return (
-        <a className="text-body" href={post.url} title={post.url}>
+        <span
+          class="text-body pointer"
+          data-tippy-content={i18n.t('expand_here')}
+          onClick={linkEvent(this, this.handleImageExpandClick)}
+        >
           {this.youtubeThumb(post.url)}
           <svg class="icon mini-overlay">
             <use xlinkHref="#icon-image"></use>
           </svg>
-        </a>
+        </span>
       );
     } else if (post.thumbnail_url) {
       return (
@@ -353,7 +357,9 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     </a>
                   </small>
                 )}
-                {(isImage(post.url) || this.props.post.thumbnail_url) && (
+                {(isImage(post.url) ||
+                  isYoutubeVideo(post.url) ||
+                  this.props.post.thumbnail_url) && (
                   <>
                     {!this.state.imageExpanded ? (
                       <span
@@ -383,10 +389,24 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                               this.handleImageExpandClick
                             )}
                           >
-                            <img
-                              class="img-fluid img-expanded"
-                              src={this.getImage()}
-                            />
+                            {isYoutubeVideo(post.url) ? (
+                              <iframe
+                                style="max-width:100%"
+                                type="text/html"
+                                width="640"
+                                height="360"
+                                src={
+                                  'https://www.youtube.com/embed/' +
+                                  getYoutubeID(post.url)
+                                }
+                                frameborder="0"
+                              ></iframe>
+                            ) : (
+                              <img
+                                class="img-fluid img-expanded"
+                                src={this.getImage()}
+                              />
+                            )}
                           </span>
                         </div>
                       </span>
