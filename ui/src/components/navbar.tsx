@@ -1,5 +1,5 @@
 import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import { Link, withRouter } from 'inferno-router';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { WebSocketService, UserService } from '../services';
@@ -44,7 +44,7 @@ interface NavbarState {
   admins: Array<UserView>;
 }
 
-export class Navbar extends Component<any, NavbarState> {
+class UnwrappedNavbar extends Component<any, NavbarState> {
   private wsSub: Subscription;
   private userSub: Subscription;
   emptyState: NavbarState = {
@@ -91,6 +91,13 @@ export class Navbar extends Component<any, NavbarState> {
 
   render() {
     return this.navbar();
+  }
+
+  // when the route is changed, close the navbar
+  componentDidUpdate(_lastProps: any) {
+    if (_lastProps.location.pathname !== this.props.location.pathname) {
+      this.setState({ expanded: false });
+    }
   }
 
   componentWillUnmount() {
@@ -426,3 +433,5 @@ export class Navbar extends Component<any, NavbarState> {
     }
   }
 }
+
+export const Navbar = withRouter(UnwrappedNavbar);
