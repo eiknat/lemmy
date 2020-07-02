@@ -127,7 +127,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     return (
       <div
         className={`comment ${
-          node.comment.parent_id && !this.props.noIndent ? 'ml-1' : ''
+          node.comment.parent_id && !this.props.noIndent ? 'ml-2' : ''
         }`}
       >
         <div
