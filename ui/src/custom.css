@@ -26,3 +26,8 @@ html, body, * {
     font-size: 16px !important;
   }
 }
+
+/* make sure long titles get broken up so they don't break mobile layout */
+a.text-body {
+  word-break: break-word;
+}
