@@ -21,6 +21,7 @@ import { Search } from './components/search';
 import { Sponsors } from './components/sponsors';
 import { Symbols } from './components/symbols';
 import { i18n } from './i18next';
+import './custom.css';
 
 const container = document.getElementById('app');
 
