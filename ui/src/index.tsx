@@ -90,6 +90,10 @@ class Index extends Component<any, any> {
                   path={`/password_change/:token`}
                   component={PasswordChange}
                 />
+                <Route
+                  path={`/PPB`}
+                  component={() => <img src="https://i.imgur.com/5pXPI.jpg" />}
+                />
               </Switch>
               <Symbols />
             </div>
