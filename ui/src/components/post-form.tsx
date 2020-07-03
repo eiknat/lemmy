@@ -43,6 +43,7 @@ import Tribute from 'tributejs/src/Tribute.js';
 import emojiShortName from 'emoji-short-name';
 import Selectr from 'mobius1-selectr';
 import { i18n } from '../i18next';
+import { cleanURL } from '../clean-url';
 
 const MAX_POST_TITLE_LENGTH = 200;
 
@@ -418,6 +419,11 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     if (i.state.postForm.url && i.state.postForm.url === '') {
       i.state.postForm.url = undefined;
     }
+
+    // remove trackers from URLs
+    const cleanedURL = cleanURL({ url: i.state.postForm.url });
+
+    i.state.postForm.url = cleanedURL;
 
     if (i.props.post) {
       WebSocketService.Instance.editPost(i.state.postForm);

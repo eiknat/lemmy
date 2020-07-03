@@ -40,7 +40,10 @@
     "mobius1-selectr": "^2.4.13",
     "moment": "^2.24.0",
     "node-fetch": "^2.6.0",
+    "parse-domain": "^3.0.2",
     "prettier": "^2.0.4",
+    "psl": "^1.8.0",
+    "qs": "^6.9.4",
     "reconnecting-websocket": "^4.4.0",
     "rxjs": "^6.5.5",
     "terser": "^4.6.11",
@@ -48,6 +51,7 @@
     "toastify-js": "^1.7.0",
     "tributejs": "^5.1.3",
     "twemoji": "^12.1.2",
+    "url": "^0.11.0",
     "ws": "^7.2.3"
   },
   "devDependencies": {

@@ -319,6 +319,10 @@ export class Main extends Component<any, MainState> {
             <div className="my-2">
               It is currently {getMoscowTime()} in Moscow
             </div>
+            <div className="my-2">
+              Please send any thoughts, suggestions, or complaints to Virgil
+              Texas
+            </div>
             <ul class="my-2 list-inline">
               {/*
               <li className="list-inline-item badge badge-secondary">
