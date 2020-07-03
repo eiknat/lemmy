@@ -291,7 +291,7 @@ export class Main extends Component<any, MainState> {
               src="/static/assets/logo.png"
               alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
             />
-            <sub>Logo courtesy of ancestral potato</sub>
+            <sub>Logo courtesy of Ancestral Potato</sub>
             <h5 class="mb-0">{`${this.state.siteRes.site.name}`}</h5>
             {this.canAdmin && (
               <ul class="list-inline mb-1 text-muted font-weight-bold">
