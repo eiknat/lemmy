@@ -109,6 +109,13 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   navbar() {
     return (
       <nav class="container-fluid navbar navbar-expand-md navbar-light shadow p-0 px-3">
+        <a class="navbar-brand" href="/">
+          <img
+              src="/static/assets/logo.png"
+              class="icon icon-navbar"
+              alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
+          />
+        </a>
         <Link title={version} class="navbar-brand" to="/">
           {this.state.siteName}
         </Link>
