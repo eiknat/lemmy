@@ -233,5 +233,6 @@
     "no_private_message_edit_allowed":
       "Sense permisos per a editar el missatge privat.",
     "couldnt_update_private_message":
-      "No s'ha pogut actualitzar el missatge privat."
+      "No s'ha pogut actualitzar el missatge privat.",
+    "invalid_login_credentials": "Les credencials d'inici de sessió no són vàlides"
 }
