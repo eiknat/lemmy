@@ -28,8 +28,7 @@ import {
   isMod,
   isImage,
   isVideo,
-  isYoutubeVideo,
-  getYoutubeID,
+  isValidEmbed,
   getUnixTime,
   pictrsImage,
   setupTippy,
@@ -162,17 +161,6 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     );
   }
 
-  youtubeThumb(src: string) {
-    let post = this.props.post;
-    let videoID = getYoutubeID(src);
-    return (
-      <img
-        className={`img-fluid thumbnail rounded`}
-        src={'https://img.youtube.com/vi/' + videoID + '/default.jpg'} //get thumb from youtube
-      />
-    );
-  }
-
   getImage(thumbnail: boolean = false) {
     let post = this.props.post;
     if (isImage(post.url)) {
@@ -204,32 +192,46 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
           </svg>
         </span>
       );
-    } else if (isYoutubeVideo(post.url)) {
+    } else if (post.thumbnail_url) {
+      return (
+        <>
+          {post.embed_html !== null && isValidEmbed(post.url) ? (
+            <span
+              class="text-body pointer"
+              data-tippy-content={i18n.t('expand_here')}
+              onClick={linkEvent(this, this.handleImageExpandClick)}
+            >
+              {this.imgThumb(this.getImage(true))}
+              <svg class="icon mini-overlay">
+                <use xlinkHref="#icon-external-link"></use>
+              </svg>
+            </span>
+          ) : (
+            <a
+              className="text-body"
+              href={post.url}
+              target="_blank"
+              title={post.url}
+            >
+              {this.imgThumb(this.getImage(true))}
+              <svg class="icon mini-overlay">
+                <use xlinkHref="#icon-external-link"></use>
+              </svg>
+            </a>
+          )}
+        </>
+      );
+    } else if (post.embed_html !== null && isValidEmbed(post.url)) {
       return (
         <span
           class="text-body pointer"
           data-tippy-content={i18n.t('expand_here')}
           onClick={linkEvent(this, this.handleImageExpandClick)}
         >
-          {this.youtubeThumb(post.url)}
-          <svg class="icon mini-overlay">
-            <use xlinkHref="#icon-image"></use>
-          </svg>
-        </span>
-      );
-    } else if (post.thumbnail_url) {
-      return (
-        <a
-          className="text-body"
-          href={post.url}
-          target="_blank"
-          title={post.url}
-        >
-          {this.imgThumb(this.getImage(true))}
-          <svg class="icon mini-overlay">
+          <svg class="icon thumbnail">
             <use xlinkHref="#icon-external-link"></use>
           </svg>
-        </a>
+        </span>
       );
     } else if (post.url) {
       if (isVideo(post.url)) {
@@ -358,7 +360,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                   </small>
                 )}
                 {(isImage(post.url) ||
-                  post.embed_html !== null ||
+                  (post.embed_html !== null && isValidEmbed(post.url)) ||
                   this.props.post.thumbnail_url) && (
                   <>
                     {console.log(post.embed_html)}
@@ -390,7 +392,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                               this.handleImageExpandClick
                             )}
                           >
-                            {post.embed_html !== null ? (
+                            {post.embed_html !== null &&
+                            isValidEmbed(post.url) ? (
                               <div
                                 dangerouslySetInnerHTML={{
                                   __html: post.embed_html,
