@@ -22,7 +22,7 @@ html, body, * {
 
   /* Make minimum text size for inputs 16px so it doesn't zoom in on mobile iOS */
 
-  input, textarea {
+  input, textarea, .custom-select-sm {
     font-size: 16px !important;
   }
 }
