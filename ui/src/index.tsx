@@ -100,12 +100,7 @@ class Index extends Component<any, any> {
                   path={`/password_change/:token`}
                   component={PasswordChange}
                 />
-                <Route path="*">
-                  <img
-                    src="https://cdn.discordapp.com/attachments/727577169370415295/728422229246869514/glitchbear.png"
-                    className="img-fluid"
-                  />
-                </Route>
+                <Route path="*" component={PPB} />
               </Switch>
               <Symbols />
             </div>
