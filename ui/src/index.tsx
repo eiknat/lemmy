@@ -40,6 +40,16 @@ class Index extends Component<any, any> {
               <Switch>
                 <Route exact path={`/`} component={Main} />
                 <Route
+                  exact
+                  path={`/ppb`}
+                  component={() => (
+                    <img
+                      src="https://i.imgur.com/5pXPI.jpg"
+                      alt="a pig that has pooped on its own balls"
+                    />
+                  )}
+                />
+                <Route
                   path={`/home/data_type/:data_type/listing_type/:listing_type/sort/:sort/page/:page`}
                   component={Main}
                 />
@@ -89,15 +99,6 @@ class Index extends Component<any, any> {
                 <Route
                   path={`/password_change/:token`}
                   component={PasswordChange}
-                />
-                <Route
-                  path={`/PPB`}
-                  component={() => (
-                    <img
-                      src="https://i.imgur.com/5pXPI.jpg"
-                      alt="a pig that has pooped on its own balls"
-                    />
-                  )}
                 />
               </Switch>
               <Symbols />

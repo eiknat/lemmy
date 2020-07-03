@@ -70,6 +70,19 @@ interface MainState {
   page: number;
 }
 
+function getMoscowTime() {
+  const localDate = new Date();
+
+  const utc = localDate.getTime() + localDate.getTimezoneOffset() * 60000;
+
+  // create new Date object for different city
+  // using supplied offset
+  const moscowTime = new Date(utc + 3600000 * 3);
+  return moscowTime.toLocaleString().split(', ')[1];
+}
+
+console.log(getMoscowTime());
+
 export class Main extends Component<any, MainState> {
   private subscription: Subscription;
   private emptyState: MainState = {
@@ -272,6 +285,10 @@ export class Main extends Component<any, MainState> {
         <div class="card border-secondary mb-3">
           <div class="card-body">
             <img
+              src="https://www.cameronsworld.net/img/content/15/37.gif"
+              className="m-4 img-fluid"
+            />
+            <img
               className="img-fluid mb-2"
               src="/static/assets/logo.png"
               alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
@@ -293,6 +310,13 @@ export class Main extends Component<any, MainState> {
                 </li>
               </ul>
             )}
+            <img
+              src="https://www.cameronsworld.net/img/content/22/left-side/12.gif"
+              className="img-fluid"
+            />
+            <div className="my-2">
+              It is currently {getMoscowTime()} in Moscow
+            </div>
             <ul class="my-2 list-inline">
               {/*
               <li className="list-inline-item badge badge-secondary">
