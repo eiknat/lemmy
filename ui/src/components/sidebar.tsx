@@ -71,7 +71,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
       link = community.actor_id;
     }
     return (
-      <div>
+      <div className="sidebar-content">
         <div class="card border-secondary mb-3">
           <div class="card-body">
             <h5 className="mb-0">

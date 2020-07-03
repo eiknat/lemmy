@@ -318,13 +318,15 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             </button>
           )}
         </div>
-        <div class="col-3 col-sm-2 pr-0 mt-1 thumbnail-wrapper">
-          <div class="position-relative">{this.thumbnail()}</div>
-        </div>
+        {!this.state.imageExpanded && (
+          <div class="col-3 col-sm-2 pr-0 mt-1 thumbnail-wrapper">
+            <div class="position-relative">{this.thumbnail()}</div>
+          </div>
+        )}
         <div
           className={`${
-            this.state.imageExpanded ? 'col-sm-12 col-md-8 ' : 'col-8 col-sm-9'
-          } mt`}
+            this.state.imageExpanded ? 'col-sm-12 col-md-8' : 'col-8 col-sm-9'
+          } mt post-content`}
         >
           <div class="row">
             <div className="col-12">
