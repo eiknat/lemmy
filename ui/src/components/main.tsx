@@ -81,8 +81,6 @@ function getMoscowTime() {
   return moscowTime.toLocaleString().split(', ')[1];
 }
 
-console.log(getMoscowTime());
-
 export class Main extends Component<any, MainState> {
   private subscription: Subscription;
   private emptyState: MainState = {
@@ -171,7 +169,7 @@ export class Main extends Component<any, MainState> {
 
   render() {
     return (
-      <div class="container">
+      <div class="container" style={{ 'max-width': '100%' }}>
         <div class="row">
           <main role="main" class="col-12 col-md-8">
             {this.posts()}

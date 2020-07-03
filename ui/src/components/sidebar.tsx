@@ -341,7 +341,6 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
   }
 
   handleModRemoveExpiresChange(i: Sidebar, event: any) {
-    console.log(event.target.value);
     i.state.removeExpires = event.target.value;
     i.setState(i.state);
   }
