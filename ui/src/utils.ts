@@ -256,7 +256,6 @@ export function isVideo(url: string) {
 }
 
 export function isValidEmbed(url: string) {
-  console.log('checking ' + url + ' for invalid embed');
   return !embedRegex.test(url);
 }
 
