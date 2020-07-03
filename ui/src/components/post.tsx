@@ -174,7 +174,7 @@ export class Post extends Component<any, PostState> {
           </h5>
         ) : (
           <div class="row">
-            <div class="col-12 col-md-8 mb-3">
+            <div class="col-12 col-md-8 mb-3 main-content">
               <PostListing
                 post={this.state.post}
                 showBody
@@ -190,7 +190,7 @@ export class Post extends Component<any, PostState> {
               {this.state.comments.length > 0 && this.sortRadios()}
               {this.commentsTree()}
             </div>
-            <div class="col-12 col-sm-12 col-md-4">
+            <div class="flex-1">
               {this.state.comments.length > 0 && this.newComments()}
               {this.sidebar()}
             </div>
