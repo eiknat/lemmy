@@ -271,6 +271,12 @@ export class Main extends Component<any, MainState> {
       <div>
         <div class="card border-secondary mb-3">
           <div class="card-body">
+            <img
+              className="img-fluid mb-2"
+              src="/static/assets/logo.png"
+              alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
+            />
+            <sub>Logo courtesy of ancestral potato</sub>
             <h5 class="mb-0">{`${this.state.siteRes.site.name}`}</h5>
             {this.canAdmin && (
               <ul class="list-inline mb-1 text-muted font-weight-bold">
@@ -362,9 +368,7 @@ export class Main extends Component<any, MainState> {
             <svg class="icon mx-2">
               <use xlinkHref="#icon-mouse">#</use>
             </svg>
-            <a href={repoUrl}>
-              Lemmy
-            </a>
+            <a href={repoUrl}>Lemmy</a>
           </h5>
           <p class="mb-0">
             <T i18nKey="landing_0">

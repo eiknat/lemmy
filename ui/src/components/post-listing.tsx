@@ -313,13 +313,13 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             </button>
           )}
         </div>
-        {!this.state.imageExpanded && (
-          <div class="col-3 col-sm-2 pr-0 mt-1">
-            <div class="position-relative">{this.thumbnail()}</div>
-          </div>
-        )}
+        <div class="col-3 col-sm-2 pr-0 mt-1">
+          <div class="position-relative">{this.thumbnail()}</div>
+        </div>
         <div
-          class={`${this.state.imageExpanded ? 'col-12' : 'col-8 col-sm-9'}`}
+          class={`${
+            this.state.imageExpanded ? 'col-12' : 'col-8 col-sm-9'
+          } mt-2`}
         >
           <div class="row">
             <div className="col-12">
@@ -370,9 +370,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         data-tippy-content={i18n.t('expand_here')}
                         onClick={linkEvent(this, this.handleImageExpandClick)}
                       >
-                        <svg class="icon icon-inline">
-                          <use xlinkHref="#icon-plus-square"></use>
-                        </svg>
+                        {/* keeping this for accessibility reasons */}
                       </span>
                     ) : (
                       <span>
@@ -380,9 +378,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                           class="text-monospace unselectable pointer ml-2 text-muted small"
                           onClick={linkEvent(this, this.handleImageExpandClick)}
                         >
-                          <svg class="icon icon-inline">
-                            <use xlinkHref="#icon-minus-square"></use>
-                          </svg>
+                          {/* keeping this for accessibility reasons */}
                         </span>
                         <div>
                           <span
