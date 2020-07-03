@@ -174,7 +174,7 @@ export class Main extends Component<any, MainState> {
           <main role="main" class="col-12 col-md-8">
             {this.posts()}
           </main>
-          <aside class="col-12 col-md-4">{this.my_sidebar()}</aside>
+          <aside class="col-12 col-md-4 sidebar">{this.my_sidebar()}</aside>
         </div>
       </div>
     );

@@ -31,3 +31,19 @@ html, body, * {
 a.text-body {
   word-break: break-word;
 }
+
+@media (min-width: 992px) {
+  .container {
+    max-width: 100%;
+  }
+
+  aside.sidebar {
+    max-width: 300px;
+  }
+
+  main[role="main"] {
+    flex: 1;
+    width: 100%;
+    max-width: 100%;
+  }
+}
