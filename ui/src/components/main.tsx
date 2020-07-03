@@ -311,6 +311,10 @@ export class Main extends Component<any, MainState> {
               </ul>
             )}
             <img
+              src="https://pbs.twimg.com/media/CQAeJOtUwAEVx54?format=jpg&name=240x240"
+              className="my-3 img-fluid"
+            />
+            <img
               src="https://www.cameronsworld.net/img/content/22/left-side/12.gif"
               className="img-fluid"
             />
