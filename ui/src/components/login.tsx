@@ -253,6 +253,12 @@ export class Login extends Component<any, State> {
   handleLoginSubmit(i: Login, event: any) {
     event.preventDefault();
     i.state.loginLoading = true;
+    i.state.loginForm.username_or_email = document.getElementById(
+      'login-email-or-username'
+    ).value;
+    i.state.loginForm.password = document.getElementById(
+      'login-password'
+    ).value;
     i.setState(i.state);
     WebSocketService.Instance.login(i.state.loginForm);
   }
