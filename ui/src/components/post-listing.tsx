@@ -318,7 +318,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             </button>
           )}
         </div>
-        {!this.state.imageExpanded && (
+        {/* show thumbnail when not expanded or content is a video */}
+        {(!this.state.imageExpanded ||
+          isVideo(post.url) ||
+          post.url.includes('youtube.com')) && (
           <div class="col-3 col-sm-2 pr-0 mt-1 thumbnail-wrapper">
             <div class="position-relative">{this.thumbnail()}</div>
           </div>
