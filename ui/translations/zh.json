@@ -241,5 +241,6 @@
     "banned_users": "被禁止用户",
     "site_saved": "网站已保存",
     "emoji_picker": "选择表情",
-    "invalid_username": "用户名无效"
+    "invalid_username": "用户名无效",
+    "invalid_login_credentials": "無效的登錄憑證"
 }

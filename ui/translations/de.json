@@ -251,5 +251,6 @@
     "number_of_upvotes": "{{count}} Stimme",
     "number_of_upvotes_plural": "{{count}} Stimmen",
     "number_of_downvotes": "{{count}} Gegenstimme",
-    "number_of_downvotes_plural": "{{count}} Gegenstimmen"
+    "number_of_downvotes_plural": "{{count}} Gegenstimmen",
+    "invalid_login_credentials": "Ungültige Login-Details"
 }
