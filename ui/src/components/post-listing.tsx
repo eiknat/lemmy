@@ -323,8 +323,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
         </div>
         <div
           className={`${
-            this.state.imageExpanded ? 'col-sm-12 col-md-8 ' : 'col-8 col-sm-9'
-          } mt`}
+            this.state.imageExpanded ? 'col-sm-12 col-md-8' : 'col-8 col-sm-9'
+          } mt post-content`}
         >
           <div class="row">
             <div className="col-12">
