@@ -318,13 +318,14 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             </button>
           )}
         </div>
-        <div class="col-3 col-sm-2 pr-0 mt-1">
+        <div class="col-3 col-sm-2 pr-0 mt-1 thumbnail-wrapper">
           <div class="position-relative">{this.thumbnail()}</div>
         </div>
         <div
-          class={`${
-            this.state.imageExpanded ? 'col-12' : 'col-8 col-sm-9'
-          } mt-2`}
+          // class={`${
+          //   this.state.imageExpanded ? 'col-12' : 'col-8 col-sm-9'
+          // } mt-2`}
+          className="col-8 col-sm-9 mt-2"
         >
           <div class="row">
             <div className="col-12">
@@ -368,7 +369,6 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                   (post.embed_html !== null && isValidEmbed(post.url)) ||
                   this.props.post.thumbnail_url) && (
                   <>
-                    {console.log(post.embed_html)}
                     {!this.state.imageExpanded ? (
                       <span
                         class="text-monospace unselectable pointer ml-2 text-muted small"
