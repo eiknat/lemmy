@@ -52,3 +52,23 @@ a.text-body {
   }
 }
 
+.post-content {
+  flex: 1;
+}
+
+.vote-bar {
+  max-width: 75px;
+}
+
+.sidebar-content {
+  max-width: 300px;
+  flex: 1;
+  padding: 0 15px;
+}
+
+.main-content {
+  /* display: flex; */
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+}
