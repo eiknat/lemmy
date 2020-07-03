@@ -95,6 +95,11 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     this.handleEditCancel = this.handleEditCancel.bind(this);
   }
 
+  componentWillMount() {
+    // scroll to top of page when loading post listing
+    window.scrollTo(0, 0);
+  }
+
   componentWillReceiveProps(nextProps: PostListingProps) {
     this.state.my_vote = nextProps.post.my_vote;
     this.state.upvotes = nextProps.post.upvotes;
