@@ -321,12 +321,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
         <div class="col-3 col-sm-2 pr-0 mt-1 thumbnail-wrapper">
           <div class="position-relative">{this.thumbnail()}</div>
         </div>
-        <div
-          // class={`${
-          //   this.state.imageExpanded ? 'col-12' : 'col-8 col-sm-9'
-          // } mt-2`}
-          className="col-8 col-sm-9 mt-2"
-        >
+        <div className="col-8 col-sm-9 mt-2">
           <div class="row">
             <div className="col-12">
               <div className="post-title">
