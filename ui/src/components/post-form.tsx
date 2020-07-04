@@ -199,7 +199,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                   htmlFor="file-upload"
                   className={`${
                     UserService.Instance.user && 'pointer'
-                  } d-inline-block float-right text-muted font-weight-bold`}
+                  } d-inline-block float-right text-muted font-weight-bold image-upload-icon m-0`}
                   data-tippy-content={i18n.t('upload_image')}
                 >
                   <svg class="icon icon-inline">

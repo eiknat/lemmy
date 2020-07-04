@@ -149,6 +149,20 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
             }`}
           >
             <div class="d-flex flex-wrap align-items-center text-muted small">
+              <div
+                className="unselectable pointer mr-2 comment-expand-button"
+                onClick={linkEvent(this, this.handleCommentCollapse)}
+              >
+                {this.state.collapsed ? (
+                  <svg class="icon icon-inline">
+                    <use xlinkHref="#icon-plus-square"></use>
+                  </svg>
+                ) : (
+                  <svg class="icon icon-inline">
+                    <use xlinkHref="#icon-minus-square"></use>
+                  </svg>
+                )}
+              </div>
               <span class="mr-2">
                 <UserListing
                   user={{
@@ -188,20 +202,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   </Link>
                 </>
               )}
-              <div
-                className="mr-lg-4 flex-grow-1 flex-lg-grow-0 unselectable pointer mx-2"
-                onClick={linkEvent(this, this.handleCommentCollapse)}
-              >
-                {this.state.collapsed ? (
-                  <svg class="icon icon-inline">
-                    <use xlinkHref="#icon-plus-square"></use>
-                  </svg>
-                ) : (
-                  <svg class="icon icon-inline">
-                    <use xlinkHref="#icon-minus-square"></use>
-                  </svg>
-                )}
-              </div>
+
               <span
                 className={`unselectable pointer ${this.scoreColor}`}
                 onClick={linkEvent(node, this.handleCommentUpvote)}
