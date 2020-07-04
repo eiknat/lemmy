@@ -389,7 +389,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         >
                           {/* keeping this for accessibility reasons */}
                         </span>
-                        <div class="embed-post">
+                        <div>
                           <span
                             class="pointer"
                             onClick={linkEvent(
