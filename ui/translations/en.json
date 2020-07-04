@@ -264,5 +264,6 @@
     "time": "Time",
     "action": "Action",
     "emoji_picker": "Emoji Picker",
-    "block_leaving": "Are you sure you want to leave?"
+    "block_leaving": "Are you sure you want to leave?",
+    "invalid_login_credentials": "Invalid login credentials."
 }

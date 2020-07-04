@@ -248,6 +248,8 @@ const youtubeRegex = new RegExp(
   /https?:\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-]*)(&(amp;)?[\w=]*)?/
 );
 
+const embedRegex = new RegExp(/(gist.github.com)/); //used to block iframely embeds from certain sites e.g. gist.github.com
+
 export function isImage(url: string) {
   return imageRegex.test(url);
 }
@@ -256,12 +258,8 @@ export function isVideo(url: string) {
   return videoRegex.test(url);
 }
 
-export function isYoutubeVideo(url: string) {
-  return youtubeRegex.test(url);
-}
-
-export function getYoutubeID(url: string) {
-  return youtubeRegex.exec(url)[1];
+export function isValidEmbed(url: string) {
+  return !embedRegex.test(url);
 }
 
 export function validURL(str: string) {

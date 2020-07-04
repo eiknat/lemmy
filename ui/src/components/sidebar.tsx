@@ -71,7 +71,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
       link = community.actor_id;
     }
     return (
-      <div>
+      <div className="sidebar-content">
         <div class="card border-secondary mb-3">
           <div class="card-body">
             <h5 className="mb-0">
@@ -341,7 +341,6 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
   }
 
   handleModRemoveExpiresChange(i: Sidebar, event: any) {
-    console.log(event.target.value);
     i.state.removeExpires = event.target.value;
     i.setState(i.state);
   }

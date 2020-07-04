@@ -70,6 +70,17 @@ interface MainState {
   page: number;
 }
 
+function getMoscowTime() {
+  const localDate = new Date();
+
+  const utc = localDate.getTime() + localDate.getTimezoneOffset() * 60000;
+
+  // create new Date object for different city
+  // using supplied offset
+  const moscowTime = new Date(utc + 3600000 * 3);
+  return moscowTime.toLocaleString().split(', ')[1];
+}
+
 export class Main extends Component<any, MainState> {
   private subscription: Subscription;
   private emptyState: MainState = {
@@ -158,12 +169,12 @@ export class Main extends Component<any, MainState> {
 
   render() {
     return (
-      <div class="container">
+      <div class="container" style={{ 'max-width': '100%' }}>
         <div class="row">
           <main role="main" class="col-12 col-md-8">
             {this.posts()}
           </main>
-          <aside class="col-12 col-md-4">{this.my_sidebar()}</aside>
+          <aside class="col-12 col-md-4 sidebar">{this.my_sidebar()}</aside>
         </div>
       </div>
     );
@@ -272,11 +283,15 @@ export class Main extends Component<any, MainState> {
         <div class="card border-secondary mb-3">
           <div class="card-body">
             <img
+              src="https://www.cameronsworld.net/img/content/15/37.gif"
+              className="m-4 img-fluid"
+            />
+            <img
               className="img-fluid mb-2"
               src="/static/assets/logo.png"
               alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
             />
-            <sub>Logo courtesy of ancestral potato</sub>
+            <sub>Logo courtesy of Ancestral Potato</sub>
             <h5 class="mb-0">{`${this.state.siteRes.site.name}`}</h5>
             {this.canAdmin && (
               <ul class="list-inline mb-1 text-muted font-weight-bold">
@@ -293,6 +308,17 @@ export class Main extends Component<any, MainState> {
                 </li>
               </ul>
             )}
+            <img
+              src="https://pbs.twimg.com/media/CQAeJOtUwAEVx54?format=jpg&name=240x240"
+              className="my-3 img-fluid"
+            />
+            <img
+              src="https://www.cameronsworld.net/img/content/22/left-side/12.gif"
+              className="img-fluid"
+            />
+            <div className="my-2">
+              It is currently {getMoscowTime()} in Moscow
+            </div>
             <ul class="my-2 list-inline">
               {/*
               <li className="list-inline-item badge badge-secondary">

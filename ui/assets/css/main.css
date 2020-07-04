@@ -99,6 +99,11 @@
   user-select: none;
 }
 
+.icon-navbar {
+  width: 1.5em;
+  height: 1.5em;
+}
+
 .icon-inline {
   margin-bottom: 2px;
 }

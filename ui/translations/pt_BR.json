@@ -256,5 +256,6 @@
     "site_saved": "Site Salvo.",
     "emoji_picker": "Selecionador de Emoji",
     "select_a_community": "Selecione uma comunidade",
-    "invalid_username": "Nome de usuário inválido."
+    "invalid_username": "Nome de usuário inválido.",
+    "invalid_login_credentials": "Credenciais de login inválidas."
 }

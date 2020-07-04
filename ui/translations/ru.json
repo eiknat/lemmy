@@ -265,5 +265,6 @@
     "monero": "Monero",
     "emoji_picker": "Сборщик эмодзи",
     "select_a_community": "Выбрать сообщество",
-    "invalid_username": "Неверное имя пользователя."
+    "invalid_username": "Неверное имя пользователя.",
+    "invalid_login_credentials": "Неверные логин или пароль."
 }

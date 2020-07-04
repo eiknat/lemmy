@@ -256,5 +256,6 @@
     "action": "Δράση",
     "emoji_picker": "Διαλογέας emoji",
     "block_leaving": "Είστε σίγουρος ότι θέλετε να φύγετε;",
-    "invalid_username": "Λάθος όνομα χρήστη."
+    "invalid_username": "Λάθος όνομα χρήστη.",
+    "invalid_login_credentials": "Μη έγκυρα διαπιστευτήρια σύνδεσης."
 }

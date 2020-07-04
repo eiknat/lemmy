@@ -25,6 +25,15 @@ import './custom.css';
 
 const container = document.getElementById('app');
 
+function PPB() {
+  return (
+    <img
+      src="https://i.imgur.com/5pXPI.jpg"
+      alt="a pig that has pooped on its own balls"
+    />
+  );
+}
+
 class Index extends Component<any, any> {
   constructor(props: any, context: any) {
     super(props, context);
@@ -39,6 +48,7 @@ class Index extends Component<any, any> {
             <div class="mt-4 p-0 fl-1">
               <Switch>
                 <Route exact path={`/`} component={Main} />
+                <Route path={`/ppb`} component={PPB} />
                 <Route
                   path={`/home/data_type/:data_type/listing_type/:listing_type/sort/:sort/page/:page`}
                   component={Main}
@@ -90,15 +100,12 @@ class Index extends Component<any, any> {
                   path={`/password_change/:token`}
                   component={PasswordChange}
                 />
-                <Route
-                  path={`/PPB`}
-                  component={() => (
-                    <img
-                      src="https://i.imgur.com/5pXPI.jpg"
-                      alt="a pig that has pooped on its own balls"
-                    />
-                  )}
-                />
+                <Route path="*">
+                  <img
+                    src="https://cdn.discordapp.com/attachments/727577169370415295/728422229246869514/glitchbear.png"
+                    className="img-fluid"
+                  />
+                </Route>
               </Switch>
               <Symbols />
             </div>

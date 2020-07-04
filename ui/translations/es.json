@@ -256,5 +256,6 @@
     "invalid_username": "Nombre de usuario inválido.",
     "invalid_community_name": "Nombre inválido.",
     "click_to_delete_picture": "Haz click para eliminar la imagen.",
-    "picture_deleted": "Foto eliminada."
+    "picture_deleted": "Foto eliminada.",
+    "invalid_login_credentials": "Credenciales de acceso invalidos."
 }

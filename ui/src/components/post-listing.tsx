@@ -28,8 +28,7 @@ import {
   isMod,
   isImage,
   isVideo,
-  isYoutubeVideo,
-  getYoutubeID,
+  isValidEmbed,
   getUnixTime,
   pictrsImage,
   setupTippy,
@@ -95,6 +94,11 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     this.handleEditCancel = this.handleEditCancel.bind(this);
   }
 
+  componentWillMount() {
+    // scroll to top of page when loading post listing
+    window.scrollTo(0, 0);
+  }
+
   componentWillReceiveProps(nextProps: PostListingProps) {
     this.state.my_vote = nextProps.post.my_vote;
     this.state.upvotes = nextProps.post.upvotes;
@@ -139,7 +143,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                 <pre>{this.props.post.body}</pre>
               ) : (
                 <div
-                  className="md-div"
+                  className="md-div post-listing-body"
                   dangerouslySetInnerHTML={mdToHtml(this.props.post.body)}
                 />
               )}
@@ -219,17 +223,44 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
       );
     } else if (post.thumbnail_url) {
       return (
-        <a
-          className="text-body"
-          href={post.url}
-          target="_blank"
-          title={post.url}
+        <>
+          {post.embed_html !== null && isValidEmbed(post.url) ? (
+            <span
+              class="text-body pointer"
+              data-tippy-content={i18n.t('expand_here')}
+              onClick={linkEvent(this, this.handleImageExpandClick)}
+            >
+              {this.imgThumb(this.getImage(true))}
+              <svg class="icon mini-overlay">
+                <use xlinkHref="#icon-external-link"></use>
+              </svg>
+            </span>
+          ) : (
+            <a
+              className="text-body"
+              href={post.url}
+              target="_blank"
+              title={post.url}
+            >
+              {this.imgThumb(this.getImage(true))}
+              <svg class="icon mini-overlay">
+                <use xlinkHref="#icon-external-link"></use>
+              </svg>
+            </a>
+          )}
+        </>
+      );
+    } else if (post.embed_html !== null && isValidEmbed(post.url)) {
+      return (
+        <span
+          class="text-body pointer"
+          data-tippy-content={i18n.t('expand_here')}
+          onClick={linkEvent(this, this.handleImageExpandClick)}
         >
-          {this.imgThumb(this.getImage(true))}
-          <svg class="icon mini-overlay">
+          <svg class="icon thumbnail">
             <use xlinkHref="#icon-external-link"></use>
           </svg>
-        </a>
+        </span>
       );
     } else if (post.url) {
       if (isVideo(post.url)) {
@@ -311,13 +342,18 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             </button>
           )}
         </div>
-        <div class="col-3 col-sm-2 pr-0 mt-1">
-          <div class="position-relative">{this.thumbnail()}</div>
-        </div>
+        {/* show thumbnail when not expanded or content is a video */}
+        {(!this.state.imageExpanded ||
+          isVideo(post.url) ||
+          post.url.includes('youtube.com')) && (
+          <div class="col-3 col-sm-2 pr-0 mt-1 thumbnail-wrapper">
+            <div class="position-relative">{this.thumbnail()}</div>
+          </div>
+        )}
         <div
-          class={`${
-            this.state.imageExpanded ? 'col-12' : 'col-8 col-sm-9'
-          } mt-2`}
+          className={`${
+            this.state.imageExpanded ? 'col-sm-12 col-md-8' : 'col-8 col-sm-9'
+          } mt post-content`}
         >
           <div class="row">
             <div className="col-12">
@@ -358,7 +394,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                   </small>
                 )}
                 {(isImage(post.url) ||
-                  isYoutubeVideo(post.url) ||
+                  (post.embed_html !== null && isValidEmbed(post.url)) ||
                   this.props.post.thumbnail_url) && (
                   <>
                     {!this.state.imageExpanded ? (
@@ -385,18 +421,13 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                               this.handleImageExpandClick
                             )}
                           >
-                            {isYoutubeVideo(post.url) ? (
-                              <iframe
-                                style="max-width:100%;margin-top: 10px"
-                                type="text/html"
-                                width="640"
-                                height="360"
-                                src={
-                                  'https://www.youtube.com/embed/' +
-                                  getYoutubeID(post.url)
-                                }
-                                frameborder="0"
-                              ></iframe>
+                            {post.embed_html !== null &&
+                            isValidEmbed(post.url) ? (
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: post.embed_html,
+                                }}
+                              />
                             ) : (
                               <img
                                 class="img-fluid img-expanded"
