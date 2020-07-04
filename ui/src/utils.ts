@@ -244,9 +244,6 @@ const imageRegex = new RegExp(
   /(http)?s?:?(\/\/[^"']*\.(?:jpg|jpeg|gif|png|svg|webp))/
 );
 const videoRegex = new RegExp(`(http)?s?:?(\/\/[^"']*\.(?:mp4))`);
-const youtubeRegex = new RegExp(
-  /https?:\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-]*)(&(amp;)?[\w=]*)?/
-);
 
 const embedRegex = new RegExp(/(gist.github.com)/); //used to block iframely embeds from certain sites e.g. gist.github.com
 
