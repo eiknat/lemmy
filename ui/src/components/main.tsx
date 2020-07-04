@@ -282,10 +282,7 @@ export class Main extends Component<any, MainState> {
       <div>
         <div class="card border-secondary mb-3">
           <div class="card-body">
-            <img
-              src="https://www.cameronsworld.net/img/content/15/37.gif"
-              className="m-4 img-fluid"
-            />
+            <img src="/static/assets/welcome.gif" className="m-4 img-fluid" />
             <img
               className="img-fluid mb-2"
               src="/static/assets/logo.png"
@@ -308,14 +305,8 @@ export class Main extends Component<any, MainState> {
                 </li>
               </ul>
             )}
-            <img
-              src="https://pbs.twimg.com/media/CQAeJOtUwAEVx54?format=jpg&name=240x240"
-              className="my-3 img-fluid"
-            />
-            <img
-              src="https://www.cameronsworld.net/img/content/22/left-side/12.gif"
-              className="img-fluid"
-            />
+            <img src="/static/assets/warning.jpg" className="my-3 img-fluid" />
+            <img src="/static/assets/construction.gif" className="img-fluid" />
             <div className="my-2">
               It is currently {getMoscowTime()} in Moscow
             </div>
