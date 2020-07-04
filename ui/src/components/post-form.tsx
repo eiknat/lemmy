@@ -443,7 +443,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     i.fetchPageTitle();
   }
 
-  fetchPageTitle() {
+  async fetchPageTitle() {
     if (validURL(this.state.postForm.url)) {
       let form: SearchForm = {
         q: this.state.postForm.url,
@@ -456,10 +456,11 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       WebSocketService.Instance.search(form);
 
       // Fetch the page title
-      getPageTitle(this.state.postForm.url).then(d => {
-        this.state.suggestedTitle = d;
+      const title = await getPageTitle(this.state.postForm.url);
+      if (title !== null) {
+        this.state.suggestedTitle = title;
         this.setState(this.state);
-      });
+      }
     } else {
       this.state.suggestedTitle = undefined;
       this.state.crossPosts = [];

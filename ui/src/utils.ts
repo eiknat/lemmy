@@ -306,10 +306,13 @@ export function routeSearchTypeToEnum(type: string): SearchType {
   return SearchType[capitalizeFirstLetter(type)];
 }
 
-export async function getPageTitle(url: string) {
-  let res = await fetch(`/iframely/oembed?url=${url}`).then(res => res.json());
-  let title = await res.title;
-  return title;
+export async function getPageTitle(url: string | null) {
+  let res = await fetch(`/iframely/oembed?url=${url}`);
+  if (!res.ok) {
+    return null;
+  }
+  const json = await res.json();
+  return json.title;
 }
 
 export function debounce(
