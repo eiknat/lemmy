@@ -111,9 +111,9 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
       <nav class="container-fluid navbar navbar-expand-md navbar-light shadow p-0 px-3">
         <a class="navbar-brand" href="/">
           <img
-              src="/static/assets/logo.png"
-              class="icon icon-navbar"
-              alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
+            src="/static/assets/logo.png"
+            class="icon icon-navbar"
+            alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
           />
         </a>
         <Link title={version} class="navbar-brand" to="/">
@@ -195,11 +195,11 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
               </Link>
             </li>
           </ul>
-          <ul class="navbar-nav ml-auto">
+          <ul class="navbar-nav ml-auto navbar-right">
             {this.canAdmin && (
-              <li className="nav-item mt-1">
+              <li className="nav-item">
                 <Link
-                  class="nav-link"
+                  className="nav-link p-0 px-2 nav-icon"
                   to={`/admin`}
                   title={i18n.t('admin_settings')}
                 >
@@ -211,8 +211,12 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
             )}
             {this.state.isLoggedIn ? (
               <>
-                <li className="nav-item mt-1">
-                  <Link class="nav-link" to="/inbox" title={i18n.t('inbox')}>
+                <li className="nav-item">
+                  <Link
+                    class="nav-link p-0 px-2 nav-icon"
+                    to="/inbox"
+                    title={i18n.t('inbox')}
+                  >
                     <svg class="icon">
                       <use xlinkHref="#icon-bell"></use>
                     </svg>

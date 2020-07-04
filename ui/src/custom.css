@@ -78,3 +78,18 @@ a.text-body {
   padding: 15px;
   border-radius: 4px;
 }
+
+@media (min-width: 768px) {
+  .navbar-right {
+    display: flex;
+    align-items: center;
+  }
+  .navbar-right .nav-link {
+    padding: 0;
+  }
+
+  .navbar-right .nav-icon {
+    line-height: 1px;
+  }
+
+}
