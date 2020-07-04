@@ -264,5 +264,7 @@
     "time": "Time",
     "action": "Action",
     "emoji_picker": "Emoji Picker",
-    "block_leaving": "Are you sure you want to leave?"
+    "block_leaving": "Are you sure you want to leave?",
+    "email_required": "Email required",
+    "modlog_warning": "CONTENT WARNING: Some deleted posts may contain disturbing or adult material. Proceed with caution."
 }
