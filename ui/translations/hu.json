@@ -256,5 +256,6 @@
     "password_incorrect": "Rossz jelszó.",
     "passwords_dont_match": "A jelszavak nem egyeznek.",
     "invalid_username": "Érvénytelen felhasználónév.",
-    "user_already_exists": "A felhasználó már létezik."
+    "user_already_exists": "A felhasználó már létezik.",
+    "invalid_login_credentials": "Érvénytelen bejelentkezési hitelesítő adatok."
 }

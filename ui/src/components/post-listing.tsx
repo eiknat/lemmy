@@ -143,7 +143,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                 <pre>{this.props.post.body}</pre>
               ) : (
                 <div
-                  className="md-div"
+                  className="md-div post-listing-body"
                   dangerouslySetInnerHTML={mdToHtml(this.props.post.body)}
                 />
               )}

@@ -173,5 +173,6 @@
     "number_of_communities": "{{count}} Komunumo",
     "number_of_communities_plural": "{{count}} Komunumoj",
     "more": "pli",
-    "select_a_community": "Elekti komunumon"
+    "select_a_community": "Elekti komunumon",
+    "invalid_login_credentials": "Nevalidaj ensalutaj akreditaĵoj."
 }
