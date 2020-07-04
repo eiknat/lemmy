@@ -166,17 +166,6 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     );
   }
 
-  youtubeThumb(src: string) {
-    let post = this.props.post;
-    let videoID = getYoutubeID(src);
-    return (
-      <img
-        className={`img-fluid thumbnail rounded`}
-        src={'https://img.youtube.com/vi/' + videoID + '/default.jpg'} //get thumb from youtube
-      />
-    );
-  }
-
   getImage(thumbnail: boolean = false) {
     let post = this.props.post;
     if (isImage(post.url)) {
@@ -203,19 +192,6 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
           onClick={linkEvent(this, this.handleImageExpandClick)}
         >
           {this.imgThumb(this.getImage(true))}
-          <svg class="icon mini-overlay">
-            <use xlinkHref="#icon-image"></use>
-          </svg>
-        </span>
-      );
-    } else if (isYoutubeVideo(post.url)) {
-      return (
-        <span
-          class="text-body pointer"
-          data-tippy-content={i18n.t('expand_here')}
-          onClick={linkEvent(this, this.handleImageExpandClick)}
-        >
-          {this.youtubeThumb(post.url)}
           <svg class="icon mini-overlay">
             <use xlinkHref="#icon-image"></use>
           </svg>
@@ -588,7 +564,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     <svg class="mr-1 icon icon-inline">
                       <use xlinkHref="#icon-message-square"></use>
                     </svg>
-                    {post.number_of_comments}
+                    {post.number_of_comments} comments
                   </Link>
                 </li>
               </ul>
