@@ -564,7 +564,9 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     <svg class="mr-1 icon icon-inline">
                       <use xlinkHref="#icon-message-square"></use>
                     </svg>
-                    {post.number_of_comments} comments
+                    {i18n.t('number_of_comments', {
+                      count: post.number_of_comments,
+                    })}
                   </Link>
                 </li>
               </ul>
