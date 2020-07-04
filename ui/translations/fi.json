@@ -251,5 +251,6 @@
     "silver_sponsors": "Hopeasponsoreita ovat ne, jotka lupaavat 40 dollaria Lemmylle.",
     "post_title_too_long": "Viestin otsikko on liian pitkä.",
     "support_on_open_collective": "Tie OpenCollectivessa",
-    "site_saved": "Sivu tallennettu."
+    "site_saved": "Sivu tallennettu.",
+    "invalid_login_credentials": "Väärät kirjautumistiedot."
 }

@@ -100,6 +100,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
   componentDidMount() {
     var textarea: any = document.getElementById(this.id);
     autosize(textarea);
+    textarea.focus();
     this.tribute.attach(textarea);
     textarea.addEventListener('tribute-replaced', () => {
       this.state.commentForm.content = textarea.value;

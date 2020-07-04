@@ -189,5 +189,6 @@
     "admin_already_created": "Beklagar, men det finns redan en administratör.",
     "user_already_exists": "Användaren finns redan.",
     "couldnt_update_user": "Kunde inte uppdatera användare.",
-    "system_err_login": "Systemfel. Försök att logga ut och sedan in igen."
+    "system_err_login": "Systemfel. Försök att logga ut och sedan in igen.",
+    "invalid_login_credentials": "Ogiltiga inloggningsuppgifter."
 }

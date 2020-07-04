@@ -11,7 +11,7 @@ import {
   WebSocketJsonResponse,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
-import { wsJsonToRes, validEmail, toast } from '../utils';
+import { wsJsonToRes, validEmail, toast, setupTippy } from '../utils';
 import { i18n } from '../i18next';
 
 interface State {
@@ -56,6 +56,10 @@ export class Login extends Component<any, State> {
       );
 
     WebSocketService.Instance.getSite();
+  }
+
+  componentDidMount() {
+    setupTippy();
   }
 
   componentWillUnmount() {
@@ -110,14 +114,24 @@ export class Login extends Component<any, State> {
                 class="form-control"
                 required
               />
-              <button
-                type="button"
-                disabled={!validEmail(this.state.loginForm.username_or_email)}
-                onClick={linkEvent(this, this.handlePasswordReset)}
-                className="btn p-0 btn-link d-inline-block float-right text-muted small font-weight-bold"
-              >
-                {i18n.t('forgot_password')}
-              </button>
+              {!validEmail(this.state.loginForm.username_or_email) ? (
+                <button
+                  type="button"
+                  onClick={linkEvent(this, this.handleInvalidPasswordReset)}
+                  data-tippy-content={i18n.t('email_required')}
+                  className="btn p-0 btn-link d-inline-block float-right text-muted small font-weight-bold"
+                >
+                  {i18n.t('forgot_password')}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={linkEvent(this, this.handlePasswordReset)}
+                  className="btn p-0 btn-link d-inline-block float-right text-muted small font-weight-bold"
+                >
+                  {i18n.t('forgot_password')}
+                </button>
+              )}
             </div>
           </div>
           <div class="form-group row">
@@ -315,6 +329,12 @@ export class Login extends Component<any, State> {
       email: i.state.loginForm.username_or_email,
     };
     WebSocketService.Instance.passwordReset(resetForm);
+  }
+
+  handleInvalidPasswordReset(i: Login, event: any) {
+    document
+      .getElementById('login-email-or-username')
+      .classList.add('is-invalid');
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
