@@ -367,8 +367,7 @@ export class Modlog extends Component<any, ModlogState> {
               </div>
               <div style="display:inline-block; float:right;">
                 <h6 style="border:3px solid #000000; padding:5px; background-color:#F39C12; color:#111111;">
-                  CONTENT WARNING: Some deleted posts may be disturbing or
-                  contain adult material. Proceed with caution.
+                  {i18n.t('modlog_warning')}
                 </h6>
               </div>
             </div>
