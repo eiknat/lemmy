@@ -219,5 +219,6 @@
     "banned_users": "المستخدمون المحظورون",
     "reset_password_mail_sent": "لقد أرسِلت إليك رسالة إلكترونية لتصفير كلمتك السرية.",
     "upvote": "صوّت إيجابيا",
-    "downvote": "صوّت سلبيا"
+    "downvote": "صوّت سلبيا",
+    "invalid_login_credentials": "اعتماد تسجيل الدخول غير صالح"
 }

@@ -259,4 +259,5 @@
     "block_leaving": "¿Está seguro de que desea salir?",
     "email_required": "Email necesario",
     "modlog_warning": "AVISO DE CONTENIDO: Algunas publicaciones eliminadas pueden contener material adulto o no inquietante. Proceda con precaución.",
+    "invalid_login_credentials": "Credenciales de acceso invalidos."
 }

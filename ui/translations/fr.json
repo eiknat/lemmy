@@ -259,4 +259,5 @@
     "picture_deleted": "Image supprimée.",
     "email_required": "Adresse mail requise.",
     "modlog_warning": "AVERTISSEMENT CONCERNANT LE CONTENU: Certaines publications supprimées sont susceptible de contenir du contenu choquant ou réservé aux adulte. Veuillez agir avec précaution.",
+    "invalid_login_credentials": "Authentification invalide."
 }
