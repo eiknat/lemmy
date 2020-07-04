@@ -79,6 +79,10 @@ a.text-body {
   border-radius: 4px;
 }
 
+.embed_post {
+  padding: 10px 0px 5px;
+}
+
 @media (min-width: 768px) {
   .navbar-right {
     display: flex;
