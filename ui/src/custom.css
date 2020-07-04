@@ -38,7 +38,7 @@ a.text-body {
   }
 
   aside.sidebar {
-    max-width: 300px;
+    max-width: 400px;
   }
 
   main[role="main"] {
@@ -61,7 +61,7 @@ a.text-body {
 }
 
 .sidebar-content {
-  max-width: 300px;
+  max-width: 400px;
   flex: 1;
   padding: 0 15px;
 }

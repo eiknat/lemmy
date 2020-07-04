@@ -213,7 +213,7 @@ export class User extends Component<any, UserState> {
           </h5>
         ) : (
           <div class="row">
-            <div class="col-12 col-md-8">
+            <main class="col-12 col-md-8" role="main">
               <h5>
                 {this.state.user.avatar && showAvatars() && (
                   <img
@@ -231,13 +231,13 @@ export class User extends Component<any, UserState> {
               {this.state.view == View.Posts && this.posts()}
               {this.state.view == View.Saved && this.overview()}
               {this.paginator()}
-            </div>
-            <div class="col-12 col-md-4">
+            </main>
+            <aside class="col-12 col-md-4 sidebar">
               {this.userInfo()}
               {this.isCurrentUser && this.userSettings()}
               {this.moderates()}
               {this.follows()}
-            </div>
+            </aside>
           </div>
         )}
       </div>
