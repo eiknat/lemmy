@@ -77,6 +77,8 @@ a.text-body {
   border: 1px solid #444;
   padding: 15px;
   border-radius: 4px;
+  margin-top: 15px;
+  margin-bottom: 10px;
 }
 
 @media (min-width: 768px) {
@@ -106,4 +108,10 @@ a.text-body {
   .comment-expand-button {
     font-size: 16px
   }
+}
+
+.post-body-expand-button {
+  background-color: transparent;
+  border: 0;
+  box-shadow: 0;
 }
