@@ -135,6 +135,14 @@ export class Login extends Component<any, State> {
             </div>
           </div>
           <div class="form-group row">
+            {' '}
+            {/*hcaptcha div*/}
+            <div
+              class="h-captcha"
+              data-sitekey="10000000-ffff-ffff-ffff-000000000001"
+            ></div>
+          </div>
+          <div class="form-group row">
             <div class="col-sm-10">
               <button type="submit" class="btn btn-secondary">
                 {this.state.loginLoading ? (
@@ -267,12 +275,12 @@ export class Login extends Component<any, State> {
   handleLoginSubmit(i: Login, event: any) {
     event.preventDefault();
     i.state.loginLoading = true;
-    i.state.loginForm.username_or_email = document.getElementById(
+    i.state.loginForm.username_or_email = (document.getElementById(
       'login-email-or-username'
-    ).value;
-    i.state.loginForm.password = document.getElementById(
+    ) as HTMLInputElement).value;
+    i.state.loginForm.password = (document.getElementById(
       'login-password'
-    ).value;
+    ) as HTMLInputElement).value;
     i.setState(i.state);
     WebSocketService.Instance.login(i.state.loginForm);
   }

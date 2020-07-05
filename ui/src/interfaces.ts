@@ -45,6 +45,7 @@ export enum UserOperation {
   GetComments,
   GetSiteConfig,
   SaveSiteConfig,
+  VerifyCaptcha,
 }
 
 export enum CommentSortType {
@@ -855,6 +856,14 @@ export interface UserJoinResponse {
   user_id: number;
 }
 
+export interface VerifyCaptchaForm {
+  captcha_token: number;
+}
+
+export interface VerifyCaptchaResponse {
+  success: boolean;
+}
+
 export type MessageType =
   | EditPrivateMessageForm
   | LoginForm
@@ -893,7 +902,8 @@ export type MessageType =
   | PrivateMessageForm
   | EditPrivateMessageForm
   | GetPrivateMessagesForm
-  | SiteConfigForm;
+  | SiteConfigForm
+  | VerifyCaptchaForm;
 
 type ResponseType =
   | SiteResponse
@@ -916,7 +926,8 @@ type ResponseType =
   | AddAdminResponse
   | PrivateMessageResponse
   | PrivateMessagesResponse
-  | GetSiteConfigResponse;
+  | GetSiteConfigResponse
+  | VerifyCaptchaResponse;
 
 export interface WebSocketResponse {
   op: UserOperation;
