@@ -116,3 +116,24 @@ a.text-body {
   border: 0;
   box-shadow: 0;
 }
+
+.welcome-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+.welcome-content {
+  width: 100%;
+  max-width: 750px;
+  padding: 10px;
+}
+
+.welcome-content > form {
+  width: 100%;
+}
+
+.welcome-logo {
+  max-width: 300px;
+}
