@@ -176,14 +176,19 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               {i18n.t('url')}
             </label>
             <div class="col-sm-10">
-              <input
-                type="url"
-                id="post-url"
-                class="form-control"
-                value={this.state.postForm.url}
-                onInput={linkEvent(this, this.handlePostUrlChange)}
-                onPaste={linkEvent(this, this.handleImageUploadPaste)}
-              />
+              {/* don't allow URL field to be edited after publishing */}
+              {!this.props.onEdit ? (
+                <input
+                  type="url"
+                  id="post-url"
+                  class="form-control"
+                  value={this.state.postForm.url}
+                  onInput={linkEvent(this, this.handlePostUrlChange)}
+                  onPaste={linkEvent(this, this.handleImageUploadPaste)}
+                />
+              ) : (
+                <span>{this.state.postForm.url}</span>
+              )}
               {this.state.suggestedTitle && (
                 <div
                   class="mt-1 text-muted small font-weight-bold pointer"
@@ -194,28 +199,30 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                   })}
                 </div>
               )}
-              <form>
-                <label
-                  htmlFor="file-upload"
-                  className={`${
-                    UserService.Instance.user && 'pointer'
-                  } d-inline-block float-right text-muted font-weight-bold image-upload-icon m-0`}
-                  data-tippy-content={i18n.t('upload_image')}
-                >
-                  <svg class="icon icon-inline">
-                    <use xlinkHref="#icon-image"></use>
-                  </svg>
-                </label>
-                <input
-                  id="file-upload"
-                  type="file"
-                  accept="image/*"
-                  name="file"
-                  class="d-none"
-                  disabled={!UserService.Instance.user}
-                  onChange={linkEvent(this, this.handleImageUpload)}
-                />
-              </form>
+              {!this.props.onEdit && (
+                <form>
+                  <label
+                    htmlFor="file-upload"
+                    className={`${
+                      UserService.Instance.user && 'pointer'
+                    } d-inline-block float-right text-muted font-weight-bold image-upload-icon m-0`}
+                    data-tippy-content={i18n.t('upload_image')}
+                  >
+                    <svg class="icon icon-inline">
+                      <use xlinkHref="#icon-image"></use>
+                    </svg>
+                  </label>
+                  <input
+                    id="file-upload"
+                    type="file"
+                    accept="image/*"
+                    name="file"
+                    class="d-none"
+                    disabled={!UserService.Instance.user}
+                    onChange={linkEvent(this, this.handleImageUpload)}
+                  />
+                </form>
+              )}
               {validURL(this.state.postForm.url) && (
                 <a
                   href={`${archiveUrl}/?run=1&url=${encodeURIComponent(
@@ -250,16 +257,20 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               {i18n.t('title')}
             </label>
             <div class="col-sm-10">
-              <textarea
-                value={this.state.postForm.name}
-                id="post-title"
-                onInput={linkEvent(this, this.handlePostNameChange)}
-                class="form-control"
-                required
-                rows={2}
-                minLength={3}
-                maxLength={MAX_POST_TITLE_LENGTH}
-              />
+              {!this.props.onEdit ? (
+                <textarea
+                  value={this.state.postForm.name}
+                  id="post-title"
+                  onInput={linkEvent(this, this.handlePostNameChange)}
+                  class="form-control"
+                  required
+                  rows={2}
+                  minLength={3}
+                  maxLength={MAX_POST_TITLE_LENGTH}
+                />
+              ) : (
+                <div className="text-body">{this.state.postForm.name}</div>
+              )}
               {this.state.suggestedPosts.length > 0 && (
                 <>
                   <div class="my-1 text-muted small font-weight-bold">

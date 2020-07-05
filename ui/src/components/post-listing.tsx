@@ -64,6 +64,15 @@ interface PostListingProps {
   admins?: Array<UserView>;
 }
 
+export function PostBody({ body }: { body: string }) {
+  return (
+    <div
+      className="md-div post-listing-body"
+      dangerouslySetInnerHTML={mdToHtml(body)}
+    />
+  );
+}
+
 export class PostListing extends Component<PostListingProps, PostListingState> {
   private emptyState: PostListingState = {
     showEdit: false,
@@ -142,10 +151,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               {this.state.viewSource ? (
                 <pre>{this.props.post.body}</pre>
               ) : (
-                <div
-                  className="md-div post-listing-body"
-                  dangerouslySetInnerHTML={mdToHtml(this.props.post.body)}
-                />
+                <PostBody body={this.props.post.body} />
               )}
             </>
           )}
@@ -269,15 +275,15 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
       }
     } else {
       return (
-        <Link
-          className="text-body"
-          to={`/post/${post.id}`}
-          title={i18n.t('comments')}
+        <button
+          className="text-body post-body-expand-button"
+          title={i18n.t('expand_here')}
+          onClick={linkEvent(this, this.handleImageExpandClick)}
         >
           <svg class="icon thumbnail">
             <use xlinkHref="#icon-message-square"></use>
           </svg>
-        </Link>
+        </button>
       );
     }
   }
@@ -321,7 +327,9 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
         {/* show thumbnail when not expanded or content is a video */}
         {(!this.state.imageExpanded ||
           isVideo(post.url) ||
-          post.embed_html !== null) && (
+          post.embed_html !== null ||
+          // if it's a text post (doesn't have URL) always show thumbnail when expanded
+          (this.state.imageExpanded && post.body && !post.url)) && (
           <div class="col-3 col-sm-2 pr-0 mt-1 thumbnail-wrapper">
             <div class="position-relative">{this.thumbnail()}</div>
           </div>
@@ -415,6 +423,9 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       </span>
                     )}
                   </>
+                )}
+                {post.body && this.state.imageExpanded && (
+                  <PostBody body={post.body} />
                 )}
                 {post.removed && (
                   <small className="ml-2 text-muted font-italic">
@@ -1352,6 +1363,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     i.state.imageExpanded = !i.state.imageExpanded;
     i.setState(i.state);
   }
+
+  // handleBodyExpand(i: PostListing) {
+  //   i.state.show
+  // }
 
   handleViewSource(i: PostListing) {
     i.state.viewSource = !i.state.viewSource;
