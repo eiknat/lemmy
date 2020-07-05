@@ -420,10 +420,12 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       i.state.postForm.url = undefined;
     }
 
-    // remove trackers from URLs
-    const cleanedURL = cleanURL({ url: i.state.postForm.url });
+    if (i.state.postForm.url !== '' && i.state.postForm.url !== undefined) {
+      // remove trackers from URL
+      const cleanedURL = cleanURL({ url: i.state.postForm.url });
 
-    i.state.postForm.url = cleanedURL;
+      i.state.postForm.url = cleanedURL;
+    }
 
     if (i.props.post) {
       WebSocketService.Instance.editPost(i.state.postForm);
