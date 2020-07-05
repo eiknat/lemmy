@@ -107,3 +107,8 @@ a.text-body {
     font-size: 16px
   }
 }
+
+.comment-embedded-image {
+  max-width: 300px;
+  max-height: 300px;
+}

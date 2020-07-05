@@ -261,7 +261,7 @@ export class Post extends Component<any, PostState> {
 
   newComments() {
     return (
-      <div class="d-none d-md-block new-comments mb-3 card border-secondary">
+      <div class="d-none d-md-block new-comments mb-3 card border-secondary sidebar-content">
         <div class="card-body small">
           <h6>{i18n.t('recent_comments')}</h6>
           <CommentNodes
