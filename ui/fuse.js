@@ -21,6 +21,7 @@ Sparky.task('config', _ => {
     experimentalFeatures: true,
     cache: !isProduction,
     sourceMaps: !isProduction,
+    // sourceMaps: true,
     transformers: {
       before: [transformClasscat(), transformInferno()],
     },

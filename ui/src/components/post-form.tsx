@@ -414,16 +414,19 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
 
   handlePostSubmit(i: PostForm, event: any) {
     event.preventDefault();
+    console.log(i.state.postForm.url);
 
     // Coerce empty url string to undefined
     if (i.state.postForm.url && i.state.postForm.url === '') {
       i.state.postForm.url = undefined;
     }
 
-    // remove trackers from URLs
-    const cleanedURL = cleanURL({ url: i.state.postForm.url });
+    if (i.state.postForm.url !== '' && i.state.postForm.url !== undefined) {
+      // remove trackers from URL
+      const cleanedURL = cleanURL({ url: i.state.postForm.url });
 
-    i.state.postForm.url = cleanedURL;
+      i.state.postForm.url = cleanedURL;
+    }
 
     if (i.props.post) {
       WebSocketService.Instance.editPost(i.state.postForm);
