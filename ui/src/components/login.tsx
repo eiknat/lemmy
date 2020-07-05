@@ -22,6 +22,15 @@ interface State {
   enable_nsfw: boolean;
 }
 
+function initCaptcha() {
+  // ignoring these warnings because it's a global
+  // @ts-ignore
+  // eslint-disable-next-line no-undef
+  const widgetID = hcaptcha.render('h-captcha', {
+    sitekey: '10000000-ffff-ffff-ffff-000000000001',
+  });
+}
+
 export class Login extends Component<any, State> {
   private subscription: Subscription;
 
@@ -60,6 +69,7 @@ export class Login extends Component<any, State> {
 
   componentDidMount() {
     setupTippy();
+    initCaptcha();
   }
 
   componentWillUnmount() {
@@ -135,12 +145,12 @@ export class Login extends Component<any, State> {
             </div>
           </div>
           <div class="form-group row">
-            {' '}
-            {/*hcaptcha div*/}
+            {/*hcaptcha target*/}
             <div
-              class="h-captcha"
+              className="h-captcha"
+              id="h-captcha"
               data-sitekey="10000000-ffff-ffff-ffff-000000000001"
-            ></div>
+            />
           </div>
           <div class="form-group row">
             <div class="col-sm-10">
