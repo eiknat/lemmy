@@ -1364,10 +1364,6 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     i.setState(i.state);
   }
 
-  // handleBodyExpand(i: PostListing) {
-  //   i.state.show
-  // }
-
   handleViewSource(i: PostListing) {
     i.state.viewSource = !i.state.viewSource;
     i.setState(i.state);
