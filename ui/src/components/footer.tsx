@@ -18,6 +18,11 @@ export class Footer extends Component<any, any> {
               <span class="navbar-text">{version}</span>
             </li>
             <li class="nav-item">
+              <Link class="nav-link" to="/about">
+                {i18n.t('about')}
+              </Link>
+            </li>
+            <li class="nav-item">
               <Link class="nav-link" to="/modlog">
                 {i18n.t('modlog')}
               </Link>

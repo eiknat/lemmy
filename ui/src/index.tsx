@@ -22,6 +22,7 @@ import { Sponsors } from './components/sponsors';
 import { Symbols } from './components/symbols';
 import { i18n } from './i18next';
 import './custom.css';
+import { About } from './components/about';
 
 const container = document.getElementById('app');
 
@@ -88,6 +89,7 @@ class Index extends Component<any, any> {
                   component={Modlog}
                 />
                 <Route path={`/modlog`} component={Modlog} />
+                <Route path={`/about`} component={About} />
                 <Route path={`/setup`} component={Setup} />
                 <Route path={`/admin`} component={AdminSettings} />
                 <Route
