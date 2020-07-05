@@ -292,6 +292,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
 
   listing() {
     let post = this.props.post;
+
+    const isMobile = window.innerWidth < 768;
     return (
       <div>
         <div class="row">
@@ -328,7 +330,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             )}
           </div>
           {/* show thumbnail when not expanded or content is a video */}
-          {(!this.state.imageExpanded ||
+          {(!isMobile ||
+            (isMobile && !this.state.imageExpanded) ||
             isVideo(post.url) ||
             post.embed_html !== null ||
             // if it's a text post (doesn't have URL) always show thumbnail when expanded
