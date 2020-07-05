@@ -44,7 +44,6 @@ import {
   SiteConfigForm,
   MessageType,
   WebSocketJsonResponse,
-  VerifyCaptchaForm,
 } from '../interfaces';
 import { UserService } from './';
 import { i18n } from '../i18next';
@@ -326,10 +325,6 @@ export class WebSocketService {
   public saveSiteConfig(form: SiteConfigForm) {
     this.setAuth(form);
     this.ws.send(this.wsSendWrapper(UserOperation.SaveSiteConfig, form));
-  }
-
-  public verifyCaptcha(form: VerifyCaptchaForm) {
-    this.ws.send(this.wsSendWrapper(UserOperation.VerifyCaptcha, form));
   }
 
   private wsSendWrapper(op: UserOperation, data: MessageType) {

@@ -38,6 +38,7 @@ export class Login extends Component<any, State> {
     loginForm: {
       username_or_email: undefined,
       password: undefined,
+      captcha_id: undefined,
     },
     registerForm: {
       username: undefined,
@@ -90,7 +91,10 @@ export class Login extends Component<any, State> {
   loginForm() {
     return (
       <div>
-        <form onSubmit={linkEvent(this, this.handleLoginSubmit)}>
+        <form
+          id="login-form"
+          onSubmit={linkEvent(this, this.handleLoginSubmit)}
+        >
           <h5>{i18n.t('login')}</h5>
           <div class="form-group row">
             <label
@@ -148,8 +152,10 @@ export class Login extends Component<any, State> {
             {/*hcaptcha target*/}
             <div
               className="h-captcha"
+              class="col-sm-10"
               id="h-captcha"
               data-sitekey="10000000-ffff-ffff-ffff-000000000001"
+              data-theme="dark"
             />
           </div>
           <div class="form-group row">
@@ -291,6 +297,9 @@ export class Login extends Component<any, State> {
     i.state.loginForm.password = (document.getElementById(
       'login-password'
     ) as HTMLInputElement).value;
+    i.state.loginForm.captcha_id = (document.querySelector(
+      "textarea[name='h-captcha-response']"
+    )).value;
     i.setState(i.state);
     WebSocketService.Instance.login(i.state.loginForm);
   }

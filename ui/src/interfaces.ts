@@ -530,6 +530,7 @@ export interface ModAdd {
 export interface LoginForm {
   username_or_email: string;
   password: string;
+  captcha_id: string;
 }
 
 export interface RegisterForm {
