@@ -204,7 +204,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
                 <input
                   id={`file-upload-${this.id}`}
                   type="file"
-                  accept="image/*,video/*"
+                  accept="image/*"
                   name="file"
                   class="d-none"
                   disabled={!UserService.Instance.user}

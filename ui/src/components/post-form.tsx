@@ -209,7 +209,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                 <input
                   id="file-upload"
                   type="file"
-                  accept="image/*,video/*"
+                  accept="image/*"
                   name="file"
                   class="d-none"
                   disabled={!UserService.Instance.user}
