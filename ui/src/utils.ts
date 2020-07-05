@@ -91,6 +91,7 @@ export const languages = [
 ];
 
 export const themes = [
+  'laborwave',
   'litera',
   'materia',
   'minty',
