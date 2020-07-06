@@ -191,7 +191,7 @@ export class Post extends Component<any, PostState> {
               {this.commentsTree()}
             </div>
             <div class="flex-1">
-              {this.state.comments.length > 0 && this.newComments()}
+              {/* {this.state.comments.length > 0 && this.newComments()} */}
               {this.sidebar()}
             </div>
           </div>

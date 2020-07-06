@@ -77,6 +77,9 @@ a.text-body {
   border: 1px solid #444;
   padding: 15px;
   border-radius: 4px;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  max-width: 800px;
 }
 
 @media (min-width: 768px) {
@@ -111,4 +114,31 @@ a.text-body {
 .comment-embedded-image {
   max-width: 300px;
   max-height: 300px;
+}
+  
+.post-body-expand-button {
+  background-color: transparent;
+  border: 0;
+  box-shadow: 0;
+}
+
+.welcome-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+.welcome-content {
+  width: 100%;
+  max-width: 750px;
+  padding: 10px;
+}
+
+.welcome-content > form {
+  width: 100%;
+}
+
+.welcome-logo {
+  max-width: 300px;
 }
