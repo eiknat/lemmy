@@ -542,7 +542,6 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       i.handleImageUpload(i, image);
     }
   }
-
   handleImageUpload(i: PostForm, event: any) {
     let file: any;
     if (event.target) {

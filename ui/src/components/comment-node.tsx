@@ -817,7 +817,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
       ? `*${i18n.t('removed')}*`
       : node.comment.deleted
       ? `*${i18n.t('deleted')}*`
-      : node.comment.content;
+      : this.limitImageSizes(node.comment.content);
   }
 
   handleReplyClick(i: CommentNode) {
@@ -1134,6 +1134,14 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     i.state.showAdvanced = !i.state.showAdvanced;
     i.setState(i.state);
     setupTippy();
+  }
+
+  limitImageSizes(comment: string): string {
+    let imageRegex = new RegExp('<img.*?src="(.*?)"[^\>]+>');
+    let imageUrls = imageRegex.exec(comment);
+    imageUrls.forEach(url =>
+      comment.replace(imageRegex, "<img class=comment-embedded-image src=\""+url+"\" alt=\"\">"));
+    return comment;
   }
 
   get scoreColor() {

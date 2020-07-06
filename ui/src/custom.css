@@ -111,6 +111,11 @@ a.text-body {
   }
 }
 
+.comment-embedded-image {
+  max-width: 300px;
+  max-height: 300px;
+}
+  
 .post-body-expand-button {
   background-color: transparent;
   border: 0;
