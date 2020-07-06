@@ -526,7 +526,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       <MomentTime data={post} />
                     </span>
                   </li>
-                  {post.body && (
+                  {post.body && !isMobile && (
                     <>
                       <li className="list-inline-item">•</li>
                       <li className="list-inline-item">
