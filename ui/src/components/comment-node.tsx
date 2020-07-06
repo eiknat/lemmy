@@ -1137,10 +1137,16 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   }
 
   limitImageSizes(comment: string): string {
-    let imageRegex = new RegExp('<img.*?src="(.*?)"[^\>]+>');
+    let imageRegex = new RegExp('<img.*?src="(.*?)"[^>]+>');
     let imageUrls = imageRegex.exec(comment);
-    imageUrls.forEach(url =>
-      comment.replace(imageRegex, "<img class=comment-embedded-image src=\""+url+"\" alt=\"\">"));
+    if (imageUrls !== null) {
+      imageUrls.forEach(url =>
+        comment.replace(
+          imageRegex,
+          '<img class=comment-embedded-image src="' + url + '" alt="">'
+        )
+      );
+    }
     return comment;
   }
 
