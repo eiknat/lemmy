@@ -1143,7 +1143,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
       imageUrls.forEach(url =>
         comment.replace(
           imageRegex,
-          '<img class=comment-embedded-image src="' + url + '" alt="">'
+          '<img class="comment-embedded-image" src="' + url + '" alt="">'
         )
       );
     }
