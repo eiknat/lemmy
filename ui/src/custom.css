@@ -113,11 +113,11 @@ a.text-body {
 
 /* images that are children of comment text that are children of
  elements with class comment-text-container */
-.comment-text-container > p > img { 
+.comment-text-container > p > img {
   max-width: 300px;
   max-height: 300px;
 }
-  
+
 .post-body-expand-button {
   background-color: transparent;
   border: 0;
@@ -143,4 +143,23 @@ a.text-body {
 
 .welcome-logo {
   max-width: 300px;
+}
+
+.navbar-toggler {
+  border: 0;
+}
+
+@media (max-width: 768px) {
+  .btn {
+    padding: 0.5rem 1.5rem;
+    font-size: 16px;
+  }
+
+  .filter-row {
+    margin-top: -10px;
+  }
+
+  .filter-row .btn-group {
+    margin-bottom: 10px;
+  }
 }
