@@ -233,7 +233,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   <pre>{this.commentUnlessRemoved}</pre>
                 ) : (
                   <div
-                    className="md-div"
+                    className="md-div comment-text-container"
                     dangerouslySetInnerHTML={mdToHtml(
                       this.commentUnlessRemoved
                     )}
@@ -817,7 +817,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
       ? `*${i18n.t('removed')}*`
       : node.comment.deleted
       ? `*${i18n.t('deleted')}*`
-      : this.limitImageSizes(node.comment.content);
+      : node.comment.content;
   }
 
   handleReplyClick(i: CommentNode) {
@@ -1134,20 +1134,6 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     i.state.showAdvanced = !i.state.showAdvanced;
     i.setState(i.state);
     setupTippy();
-  }
-
-  limitImageSizes(comment: string): string {
-    let imageRegex = new RegExp('<img.*?src="(.*?)"[^>]+>');
-    let imageUrls = imageRegex.exec(comment);
-    if (imageUrls !== null) {
-      imageUrls.forEach(url =>
-        comment.replace(
-          imageRegex,
-          '<img class="comment-embedded-image" src="' + url + '" alt="">'
-        )
-      );
-    }
-    return comment;
   }
 
   get scoreColor() {
