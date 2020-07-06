@@ -1011,7 +1011,9 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             </div>
           </div>
         </div>
-        {post.body && this.state.imageExpanded && <PostBody body={post.body} />}
+        {post.body && this.state.imageExpanded && !this.props.showBody && (
+          <PostBody body={post.body} />
+        )}
       </div>
     );
   }
