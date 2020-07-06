@@ -6,6 +6,10 @@ html, body, * {
   margin-top: 8px;
 }
 
+.sort-select {
+  margin-top: 10px;
+}
+
 @media (max-width: 992px) {
   .filter-row {
     display: flex;
@@ -161,5 +165,23 @@ a.text-body {
 
   .filter-row .btn-group {
     margin-bottom: 10px;
+    border-bottom: 1px solid rgba(68, 68, 68, 0.4);
+  }
+
+  .filter-row .listing-type-select {
+    display: flex;
+    margin-top: -14px;
+    width: calc(100% + 30px);
+    margin-right: -15px !important;
+    margin-left: -15px;
+  }
+
+  .listing-type-select .btn-group {
+    width: 100%;
+  }
+
+  .filter-row .listing-type-select .btn {
+    background-color: transparent;
+    border: 0;
   }
 }
