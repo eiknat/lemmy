@@ -367,6 +367,10 @@ export class Login extends Component<any, State> {
   parseMessage(msg: WebSocketJsonResponse) {
     let res = wsJsonToRes(msg);
     if (msg.error) {
+      if (msg.error == 'invalid-captcha') {
+        document.getElementById('h-captcha').innerHTML = '';
+        initCaptcha();
+      }
       toast(i18n.t(msg.error), 'danger');
       this.state = this.emptyState;
       this.setState(this.state);
