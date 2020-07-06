@@ -480,16 +480,16 @@ export class Main extends Component<any, MainState> {
     return (
       <div className="mb-3 filter-row">
         <span className="listing-select-group">
-          <span class="mr-3 data-type-select">
-            <DataTypeSelect
-              type_={this.state.dataType}
-              onChange={this.handleDataTypeChange}
-            />
-          </span>
           <span class="mr-3 listing-type-select">
             <ListingTypeSelect
               type_={this.state.listingType}
               onChange={this.handleListingTypeChange}
+            />
+          </span>
+          <span class="mr-3 data-type-select">
+            <DataTypeSelect
+              type_={this.state.dataType}
+              onChange={this.handleDataTypeChange}
             />
           </span>
         </span>
