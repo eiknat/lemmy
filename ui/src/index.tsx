@@ -28,10 +28,13 @@ const container = document.getElementById('app');
 
 function PPB() {
   return (
-    <img
-      src="https://i.imgur.com/5pXPI.jpg"
-      alt="a pig that has pooped on its own balls"
-    />
+    <div style={{ 'max-width': '500px' }}>
+      <img
+        src="https://i.imgur.com/5pXPI.jpg"
+        className="img-fluid"
+        alt="a pig that has pooped on its own balls"
+      />
+    </div>
   );
 }
 
