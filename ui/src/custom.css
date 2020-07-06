@@ -108,8 +108,9 @@ a.text-body {
   }
 }
 
-/* images that are children of elements with class comment-text-container */
-.comment-text-container > img { 
+/* images that are children of comment text that are children of
+ elements with class comment-text-container */
+.comment-text-container > p > img { 
   max-width: 300px;
   max-height: 300px;
 }
