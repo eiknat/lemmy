@@ -184,4 +184,8 @@ a.text-body {
     background-color: transparent;
     border: 0;
   }
+
+  .user-view-toggle {
+    overflow: auto;
+  }
 }
