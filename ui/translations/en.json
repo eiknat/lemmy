@@ -148,7 +148,7 @@
     "verify_password": "Verify Password",
     "old_password": "Old Password",
     "forgot_password": "forgot password",
-    "reset_password_mail_sent": "Sent an Email to reset your password.",
+    "reset_password_mail_sent": "A password reset email will be sent if the email is linked to an account.",
     "password_change": "Password Change",
     "new_password": "New Password",
     "no_email_setup": "This server hasn't correctly set up email.",
