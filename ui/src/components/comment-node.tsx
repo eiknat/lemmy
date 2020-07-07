@@ -233,7 +233,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   <pre>{this.commentUnlessRemoved}</pre>
                 ) : (
                   <div
-                    className="md-div"
+                    className="md-div comment-text-container"
                     dangerouslySetInnerHTML={mdToHtml(
                       this.commentUnlessRemoved
                     )}

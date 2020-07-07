@@ -16,6 +16,7 @@ import { User } from './components/user';
 import { Modlog } from './components/modlog';
 import { Setup } from './components/setup';
 import { AdminSettings } from './components/admin-settings';
+import { WelcomePage } from './components/welcome';
 import { Inbox } from './components/inbox';
 import { Search } from './components/search';
 import { Sponsors } from './components/sponsors';
@@ -27,10 +28,13 @@ const container = document.getElementById('app');
 
 function PPB() {
   return (
-    <img
-      src="https://i.imgur.com/5pXPI.jpg"
-      alt="a pig that has pooped on its own balls"
-    />
+    <div style={{ 'max-width': '500px' }}>
+      <img
+        src="https://i.imgur.com/5pXPI.jpg"
+        className="img-fluid"
+        alt="a pig that has pooped on its own balls"
+      />
+    </div>
   );
 }
 
@@ -48,6 +52,7 @@ class Index extends Component<any, any> {
             <div class="mt-4 p-0 fl-1">
               <Switch>
                 <Route exact path={`/`} component={Main} />
+                {/* <Route exact path={`/`} component={WelcomePage} /> */}
                 <Route path={`/ppb`} component={PPB} />
                 <Route
                   path={`/home/data_type/:data_type/listing_type/:listing_type/sort/:sort/page/:page`}
@@ -100,6 +105,9 @@ class Index extends Component<any, any> {
                   path={`/password_change/:token`}
                   component={PasswordChange}
                 />
+
+                <Route path={`/pbb`} component={PPB} />
+                <Route path={`/welcome`} component={WelcomePage} />
                 <Route path="*" component={PPB} />
               </Switch>
               <Symbols />

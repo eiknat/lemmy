@@ -6,6 +6,10 @@ html, body, * {
   margin-top: 8px;
 }
 
+.sort-select {
+  margin-top: 10px;
+}
+
 @media (max-width: 992px) {
   .filter-row {
     display: flex;
@@ -77,6 +81,9 @@ a.text-body {
   border: 1px solid #444;
   padding: 15px;
   border-radius: 4px;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  max-width: 800px;
 }
 
 @media (min-width: 768px) {
@@ -105,5 +112,76 @@ a.text-body {
 
   .comment-expand-button {
     font-size: 16px
+  }
+}
+
+/* images that are children of comment text that are children of
+ elements with class comment-text-container */
+.comment-text-container > p > img {
+  max-width: 300px;
+  max-height: 300px;
+}
+
+.post-body-expand-button {
+  background-color: transparent;
+  border: 0;
+  box-shadow: 0;
+}
+
+.welcome-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+.welcome-content {
+  width: 100%;
+  max-width: 750px;
+  padding: 10px;
+}
+
+.welcome-content > form {
+  width: 100%;
+}
+
+.welcome-logo {
+  max-width: 300px;
+}
+
+.navbar-toggler {
+  border: 0;
+}
+
+@media (max-width: 768px) {
+  .btn {
+    padding: 0.5rem 1.5rem;
+    font-size: 16px;
+  }
+
+  .filter-row {
+    margin-top: -10px;
+  }
+
+  .filter-row .btn-group {
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(68, 68, 68, 0.4);
+  }
+
+  .filter-row .listing-type-select {
+    display: flex;
+    margin-top: -14px;
+    width: calc(100% + 30px);
+    margin-right: -15px !important;
+    margin-left: -15px;
+  }
+
+  .listing-type-select .btn-group {
+    width: 100%;
+  }
+
+  .filter-row .listing-type-select .btn {
+    background-color: transparent;
+    border: 0;
   }
 }
