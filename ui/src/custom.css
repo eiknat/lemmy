@@ -189,3 +189,8 @@ a.text-body {
     overflow: auto;
   }
 }
+
+.about-body {
+  max-width: 700px;
+  margin: 0 auto;
+}
