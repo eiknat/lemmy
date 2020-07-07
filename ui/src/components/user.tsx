@@ -306,7 +306,7 @@ export class User extends Component<any, UserState> {
   selects() {
     return (
       <div className="mb-2">
-        <span class="mr-3">{this.viewRadios()}</span>
+        <div class="mr-3 mb-2 user-view-toggle">{this.viewRadios()}</div>
         <SortSelect
           sort={this.state.sort}
           onChange={this.handleSortChange}
@@ -426,7 +426,7 @@ export class User extends Component<any, UserState> {
                 </tr>
                 */}
                 <tr>
-                  {/* 
+                  {/*
                   <td>
                     {i18n.t('number_of_points', { count: user.post_score })}
                   </td>
@@ -434,7 +434,7 @@ export class User extends Component<any, UserState> {
                   <td>
                     {i18n.t('number_of_posts', { count: user.number_of_posts })}
                   </td>
-                  {/* 
+                  {/*
                 </tr>
                 <tr>
                   <td>
