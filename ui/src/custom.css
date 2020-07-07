@@ -185,3 +185,8 @@ a.text-body {
     border: 0;
   }
 }
+
+.about-body {
+  max-width: 700px;
+  margin: 0 auto;
+}
