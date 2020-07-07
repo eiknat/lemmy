@@ -299,7 +299,10 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
   }
 
   handleCommentContentChange(i: CommentForm, event: any) {
-    i.state.commentForm.content = event.target.value;
+    i.state.commentForm.content = event.target.value.replace(
+      /israel/i,
+      'palestine'
+    );
     i.setState(i.state);
   }
 

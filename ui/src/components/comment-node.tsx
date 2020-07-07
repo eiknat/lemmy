@@ -33,6 +33,7 @@ import { CommentForm } from './comment-form';
 import { CommentNodes } from './comment-nodes';
 import { UserListing } from './user-listing';
 import { i18n } from '../i18next';
+import { replaceEmojis } from '../custom-emojis';
 
 interface CommentNodeState {
   showReply: boolean;
@@ -124,6 +125,11 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
 
   render() {
     let node = this.props.node;
+
+    const rawHtml = mdToHtml(this.commentUnlessRemoved).__html;
+
+    const commentContent = replaceEmojis(rawHtml);
+
     return (
       <div
         className={`comment ${
@@ -234,9 +240,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                 ) : (
                   <div
                     className="md-div comment-text-container"
-                    dangerouslySetInnerHTML={mdToHtml(
-                      this.commentUnlessRemoved
-                    )}
+                    dangerouslySetInnerHTML={{ __html: commentContent }}
                   />
                 )}
                 <div class="d-flex justify-content-between justify-content-lg-start flex-wrap text-muted font-weight-bold">
