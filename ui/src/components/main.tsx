@@ -224,6 +224,7 @@ export class Main extends Component<any, MainState> {
               </div>
             </div>
             {this.sidebar()}
+            {this.donations()}
             {this.landing()}
           </div>
         )}
@@ -311,9 +312,9 @@ export class Main extends Component<any, MainState> {
               It is currently {getMoscowTime()} in Moscow
             </div>
             <div className="my-2">
-              Please send any thoughts, suggestions, or complaints to{' '}
+              Please send any thoughts, suggestions, memes or complaints to{' '}
               <a href="mailto:chapotraphouse@gmail.com?subject=ChapoTrapHouse Memes">
-                Matt Christman
+                Matt Christman.
               </a>
             </div>
             <ul class="my-2 list-inline">
@@ -378,6 +379,24 @@ export class Main extends Component<any, MainState> {
             </div>
           </div>
         )}
+      </div>
+    );
+  }
+
+  donations() {
+    return (
+      <div class="card border-secondary mb-3">
+        <div class="card-body">
+          <h5>
+            Support us through
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"> Patreon!</a>
+          </h5>
+          <p class="mb-0">
+            Our Soros donations only get us so far, and that&apos;s where your
+            donations help. It costs [replace-me] per month to show you yet
+            another post of pig poop balls, so pitch in today!
+          </p>
+        </div>
       </div>
     );
   }
@@ -461,16 +480,16 @@ export class Main extends Component<any, MainState> {
     return (
       <div className="mb-3 filter-row">
         <span className="listing-select-group">
-          <span class="mr-3 data-type-select">
-            <DataTypeSelect
-              type_={this.state.dataType}
-              onChange={this.handleDataTypeChange}
-            />
-          </span>
           <span class="mr-3 listing-type-select">
             <ListingTypeSelect
               type_={this.state.listingType}
               onChange={this.handleListingTypeChange}
+            />
+          </span>
+          <span class="mr-3 data-type-select">
+            <DataTypeSelect
+              type_={this.state.dataType}
+              onChange={this.handleDataTypeChange}
             />
           </span>
         </span>

@@ -22,6 +22,15 @@ interface State {
   enable_nsfw: boolean;
 }
 
+function initCaptcha() {
+  // ignoring these warnings because it's a global
+  // @ts-ignore
+  // eslint-disable-next-line no-undef
+  const widgetID = hcaptcha.render('h-captcha', {
+    sitekey: '10000000-ffff-ffff-ffff-000000000001',
+  });
+}
+
 export class Login extends Component<any, State> {
   private subscription: Subscription;
 
@@ -29,6 +38,7 @@ export class Login extends Component<any, State> {
     loginForm: {
       username_or_email: undefined,
       password: undefined,
+      captcha_id: undefined,
     },
     registerForm: {
       username: undefined,
@@ -60,6 +70,7 @@ export class Login extends Component<any, State> {
 
   componentDidMount() {
     setupTippy();
+    initCaptcha();
   }
 
   componentWillUnmount() {
@@ -80,7 +91,10 @@ export class Login extends Component<any, State> {
   loginForm() {
     return (
       <div>
-        <form onSubmit={linkEvent(this, this.handleLoginSubmit)}>
+        <form
+          id="login-form"
+          onSubmit={linkEvent(this, this.handleLoginSubmit)}
+        >
           <h5>{i18n.t('login')}</h5>
           <div class="form-group row">
             <label
@@ -133,6 +147,16 @@ export class Login extends Component<any, State> {
                 </button>
               )}
             </div>
+          </div>
+          <div class="form-group row">
+            {/*hcaptcha target*/}
+            <div
+              className="h-captcha"
+              class="col-sm-10"
+              id="h-captcha"
+              data-sitekey="10000000-ffff-ffff-ffff-000000000001"
+              data-theme="dark"
+            />
           </div>
           <div class="form-group row">
             <div class="col-sm-10">
@@ -267,12 +291,15 @@ export class Login extends Component<any, State> {
   handleLoginSubmit(i: Login, event: any) {
     event.preventDefault();
     i.state.loginLoading = true;
-    i.state.loginForm.username_or_email = document.getElementById(
+    i.state.loginForm.username_or_email = (document.getElementById(
       'login-email-or-username'
-    ).value;
-    i.state.loginForm.password = document.getElementById(
+    ) as HTMLInputElement).value;
+    i.state.loginForm.password = (document.getElementById(
       'login-password'
-    ).value;
+    ) as HTMLInputElement).value;
+    i.state.loginForm.captcha_id = (document.querySelector(
+      "textarea[name='h-captcha-response']"
+    )).value;
     i.setState(i.state);
     WebSocketService.Instance.login(i.state.loginForm);
   }
