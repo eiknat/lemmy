@@ -505,6 +505,7 @@ export class Main extends Component<any, MainState> {
               href={`/feeds/all.xml?sort=${SortType[this.state.sort]}`}
               target="_blank"
               title="RSS"
+              rel="noopener"
             >
               <svg class="icon text-muted small">
                 <use xlinkHref="#icon-rss">#</use>
