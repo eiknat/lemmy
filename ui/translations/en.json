@@ -269,5 +269,6 @@
     "block_leaving": "Are you sure you want to leave?",
     "email_required": "Email required",
     "modlog_warning": "CONTENT WARNING: Some deleted posts may contain disturbing or adult material. Proceed with caution.",
-    "invalid_login_credentials": "Invalid login credentials."
+    "invalid_login_credentials": "Invalid login credentials.",
+    "invalid-captcha": "Error with captcha authentication."
 }

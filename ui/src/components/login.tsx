@@ -29,6 +29,11 @@ function initCaptcha() {
   const widgetID = hcaptcha.render('h-captcha', {
     sitekey: '10000000-ffff-ffff-ffff-000000000001',
   });
+  // @ts-ignore
+  // eslint-disable-next-line no-undef
+  const widgetIDRegister = hcaptcha.render('h-captcha-register', {
+    sitekey: '10000000-ffff-ffff-ffff-000000000001',
+  });
 }
 
 export class Login extends Component<any, State> {
@@ -46,6 +51,7 @@ export class Login extends Component<any, State> {
       password_verify: undefined,
       admin: false,
       show_nsfw: false,
+      captcha_id: undefined,
     },
     loginLoading: false,
     registerLoading: false,
@@ -272,6 +278,16 @@ export class Login extends Component<any, State> {
           </div>
         )}
         <div class="form-group row">
+          {/*hcaptcha target*/}
+          <div
+            className="h-captcha h-captcha-register"
+            class="col-sm-10"
+            id="h-captcha-register"
+            data-sitekey="10000000-ffff-ffff-ffff-000000000001"
+            data-theme="dark"
+          />
+        </div>
+        <div class="form-group row">
           <div class="col-sm-10">
             <button type="submit" class="btn btn-secondary">
               {this.state.registerLoading ? (
@@ -317,6 +333,9 @@ export class Login extends Component<any, State> {
   handleRegisterSubmit(i: Login, event: any) {
     event.preventDefault();
     i.state.registerLoading = true;
+    i.state.registerForm.captcha_id = (document.querySelectorAll(
+      "textarea[name='h-captcha-response']"
+    )[1] as HTMLInputElement).value;
     i.setState(i.state);
 
     WebSocketService.Instance.register(i.state.registerForm);
@@ -367,6 +386,10 @@ export class Login extends Component<any, State> {
   parseMessage(msg: WebSocketJsonResponse) {
     let res = wsJsonToRes(msg);
     if (msg.error) {
+      if (msg.error == 'invalid-captcha') {
+        document.getElementById('h-captcha').innerHTML = '';
+        initCaptcha();
+      }
       toast(i18n.t(msg.error), 'danger');
       this.state = this.emptyState;
       this.setState(this.state);

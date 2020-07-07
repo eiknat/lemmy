@@ -540,6 +540,7 @@ export interface RegisterForm {
   password_verify: string;
   admin: boolean;
   show_nsfw: boolean;
+  captcha_id: string;
 }
 
 export interface LoginResponse {
