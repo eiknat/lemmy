@@ -331,7 +331,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
           </div>
           {/* show thumbnail when not expanded or content is a video */}
           {(!isMobile ||
-            (isMobile && !this.state.imageExpanded) ||
+            (isMobile && !this.state.imageExpanded && (post.body || post.url)) ||
             isVideo(post.url) ||
             post.embed_html !== null ||
             // if it's a text post (doesn't have URL) always show thumbnail when expanded
