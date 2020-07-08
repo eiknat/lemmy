@@ -314,9 +314,9 @@ export class Login extends Component<any, State> {
     i.state.loginForm.password = (document.getElementById(
       'login-password'
     ) as HTMLInputElement).value;
-    i.state.loginForm.captcha_id = (document.querySelector(
+    i.state.loginForm.captcha_id = document.querySelector(
       "textarea[name='h-captcha-response']"
-    )).value;
+    ).value;
     i.setState(i.state);
     WebSocketService.Instance.login(i.state.loginForm);
   }
@@ -387,11 +387,16 @@ export class Login extends Component<any, State> {
   parseMessage(msg: WebSocketJsonResponse) {
     let res = wsJsonToRes(msg);
     if (msg.error) {
-      if (msg.error == 'invalid-captcha') {
+      if (msg.error.includes('invalid_captcha')) {
+        let error_codes = msg.error.split(';'); //captcha error codes are sent deliniated with semicolons
+        let error_message = '';
+        error_codes.forEach(item => (error_message += i18n.t(item)));
+        toast(error_message, 'danger');
         document.getElementById('h-captcha').innerHTML = '';
         initCaptcha();
+      } else {
+        toast(i18n.t(msg.error), 'danger');
       }
-      toast(i18n.t(msg.error), 'danger');
       this.state = this.emptyState;
       this.setState(this.state);
       return;
