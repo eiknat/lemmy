@@ -13,6 +13,7 @@ import {
 import { WebSocketService, UserService } from '../services';
 import { wsJsonToRes, validEmail, toast, setupTippy } from '../utils';
 import { i18n } from '../i18next';
+import { HCAPTCHA_SITE_KEY } from '../env';
 
 interface State {
   loginForm: LoginForm;
@@ -32,12 +33,12 @@ function initCaptcha() {
   // @ts-ignore
   // eslint-disable-next-line no-undef
   const widgetID = hcaptcha.render('h-captcha', {
-    sitekey: /*TESTING*/ '10000000-ffff-ffff-ffff-000000000001',
+    sitekey: HCAPTCHA_SITE_KEY,
   });
   // @ts-ignore
   // eslint-disable-next-line no-undef
   const widgetIDRegister = hcaptcha.render('h-captcha-register', {
-    sitekey: /*TESTING*/ '10000000-ffff-ffff-ffff-000000000001',
+    sitekey: HCAPTCHA_SITE_KEY,
   });
 }
 
@@ -170,7 +171,7 @@ export class Login extends Component<any, State> {
               className="h-captcha"
               class="col-sm-10"
               id="h-captcha"
-              data-sitekey={/*TESTING*/ '10000000-ffff-ffff-ffff-000000000001'}
+              data-sitekey={HCAPTCHA_SITE_KEY}
               data-theme="dark"
             />
           </div>
@@ -310,7 +311,7 @@ export class Login extends Component<any, State> {
             className="h-captcha h-captcha-register"
             class="col-sm-10"
             id="h-captcha-register"
-            data-sitekey={/*TESTING*/ '10000000-ffff-ffff-ffff-000000000001'}
+            data-sitekey={HCAPTCHA_SITE_KEY}
             data-theme="dark"
           />
         </div>
@@ -344,9 +345,9 @@ export class Login extends Component<any, State> {
     i.state.loginForm.password = (document.getElementById(
       'login-password'
     ) as HTMLInputElement).value;
-    i.state.loginForm.captcha_id = document.querySelector(
+    i.state.loginForm.captcha_id = (document.querySelector(
       "textarea[name='h-captcha-response']"
-    ).value;
+    )).value;
     i.setState(i.state);
     WebSocketService.Instance.login(i.state.loginForm);
   }
