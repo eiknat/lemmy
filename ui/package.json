@@ -25,7 +25,6 @@
     "autosize": "^4.0.2",
     "bootswatch": "^4.3.1",
     "classcat": "^4.0.2",
-    "dotenv": "^8.2.0",
     "emoji-short-name": "^1.0.0",
     "husky": "^4.2.5",
     "i18next": "^19.4.1",
