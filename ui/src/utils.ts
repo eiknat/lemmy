@@ -53,7 +53,7 @@ import emojiShortName from 'emoji-short-name';
 import Toastify from 'toastify-js';
 import tippy from 'tippy.js';
 import EmojiButton from '@joeattardi/emoji-button';
-import { customEmojis } from './custom-emojis';
+import { customEmojis, replaceEmojis } from './custom-emojis';
 
 export const repoUrl = 'https://github.com/LemmyNet/lemmy';
 export const helpGuideUrl = '/docs/about_guide.html';
@@ -203,7 +203,7 @@ export function hotRank(score: number, timeStr: string): number {
 }
 
 export function mdToHtml(text: string) {
-  return { __html: md.render(text) };
+  return { __html: replaceEmojis(md.render(text)) };
 }
 
 export function getUnixTime(text: string): number {
