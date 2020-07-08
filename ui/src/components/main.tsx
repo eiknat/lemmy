@@ -68,9 +68,10 @@ interface MainState {
   dataType: DataType;
   sort: SortType;
   page: number;
+  time: string;
 }
 
-function getMoscowTime() {
+function getMoscowTime(): string {
   const localDate = new Date();
 
   const utc = localDate.getTime() + localDate.getTimezoneOffset() * 60000;
@@ -83,6 +84,7 @@ function getMoscowTime() {
 
 export class Main extends Component<any, MainState> {
   private subscription: Subscription;
+  private timeId: Timeout;
   private emptyState: MainState = {
     subscribedCommunities: [],
     trendingCommunities: [],
@@ -113,6 +115,7 @@ export class Main extends Component<any, MainState> {
     dataType: getDataTypeFromProps(this.props),
     sort: getSortTypeFromProps(this.props),
     page: getPageFromProps(this.props),
+    time: getMoscowTime(),
   };
 
   constructor(props: any, context: any) {
@@ -148,8 +151,15 @@ export class Main extends Component<any, MainState> {
     this.fetchData();
   }
 
+  componentDidMount() {
+    this.timeId = setInterval(() => {
+      this.setState({ time: getMoscowTime() });
+    }, 1000);
+  }
+
   componentWillUnmount() {
     this.subscription.unsubscribe();
+    clearInterval(this.timeId);
   }
 
   // Necessary for back button for some reason
@@ -309,7 +319,7 @@ export class Main extends Component<any, MainState> {
             <img src="/static/assets/warning.jpg" className="my-3 img-fluid" />
             <img src="/static/assets/construction.gif" className="img-fluid" />
             <div className="my-2">
-              It is currently {getMoscowTime()} in Moscow
+              It is currently {this.state.time} in Moscow
             </div>
             <div className="my-2">
               Please send any thoughts, suggestions, memes or complaints to{' '}
