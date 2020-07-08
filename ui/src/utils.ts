@@ -21,6 +21,7 @@ import 'moment/locale/gl';
 import 'moment/locale/tr';
 import 'moment/locale/hu';
 import 'moment/locale/uk';
+import 'moment/locale/sq';
 
 import {
   UserOperation,
@@ -52,6 +53,7 @@ import emojiShortName from 'emoji-short-name';
 import Toastify from 'toastify-js';
 import tippy from 'tippy.js';
 import EmojiButton from '@joeattardi/emoji-button';
+import { customEmojis } from './custom-emojis';
 
 export const repoUrl = 'https://github.com/LemmyNet/lemmy';
 export const helpGuideUrl = '/docs/about_guide.html';
@@ -83,14 +85,16 @@ export const languages = [
   { code: 'fi', name: 'Suomi' },
   { code: 'fr', name: 'Français' },
   { code: 'sv', name: 'Svenska' },
+  { code: 'sq', name: 'Shqip' },
   { code: 'tr', name: 'Türkçe' },
-  { code: 'uk', name: 'українська мова' },
+  { code: 'uk', name: 'Українська Mова' },
   { code: 'ru', name: 'Русский' },
   { code: 'nl', name: 'Nederlands' },
   { code: 'it', name: 'Italiano' },
 ];
 
 export const themes = [
+  'laborwave',
   'litera',
   'materia',
   'minty',
@@ -306,10 +310,13 @@ export function routeSearchTypeToEnum(type: string): SearchType {
   return SearchType[capitalizeFirstLetter(type)];
 }
 
-export async function getPageTitle(url: string) {
-  let res = await fetch(`/iframely/oembed?url=${url}`).then(res => res.json());
-  let title = await res.title;
-  return title;
+export async function getPageTitle(url: string | null) {
+  let res = await fetch(`/iframely/oembed?url=${url}`);
+  if (!res.ok) {
+    return null;
+  }
+  const json = await res.json();
+  return json.title;
 }
 
 export function debounce(
@@ -421,6 +428,8 @@ export function getMomentLanguage(): string {
     lang = 'hu';
   } else if (lang.startsWith('uk')) {
     lang = 'uk';
+  } else if (lang.startsWith('sq')) {
+    lang = 'sq';
   } else {
     lang = 'en';
   }
@@ -587,9 +596,17 @@ export function setupTribute(): Tribute {
         selectTemplate: (item: any) => {
           return `:${item.original.key}:`;
         },
-        values: Object.entries(emojiShortName).map(e => {
-          return { key: e[1], val: e[0] };
-        }),
+        values: [
+          // ...Object.entries(emojiShortName).map(e => {
+          //   return { key: e[1], val: e[0] };
+          // }),
+          {
+            key: 'logo',
+            val:
+              '<img class="icon icon-navbar" src="/static/assets/logo.png" alt="vaporwave hammer and sickle logo, courtesy of ancestral potato">',
+          },
+          ...customEmojis,
+        ],
         allowSpaces: false,
         autocompleteMode: true,
         menuItemLimit: mentionDropdownFetchLimit,
@@ -926,7 +943,7 @@ export function postSort(
         +a.removed - +b.removed ||
         +a.deleted - +b.deleted ||
         (communityType && +b.stickied - +a.stickied) ||
-        hotRankPost(b) - hotRankPost(a)
+        b.hot_rank - a.hot_rank
     );
   }
 }

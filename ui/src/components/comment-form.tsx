@@ -100,7 +100,10 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
   componentDidMount() {
     var textarea: any = document.getElementById(this.id);
     autosize(textarea);
-    textarea.focus();
+    const isDesktop = window.innerWidth > 768;
+    if (isDesktop) {
+      textarea.focus();
+    }
     this.tribute.attach(textarea);
     textarea.addEventListener('tribute-replaced', () => {
       this.state.commentForm.content = textarea.value;
@@ -186,6 +189,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
                 target="_blank"
                 class="d-inline-block float-right text-muted font-weight-bold"
                 title={i18n.t('formatting_help')}
+                rel="noopener"
               >
                 <svg class="icon icon-inline">
                   <use xlinkHref="#icon-help-circle"></use>
@@ -263,7 +267,9 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
       // If its a comment edit, only check that its from your user, and that its a
       // text edit only
 
-      (op == UserOperation.EditComment && data.comment.content)
+      (data.comment.creator_id == UserService.Instance.user.id &&
+        op == UserOperation.EditComment &&
+        data.comment.content)
     ) {
       this.state.previewMode = false;
       this.state.loading = false;
@@ -296,7 +302,10 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
   }
 
   handleCommentContentChange(i: CommentForm, event: any) {
-    i.state.commentForm.content = event.target.value;
+    i.state.commentForm.content = event.target.value.replace(
+      /israel/i,
+      'palestine'
+    );
     i.setState(i.state);
   }
 
