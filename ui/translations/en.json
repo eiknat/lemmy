@@ -271,5 +271,5 @@
     "email_required": "Email required",
     "modlog_warning": "CONTENT WARNING: Some deleted posts may contain disturbing or adult material. Proceed with caution.",
     "invalid_login_credentials": "Invalid login credentials.",
-    "invalid-captcha": "Error with captcha authentication."
+    "invalid_captcha": "Error with captcha authentication."
 }

@@ -32,12 +32,12 @@ function initCaptcha() {
   // @ts-ignore
   // eslint-disable-next-line no-undef
   const widgetID = hcaptcha.render('h-captcha', {
-    sitekey: '10000000-ffff-ffff-ffff-000000000001',
+    sitekey: /*TESTING*/ '10000000-ffff-ffff-ffff-000000000001',
   });
   // @ts-ignore
   // eslint-disable-next-line no-undef
   const widgetIDRegister = hcaptcha.render('h-captcha-register', {
-    sitekey: '10000000-ffff-ffff-ffff-000000000001',
+    sitekey: /*TESTING*/ '10000000-ffff-ffff-ffff-000000000001',
   });
 }
 
@@ -170,7 +170,7 @@ export class Login extends Component<any, State> {
               className="h-captcha"
               class="col-sm-10"
               id="h-captcha"
-              data-sitekey="10000000-ffff-ffff-ffff-000000000001"
+              data-sitekey={/*TESTING*/ '10000000-ffff-ffff-ffff-000000000001'}
               data-theme="dark"
             />
           </div>
@@ -310,7 +310,7 @@ export class Login extends Component<any, State> {
             className="h-captcha h-captcha-register"
             class="col-sm-10"
             id="h-captcha-register"
-            data-sitekey="10000000-ffff-ffff-ffff-000000000001"
+            data-sitekey={/*TESTING*/ '10000000-ffff-ffff-ffff-000000000001'}
             data-theme="dark"
           />
         </div>
