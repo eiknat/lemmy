@@ -7,3 +7,5 @@ const endpoint = `${host}:${port}`;
 export const wsUri = `${
   window.location.protocol == 'https:' ? 'wss://' : 'ws://'
 }${endpoint}/api/v1/ws`;
+
+export const HCAPTCHA_SITE_KEY = '10000000-ffff-ffff-ffff-000000000001';
