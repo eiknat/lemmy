@@ -21,6 +21,7 @@ import 'moment/locale/gl';
 import 'moment/locale/tr';
 import 'moment/locale/hu';
 import 'moment/locale/uk';
+import 'moment/locale/sq';
 
 import {
   UserOperation,
@@ -84,8 +85,9 @@ export const languages = [
   { code: 'fi', name: 'Suomi' },
   { code: 'fr', name: 'Français' },
   { code: 'sv', name: 'Svenska' },
+  { code: 'sq', name: 'Shqip' },
   { code: 'tr', name: 'Türkçe' },
-  { code: 'uk', name: 'українська мова' },
+  { code: 'uk', name: 'Українська Mова' },
   { code: 'ru', name: 'Русский' },
   { code: 'nl', name: 'Nederlands' },
   { code: 'it', name: 'Italiano' },
@@ -426,6 +428,8 @@ export function getMomentLanguage(): string {
     lang = 'hu';
   } else if (lang.startsWith('uk')) {
     lang = 'uk';
+  } else if (lang.startsWith('sq')) {
+    lang = 'sq';
   } else {
     lang = 'en';
   }
@@ -939,7 +943,7 @@ export function postSort(
         +a.removed - +b.removed ||
         +a.deleted - +b.deleted ||
         (communityType && +b.stickied - +a.stickied) ||
-        hotRankPost(b) - hotRankPost(a)
+        b.hot_rank - a.hot_rank
     );
   }
 }

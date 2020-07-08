@@ -266,6 +266,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             href={post.url}
             target="_blank"
             title={post.url}
+            rel="noopener"
           >
             <svg class="icon thumbnail">
               <use xlinkHref="#icon-external-link"></use>

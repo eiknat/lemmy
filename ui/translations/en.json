@@ -267,6 +267,7 @@
     "action": "Action",
     "emoji_picker": "Emoji Picker",
     "block_leaving": "Are you sure you want to leave?",
+    "what_is": "What is",
     "email_required": "Email required",
     "modlog_warning": "CONTENT WARNING: Some deleted posts may contain disturbing or adult material. Proceed with caution.",
     "invalid_login_credentials": "Invalid login credentials.",
