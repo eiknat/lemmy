@@ -52,6 +52,7 @@ import emojiShortName from 'emoji-short-name';
 import Toastify from 'toastify-js';
 import tippy from 'tippy.js';
 import EmojiButton from '@joeattardi/emoji-button';
+import { customEmojis } from './custom-emojis';
 
 export const repoUrl = 'https://github.com/LemmyNet/lemmy';
 export const helpGuideUrl = '/docs/about_guide.html';
@@ -91,6 +92,7 @@ export const languages = [
 ];
 
 export const themes = [
+  'laborwave',
   'litera',
   'materia',
   'minty',
@@ -306,10 +308,13 @@ export function routeSearchTypeToEnum(type: string): SearchType {
   return SearchType[capitalizeFirstLetter(type)];
 }
 
-export async function getPageTitle(url: string) {
-  let res = await fetch(`/iframely/oembed?url=${url}`).then(res => res.json());
-  let title = await res.title;
-  return title;
+export async function getPageTitle(url: string | null) {
+  let res = await fetch(`/iframely/oembed?url=${url}`);
+  if (!res.ok) {
+    return null;
+  }
+  const json = await res.json();
+  return json.title;
 }
 
 export function debounce(
@@ -587,9 +592,17 @@ export function setupTribute(): Tribute {
         selectTemplate: (item: any) => {
           return `:${item.original.key}:`;
         },
-        values: Object.entries(emojiShortName).map(e => {
-          return { key: e[1], val: e[0] };
-        }),
+        values: [
+          // ...Object.entries(emojiShortName).map(e => {
+          //   return { key: e[1], val: e[0] };
+          // }),
+          {
+            key: 'logo',
+            val:
+              '<img class="icon icon-navbar" src="/static/assets/logo.png" alt="vaporwave hammer and sickle logo, courtesy of ancestral potato">',
+          },
+          ...customEmojis,
+        ],
         allowSpaces: false,
         autocompleteMode: true,
         menuItemLimit: mentionDropdownFetchLimit,

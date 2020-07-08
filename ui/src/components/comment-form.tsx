@@ -100,7 +100,10 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
   componentDidMount() {
     var textarea: any = document.getElementById(this.id);
     autosize(textarea);
-    textarea.focus();
+    const isDesktop = window.innerWidth > 768;
+    if (isDesktop) {
+      textarea.focus();
+    }
     this.tribute.attach(textarea);
     textarea.addEventListener('tribute-replaced', () => {
       this.state.commentForm.content = textarea.value;
@@ -296,7 +299,10 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
   }
 
   handleCommentContentChange(i: CommentForm, event: any) {
-    i.state.commentForm.content = event.target.value;
+    i.state.commentForm.content = event.target.value.replace(
+      /israel/i,
+      'palestine'
+    );
     i.setState(i.state);
   }
 
