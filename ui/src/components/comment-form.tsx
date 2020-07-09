@@ -25,6 +25,7 @@ import autosize from 'autosize';
 import Tribute from 'tributejs/src/Tribute.js';
 import emojiShortName from 'emoji-short-name';
 import { i18n } from '../i18next';
+import { TextAreaWithCounter, MAX_COMMENT_LENGTH } from './post-form';
 
 interface CommentFormProps {
   postId?: number;
@@ -129,7 +130,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
         >
           <div class="form-group row">
             <div className={`col-sm-12`}>
-              <textarea
+              <TextAreaWithCounter
                 id={this.id}
                 className={`form-control ${this.state.previewMode && 'd-none'}`}
                 value={this.state.commentForm.content}
@@ -138,7 +139,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
                 required
                 disabled={this.props.disabled}
                 rows={2}
-                maxLength={10000}
+                maxLength={MAX_COMMENT_LENGTH}
               />
               {this.state.previewMode && (
                 <div
