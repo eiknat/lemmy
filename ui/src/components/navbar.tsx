@@ -29,6 +29,7 @@ import {
   toast,
   messageToastify,
   md,
+  imagesDownsize,
 } from '../utils';
 import { version } from '../version';
 import { i18n } from '../i18next';
@@ -500,7 +501,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     let link = isCommentType(reply)
       ? `/post/${reply.post_id}/comment/${reply.id}`
       : `/inbox`;
-    let htmlBody = md.render(reply.content);
+    let htmlBody = imagesDownsize(md.render(reply.content), true);
     let body = reply.content; // Unfortunately the notifications API can't do html
 
     messageToastify(
