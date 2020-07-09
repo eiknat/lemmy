@@ -45,7 +45,8 @@ import Selectr from 'mobius1-selectr';
 import { i18n } from '../i18next';
 import { cleanURL } from '../clean-url';
 
-export const MAX_POST_TITLE_LENGTH = 140;
+export const MAX_POST_TITLE_LENGTH = 160;
+export const MAX_POST_BODY_LENGTH = 20000;
 
 interface PostFormProps {
   post?: Post; // If a post is given, that means this is an edit
@@ -313,7 +314,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                 onInput={linkEvent(this, this.handlePostBodyChange)}
                 className={`form-control ${this.state.previewMode && 'd-none'}`}
                 rows={4}
-                maxLength={10000}
+                maxLength={MAX_POST_BODY_LENGTH}
               />
               {this.state.previewMode && (
                 <div
