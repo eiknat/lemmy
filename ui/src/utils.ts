@@ -1024,6 +1024,6 @@ export function imagesDownsize(
     imgTagRegex,
     '$& class="' + (very_low ? 'notification-image' : 'comment-image') + '"'
   );
-  console.log(html);
+  //console.log(html);
   return html;
 }
