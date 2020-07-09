@@ -26,6 +26,7 @@ import Tribute from 'tributejs/src/Tribute.js';
 import emojiShortName from 'emoji-short-name';
 import { i18n } from '../i18next';
 import { TextAreaWithCounter, MAX_COMMENT_LENGTH } from './post-form';
+import { stat } from 'fs';
 
 interface CommentFormProps {
   postId?: number;
@@ -385,6 +386,11 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
   parseMessage(msg: WebSocketJsonResponse) {
     let res = wsJsonToRes(msg);
 
+    if (msg.error) {
+      this.state.loading = false;
+      this.setState(this.state);
+      return;
+    }
     // Only do the showing and hiding if logged in
     if (UserService.Instance.user) {
       if (res.op == UserOperation.CreateComment) {
