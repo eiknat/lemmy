@@ -45,7 +45,7 @@ import Selectr from 'mobius1-selectr';
 import { i18n } from '../i18next';
 import { cleanURL } from '../clean-url';
 
-const MAX_POST_TITLE_LENGTH = 200;
+export const MAX_POST_TITLE_LENGTH = 140;
 
 interface PostFormProps {
   post?: Post; // If a post is given, that means this is an edit
@@ -66,6 +66,25 @@ interface PostFormState {
   crossPosts: Array<Post>;
   enable_nsfw: boolean;
 }
+
+export const TextAreaWithCounter = ({ maxLength, ...props }) => {
+  const characterLimitExceeded = props.value && props.value.length > maxLength;
+  return (
+    <>
+      <textarea {...props} />
+      {props.value && (
+        <div class="mt-2">
+          <span
+            style={{ color: characterLimitExceeded ? 'var(--red)' : 'inherit' }}
+          >
+            {props.value.length.toLocaleString()}{' '}
+          </span>{' '}
+          / {maxLength.toLocaleString()}
+        </div>
+      )}
+    </>
+  );
+};
 
 export class PostForm extends Component<PostFormProps, PostFormState> {
   private id = `post-form-${randomStr()}`;
@@ -259,7 +278,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
             </label>
             <div class="col-sm-10">
               {!this.props.onEdit ? (
-                <textarea
+                <TextAreaWithCounter
                   value={this.state.postForm.name}
                   id="post-title"
                   onInput={linkEvent(this, this.handlePostNameChange)}
@@ -288,7 +307,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               {i18n.t('body')}
             </label>
             <div class="col-sm-10">
-              <textarea
+              <TextAreaWithCounter
                 id={this.id}
                 value={this.state.postForm.body}
                 onInput={linkEvent(this, this.handlePostBodyChange)}
