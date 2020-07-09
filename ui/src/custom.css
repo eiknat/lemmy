@@ -190,9 +190,19 @@ a.text-body {
   }
 }
 
-.about-body {
+.about-container {
   max-width: 700px;
   margin: 0 auto;
+}
+
+.about-body {
+
+  padding: 0 30px;
+}
+
+.about-header {
+  display: flex;
+  justify-content: center;;
 }
 
 .navbar-brand {
@@ -203,3 +213,4 @@ a.text-body {
   max-width: 300px;
   width: 100%;
 }
+
