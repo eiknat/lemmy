@@ -855,12 +855,14 @@ export class User extends Component<any, UserState> {
             {i18n.t('prev')}
           </button>
         )}
-        <button
-          class="btn btn-sm btn-secondary"
-          onClick={linkEvent(this, this.nextPage)}
-        >
-          {i18n.t('next')}
-        </button>
+        {this.state.posts.length + this.state.comments.length > fetchLimit && (
+          <button
+            class="btn btn-sm btn-secondary"
+            onClick={linkEvent(this, this.nextPage)}
+          >
+            {i18n.t('next')}
+          </button>
+        )}
       </div>
     );
   }
