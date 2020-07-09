@@ -420,6 +420,7 @@ export class Login extends Component<any, State> {
     document
       .getElementById('login-email-or-username')
       .classList.add('is-invalid');
+    toast(i18n.t('email_required'), 'danger');
   }
 
   get mathCheck(): boolean {
