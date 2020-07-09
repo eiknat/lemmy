@@ -241,7 +241,7 @@ export class Inbox extends Component<any, InboxState> {
     return (
       <div className="mb-2">
         <span class="mr-3">{this.unreadOrAllRadios()}</span>
-        <span class="mr-3">{this.messageTypeRadios()}</span>
+        <div class="mr-3 my-2 user-view-toggle">{this.messageTypeRadios()}</div>
         <SortSelect
           sort={this.state.sort}
           onChange={this.handleSortChange}

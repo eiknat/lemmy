@@ -229,3 +229,8 @@ a.text-body {
   max-width: 96px;
   max-height: 96px;
 }
+
+.comment-node {
+  padding: 0.5rem;
+}
+
