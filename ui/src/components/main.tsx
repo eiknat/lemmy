@@ -68,6 +68,7 @@ interface MainState {
   dataType: DataType;
   sort: SortType;
   page: number;
+  filtersOpen: boolean;
 }
 
 function getMoscowTime(): string {
@@ -113,6 +114,7 @@ export class Main extends Component<any, MainState> {
     dataType: getDataTypeFromProps(this.props),
     sort: getSortTypeFromProps(this.props),
     page: getPageFromProps(this.props),
+    filtersOpen: false,
   };
 
   constructor(props: any, context: any) {
@@ -477,22 +479,9 @@ export class Main extends Component<any, MainState> {
   }
 
   selects() {
+    const isMobile = window.innerWidth < 768;
     return (
       <div className="mb-3 filter-row">
-        <span className="listing-select-group">
-          <span class="mr-3 listing-type-select">
-            <ListingTypeSelect
-              type_={this.state.listingType}
-              onChange={this.handleListingTypeChange}
-            />
-          </span>
-          <span class="mr-3 data-type-select">
-            <DataTypeSelect
-              type_={this.state.dataType}
-              onChange={this.handleDataTypeChange}
-            />
-          </span>
-        </span>
         <span>
           <span class="mr-2 sort-select">
             <SortSelect
@@ -526,7 +515,32 @@ export class Main extends Component<any, MainState> {
                 </svg>
               </a>
             )}
+          <button
+            className="btn text-right"
+            onClick={linkEvent(this, this.toggleMobileFilters)}
+            style={{ padding: '0 10px 2px 10px' }}
+          >
+            <svg className="icon text-muted">
+              <use xlinkHref="#icon-settings">#</use>
+            </svg>
+          </button>
         </span>
+        {(!isMobile || (isMobile && this.state.filtersOpen)) && (
+          <span className="listing-select-group my-3">
+            <span class="mr-3">
+              <ListingTypeSelect
+                type_={this.state.listingType}
+                onChange={this.handleListingTypeChange}
+              />
+            </span>
+            <span class="mr-3 data-type-select">
+              <DataTypeSelect
+                type_={this.state.dataType}
+                onChange={this.handleDataTypeChange}
+              />
+            </span>
+          </span>
+        )}
       </div>
     );
   }
@@ -554,13 +568,11 @@ export class Main extends Component<any, MainState> {
     );
   }
 
-  get canAdmin(): boolean {
-    return (
-      UserService.Instance.user &&
-      this.state.siteRes.admins
-        .map(a => a.id)
-        .includes(UserService.Instance.user.id)
-    );
+  get canAdmin(): boolean {}
+
+  toggleMobileFilters(i: Main) {
+    i.state.filtersOpen = !i.state.filtersOpen;
+    i.setState(i.state);
   }
 
   handleEditClick(i: Main) {

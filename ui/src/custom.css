@@ -214,3 +214,6 @@ a.text-body {
   width: 100%;
 }
 
+.comment-node {
+  padding: 0.5rem;
+}
