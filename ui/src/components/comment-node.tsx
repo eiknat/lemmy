@@ -26,6 +26,7 @@ import {
   isMod,
   setupTippy,
   colorList,
+  imagesDownsize,
 } from '../utils';
 import moment from 'moment';
 import { MomentTime } from './moment-time';
@@ -236,9 +237,12 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                 ) : (
                   <div
                     className="md-div comment-text-container"
-                    dangerouslySetInnerHTML={mdToHtml(
-                      this.commentUnlessRemoved
-                    )}
+                    dangerouslySetInnerHTML={{
+                      __html: imagesDownsize(
+                        String(mdToHtml(this.commentUnlessRemoved).__html),
+                        false
+                      ),
+                    }}
                   />
                 )}
                 <div class="d-flex justify-content-between justify-content-lg-start flex-wrap text-muted font-weight-bold">

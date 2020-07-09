@@ -54,6 +54,7 @@ import Toastify from 'toastify-js';
 import tippy from 'tippy.js';
 import EmojiButton from '@joeattardi/emoji-button';
 import { customEmojis, replaceEmojis } from './custom-emojis';
+import { match } from 'assert';
 
 export const repoUrl = 'https://github.com/LemmyNet/lemmy';
 export const helpGuideUrl = '/docs/about_guide.html';
@@ -998,4 +999,36 @@ function canUseWebP() {
 
   // // very old browser like IE 8, canvas not supported
   // return false;
+}
+
+export function imagesDownsize(html: string, very_low: boolean): string {
+  const imgPictrsRegex = new RegExp(
+    /<img src="https:\/\/.*?chapo\.chat\/pictrs\/image/
+  );
+  const imgTagRegex = new RegExp(/<img(.*?src=".*?"[^>]+>)/);
+  let matchArrPictrs = html.match(imgPictrsRegex);
+  if (matchArrPictrs != null) {
+    for (let match of matchArrPictrs) {
+      html = html.replace(
+        imgPictrsRegex,
+        match + '/thumbnail' + (very_low ? '96' : '256')
+      );
+    }
+  }
+  let matchArrImg = html.match(imgTagRegex);
+  if (matchArrImg != null) {
+    for (let match of matchArrImg) {
+      if (!match.includes('<img')) {
+        html = html.replace(
+          imgTagRegex,
+          '<img class="' +
+            (very_low ? 'notification-image' : 'comment-image') +
+            '"' +
+            match
+        );
+      }
+    }
+  }
+  //console.log(html);
+  return html;
 }
