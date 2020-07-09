@@ -1001,7 +1001,7 @@ function canUseWebP() {
   // return false;
 }
 
-export function imagesDownsize(html: string, very_low: boolean): string {
+export function imagesDownsize(html: String, very_low: boolean): String {
   const imgPictrsRegex = new RegExp(
     /<img src="https:\/\/.*?chapo\.chat\/pictrs\/image/
   );
