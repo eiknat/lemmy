@@ -349,6 +349,8 @@ export class Post extends Component<any, PostState> {
     let res = wsJsonToRes(msg);
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
+      this.state.loading = false;
+      this.setState(this.state);
       return;
     } else if (msg.reconnect) {
       WebSocketService.Instance.getPost({
