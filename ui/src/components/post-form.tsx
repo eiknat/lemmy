@@ -47,6 +47,7 @@ import { cleanURL } from '../clean-url';
 
 export const MAX_POST_TITLE_LENGTH = 160;
 export const MAX_POST_BODY_LENGTH = 20000;
+export const MAX_COMMENT_LENGTH = 10000;
 
 interface PostFormProps {
   post?: Post; // If a post is given, that means this is an edit
@@ -453,7 +454,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       i.state.postForm.url = undefined;
     }
 
-    if (i.state.postForm.url !== '' && i.state.postForm.url !== null) {
+    if (i.state.postForm.url !== '' && !!i.state.postForm.url) {
       // remove trackers from URL
       const cleanedURL = cleanURL({ url: i.state.postForm.url });
 
