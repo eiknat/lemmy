@@ -433,7 +433,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       i.state.postForm.url = undefined;
     }
 
-    if (i.state.postForm.url !== '' && i.state.postForm.url !== undefined) {
+    if (i.state.postForm.url !== '' && i.state.postForm.url !== null) {
       // remove trackers from URL
       const cleanedURL = cleanURL({ url: i.state.postForm.url });
 
