@@ -286,10 +286,9 @@ export class Main extends Component<any, MainState> {
             <img src="/static/assets/welcome.gif" className="m-4 img-fluid" />
             <img
               className="img-fluid mb-2"
-              src="/static/assets/logo.png"
-              alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
+              src="/static/assets/hexbear-logo.png"
+              alt="hexbear logo"
             />
-            <sub>Logo courtesy of Ancestral Potato</sub>
             <h5 class="mb-0">{`${this.state.siteRes.site.name}`}</h5>
             {this.canAdmin && (
               <ul class="list-inline mb-1 text-muted font-weight-bold">
