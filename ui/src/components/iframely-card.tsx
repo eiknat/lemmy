@@ -67,15 +67,17 @@ export class IFramelyCard extends Component<
                         <use xlinkHref="#icon-external-link"></use>
                       </svg>
                     </a>
-                    {post.embed_html && (
-                      <span
-                        class="ml-2 pointer text-monospace"
-                        onClick={linkEvent(this, this.handleIframeExpand)}
-                        data-tippy-content={i18n.t('expand_here')}
-                      >
-                        {this.state.expanded ? '[-]' : '[+]'}
-                      </span>
-                    )}
+                    {
+                      //post.embed_html && (     Commented out - all iframely embeds are working on the post listing instead.
+                      //  <span
+                      //    class="ml-2 pointer text-monospace"
+                      //    onClick={linkEvent(this, this.handleIframeExpand)}
+                      //    data-tippy-content={i18n.t('expand_here')}
+                      //  >
+                      //    {this.state.expanded ? '[-]' : '[+]'}
+                      // </span>
+                      //)
+                    }
                   </span>
                   {post.embed_description && (
                     <div

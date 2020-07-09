@@ -26,6 +26,7 @@ import {
   isMod,
   setupTippy,
   colorList,
+  imagesDownsize,
 } from '../utils';
 import moment from 'moment';
 import { MomentTime } from './moment-time';
@@ -33,6 +34,7 @@ import { CommentForm } from './comment-form';
 import { CommentNodes } from './comment-nodes';
 import { UserListing } from './user-listing';
 import { i18n } from '../i18next';
+import { replaceEmojis } from '../custom-emojis';
 
 interface CommentNodeState {
   showReply: boolean;
@@ -124,10 +126,11 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
 
   render() {
     let node = this.props.node;
+
     return (
       <div
         className={`comment ${
-          node.comment.parent_id && !this.props.noIndent ? 'ml-1' : ''
+          node.comment.parent_id && !this.props.noIndent ? 'ml-2' : ''
         }`}
       >
         <div
@@ -149,6 +152,20 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
             }`}
           >
             <div class="d-flex flex-wrap align-items-center text-muted small">
+              <div
+                className="unselectable pointer mr-2 comment-expand-button"
+                onClick={linkEvent(this, this.handleCommentCollapse)}
+              >
+                {this.state.collapsed ? (
+                  <svg class="icon icon-inline">
+                    <use xlinkHref="#icon-plus-square"></use>
+                  </svg>
+                ) : (
+                  <svg class="icon icon-inline">
+                    <use xlinkHref="#icon-minus-square"></use>
+                  </svg>
+                )}
+              </div>
               <span class="mr-2">
                 <UserListing
                   user={{
@@ -188,20 +205,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   </Link>
                 </>
               )}
-              <div
-                className="mr-lg-4 flex-grow-1 flex-lg-grow-0 unselectable pointer mx-2"
-                onClick={linkEvent(this, this.handleCommentCollapse)}
-              >
-                {this.state.collapsed ? (
-                  <svg class="icon icon-inline">
-                    <use xlinkHref="#icon-plus-square"></use>
-                  </svg>
-                ) : (
-                  <svg class="icon icon-inline">
-                    <use xlinkHref="#icon-minus-square"></use>
-                  </svg>
-                )}
-              </div>
+
               <span
                 className={`unselectable pointer ${this.scoreColor}`}
                 onClick={linkEvent(node, this.handleCommentUpvote)}
@@ -232,10 +236,14 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   <pre>{this.commentUnlessRemoved}</pre>
                 ) : (
                   <div
-                    className="md-div"
-                    dangerouslySetInnerHTML={mdToHtml(
-                      this.commentUnlessRemoved
-                    )}
+                    className="md-div comment-text-container"
+                    dangerouslySetInnerHTML={{
+                      __html: imagesDownsize(
+                        String(mdToHtml(this.commentUnlessRemoved).__html),
+                        false,
+                        true
+                      ),
+                    }}
                   />
                 )}
                 <div class="d-flex justify-content-between justify-content-lg-start flex-wrap text-muted font-weight-bold">

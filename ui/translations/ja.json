@@ -235,5 +235,6 @@
     "no_private_message_edit_allowed": "プライベートメッセージの編集許可がありません。",
     "couldnt_update_private_message": "プライベートメッセージが更新されない。",
     "couldnt_like_comment": "コメントが「いいね」できない。",
-    "couldnt_like_post": "投稿が「いいね」できない。"
+    "couldnt_like_post": "投稿が「いいね」できない。",
+    "invalid_login_credentials": "無効なログイン資格情報。"
 }

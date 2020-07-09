@@ -68,6 +68,18 @@ interface MainState {
   dataType: DataType;
   sort: SortType;
   page: number;
+  filtersOpen: boolean;
+}
+
+function getMoscowTime(): string {
+  const localDate = new Date();
+
+  const utc = localDate.getTime() + localDate.getTimezoneOffset() * 60000;
+
+  // create new Date object for different city
+  // using supplied offset
+  const moscowTime = new Date(utc + 3600000 * 3);
+  return moscowTime.toLocaleString().split(', ')[1];
 }
 
 export class Main extends Component<any, MainState> {
@@ -102,6 +114,7 @@ export class Main extends Component<any, MainState> {
     dataType: getDataTypeFromProps(this.props),
     sort: getSortTypeFromProps(this.props),
     page: getPageFromProps(this.props),
+    filtersOpen: false,
   };
 
   constructor(props: any, context: any) {
@@ -158,12 +171,12 @@ export class Main extends Component<any, MainState> {
 
   render() {
     return (
-      <div class="container">
+      <div class="container" style={{ 'max-width': '100%' }}>
         <div class="row">
           <main role="main" class="col-12 col-md-8">
             {this.posts()}
           </main>
-          <aside class="col-12 col-md-4">{this.my_sidebar()}</aside>
+          <aside class="col-12 col-md-4 sidebar">{this.my_sidebar()}</aside>
         </div>
       </div>
     );
@@ -213,6 +226,7 @@ export class Main extends Component<any, MainState> {
               </div>
             </div>
             {this.sidebar()}
+            {this.donations()}
             {this.landing()}
           </div>
         )}
@@ -271,6 +285,12 @@ export class Main extends Component<any, MainState> {
       <div>
         <div class="card border-secondary mb-3">
           <div class="card-body">
+            <img src="/static/assets/welcome.gif" className="m-4 img-fluid" />
+            <img
+              className="img-fluid mb-2"
+              src="/static/assets/hexbear-logo.png"
+              alt="hexbear logo"
+            />
             <h5 class="mb-0">{`${this.state.siteRes.site.name}`}</h5>
             {this.canAdmin && (
               <ul class="list-inline mb-1 text-muted font-weight-bold">
@@ -287,6 +307,17 @@ export class Main extends Component<any, MainState> {
                 </li>
               </ul>
             )}
+            <img src="/static/assets/warning.jpg" className="my-3 img-fluid" />
+            <img src="/static/assets/construction.gif" className="img-fluid" />
+            <div className="my-2">
+              It is currently {getMoscowTime()} in Moscow
+            </div>
+            <div className="my-2">
+              Please send any thoughts, suggestions, memes or complaints to{' '}
+              <a href="mailto:chapotraphouse@gmail.com?subject=ChapoTrapHouse Memes">
+                Matt Christman.
+              </a>
+            </div>
             <ul class="my-2 list-inline">
               {/*
               <li className="list-inline-item badge badge-secondary">
@@ -353,6 +384,24 @@ export class Main extends Component<any, MainState> {
     );
   }
 
+  donations() {
+    return (
+      <div class="card border-secondary mb-3">
+        <div class="card-body">
+          <h5>
+            Support us through
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"> Patreon!</a>
+          </h5>
+          <p class="mb-0">
+            Our Soros donations only get us so far, and that&apos;s where your
+            donations help. It costs [replace-me] per month to show you yet
+            another post of pig poop balls, so pitch in today!
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   landing() {
     return (
       <div class="card border-secondary">
@@ -362,9 +411,7 @@ export class Main extends Component<any, MainState> {
             <svg class="icon mx-2">
               <use xlinkHref="#icon-mouse">#</use>
             </svg>
-            <a href={repoUrl}>
-              Lemmy<sup>beta</sup>
-            </a>
+            <a href={repoUrl}>Lemmy</a>
           </h5>
           <p class="mb-0">
             <T i18nKey="landing_0">
@@ -431,41 +478,19 @@ export class Main extends Component<any, MainState> {
   }
 
   selects() {
+    const isMobile = window.innerWidth < 768;
     return (
-      <div className="mb-3">
-        <span class="mr-3">
-          <DataTypeSelect
-            type_={this.state.dataType}
-            onChange={this.handleDataTypeChange}
-          />
-        </span>
-        <span class="mr-3">
-          <ListingTypeSelect
-            type_={this.state.listingType}
-            onChange={this.handleListingTypeChange}
-          />
-        </span>
-        <span class="mr-2">
-          <SortSelect sort={this.state.sort} onChange={this.handleSortChange} />
-        </span>
-        {this.state.listingType == ListingType.All && (
-          <a
-            href={`/feeds/all.xml?sort=${SortType[this.state.sort]}`}
-            target="_blank"
-            rel="noopener"
-            title="RSS"
-          >
-            <svg class="icon text-muted small">
-              <use xlinkHref="#icon-rss">#</use>
-            </svg>
-          </a>
-        )}
-        {UserService.Instance.user &&
-          this.state.listingType == ListingType.Subscribed && (
+      <div className="mb-3 filter-row">
+        <span>
+          <span class="mr-2 sort-select">
+            <SortSelect
+              sort={this.state.sort}
+              onChange={this.handleSortChange}
+            />
+          </span>
+          {this.state.listingType == ListingType.All && (
             <a
-              href={`/feeds/front/${UserService.Instance.auth}.xml?sort=${
-                SortType[this.state.sort]
-              }`}
+              href={`/feeds/all.xml?sort=${SortType[this.state.sort]}`}
               target="_blank"
               title="RSS"
               rel="noopener"
@@ -475,6 +500,46 @@ export class Main extends Component<any, MainState> {
               </svg>
             </a>
           )}
+          {UserService.Instance.user &&
+            this.state.listingType == ListingType.Subscribed && (
+              <a
+                href={`/feeds/front/${UserService.Instance.auth}.xml?sort=${
+                  SortType[this.state.sort]
+                }`}
+                target="_blank"
+                title="RSS"
+              >
+                <svg class="icon text-muted small">
+                  <use xlinkHref="#icon-rss">#</use>
+                </svg>
+              </a>
+            )}
+          <button
+            className="btn text-right"
+            onClick={linkEvent(this, this.toggleMobileFilters)}
+            style={{ padding: '0 10px 2px 10px' }}
+          >
+            <svg className="icon text-muted">
+              <use xlinkHref="#icon-settings">#</use>
+            </svg>
+          </button>
+        </span>
+        {(!isMobile || (isMobile && this.state.filtersOpen)) && (
+          <span className="listing-select-group my-3">
+            <span class="mr-3">
+              <ListingTypeSelect
+                type_={this.state.listingType}
+                onChange={this.handleListingTypeChange}
+              />
+            </span>
+            <span class="mr-3 data-type-select">
+              <DataTypeSelect
+                type_={this.state.dataType}
+                onChange={this.handleDataTypeChange}
+              />
+            </span>
+          </span>
+        )}
       </div>
     );
   }
@@ -502,13 +567,11 @@ export class Main extends Component<any, MainState> {
     );
   }
 
-  get canAdmin(): boolean {
-    return (
-      UserService.Instance.user &&
-      this.state.siteRes.admins
-        .map(a => a.id)
-        .includes(UserService.Instance.user.id)
-    );
+  get canAdmin(): boolean {}
+
+  toggleMobileFilters(i: Main) {
+    i.state.filtersOpen = !i.state.filtersOpen;
+    i.setState(i.state);
   }
 
   handleEditClick(i: Main) {

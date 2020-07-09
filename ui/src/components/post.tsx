@@ -174,7 +174,7 @@ export class Post extends Component<any, PostState> {
           </h5>
         ) : (
           <div class="row">
-            <div class="col-12 col-md-8 mb-3">
+            <div class="col-12 col-md-8 mb-3 main-content">
               <PostListing
                 post={this.state.post}
                 showBody
@@ -190,8 +190,8 @@ export class Post extends Component<any, PostState> {
               {this.state.comments.length > 0 && this.sortRadios()}
               {this.commentsTree()}
             </div>
-            <div class="col-12 col-sm-12 col-md-4">
-              {this.state.comments.length > 0 && this.newComments()}
+            <div class="flex-1">
+              {/* {this.state.comments.length > 0 && this.newComments()} */}
               {this.sidebar()}
             </div>
           </div>
@@ -261,7 +261,7 @@ export class Post extends Component<any, PostState> {
 
   newComments() {
     return (
-      <div class="d-none d-md-block new-comments mb-3 card border-secondary">
+      <div class="d-none d-md-block new-comments mb-3 card border-secondary sidebar-content">
         <div class="card-body small">
           <h6>{i18n.t('recent_comments')}</h6>
           <CommentNodes
@@ -349,6 +349,8 @@ export class Post extends Component<any, PostState> {
     let res = wsJsonToRes(msg);
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
+      this.state.loading = false;
+      this.setState(this.state);
       return;
     } else if (msg.reconnect) {
       WebSocketService.Instance.getPost({

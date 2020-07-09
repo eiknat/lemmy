@@ -351,17 +351,26 @@ export class Modlog extends Component<any, ModlogState> {
           </h5>
         ) : (
           <div>
-            <h5>
-              {this.state.communityName && (
-                <Link
-                  className="text-body"
-                  to={`/c/${this.state.communityName}`}
-                >
-                  /c/{this.state.communityName}{' '}
-                </Link>
-              )}
-              <span>{i18n.t('modlog')}</span>
-            </h5>
+            <div>
+              <div style="display:inline-block; margin-top:6px">
+                <h5>
+                  {this.state.communityName && (
+                    <Link
+                      className="text-body"
+                      to={`/c/${this.state.communityName}`}
+                    >
+                      /c/{this.state.communityName}{' '}
+                    </Link>
+                  )}
+                  <span>{i18n.t('modlog')}</span>
+                </h5>
+              </div>
+              <div style="display:inline-block; float:right;">
+                <h6 style="border:3px solid #000000; padding:5px; background-color:#F39C12; color:#111111;">
+                  {i18n.t('modlog_warning')}
+                </h6>
+              </div>
+            </div>
             <div class="table-responsive">
               <table id="modlog_table" class="table table-sm table-hover">
                 <thead class="pointer">

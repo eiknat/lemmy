@@ -243,5 +243,6 @@
     "user_already_exists": "მომხმარებელი უკვე არსებობს.",
     "email_already_exists": "ელ-პოსტა უკვე არსებობს.",
     "couldnt_update_user": "მომხმარებლის განახლება ვერ მოხერხდა.",
-    "system_err_login": "ერორი.  თავიდან შემოსვლა ცადეთ."
+    "system_err_login": "ერორი.  თავიდან შემოსვლა ცადეთ.",
+    "invalid_login_credentials": "არასწორი შესვლის სერთიფიკატები."
 }

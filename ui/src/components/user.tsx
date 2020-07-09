@@ -213,7 +213,7 @@ export class User extends Component<any, UserState> {
           </h5>
         ) : (
           <div class="row">
-            <div class="col-12 col-md-8">
+            <main class="col-12 col-md-8" role="main">
               <h5>
                 {this.state.user.avatar && showAvatars() && (
                   <img
@@ -231,13 +231,13 @@ export class User extends Component<any, UserState> {
               {this.state.view == View.Posts && this.posts()}
               {this.state.view == View.Saved && this.overview()}
               {this.paginator()}
-            </div>
-            <div class="col-12 col-md-4">
+            </main>
+            <aside class="col-12 col-md-4 sidebar">
               {this.userInfo()}
               {this.isCurrentUser && this.userSettings()}
               {this.moderates()}
               {this.follows()}
-            </div>
+            </aside>
           </div>
         )}
       </div>
@@ -306,7 +306,7 @@ export class User extends Component<any, UserState> {
   selects() {
     return (
       <div className="mb-2">
-        <span class="mr-3">{this.viewRadios()}</span>
+        <div class="mr-3 mb-2 user-view-toggle">{this.viewRadios()}</div>
         <SortSelect
           sort={this.state.sort}
           onChange={this.handleSortChange}
@@ -427,7 +427,7 @@ export class User extends Component<any, UserState> {
                 </tr>
                 */}
                 <tr>
-                  {/* 
+                  {/*
                   <td>
                     {i18n.t('number_of_points', { count: user.post_score })}
                   </td>
@@ -435,7 +435,7 @@ export class User extends Component<any, UserState> {
                   <td>
                     {i18n.t('number_of_posts', { count: user.number_of_posts })}
                   </td>
-                  {/* 
+                  {/*
                 </tr>
                 <tr>
                   <td>
@@ -855,12 +855,14 @@ export class User extends Component<any, UserState> {
             {i18n.t('prev')}
           </button>
         )}
-        <button
-          class="btn btn-sm btn-secondary"
-          onClick={linkEvent(this, this.nextPage)}
-        >
-          {i18n.t('next')}
-        </button>
+        {this.state.posts.length + this.state.comments.length > fetchLimit && (
+          <button
+            class="btn btn-sm btn-secondary"
+            onClick={linkEvent(this, this.nextPage)}
+          >
+            {i18n.t('next')}
+          </button>
+        )}
       </div>
     );
   }
