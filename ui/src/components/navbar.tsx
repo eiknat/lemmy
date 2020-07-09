@@ -501,7 +501,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     let link = isCommentType(reply)
       ? `/post/${reply.post_id}/comment/${reply.id}`
       : `/inbox`;
-    let htmlBody = imagesDownsize(md.render(reply.content), true);
+    let htmlBody = imagesDownsize(md.render(reply.content), true, false);
     let body = reply.content; // Unfortunately the notifications API can't do html
 
     messageToastify(

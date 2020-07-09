@@ -240,7 +240,8 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                     dangerouslySetInnerHTML={{
                       __html: imagesDownsize(
                         String(mdToHtml(this.commentUnlessRemoved).__html),
-                        false
+                        false,
+                        true
                       ),
                     }}
                   />

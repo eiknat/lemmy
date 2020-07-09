@@ -1001,34 +1001,29 @@ function canUseWebP() {
   // return false;
 }
 
-export function imagesDownsize(html: String, very_low: boolean): String {
+export function imagesDownsize(
+  html: string,
+  very_low: boolean,
+  can_expand: boolean
+): string {
   const imgPictrsRegex = new RegExp(
-    /<img src="https:\/\/.*?chapo\.chat\/pictrs\/image/
+    /<img src=(("https:\/\/.*?chapo\.chat\/pictrs\/image\/)(.{10})(.jpg"))( alt=".*?">)/g
   );
-  const imgTagRegex = new RegExp(/<img(.*?src=".*?"[^>]+>)/);
-  let matchArrPictrs = html.match(imgPictrsRegex);
-  if (matchArrPictrs != null) {
-    for (let match of matchArrPictrs) {
-      html = html.replace(
-        imgPictrsRegex,
-        match + '/thumbnail' + (very_low ? '96' : '256')
-      );
-    }
-  }
-  let matchArrImg = html.match(imgTagRegex);
-  if (matchArrImg != null) {
-    for (let match of matchArrImg) {
-      if (!match.includes('<img')) {
-        html = html.replace(
-          imgTagRegex,
-          '<img class="' +
-            (very_low ? 'notification-image' : 'comment-image') +
-            '"' +
-            match
-        );
-      }
-    }
-  }
+  const imgTagRegex = new RegExp(/<img/g);
+  html = html.replaceAll(
+    imgPictrsRegex,
+    (can_expand
+      ? '<a target="_blank" rel="noopener noreferrer" href=$1>'
+      : '') +
+      '<img id="$3" src=$2thumbnail' +
+      (very_low ? '96' : '256') +
+      '/$3$4$5' +
+      (can_expand ? '</a>' : '')
+  );
+  html = html.replaceAll(
+    imgTagRegex,
+    '$& class="' + (very_low ? 'notification-image' : 'comment-image') + '"'
+  );
   //console.log(html);
   return html;
 }
