@@ -159,7 +159,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
       <nav class="container-fluid navbar navbar-expand-md navbar-light shadow p-0 px-3">
         <a class="navbar-brand" href="/">
           <img
-            src="/static/assets/logo.png"
+            src="/static/assets/hexbear_head.svg"
             class="icon icon-navbar"
             alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
           />

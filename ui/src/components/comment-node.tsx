@@ -126,10 +126,6 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   render() {
     let node = this.props.node;
 
-    const rawHtml = mdToHtml(this.commentUnlessRemoved).__html;
-
-    const commentContent = replaceEmojis(rawHtml);
-
     return (
       <div
         className={`comment ${
@@ -240,7 +236,9 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                 ) : (
                   <div
                     className="md-div comment-text-container"
-                    dangerouslySetInnerHTML={{ __html: commentContent }}
+                    dangerouslySetInnerHTML={mdToHtml(
+                      this.commentUnlessRemoved
+                    )}
                   />
                 )}
                 <div class="d-flex justify-content-between justify-content-lg-start flex-wrap text-muted font-weight-bold">
