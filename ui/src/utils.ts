@@ -563,7 +563,7 @@ export function messageToastify(
   router: any
 ) {
   let backgroundColor = `var(--light)`;
-
+  body = '<div class="notiication-text-container">' + body + '</div>';
   let toast = Toastify({
     text: `${body}<br />${creator}`,
     avatar: avatar,
