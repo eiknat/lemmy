@@ -584,6 +584,9 @@ export function messageToastify(
 
 export function setupTribute(): Tribute {
   return new Tribute({
+    noMatchTemplate: function () {
+      return '<span style:"visibility: hidden;"></span>';
+    },
     collection: [
       // Emojis
       {
