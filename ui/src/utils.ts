@@ -684,8 +684,14 @@ function userSearch(text: string, cb: any) {
         if (res.op == UserOperation.Search) {
           let data = res.data as SearchResponse;
           let users = data.users.map(u => {
+            const currentHost = hostname(window.location.href);
+            const userHost = hostname(u.actor_id);
+
             return {
-              key: `@${u.name}@${hostname(u.actor_id)}`,
+              // don't show hostname if it's the current instance
+              key: `@${u.name}${
+                currentHost !== userHost ? `@${hostname(u.actor_id)}` : ''
+              }`,
               name: u.name,
               local: u.local,
               id: u.id,
