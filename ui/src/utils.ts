@@ -1010,7 +1010,7 @@ export function imagesDownsize(
     /<img src=(("https:\/\/.*?chapo\.chat\/pictrs\/image\/)(.{10})(.jpg"))( alt=".*?">)/g
   );
   const imgTagRegex = new RegExp(/<img/g);
-  html = html.replaceAll(
+  html = html.replace(
     imgPictrsRegex,
     (can_expand
       ? '<a target="_blank" rel="noopener noreferrer" href=$1>'
@@ -1020,7 +1020,7 @@ export function imagesDownsize(
       '/$3$4$5' +
       (can_expand ? '</a>' : '')
   );
-  html = html.replaceAll(
+  html = html.replace(
     imgTagRegex,
     '$& class="' + (very_low ? 'notification-image' : 'comment-image') + '"'
   );
