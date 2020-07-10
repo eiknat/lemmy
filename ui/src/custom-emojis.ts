@@ -127,7 +127,6 @@ export const emojiPaths = [
   'yugoslavia.png',
   'zizek-fuck.png',
   'zizek-ok.png',
-  'quill.png'
 ];
 
 const EMOJI_DIR_PATH = '/static/assets/emojis/';
