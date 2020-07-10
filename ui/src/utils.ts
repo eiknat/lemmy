@@ -684,8 +684,14 @@ function userSearch(text: string, cb: any) {
         if (res.op == UserOperation.Search) {
           let data = res.data as SearchResponse;
           let users = data.users.map(u => {
+            const currentHost = hostname(window.location.href);
+            const userHost = hostname(u.actor_id);
+
             return {
-              key: `@${u.name}@${hostname(u.actor_id)}`,
+              // don't show hostname if it's the current instance
+              key: `@${u.name}${
+                currentHost !== userHost ? `@${hostname(u.actor_id)}` : ''
+              }`,
               name: u.name,
               local: u.local,
               id: u.id,
@@ -1009,7 +1015,7 @@ export function imagesDownsize(
   const imgPictrsRegex = new RegExp(
     /<img src=(("https:\/\/.*?chapo\.chat\/pictrs\/image\/)(.{10})(.jpg"))( alt=".*?">)/g
   );
-  const imgTagRegex = new RegExp(/<img/g);
+  const imgTagRegex = new RegExp(/<img((?!icon).)*$/g);
   html = html.replace(
     imgPictrsRegex,
     (can_expand
@@ -1024,6 +1030,5 @@ export function imagesDownsize(
     imgTagRegex,
     '$& class="' + (very_low ? 'notification-image' : 'comment-image') + '"'
   );
-  //console.log(html);
   return html;
 }
