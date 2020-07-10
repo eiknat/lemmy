@@ -16,13 +16,28 @@ import { User } from './components/user';
 import { Modlog } from './components/modlog';
 import { Setup } from './components/setup';
 import { AdminSettings } from './components/admin-settings';
+import { WelcomePage } from './components/welcome';
 import { Inbox } from './components/inbox';
 import { Search } from './components/search';
 import { Sponsors } from './components/sponsors';
 import { Symbols } from './components/symbols';
 import { i18n } from './i18next';
+import './custom.css';
+import { About } from './components/about';
 
 const container = document.getElementById('app');
+
+function PPB() {
+  return (
+    <div style={{ 'max-width': '500px' }}>
+      <img
+        src="https://i.imgur.com/5pXPI.jpg"
+        className="img-fluid"
+        alt="a pig that has pooped on its own balls"
+      />
+    </div>
+  );
+}
 
 class Index extends Component<any, any> {
   constructor(props: any, context: any) {
@@ -38,6 +53,8 @@ class Index extends Component<any, any> {
             <div class="mt-4 p-0 fl-1">
               <Switch>
                 <Route exact path={`/`} component={Main} />
+                {/* <Route exact path={`/`} component={WelcomePage} /> */}
+                <Route path={`/ppb`} component={PPB} />
                 <Route
                   path={`/home/data_type/:data_type/listing_type/:listing_type/sort/:sort/page/:page`}
                   component={Main}
@@ -77,6 +94,7 @@ class Index extends Component<any, any> {
                   component={Modlog}
                 />
                 <Route path={`/modlog`} component={Modlog} />
+                <Route path={`/about`} component={About} />
                 <Route path={`/setup`} component={Setup} />
                 <Route path={`/admin`} component={AdminSettings} />
                 <Route
@@ -89,6 +107,10 @@ class Index extends Component<any, any> {
                   path={`/password_change/:token`}
                   component={PasswordChange}
                 />
+
+                <Route path={`/pbb`} component={PPB} />
+                <Route path={`/welcome`} component={WelcomePage} />
+                <Route path="*" component={PPB} />
               </Switch>
               <Symbols />
             </div>

@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import { Component, linkEvent, createRef, RefObject } from 'inferno';
+import { Link, withRouter } from 'inferno-router';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { WebSocketService, UserService } from '../services';
@@ -29,6 +29,7 @@ import {
   toast,
   messageToastify,
   md,
+  imagesDownsize,
 } from '../utils';
 import { version } from '../version';
 import { i18n } from '../i18next';
@@ -42,11 +43,14 @@ interface NavbarState {
   unreadCount: number;
   siteName: string;
   admins: Array<UserView>;
+  searchParam: string;
+  toggleSearch: boolean;
 }
 
-export class Navbar extends Component<any, NavbarState> {
+class UnwrappedNavbar extends Component<any, NavbarState> {
   private wsSub: Subscription;
   private userSub: Subscription;
+  private searchTextField: RefObject<HTMLInputElement>;
   emptyState: NavbarState = {
     isLoggedIn: UserService.Instance.user !== undefined,
     unreadCount: 0,
@@ -56,6 +60,8 @@ export class Navbar extends Component<any, NavbarState> {
     expanded: false,
     siteName: undefined,
     admins: [],
+    searchParam: '',
+    toggleSearch: false,
   };
 
   constructor(props: any, context: any) {
@@ -87,10 +93,60 @@ export class Navbar extends Component<any, NavbarState> {
     }
 
     WebSocketService.Instance.getSite();
+
+    this.searchTextField = createRef();
+  }
+
+  handleSearchParam(i: Navbar, event: any) {
+    i.state.searchParam = event.target.value;
+    i.setState(i.state);
+  }
+
+  updateUrl() {
+    const searchParam = this.state.searchParam;
+    this.setState({ searchParam: '' });
+    this.setState({ toggleSearch: false });
+    if (searchParam === '') {
+      this.context.router.history.push(`/search/`);
+    } else {
+      this.context.router.history.push(
+        `/search/q/${searchParam}/type/all/sort/topall/page/1`
+      );
+    }
+  }
+
+  handleSearchSubmit(i: Navbar, event: any) {
+    event.preventDefault();
+    i.updateUrl();
+  }
+
+  handleSearchBtn(i: Navbar, event: any) {
+    event.preventDefault();
+    i.setState({ toggleSearch: true });
+
+    i.searchTextField.current.focus();
+    const offsetWidth = i.searchTextField.current.offsetWidth;
+    if (i.state.searchParam && offsetWidth > 100) {
+      i.updateUrl();
+    }
+  }
+
+  handleSearchBlur(i: Navbar, event: any) {
+    if (!(event.relatedTarget && event.relatedTarget.name !== 'search-btn')) {
+      i.state.toggleSearch = false;
+      i.setState(i.state);
+    }
   }
 
   render() {
     return this.navbar();
+  }
+
+  // when the route is changed, close the navbar
+  componentDidUpdate(_lastProps: any) {
+    if (_lastProps.location.pathname !== this.props.location.pathname) {
+      this.setState({ expanded: false });
+    }
   }
 
   componentWillUnmount() {
@@ -102,6 +158,13 @@ export class Navbar extends Component<any, NavbarState> {
   navbar() {
     return (
       <nav class="container-fluid navbar navbar-expand-md navbar-light shadow p-0 px-3">
+        <a class="navbar-brand" href="/">
+          <img
+            src="/static/assets/hexbear_head.svg"
+            class="icon icon-navbar"
+            alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
+          />
+        </a>
         <Link title={version} class="navbar-brand" to="/">
           {this.state.siteName}
         </Link>
@@ -133,7 +196,7 @@ export class Navbar extends Component<any, NavbarState> {
         <div
           className={`${!this.state.expanded && 'collapse'} navbar-collapse`}
         >
-          <ul class="navbar-nav mr-auto">
+          <ul class="navbar-nav my-2 mr-auto">
             <li class="nav-item">
               <Link
                 class="nav-link"
@@ -141,11 +204,6 @@ export class Navbar extends Component<any, NavbarState> {
                 title={i18n.t('communities')}
               >
                 {i18n.t('communities')}
-              </Link>
-            </li>
-            <li class="nav-item">
-              <Link class="nav-link" to="/search" title={i18n.t('search')}>
-                {i18n.t('search')}
               </Link>
             </li>
             <li class="nav-item">
@@ -181,11 +239,41 @@ export class Navbar extends Component<any, NavbarState> {
               </Link>
             </li>
           </ul>
-          <ul class="navbar-nav ml-auto">
+          {!this.context.router.history.location.pathname.match(
+            /^\/search/
+          ) && (
+            <form
+              class="form-inline"
+              onSubmit={linkEvent(this, this.handleSearchSubmit)}
+            >
+              <input
+                class={`form-control mr-0 search-input ${
+                  this.state.toggleSearch ? 'show-input' : 'hide-input'
+                }`}
+                onInput={linkEvent(this, this.handleSearchParam)}
+                value={this.state.searchParam}
+                ref={this.searchTextField}
+                type="text"
+                placeholder={i18n.t('search')}
+                onBlur={linkEvent(this, this.handleSearchBlur)}
+              ></input>
+              <button
+                name="search-btn"
+                onClick={linkEvent(this, this.handleSearchBtn)}
+                class="btn btn-link"
+                style="color: var(--gray)"
+              >
+                <svg class="icon">
+                  <use xlinkHref="#icon-search"></use>
+                </svg>
+              </button>
+            </form>
+          )}
+          <ul class="navbar-nav my-2 navbar-right">
             {this.canAdmin && (
-              <li className="nav-item mt-1">
+              <li className="nav-item">
                 <Link
-                  class="nav-link"
+                  className="nav-link p-0 px-2 nav-icon"
                   to={`/admin`}
                   title={i18n.t('admin_settings')}
                 >
@@ -195,10 +283,16 @@ export class Navbar extends Component<any, NavbarState> {
                 </Link>
               </li>
             )}
-            {this.state.isLoggedIn ? (
-              <>
-                <li className="nav-item mt-1">
-                  <Link class="nav-link" to="/inbox" title={i18n.t('inbox')}>
+          </ul>
+          {this.state.isLoggedIn ? (
+            <>
+              <ul class="navbar-nav my-2">
+                <li className="nav-item">
+                  <Link
+                    class="nav-link p-0 px-2 nav-icon"
+                    to="/inbox"
+                    title={i18n.t('inbox')}
+                  >
                     <svg class="icon">
                       <use xlinkHref="#icon-bell"></use>
                     </svg>
@@ -209,6 +303,8 @@ export class Navbar extends Component<any, NavbarState> {
                     )}
                   </Link>
                 </li>
+              </ul>
+              <ul class="navbar-nav">
                 <li className="nav-item">
                   <Link
                     class="nav-link"
@@ -230,17 +326,21 @@ export class Navbar extends Component<any, NavbarState> {
                     </span>
                   </Link>
                 </li>
-              </>
-            ) : (
-              <Link
-                class="nav-link"
-                to="/login"
-                title={i18n.t('login_sign_up')}
-              >
-                {i18n.t('login_sign_up')}
-              </Link>
-            )}
-          </ul>
+              </ul>
+            </>
+          ) : (
+            <ul class="navbar-nav my-2">
+              <li className="nav-item">
+                <Link
+                  class="nav-link"
+                  to="/login"
+                  title={i18n.t('login_sign_up')}
+                >
+                  {i18n.t('login_sign_up')}
+                </Link>
+              </li>
+            </ul>
+          )}
         </div>
       </nav>
     );
@@ -401,7 +501,7 @@ export class Navbar extends Component<any, NavbarState> {
     let link = isCommentType(reply)
       ? `/post/${reply.post_id}/comment/${reply.id}`
       : `/inbox`;
-    let htmlBody = md.render(reply.content);
+    let htmlBody = imagesDownsize(md.render(reply.content), true, false);
     let body = reply.content; // Unfortunately the notifications API can't do html
 
     messageToastify(
@@ -426,3 +526,5 @@ export class Navbar extends Component<any, NavbarState> {
     }
   }
 }
+
+export const Navbar = withRouter(UnwrappedNavbar);

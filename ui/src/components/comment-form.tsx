@@ -25,6 +25,8 @@ import autosize from 'autosize';
 import Tribute from 'tributejs/src/Tribute.js';
 import emojiShortName from 'emoji-short-name';
 import { i18n } from '../i18next';
+import { TextAreaWithCounter, MAX_COMMENT_LENGTH } from './post-form';
+import { stat } from 'fs';
 
 interface CommentFormProps {
   postId?: number;
@@ -100,6 +102,10 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
   componentDidMount() {
     var textarea: any = document.getElementById(this.id);
     autosize(textarea);
+    const isDesktop = window.innerWidth > 768;
+    if (isDesktop) {
+      textarea.focus();
+    }
     this.tribute.attach(textarea);
     textarea.addEventListener('tribute-replaced', () => {
       this.state.commentForm.content = textarea.value;
@@ -125,7 +131,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
         >
           <div class="form-group row">
             <div className={`col-sm-12`}>
-              <textarea
+              <TextAreaWithCounter
                 id={this.id}
                 className={`form-control ${this.state.previewMode && 'd-none'}`}
                 value={this.state.commentForm.content}
@@ -134,7 +140,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
                 required
                 disabled={this.props.disabled}
                 rows={2}
-                maxLength={10000}
+                maxLength={MAX_COMMENT_LENGTH}
               />
               {this.state.previewMode && (
                 <div
@@ -204,7 +210,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
                 <input
                   id={`file-upload-${this.id}`}
                   type="file"
-                  accept="image/*,video/*"
+                  accept="image/*"
                   name="file"
                   class="d-none"
                   disabled={!UserService.Instance.user}
@@ -263,7 +269,9 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
       // If its a comment edit, only check that its from your user, and that its a
       // text edit only
 
-      (op == UserOperation.EditComment && data.comment.content)
+      (data.comment.creator_id == UserService.Instance.user.id &&
+        op == UserOperation.EditComment &&
+        data.comment.content)
     ) {
       this.state.previewMode = false;
       this.state.loading = false;
@@ -296,7 +304,10 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
   }
 
   handleCommentContentChange(i: CommentForm, event: any) {
-    i.state.commentForm.content = event.target.value;
+    i.state.commentForm.content = event.target.value.replace(
+      /israel/i,
+      'palestine'
+    );
     i.setState(i.state);
   }
 
@@ -375,6 +386,11 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
   parseMessage(msg: WebSocketJsonResponse) {
     let res = wsJsonToRes(msg);
 
+    if (msg.error) {
+      this.state.loading = false;
+      this.setState(this.state);
+      return;
+    }
     // Only do the showing and hiding if logged in
     if (UserService.Instance.user) {
       if (res.op == UserOperation.CreateComment) {

@@ -11,8 +11,9 @@ import {
   WebSocketJsonResponse,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
-import { wsJsonToRes, validEmail, toast } from '../utils';
+import { wsJsonToRes, validEmail, toast, setupTippy } from '../utils';
 import { i18n } from '../i18next';
+import { HCAPTCHA_SITE_KEY } from '../env';
 
 interface State {
   loginForm: LoginForm;
@@ -20,6 +21,25 @@ interface State {
   loginLoading: boolean;
   registerLoading: boolean;
   enable_nsfw: boolean;
+  mathQuestion: {
+    a: number;
+    b: number;
+    answer: number;
+  };
+}
+
+function initCaptcha() {
+  // ignoring these warnings because it's a global
+  // @ts-ignore
+  // eslint-disable-next-line no-undef
+  const widgetID = hcaptcha.render('h-captcha', {
+    sitekey: HCAPTCHA_SITE_KEY,
+  });
+  // @ts-ignore
+  // eslint-disable-next-line no-undef
+  const widgetIDRegister = hcaptcha.render('h-captcha-register', {
+    sitekey: HCAPTCHA_SITE_KEY,
+  });
 }
 
 export class Login extends Component<any, State> {
@@ -29,6 +49,7 @@ export class Login extends Component<any, State> {
     loginForm: {
       username_or_email: undefined,
       password: undefined,
+      captcha_id: undefined,
     },
     registerForm: {
       username: undefined,
@@ -36,10 +57,16 @@ export class Login extends Component<any, State> {
       password_verify: undefined,
       admin: false,
       show_nsfw: false,
+      captcha_id: undefined,
     },
     loginLoading: false,
     registerLoading: false,
     enable_nsfw: undefined,
+    mathQuestion: {
+      a: Math.floor(Math.random() * 10) + 1,
+      b: Math.floor(Math.random() * 10) + 1,
+      answer: undefined,
+    },
   };
 
   constructor(props: any, context: any) {
@@ -56,6 +83,11 @@ export class Login extends Component<any, State> {
       );
 
     WebSocketService.Instance.getSite();
+  }
+
+  componentDidMount() {
+    setupTippy();
+    initCaptcha();
   }
 
   componentWillUnmount() {
@@ -76,7 +108,10 @@ export class Login extends Component<any, State> {
   loginForm() {
     return (
       <div>
-        <form onSubmit={linkEvent(this, this.handleLoginSubmit)}>
+        <form
+          id="login-form"
+          onSubmit={linkEvent(this, this.handleLoginSubmit)}
+        >
           <h5>{i18n.t('login')}</h5>
           <div class="form-group row">
             <label
@@ -110,15 +145,35 @@ export class Login extends Component<any, State> {
                 class="form-control"
                 required
               />
-              <button
-                type="button"
-                disabled={!validEmail(this.state.loginForm.username_or_email)}
-                onClick={linkEvent(this, this.handlePasswordReset)}
-                className="btn p-0 btn-link d-inline-block float-right text-muted small font-weight-bold"
-              >
-                {i18n.t('forgot_password')}
-              </button>
+              {!validEmail(this.state.loginForm.username_or_email) ? (
+                <button
+                  type="button"
+                  onClick={linkEvent(this, this.handleInvalidPasswordReset)}
+                  data-tippy-content={i18n.t('email_required')}
+                  className="btn p-0 btn-link d-inline-block float-right text-muted small font-weight-bold"
+                >
+                  {i18n.t('forgot_password')}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={linkEvent(this, this.handlePasswordReset)}
+                  className="btn p-0 btn-link d-inline-block float-right text-muted small font-weight-bold"
+                >
+                  {i18n.t('forgot_password')}
+                </button>
+              )}
             </div>
+          </div>
+          <div class="form-group row">
+            {/*hcaptcha target*/}
+            <div
+              className="h-captcha"
+              class="col-sm-10"
+              id="h-captcha"
+              data-sitekey={HCAPTCHA_SITE_KEY}
+              data-theme="dark"
+            />
           </div>
           <div class="form-group row">
             <div class="col-sm-10">
@@ -215,6 +270,23 @@ export class Login extends Component<any, State> {
             />
           </div>
         </div>
+        <div class="form-group row">
+          <label class="col-sm-10 col-form-label" htmlFor="register-math">
+            {i18n.t('what_is')}{' '}
+            {`${this.state.mathQuestion.a} + ${this.state.mathQuestion.b}?`}
+          </label>
+
+          <div class="col-sm-2">
+            <input
+              type="number"
+              id="register-math"
+              class="form-control"
+              value={this.state.mathQuestion.answer}
+              onInput={linkEvent(this, this.handleMathAnswerChange)}
+              required
+            />
+          </div>
+        </div>
         {this.state.enable_nsfw && (
           <div class="form-group row">
             <div class="col-sm-10">
@@ -234,8 +306,22 @@ export class Login extends Component<any, State> {
           </div>
         )}
         <div class="form-group row">
+          {/*hcaptcha target*/}
+          <div
+            className="h-captcha h-captcha-register"
+            class="col-sm-10"
+            id="h-captcha-register"
+            data-sitekey={HCAPTCHA_SITE_KEY}
+            data-theme="dark"
+          />
+        </div>
+        <div class="form-group row">
           <div class="col-sm-10">
-            <button type="submit" class="btn btn-secondary">
+            <button
+              type="submit"
+              class="btn btn-secondary"
+              disabled={this.mathCheck}
+            >
               {this.state.registerLoading ? (
                 <svg class="icon icon-spinner spin">
                   <use xlinkHref="#icon-spinner"></use>
@@ -253,6 +339,15 @@ export class Login extends Component<any, State> {
   handleLoginSubmit(i: Login, event: any) {
     event.preventDefault();
     i.state.loginLoading = true;
+    i.state.loginForm.username_or_email = (document.getElementById(
+      'login-email-or-username'
+    ) as HTMLInputElement).value;
+    i.state.loginForm.password = (document.getElementById(
+      'login-password'
+    ) as HTMLInputElement).value;
+    i.state.loginForm.captcha_id = document.querySelector(
+      "textarea[name='h-captcha-response']"
+    ).value;
     i.setState(i.state);
     WebSocketService.Instance.login(i.state.loginForm);
   }
@@ -270,9 +365,14 @@ export class Login extends Component<any, State> {
   handleRegisterSubmit(i: Login, event: any) {
     event.preventDefault();
     i.state.registerLoading = true;
+    i.state.registerForm.captcha_id = (document.querySelectorAll(
+      "textarea[name='h-captcha-response']"
+    )[1] as HTMLInputElement).value;
     i.setState(i.state);
 
-    WebSocketService.Instance.register(i.state.registerForm);
+    if (!i.mathCheck) {
+      WebSocketService.Instance.register(i.state.registerForm);
+    }
   }
 
   handleRegisterUsernameChange(i: Login, event: any) {
@@ -303,6 +403,11 @@ export class Login extends Component<any, State> {
     i.setState(i.state);
   }
 
+  handleMathAnswerChange(i: Login, event: any) {
+    i.state.mathQuestion.answer = event.target.value;
+    i.setState(i.state);
+  }
+
   handlePasswordReset(i: Login) {
     event.preventDefault();
     let resetForm: PasswordResetForm = {
@@ -311,10 +416,33 @@ export class Login extends Component<any, State> {
     WebSocketService.Instance.passwordReset(resetForm);
   }
 
+  handleInvalidPasswordReset(i: Login, event: any) {
+    document
+      .getElementById('login-email-or-username')
+      .classList.add('is-invalid');
+    toast(i18n.t('email_required'), 'danger');
+  }
+
+  get mathCheck(): boolean {
+    return (
+      this.state.mathQuestion.answer !=
+      this.state.mathQuestion.a + this.state.mathQuestion.b
+    );
+  }
+
   parseMessage(msg: WebSocketJsonResponse) {
     let res = wsJsonToRes(msg);
     if (msg.error) {
-      toast(i18n.t(msg.error), 'danger');
+      if (msg.error.includes('invalid_captcha')) {
+        let error_codes = msg.error.split(';'); //captcha error codes are sent deliniated with semicolons
+        let error_message = '';
+        error_codes.forEach(item => (error_message += i18n.t(item)));
+        toast(error_message, 'danger');
+        document.getElementById('h-captcha').innerHTML = '';
+        initCaptcha();
+      } else {
+        toast(i18n.t(msg.error), 'danger');
+      }
       this.state = this.emptyState;
       this.setState(this.state);
       return;

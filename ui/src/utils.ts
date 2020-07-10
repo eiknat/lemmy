@@ -21,6 +21,7 @@ import 'moment/locale/gl';
 import 'moment/locale/tr';
 import 'moment/locale/hu';
 import 'moment/locale/uk';
+import 'moment/locale/sq';
 
 import {
   UserOperation,
@@ -52,6 +53,8 @@ import emojiShortName from 'emoji-short-name';
 import Toastify from 'toastify-js';
 import tippy from 'tippy.js';
 import EmojiButton from '@joeattardi/emoji-button';
+import { customEmojis, replaceEmojis } from './custom-emojis';
+import { match } from 'assert';
 
 export const repoUrl = 'https://github.com/LemmyNet/lemmy';
 export const helpGuideUrl = '/docs/about_guide.html';
@@ -83,14 +86,16 @@ export const languages = [
   { code: 'fi', name: 'Suomi' },
   { code: 'fr', name: 'Français' },
   { code: 'sv', name: 'Svenska' },
+  { code: 'sq', name: 'Shqip' },
   { code: 'tr', name: 'Türkçe' },
-  { code: 'uk', name: 'українська мова' },
+  { code: 'uk', name: 'Українська Mова' },
   { code: 'ru', name: 'Русский' },
   { code: 'nl', name: 'Nederlands' },
   { code: 'it', name: 'Italiano' },
 ];
 
 export const themes = [
+  'laborwave',
   'litera',
   'materia',
   'minty',
@@ -104,6 +109,7 @@ export const themes = [
   'vaporwave-dark',
   'i386',
   'litely',
+  'lux',
 ];
 
 export const emojiPicker = new EmojiButton({
@@ -198,7 +204,7 @@ export function hotRank(score: number, timeStr: string): number {
 }
 
 export function mdToHtml(text: string) {
-  return { __html: md.render(text) };
+  return { __html: replaceEmojis(md.render(text)) };
 }
 
 export function getUnixTime(text: string): number {
@@ -244,12 +250,18 @@ const imageRegex = new RegExp(
 );
 const videoRegex = new RegExp(`(http)?s?:?(\/\/[^"']*\.(?:mp4))`);
 
+const embedRegex = new RegExp(/(gist.github.com)/); //used to block iframely embeds from certain sites e.g. gist.github.com
+
 export function isImage(url: string) {
   return imageRegex.test(url);
 }
 
 export function isVideo(url: string) {
   return videoRegex.test(url);
+}
+
+export function isValidEmbed(url: string) {
+  return !embedRegex.test(url);
 }
 
 export function validURL(str: string) {
@@ -299,10 +311,13 @@ export function routeSearchTypeToEnum(type: string): SearchType {
   return SearchType[capitalizeFirstLetter(type)];
 }
 
-export async function getPageTitle(url: string) {
-  let res = await fetch(`/iframely/oembed?url=${url}`).then(res => res.json());
-  let title = await res.title;
-  return title;
+export async function getPageTitle(url: string | null) {
+  let res = await fetch(`/iframely/oembed?url=${url}`);
+  if (!res.ok) {
+    return null;
+  }
+  const json = await res.json();
+  return json.title;
 }
 
 export function debounce(
@@ -414,6 +429,8 @@ export function getMomentLanguage(): string {
     lang = 'hu';
   } else if (lang.startsWith('uk')) {
     lang = 'uk';
+  } else if (lang.startsWith('sq')) {
+    lang = 'sq';
   } else {
     lang = 'en';
   }
@@ -547,7 +564,7 @@ export function messageToastify(
   router: any
 ) {
   let backgroundColor = `var(--light)`;
-
+  body = '<div class="notiication-text-container">' + body + '</div>';
   let toast = Toastify({
     text: `${body}<br />${creator}`,
     avatar: avatar,
@@ -568,6 +585,9 @@ export function messageToastify(
 
 export function setupTribute(): Tribute {
   return new Tribute({
+    noMatchTemplate: function () {
+      return '<span style:"visibility: hidden;"></span>';
+    },
     collection: [
       // Emojis
       {
@@ -580,9 +600,17 @@ export function setupTribute(): Tribute {
         selectTemplate: (item: any) => {
           return `:${item.original.key}:`;
         },
-        values: Object.entries(emojiShortName).map(e => {
-          return { key: e[1], val: e[0] };
-        }),
+        values: [
+          // ...Object.entries(emojiShortName).map(e => {
+          //   return { key: e[1], val: e[0] };
+          // }),
+          {
+            key: 'logo',
+            val:
+              '<img class="icon icon-navbar" src="/static/assets/logo.png" alt="vaporwave hammer and sickle logo, courtesy of ancestral potato">',
+          },
+          ...customEmojis,
+        ],
         allowSpaces: false,
         autocompleteMode: true,
         menuItemLimit: mentionDropdownFetchLimit,
@@ -919,7 +947,7 @@ export function postSort(
         +a.removed - +b.removed ||
         +a.deleted - +b.deleted ||
         (communityType && +b.stickied - +a.stickied) ||
-        hotRankPost(b) - hotRankPost(a)
+        b.hot_rank - a.hot_rank
     );
   }
 }
@@ -971,4 +999,31 @@ function canUseWebP() {
 
   // // very old browser like IE 8, canvas not supported
   // return false;
+}
+
+export function imagesDownsize(
+  html: string,
+  very_low: boolean,
+  can_expand: boolean
+): string {
+  const imgPictrsRegex = new RegExp(
+    /<img src=(("https:\/\/.*?chapo\.chat\/pictrs\/image\/)(.{10})(.jpg"))( alt=".*?">)/g
+  );
+  const imgTagRegex = new RegExp(/<img/g);
+  html = html.replace(
+    imgPictrsRegex,
+    (can_expand
+      ? '<a target="_blank" rel="noopener noreferrer" href=$1>'
+      : '') +
+      '<img id="$3" src=$2thumbnail' +
+      (very_low ? '96' : '256') +
+      '/$3$4$5' +
+      (can_expand ? '</a>' : '')
+  );
+  html = html.replace(
+    imgTagRegex,
+    '$& class="' + (very_low ? 'notification-image' : 'comment-image') + '"'
+  );
+  //console.log(html);
+  return html;
 }

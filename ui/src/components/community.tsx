@@ -142,7 +142,6 @@ export class Community extends Component<any, State> {
   render() {
     return (
       <div class="container">
-        {this.selects()}
         {this.state.loading ? (
           <h5>
             <svg class="icon icon-spinner spin">
@@ -151,7 +150,8 @@ export class Community extends Component<any, State> {
           </h5>
         ) : (
           <div class="row">
-            <div class="col-12 col-md-8">
+            <main class="col-12 col-md-8" role="main">
+              {this.selects()}
               <h5>
                 {this.state.community.title}
                 {this.state.community.removed && (
@@ -167,15 +167,15 @@ export class Community extends Component<any, State> {
               </h5>
               {this.listings()}
               {this.paginator()}
-            </div>
-            <div class="col-12 col-md-4">
+            </main>
+            <aside class="col-12 col-md-4 sidebar">
               <Sidebar
                 community={this.state.community}
                 moderators={this.state.moderators}
                 admins={this.state.admins}
                 online={this.state.online}
               />
-            </div>
+            </aside>
           </div>
         )}
       </div>

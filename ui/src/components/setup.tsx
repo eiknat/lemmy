@@ -28,6 +28,7 @@ export class Setup extends Component<any, State> {
       password_verify: undefined,
       admin: true,
       show_nsfw: true,
+      captcha_id: '',
     },
     doneRegisteringUser: false,
     userLoading: false,

@@ -43,8 +43,11 @@ import Tribute from 'tributejs/src/Tribute.js';
 import emojiShortName from 'emoji-short-name';
 import Selectr from 'mobius1-selectr';
 import { i18n } from '../i18next';
+import { cleanURL } from '../clean-url';
 
-const MAX_POST_TITLE_LENGTH = 200;
+export const MAX_POST_TITLE_LENGTH = 160;
+export const MAX_POST_BODY_LENGTH = 20000;
+export const MAX_COMMENT_LENGTH = 10000;
 
 interface PostFormProps {
   post?: Post; // If a post is given, that means this is an edit
@@ -65,6 +68,25 @@ interface PostFormState {
   crossPosts: Array<Post>;
   enable_nsfw: boolean;
 }
+
+export const TextAreaWithCounter = ({ maxLength, ...props }) => {
+  const characterLimitExceeded = props.value && props.value.length > maxLength;
+  return (
+    <>
+      <textarea {...props} />
+      {props.value && (
+        <div class="mt-2">
+          <span
+            style={{ color: characterLimitExceeded ? 'var(--red)' : 'inherit' }}
+          >
+            {props.value.length.toLocaleString()}{' '}
+          </span>{' '}
+          / {maxLength.toLocaleString()}
+        </div>
+      )}
+    </>
+  );
+};
 
 export class PostForm extends Component<PostFormProps, PostFormState> {
   private id = `post-form-${randomStr()}`;
@@ -175,14 +197,19 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               {i18n.t('url')}
             </label>
             <div class="col-sm-10">
-              <input
-                type="url"
-                id="post-url"
-                class="form-control"
-                value={this.state.postForm.url}
-                onInput={linkEvent(this, this.handlePostUrlChange)}
-                onPaste={linkEvent(this, this.handleImageUploadPaste)}
-              />
+              {/* don't allow URL field to be edited after publishing */}
+              {!this.props.onEdit ? (
+                <input
+                  type="url"
+                  id="post-url"
+                  class="form-control"
+                  value={this.state.postForm.url}
+                  onInput={linkEvent(this, this.handlePostUrlChange)}
+                  onPaste={linkEvent(this, this.handleImageUploadPaste)}
+                />
+              ) : (
+                <span>{this.state.postForm.url}</span>
+              )}
               {this.state.suggestedTitle && (
                 <div
                   class="mt-1 text-muted small font-weight-bold pointer"
@@ -193,28 +220,30 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                   })}
                 </div>
               )}
-              <form>
-                <label
-                  htmlFor="file-upload"
-                  className={`${
-                    UserService.Instance.user && 'pointer'
-                  } d-inline-block float-right text-muted font-weight-bold`}
-                  data-tippy-content={i18n.t('upload_image')}
-                >
-                  <svg class="icon icon-inline">
-                    <use xlinkHref="#icon-image"></use>
-                  </svg>
-                </label>
-                <input
-                  id="file-upload"
-                  type="file"
-                  accept="image/*,video/*"
-                  name="file"
-                  class="d-none"
-                  disabled={!UserService.Instance.user}
-                  onChange={linkEvent(this, this.handleImageUpload)}
-                />
-              </form>
+              {!this.props.onEdit && (
+                <form>
+                  <label
+                    htmlFor="file-upload"
+                    className={`${
+                      UserService.Instance.user && 'pointer'
+                    } d-inline-block float-right text-muted font-weight-bold image-upload-icon m-0`}
+                    data-tippy-content={i18n.t('upload_image')}
+                  >
+                    <svg class="icon icon-inline">
+                      <use xlinkHref="#icon-image"></use>
+                    </svg>
+                  </label>
+                  <input
+                    id="file-upload"
+                    type="file"
+                    accept="image/*"
+                    name="file"
+                    class="d-none"
+                    disabled={!UserService.Instance.user}
+                    onChange={linkEvent(this, this.handleImageUpload)}
+                  />
+                </form>
+              )}
               {validURL(this.state.postForm.url) && (
                 <a
                   href={`${archiveUrl}/?run=1&url=${encodeURIComponent(
@@ -250,16 +279,20 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               {i18n.t('title')}
             </label>
             <div class="col-sm-10">
-              <textarea
-                value={this.state.postForm.name}
-                id="post-title"
-                onInput={linkEvent(this, this.handlePostNameChange)}
-                class="form-control"
-                required
-                rows={2}
-                minLength={3}
-                maxLength={MAX_POST_TITLE_LENGTH}
-              />
+              {!this.props.onEdit ? (
+                <TextAreaWithCounter
+                  value={this.state.postForm.name}
+                  id="post-title"
+                  onInput={linkEvent(this, this.handlePostNameChange)}
+                  class="form-control"
+                  required
+                  rows={2}
+                  minLength={3}
+                  maxLength={MAX_POST_TITLE_LENGTH}
+                />
+              ) : (
+                <div className="text-body">{this.state.postForm.name}</div>
+              )}
               {this.state.suggestedPosts.length > 0 && (
                 <>
                   <div class="my-1 text-muted small font-weight-bold">
@@ -276,13 +309,13 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               {i18n.t('body')}
             </label>
             <div class="col-sm-10">
-              <textarea
+              <TextAreaWithCounter
                 id={this.id}
                 value={this.state.postForm.body}
                 onInput={linkEvent(this, this.handlePostBodyChange)}
                 className={`form-control ${this.state.previewMode && 'd-none'}`}
                 rows={4}
-                maxLength={10000}
+                maxLength={MAX_POST_BODY_LENGTH}
               />
               {this.state.previewMode && (
                 <div
@@ -421,6 +454,13 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       i.state.postForm.url = undefined;
     }
 
+    if (i.state.postForm.url !== '' && !!i.state.postForm.url) {
+      // remove trackers from URL
+      const cleanedURL = cleanURL({ url: i.state.postForm.url });
+
+      i.state.postForm.url = cleanedURL;
+    }
+
     if (i.props.post) {
       WebSocketService.Instance.editPost(i.state.postForm);
     } else {
@@ -445,7 +485,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     i.fetchPageTitle();
   }
 
-  fetchPageTitle() {
+  async fetchPageTitle() {
     if (validURL(this.state.postForm.url)) {
       let form: SearchForm = {
         q: this.state.postForm.url,
@@ -458,10 +498,11 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       WebSocketService.Instance.search(form);
 
       // Fetch the page title
-      getPageTitle(this.state.postForm.url).then(d => {
-        this.state.suggestedTitle = d;
+      const title = await getPageTitle(this.state.postForm.url);
+      if (title !== null) {
+        this.state.suggestedTitle = title;
         this.setState(this.state);
-      });
+      }
     } else {
       this.state.suggestedTitle = undefined;
       this.state.crossPosts = [];
@@ -524,7 +565,6 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       i.handleImageUpload(i, image);
     }
   }
-
   handleImageUpload(i: PostForm, event: any) {
     let file: any;
     if (event.target) {
