@@ -180,6 +180,9 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
   }
 
   render() {
+    const postTitleBlank =
+      this.state.postForm.name === null ||
+      this.state.postForm.name.trim() === '';
     return (
       <div>
         <Prompt
@@ -401,7 +404,9 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
             <div class="col-sm-10">
               <button
                 disabled={
-                  !this.state.postForm.community_id || this.state.loading
+                  !this.state.postForm.community_id ||
+                  this.state.loading ||
+                  postTitleBlank
                 }
                 type="submit"
                 class="btn btn-secondary mr-2"
@@ -448,6 +453,12 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
 
   handlePostSubmit(i: PostForm, event: any) {
     event.preventDefault();
+
+    // make sure post title is not just whitespace
+    if (i.state.postForm.name.trim() === '') {
+      toast('Post title cannot be blank', 'danger');
+      return;
+    }
 
     // Coerce empty url string to undefined
     if (i.state.postForm.url && i.state.postForm.url === '') {
