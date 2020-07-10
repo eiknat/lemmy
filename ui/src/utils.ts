@@ -1009,7 +1009,7 @@ export function imagesDownsize(
   const imgPictrsRegex = new RegExp(
     /<img src=(("https:\/\/.*?chapo\.chat\/pictrs\/image\/)(.{10})(.jpg"))( alt=".*?">)/g
   );
-  const imgTagRegex = new RegExp(/<img/g);
+  const imgTagRegex = new RegExp(/<img((?!icon).)*$/g);
   html = html.replace(
     imgPictrsRegex,
     (can_expand
@@ -1024,6 +1024,5 @@ export function imagesDownsize(
     imgTagRegex,
     '$& class="' + (very_low ? 'notification-image' : 'comment-image') + '"'
   );
-  //console.log(html);
   return html;
 }
