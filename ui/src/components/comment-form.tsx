@@ -119,6 +119,11 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
   }
 
   render() {
+    const contentEmpty =
+      (this.state.commentForm &&
+        this.state.commentForm.content &&
+        this.state.commentForm.content.trim() === '') ||
+      this.state.commentForm.content === null;
     return (
       <div class="mb-3">
         <Prompt
@@ -157,7 +162,9 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
               <button
                 type="submit"
                 class="btn btn-sm btn-secondary mr-2"
-                disabled={this.props.disabled || this.state.loading}
+                disabled={
+                  this.props.disabled || this.state.loading || contentEmpty
+                }
               >
                 {this.state.loading ? (
                   <svg class="icon icon-spinner spin">
@@ -289,6 +296,12 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
 
   handleCommentSubmit(i: CommentForm, event: any) {
     event.preventDefault();
+
+    if (i.state.commentForm.content.trim() === '') {
+      toast('Comment content cannot be blank', 'danger');
+      return;
+    }
+
     if (i.props.edit) {
       WebSocketService.Instance.editComment(i.state.commentForm);
     } else {
