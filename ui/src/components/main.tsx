@@ -165,7 +165,6 @@ export class Main extends Component<any, MainState> {
       this.state.sort = getSortTypeFromProps(nextProps);
       this.state.page = getPageFromProps(nextProps);
       this.setState(this.state);
-      this.fetchData();
     }
   }
 
