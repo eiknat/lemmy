@@ -565,6 +565,9 @@ export function messageToastify(
 ) {
   let backgroundColor = `var(--light)`;
   body = '<div class="notification-text-container">' + body + '</div>';
+  if (!UserService.Instance.user || !UserService.Instance.user.show_nsfw) {
+    body = replaceImageEmbeds(body);
+  }
   let toast = Toastify({
     text: `${body}${creator}`,
     avatar: avatar,
@@ -1040,5 +1043,11 @@ export function imagesDownsize(
     imgTagRegex,
     '$& class="' + (very_low ? 'notification-image' : 'comment-image') + '"'
   );
+  return html;
+}
+
+export function replaceImageEmbeds(html: string): string {
+  const imgTagRegex = new RegExp(/<img.*?src="(.*?)"[^>]+>/g);
+  html = html.replace(imgTagRegex, '<a href="$1">Embedded image</a>');
   return html;
 }
