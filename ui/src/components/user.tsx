@@ -187,7 +187,6 @@ export class User extends Component<any, UserState> {
       this.state.sort = this.getSortTypeFromProps(nextProps);
       this.state.page = this.getPageFromProps(nextProps);
       this.setState(this.state);
-      this.refetch();
     }
   }
 

@@ -45,8 +45,9 @@ export class ListingTypeSelect extends Component<
           {i18n.t('subscribed')}
         </label>
         <label
-          className={`pointer btn btn-sm btn-secondary ${this.state.type_ ==
-            ListingType.All && 'active'}`}
+          className={`pointer btn btn-sm btn-secondary ${
+            this.state.type_ == ListingType.All && 'active'
+          }`}
         >
           <input
             type="radio"
