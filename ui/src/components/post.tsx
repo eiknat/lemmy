@@ -1,5 +1,5 @@
-import { Component, linkEvent, render } from 'inferno';
-import { Subscription, fromEvent } from 'rxjs';
+import { Component, linkEvent } from 'inferno';
+import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
   UserOperation,
@@ -341,6 +341,7 @@ export class Post extends Component<any, PostState> {
 
   commentsTree() {
     let nodes = this.buildCommentsTree();
+    //console.log(this.state.commentLoadTo);
     return (
       <div>
         <CommentNodes
@@ -359,7 +360,7 @@ export class Post extends Component<any, PostState> {
   updateScroll(i: Post) {
     return function eventFunc(evt) {
       //distance to page bottom
-      console.log(i);
+      //console.log(i);
       let toPageBottom = Math.max(
         document.body.offsetHeight - (window.pageYOffset + window.innerHeight)
       );

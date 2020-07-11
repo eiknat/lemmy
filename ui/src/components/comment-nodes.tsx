@@ -60,7 +60,7 @@ export class CommentNodes extends Component<
   }
 
   sorter(): Array<CommentNodeI> {
-    console.log('sorting comments');
+    //console.log('sorting comments');
     if (this.props.sort !== undefined) {
       commentSort(this.props.nodes, this.props.sort);
     } else if (this.props.sortType !== undefined) {
