@@ -38,6 +38,7 @@ import {
   createPostLikeRes,
   commentsToFlatNodes,
   setupTippy,
+  testMessageToast,
 } from '../utils';
 import { PostListing } from './post-listing';
 import { Sidebar } from './sidebar';
@@ -105,6 +106,7 @@ export class Post extends Component<any, PostState> {
 
   componentDidMount() {
     autosize(document.querySelectorAll('textarea'));
+    //testMessageToast();
   }
 
   componentDidUpdate(_lastProps: any, lastState: PostState, _snapshot: any) {
