@@ -341,7 +341,6 @@ export class Post extends Component<any, PostState> {
 
   commentsTree() {
     let nodes = this.buildCommentsTree();
-    //console.log(this.state.commentLoadTo);
     return (
       <div>
         <CommentNodes
@@ -360,13 +359,11 @@ export class Post extends Component<any, PostState> {
   updateScroll(i: Post) {
     return function eventFunc(evt) {
       //distance to page bottom
-      //console.log(i);
       let toPageBottom = Math.max(
         document.body.offsetHeight - (window.pageYOffset + window.innerHeight)
       );
 
       if (toPageBottom < 400) {
-        console.log('loading more comments');
         i.state.commentLoadTo += commentFetchLimit;
         i.setState(i.state);
       }
