@@ -27,6 +27,7 @@ import {
   setupTippy,
   colorList,
   imagesDownsize,
+  replaceImageEmbeds,
 } from '../utils';
 import moment from 'moment';
 import { MomentTime } from './moment-time';
@@ -237,13 +238,9 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                 ) : (
                   <div
                     className="md-div comment-text-container"
-                    dangerouslySetInnerHTML={{
-                      __html: imagesDownsize(
-                        String(mdToHtml(this.commentUnlessRemoved).__html),
-                        false,
-                        true
-                      ),
-                    }}
+                    dangerouslySetInnerHTML={this.formatInnerHTML(
+                      this.commentUnlessRemoved
+                    )}
                   />
                 )}
                 <div class="d-flex justify-content-between justify-content-lg-start flex-wrap text-muted font-weight-bold">
@@ -825,6 +822,14 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
       : node.comment.deleted
       ? `*${i18n.t('deleted')}*`
       : node.comment.content;
+  }
+
+  formatInnerHTML(html: string) {
+    html = imagesDownsize(mdToHtml(html).__html, false, true);
+    if (!UserService.Instance.user || !UserService.Instance.user.show_nsfw) {
+      html = replaceImageEmbeds(html);
+    }
+    return { __html: html };
   }
 
   handleReplyClick(i: CommentNode) {
