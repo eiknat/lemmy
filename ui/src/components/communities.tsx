@@ -68,7 +68,6 @@ export class Communities extends Component<any, CommunitiesState> {
     if (nextProps.history.action == 'POP') {
       this.state = this.emptyState;
       this.state.page = this.getPageFromProps(nextProps);
-      this.refetch();
     }
   }
 
