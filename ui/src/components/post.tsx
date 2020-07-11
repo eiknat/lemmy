@@ -114,11 +114,8 @@ export class Post extends Component<any, PostState> {
 
   componentDidMount() {
     autosize(document.querySelectorAll('textarea'));
-<<<<<<< ui/src/components/post.tsx
     //testMessageToast();
-=======
     window.addEventListener('scroll', this.debouncedScroll, false);
->>>>>>> ui/src/components/post.tsx
   }
 
   componentDidUpdate(_lastProps: any, lastState: PostState, _snapshot: any) {
