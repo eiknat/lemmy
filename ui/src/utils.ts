@@ -64,6 +64,7 @@ export const archiveUrl = 'https://archive.is';
 
 export const postRefetchSeconds: number = 60 * 1000;
 export const fetchLimit: number = 20;
+export const commentFetchLimit: number = 10;
 export const mentionDropdownFetchLimit = 10;
 
 export const languages = [
