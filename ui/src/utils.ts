@@ -64,6 +64,7 @@ export const archiveUrl = 'https://archive.is';
 
 export const postRefetchSeconds: number = 60 * 1000;
 export const fetchLimit: number = 20;
+export const commentFetchLimit = 15;
 export const mentionDropdownFetchLimit = 10;
 
 export const languages = [
@@ -497,7 +498,7 @@ export function pictrsAvatarThumbnail(src: string): string {
 
 export function showAvatars(): boolean {
   return (
-    (UserService.Instance.user && UserService.Instance.user.show_avatars) ||
+    //(UserService.Instance.user && UserService.Instance.user.show_avatars) ||
     !UserService.Instance.user
   );
 }
@@ -564,9 +565,12 @@ export function messageToastify(
   router: any
 ) {
   let backgroundColor = `var(--light)`;
-  body = '<div class="notiication-text-container">' + body + '</div>';
+  body = '<div class="notification-text-container">' + body + '</div>';
+  if (!UserService.Instance.user || !UserService.Instance.user.show_nsfw) {
+    body = replaceImageEmbeds(body);
+  }
   let toast = Toastify({
-    text: `${body}<br />${creator}`,
+    text: `${body}${creator}`,
     avatar: avatar,
     backgroundColor: backgroundColor,
     className: 'text-dark',
@@ -581,6 +585,16 @@ export function messageToastify(
       }
     },
   }).showToast();
+}
+
+export function testMessageToast() {
+  messageToastify(
+    'example-user',
+    null,
+    '<p>Example toast. <img src="https://dev.chapo.chat/pictrs/image/YsYoLsoLaf.jpg" alt=""/> The quick brown fox jumped over the lazy dog. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    'dev.chapo.chat',
+    null
+  );
 }
 
 export function setupTribute(): Tribute {
@@ -1030,5 +1044,11 @@ export function imagesDownsize(
     imgTagRegex,
     '$& class="' + (very_low ? 'notification-image' : 'comment-image') + '"'
   );
+  return html;
+}
+
+export function replaceImageEmbeds(html: string): string {
+  const imgTagRegex = new RegExp(/<img.*?src="(.*?)"[^>]+>/g);
+  html = html.replace(imgTagRegex, '<a href="$1">Embedded image</a>');
   return html;
 }

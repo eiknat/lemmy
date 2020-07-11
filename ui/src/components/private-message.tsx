@@ -5,7 +5,14 @@ import {
   EditPrivateMessageForm,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
-import { mdToHtml, pictrsAvatarThumbnail, showAvatars, toast } from '../utils';
+import {
+  mdToHtml,
+  pictrsAvatarThumbnail,
+  showAvatars,
+  toast,
+  imagesDownsize,
+  replaceImageEmbeds,
+} from '../utils';
 import { MomentTime } from './moment-time';
 import { PrivateMessageForm } from './private-message-form';
 import { i18n } from '../i18next';
@@ -122,7 +129,9 @@ export class PrivateMessage extends Component<
               ) : (
                 <div
                   className="md-div"
-                  dangerouslySetInnerHTML={mdToHtml(this.messageUnlessRemoved)}
+                  dangerouslySetInnerHTML={this.formatInnerHTML(
+                    this.messageUnlessRemoved
+                  )}
                 />
               )}
               <ul class="list-inline mb-0 text-muted font-weight-bold">
@@ -230,6 +239,14 @@ export class PrivateMessage extends Component<
   get messageUnlessRemoved(): string {
     let message = this.props.privateMessage;
     return message.deleted ? `*${i18n.t('deleted')}*` : message.content;
+  }
+
+  formatInnerHTML(html: string) {
+    html = imagesDownsize(mdToHtml(html).__html, false, true);
+    if (!UserService.Instance.user || !UserService.Instance.user.show_nsfw) {
+      html = replaceImageEmbeds(html);
+    }
+    return { __html: html };
   }
 
   handleReplyClick(i: PrivateMessage) {

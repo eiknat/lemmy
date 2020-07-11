@@ -38,6 +38,9 @@ import {
   createPostLikeRes,
   commentsToFlatNodes,
   setupTippy,
+  testMessageToast,
+  commentFetchLimit,
+  debounce,
 } from '../utils';
 import { PostListing } from './post-listing';
 import { Sidebar } from './sidebar';
@@ -49,6 +52,7 @@ import { i18n } from '../i18next';
 interface PostState {
   post: PostI;
   comments: Array<Comment>;
+  commentLoadTo: number;
   commentSort: CommentSortType;
   community: Community;
   moderators: Array<CommunityUser>;
@@ -62,9 +66,11 @@ interface PostState {
 
 export class Post extends Component<any, PostState> {
   private subscription: Subscription;
+  private debouncedScroll;
   private emptyState: PostState = {
     post: null,
     comments: [],
+    commentLoadTo: commentFetchLimit,
     commentSort: CommentSortType.Hot,
     community: null,
     moderators: [],
@@ -97,14 +103,19 @@ export class Post extends Component<any, PostState> {
       id: postId,
     };
     WebSocketService.Instance.getPost(form);
+
+    this.debouncedScroll = debounce(this.updateScroll(this), 500);
   }
 
   componentWillUnmount() {
     this.subscription.unsubscribe();
+    window.removeEventListener('scroll', this.debouncedScroll);
   }
 
   componentDidMount() {
     autosize(document.querySelectorAll('textarea'));
+    //testMessageToast();
+    window.addEventListener('scroll', this.debouncedScroll, false);
   }
 
   componentDidUpdate(_lastProps: any, lastState: PostState, _snapshot: any) {
@@ -310,7 +321,9 @@ export class Post extends Component<any, PostState> {
       let child = map.get(comment.id);
       if (comment.parent_id) {
         let parent_ = map.get(comment.parent_id);
-        parent_.children.push(child);
+        if (parent !== undefined) {
+          parent_.children.push(child);
+        }
       } else {
         tree.push(child);
       }
@@ -339,9 +352,24 @@ export class Post extends Component<any, PostState> {
           admins={this.state.admins}
           postCreatorId={this.state.post.creator_id}
           sort={this.state.commentSort}
+          maxView={this.state.commentLoadTo}
         />
       </div>
     );
+  }
+
+  updateScroll(i: Post) {
+    return function eventFunc(evt) {
+      //distance to page bottom
+      let toPageBottom = Math.max(
+        document.body.offsetHeight - (window.pageYOffset + window.innerHeight)
+      );
+
+      if (toPageBottom < 400) {
+        i.state.commentLoadTo += commentFetchLimit;
+        i.setState(i.state);
+      }
+    };
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
