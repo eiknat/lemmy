@@ -498,7 +498,7 @@ export function pictrsAvatarThumbnail(src: string): string {
 
 export function showAvatars(): boolean {
   return (
-    (UserService.Instance.user && UserService.Instance.user.show_avatars) ||
+    //(UserService.Instance.user && UserService.Instance.user.show_avatars) ||
     !UserService.Instance.user
   );
 }
