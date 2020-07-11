@@ -64,6 +64,7 @@ export const archiveUrl = 'https://archive.is';
 
 export const postRefetchSeconds: number = 60 * 1000;
 export const fetchLimit: number = 20;
+export const commentFetchLimit = 15;
 export const mentionDropdownFetchLimit = 10;
 
 export const languages = [
@@ -497,7 +498,7 @@ export function pictrsAvatarThumbnail(src: string): string {
 
 export function showAvatars(): boolean {
   return (
-    (UserService.Instance.user && UserService.Instance.user.show_avatars) ||
+    //(UserService.Instance.user && UserService.Instance.user.show_avatars) ||
     !UserService.Instance.user
   );
 }
