@@ -565,6 +565,7 @@ export function messageToastify(
   router: any
 ) {
   let backgroundColor = `var(--light)`;
+  body = body.substring(0,281);
   body = '<div class="notiication-text-container">' + body + '</div>';
   let toast = Toastify({
     text: `${body}<br />${creator}`,
