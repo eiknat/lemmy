@@ -42,8 +42,9 @@ export class DataTypeSelect extends Component<
           {i18n.t('posts')}
         </label>
         <label
-          className={`pointer btn btn-sm btn-secondary ${this.state.type_ ==
-            DataType.Comment && 'active'}`}
+          className={`pointer btn btn-sm btn-secondary ${
+            this.state.type_ == DataType.Comment && 'active'
+          }`}
         >
           <input
             type="radio"

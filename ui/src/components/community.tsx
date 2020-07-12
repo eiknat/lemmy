@@ -23,6 +23,7 @@ import {
   GetCommentsResponse,
   CommentResponse,
   WebSocketJsonResponse,
+  FollowCommunityForm,
 } from '../interfaces';
 import { WebSocketService } from '../services';
 import { PostListings } from './post-listings';
@@ -149,34 +150,70 @@ export class Community extends Component<any, State> {
             </svg>
           </h5>
         ) : (
-          <div class="row">
-            <main class="col-12 col-md-8" role="main">
-              {this.selects()}
-              <h5>
-                {this.state.community.title}
-                {this.state.community.removed && (
-                  <small className="ml-2 text-muted font-italic">
-                    {i18n.t('removed')}
-                  </small>
-                )}
-                {this.state.community.nsfw && (
-                  <small className="ml-2 text-muted font-italic">
-                    {i18n.t('nsfw')}
-                  </small>
-                )}
-              </h5>
-              {this.listings()}
-              {this.paginator()}
-            </main>
-            <aside class="col-12 col-md-4 sidebar">
-              <Sidebar
-                community={this.state.community}
-                moderators={this.state.moderators}
-                admins={this.state.admins}
-                online={this.state.online}
-              />
-            </aside>
-          </div>
+          <>
+            {/* WIP */}
+            <div className="row">
+              <div className="community-header">
+                <div className="top-section">
+                  <h4>{this.state.community.title}</h4>
+                  <div className="header-right-section">
+                    <div className="community-stats">
+                      <p>{this.state.community.number_of_subscribers}</p>
+                      <h6>Members</h6>
+                    </div>
+                    {this.state.community.subscribed ? (
+                      <button
+                        class="btn btn-secondary subscribe-button"
+                        onClick={linkEvent(
+                          this.state.community.id,
+                          this.handleUnsubscribe
+                        )}
+                      >
+                        {i18n.t('unsubscribe')}
+                      </button>
+                    ) : (
+                      <button
+                        class="btn btn-secondary subscribe-button"
+                        onClick={linkEvent(
+                          this.state.community.id,
+                          this.handleSubscribe
+                        )}
+                      >
+                        {i18n.t('subscribe')}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <main class="col-12 col-md-8" role="main">
+                {this.selects()}
+                <h5>
+                  {this.state.community.removed && (
+                    <small className="ml-2 text-muted font-italic">
+                      {i18n.t('removed')}
+                    </small>
+                  )}
+                  {this.state.community.nsfw && (
+                    <small className="ml-2 text-muted font-italic">
+                      {i18n.t('nsfw')}
+                    </small>
+                  )}
+                </h5>
+                {this.listings()}
+                {this.paginator()}
+              </main>
+              <aside class="col-12 col-md-4 sidebar">
+                <Sidebar
+                  community={this.state.community}
+                  moderators={this.state.moderators}
+                  admins={this.state.admins}
+                  online={this.state.online}
+                />
+              </aside>
+            </div>
+          </>
         )}
       </div>
     );
@@ -284,6 +321,22 @@ export class Community extends Component<any, State> {
     this.updateUrl();
     this.fetchData();
     window.scrollTo(0, 0);
+  }
+
+  handleUnsubscribe(communityId: number) {
+    let form: FollowCommunityForm = {
+      community_id: communityId,
+      follow: false,
+    };
+    WebSocketService.Instance.followCommunity(form);
+  }
+
+  handleSubscribe(communityId: number) {
+    let form: FollowCommunityForm = {
+      community_id: communityId,
+      follow: true,
+    };
+    WebSocketService.Instance.followCommunity(form);
   }
 
   updateUrl() {

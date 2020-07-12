@@ -531,11 +531,27 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       <MomentTime data={post} />
                     </span>
                   </li>
-                  {post.body && !isMobile && (
+                  <br />
+                  <div className="list-inline-item">
+                    <Link
+                      className="text-muted"
+                      title={i18n.t('number_of_comments', {
+                        count: post.number_of_comments,
+                      })}
+                      to={`/post/${post.id}`}
+                    >
+                      <svg class="mr-1 icon icon-inline">
+                        <use xlinkHref="#icon-message-square"></use>
+                      </svg>
+                      {i18n.t('number_of_comments', {
+                        count: post.number_of_comments,
+                      })}
+                    </Link>
+                  </div>
+                  {/* {post.body && !isMobile && (
                     <>
                       <li className="list-inline-item">•</li>
                       <li className="list-inline-item">
-                        {/* Using a link with tippy doesn't work on touch devices unfortunately */}
                         <Link
                           className="text-muted"
                           data-tippy-content={md.render(
@@ -550,8 +566,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         </Link>
                       </li>
                     </>
-                  )}
-                  <li className="list-inline-item">•</li>
+                  )} */}
+                  {/* <li className="list-inline-item">•</li> */}
                   {this.state.upvotes !== this.state.score && (
                     <>
                       <span
@@ -575,25 +591,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                           </span>
                         </li>
                       </span>
-                      <li className="list-inline-item">•</li>
                     </>
                   )}
-                  <li className="list-inline-item">
-                    <Link
-                      className="text-muted"
-                      title={i18n.t('number_of_comments', {
-                        count: post.number_of_comments,
-                      })}
-                      to={`/post/${post.id}`}
-                    >
-                      <svg class="mr-1 icon icon-inline">
-                        <use xlinkHref="#icon-message-square"></use>
-                      </svg>
-                      {i18n.t('number_of_comments', {
-                        count: post.number_of_comments,
-                      })}
-                    </Link>
-                  </li>
                 </ul>
                 {this.props.post.duplicates && (
                   <ul class="list-inline mb-1 small text-muted">
