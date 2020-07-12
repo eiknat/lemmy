@@ -32,6 +32,7 @@ import Tribute from 'tributejs/src/Tribute.js';
 import autosize from 'autosize';
 import { i18n } from '../i18next';
 import { T } from 'inferno-i18next';
+import { TextAreaWithCounter } from './post-form';
 
 interface PrivateMessageFormProps {
   privateMessage?: PrivateMessage; // If a pm is given, that means this is an edit
@@ -147,13 +148,13 @@ export class PrivateMessageForm extends Component<
           <div class="form-group row">
             <label class="col-sm-2 col-form-label">{i18n.t('message')}</label>
             <div class="col-sm-10">
-              <textarea
+              <TextAreaWithCounter
                 id={this.id}
                 value={this.state.privateMessageForm.content}
                 onInput={linkEvent(this, this.handleContentChange)}
                 className={`form-control ${this.state.previewMode && 'd-none'}`}
                 rows={4}
-                maxLength={10000}
+                maxLength={4000}
               />
               {this.state.previewMode && (
                 <div
