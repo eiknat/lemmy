@@ -274,5 +274,6 @@
     "invalid_captcha": "Error with captcha authentication: ",
     "missing_input_response": "Captcha was not completed ",
     "invalid_input_response": "Captcha validation failed. Please retry ",
-    "invalid_or_already_seen_response": "Captcha validation failed. Please retry "
+    "invalid_or_already_seen_response": "Captcha validation failed. Please retry ",
+    "ago": "ago"
 }
