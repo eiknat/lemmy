@@ -30,10 +30,9 @@ export class MomentTime extends Component<MomentTimeProps, any> {
           )} ${this.format(this.props.data.updated)}`}
           className="font-italics pointer unselectable"
         >
-          <svg class="icon icon-inline mr-1">
-            <use xlinkHref="#icon-edit-2"></use>
-          </svg>
-          {moment.utc(this.props.data.updated).fromNow(!this.props.showAgo)}
+          {i18n.t('modified')}{' '}
+          {moment.utc(this.props.data.updated).fromNow(!this.props.showAgo)}{' '}
+          {i18n.t('ago')}
         </span>
       );
     } else {
@@ -50,9 +49,6 @@ export class MomentTime extends Component<MomentTimeProps, any> {
   }
 
   format(input: string): string {
-    return moment
-      .utc(input)
-      .local()
-      .format('LLLL');
+    return moment.utc(input).local().format('LLLL');
   }
 }

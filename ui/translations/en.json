@@ -241,6 +241,9 @@
     "community_user_already_banned": "Community user already banned.",
     "couldnt_create_post": "Couldn't create post.",
     "post_title_too_long": "Post title too long.",
+    "post_body_too_long": "Post body too long.",
+    "message_too_long": "Message too long.",
+    "comment_too_long": "Comment too long.",
     "couldnt_like_post": "Couldn't like post.",
     "couldnt_find_post": "Couldn't find post.",
     "couldnt_get_posts": "Couldn't get posts",
@@ -274,5 +277,6 @@
     "invalid_captcha": "Error with captcha authentication: ",
     "missing_input_response": "Captcha was not completed ",
     "invalid_input_response": "Captcha validation failed. Please retry ",
-    "invalid_or_already_seen_response": "Captcha validation failed. Please retry "
+    "invalid_or_already_seen_response": "Captcha validation failed. Please retry ",
+    "ago": "ago"
 }
