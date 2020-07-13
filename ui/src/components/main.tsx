@@ -513,15 +513,17 @@ export class Main extends Component<any, MainState> {
                 </svg>
               </a>
             )}
-          <button
-            className="btn text-right"
-            onClick={linkEvent(this, this.toggleMobileFilters)}
-            style={{ padding: '0 10px 2px 10px' }}
-          >
-            <svg className="icon text-muted">
-              <use xlinkHref="#icon-settings">#</use>
-            </svg>
-          </button>
+          {isMobile && (
+            <button
+              className="btn text-right"
+              onClick={linkEvent(this, this.toggleMobileFilters)}
+              style={{ padding: '0 10px 2px 10px' }}
+            >
+              <svg className="icon text-muted">
+                <use xlinkHref="#icon-settings">#</use>
+              </svg>
+            </button>
+          )}
         </span>
         {(!isMobile || (isMobile && this.state.filtersOpen)) && (
           <span className="listing-select-group my-3">
