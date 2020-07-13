@@ -1,3 +1,13 @@
+// eslint-disable-next-line no-undef
+if (process.env.NODE_ENV !== 'development') {
+  // @ts-ignore
+  // eslint-disable-next-line no-undef
+  Sentry.init({
+    dsn:
+      'https://9f55bebad32f4692bc91eb8893bd1862@o419785.ingest.sentry.io/5336831',
+  });
+}
+
 import { render, Component } from 'inferno';
 import { BrowserRouter, Route, Switch } from 'inferno-router';
 import { Provider } from 'inferno-i18next';
