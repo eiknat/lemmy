@@ -47,7 +47,6 @@ import {
   setupTippy,
 } from '../utils';
 import { i18n } from '../i18next';
-import { Link } from 'inferno-router';
 
 interface State {
   community: CommunityI;
