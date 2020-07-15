@@ -254,16 +254,28 @@ a.text-body {
   background-color: #1D1D1D;
   margin-top: -1.5rem;
   margin-bottom: 1rem;
-  height: 75;
+  height: 74;
   width: 100%;
-  padding: 15px;
+  padding: 5px;
   flex-wrap: wrap;
+  /*justify-content: center;*/
 }
 
-.community-header h4 {
-  font-weight: 700;
+.header-names {
+  padding-top: 5px;
+  padding-left: 5%;
+}
+
+.header-names h4 {
+  font-weight: 900;
   font-size: 24px;
   margin: 0;
+}
+
+.header-names h6 {
+  color: #C0C5D8;
+  padding-top: 3px;
+  font-size: 12px;
 }
 
 .top-section {
@@ -286,7 +298,7 @@ a.text-body {
 
 .header-right-section {
   display: flex;
-  padding: 15px 0;
+  padding: 15px 25px;
 }
 
 .subscribe-button {
@@ -294,12 +306,38 @@ a.text-body {
   font-size: 14px;
   color: #fff;
   font-weight: 700;
-  /* border: 1px solid #575757; */
+  border-radius: 6px;
+  /*border: 2px solid #575757;*/
   /* background-color: #444; */
 }
 
+.unsubscribe-button{
+  padding: 8px 15px;
+  font-size: 14px;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 6px;
+  border: 2px solid #323232;
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.community-button-separator{
+  border-right: 3px solid #323232;
+  margin: 0 15px;
+}
+
+.create-post-button{
+  padding: 9px 15px;
+  font-size: 14px;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 6px;
+  border: 0;
+  background-color: #A4288B;
+}
+
 .community-stats {
-  padding: 0 30px;
+  padding: 2px 15px 2px 0;
 }
 
 .community-stats h6 {
@@ -315,4 +353,12 @@ a.text-body {
   font-size: 14px;
   line-height: 17px;
   font-weight: 700;
+}
+
+.community-stats-sidebar {
+  margin-bottom: 0.25rem;
+}
+
+.community-sidebar-item {
+  display: inline-block;
 }

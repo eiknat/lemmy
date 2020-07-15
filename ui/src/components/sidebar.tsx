@@ -74,7 +74,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
       <div className="sidebar-content">
         <div class="card border-secondary mb-3">
           <div class="card-body">
-            <h5 className="mb-0">
+            {/*<h5 className="mb-0">
               <span>{community.title}</span>
               {community.removed && (
                 <small className="ml-2 text-muted font-italic">
@@ -86,8 +86,93 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
                   {i18n.t('deleted')}
                 </small>
               )}
-            </h5>
-            <CommunityLink community={community} realLink />
+              </h5>
+              <CommunityLink community={community} realLink />
+            <ul class="my-1 list-inline">
+              {
+              <li className="list-inline-item badge badge-secondary">
+                {i18n.t('number_online', { count: this.props.online })}
+              </li>
+              }
+              <li className="list-inline-item badge badge-secondary">
+                {i18n.t('number_of_subscribers', {
+                  count: community.number_of_subscribers,
+                })}
+              </li>
+              <li className="list-inline-item badge badge-secondary">
+                {i18n.t('number_of_posts', {
+                  count: community.number_of_posts,
+                })}
+              </li>
+              <li className="list-inline-item badge badge-secondary">
+                {i18n.t('number_of_comments', {
+                  count: community.number_of_comments,
+                })}
+              </li>
+              <li className="list-inline-item">
+                <Link className="badge badge-secondary" to="/communities">
+                  {community.category_name}
+                </Link>
+              </li>
+              <li className="list-inline-item">
+                <Link
+                  className="badge badge-secondary"
+                  to={`/modlog/community/${this.props.community.id}`}
+                >
+                  {i18n.t('modlog')}
+                </Link>
+              </li>
+            </ul>
+            <ul class="list-inline small">
+              <li class="list-inline-item">{i18n.t('mods')}: </li>
+              {this.props.moderators.map(mod => (
+                <li class="list-inline-item">
+                  <UserListing
+                    user={{
+                      name: mod.user_name,
+                      avatar: mod.avatar,
+                      id: mod.user_id,
+                      local: mod.user_local,
+                      actor_id: mod.user_actor_id,
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>*/}
+            {/* TODO the to= needs to be able to handle community_ids as well, since they're federated */}
+            {/*<Link
+              class={`btn btn-sm btn-secondary btn-block mb-3 ${
+                (community.deleted || community.removed) && 'no-click'
+              }`}
+              to={`/create_post?community=${community.name}`}
+            >
+              {i18n.t('create_a_post')}
+            </Link>
+            <div>
+              {community.subscribed ? (
+                <button
+                  class="btn btn-sm btn-secondary btn-block"
+                  onClick={linkEvent(community.id, this.handleUnsubscribe)}
+                >
+                  {i18n.t('unsubscribe')}
+                </button>
+              ) : (
+                <button
+                  class="btn btn-sm btn-secondary btn-block"
+                  onClick={linkEvent(community.id, this.handleSubscribe)}
+                >
+                  {i18n.t('subscribe')}
+                </button>
+              )}
+              </div>*/}
+            {community.description && (
+              <div class="card-body">
+                <div
+                  className="md-div"
+                  dangerouslySetInnerHTML={mdToHtml(community.description)}
+                />
+              </div>
+            )}
             <ul class="list-inline mb-1 text-muted font-weight-bold">
               {this.canMod && (
                 <>
@@ -172,42 +257,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
                 </div>
               </form>
             )}
-            <ul class="my-1 list-inline">
-              {/*
-              <li className="list-inline-item badge badge-secondary">
-                {i18n.t('number_online', { count: this.props.online })}
-              </li>
-              */}
-              <li className="list-inline-item badge badge-secondary">
-                {i18n.t('number_of_subscribers', {
-                  count: community.number_of_subscribers,
-                })}
-              </li>
-              <li className="list-inline-item badge badge-secondary">
-                {i18n.t('number_of_posts', {
-                  count: community.number_of_posts,
-                })}
-              </li>
-              <li className="list-inline-item badge badge-secondary">
-                {i18n.t('number_of_comments', {
-                  count: community.number_of_comments,
-                })}
-              </li>
-              <li className="list-inline-item">
-                <Link className="badge badge-secondary" to="/communities">
-                  {community.category_name}
-                </Link>
-              </li>
-              <li className="list-inline-item">
-                <Link
-                  className="badge badge-secondary"
-                  to={`/modlog/community/${this.props.community.id}`}
-                >
-                  {i18n.t('modlog')}
-                </Link>
-              </li>
-            </ul>
-            <ul class="list-inline small">
+            <ul class="list-inline small community-stats-sidebar">
               <li class="list-inline-item">{i18n.t('mods')}: </li>
               {this.props.moderators.map(mod => (
                 <li class="list-inline-item">
@@ -223,44 +273,27 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
                 </li>
               ))}
             </ul>
-            {/* TODO the to= needs to be able to handle community_ids as well, since they're federated */}
-            <Link
-              class={`btn btn-sm btn-secondary btn-block mb-3 ${
-                (community.deleted || community.removed) && 'no-click'
-              }`}
-              to={`/create_post?community=${community.name}`}
-            >
-              {i18n.t('create_a_post')}
-            </Link>
-            <div>
-              {community.subscribed ? (
-                <button
-                  class="btn btn-sm btn-secondary btn-block"
-                  onClick={linkEvent(community.id, this.handleUnsubscribe)}
-                >
-                  {i18n.t('unsubscribe')}
-                </button>
-              ) : (
-                <button
-                  class="btn btn-sm btn-secondary btn-block"
-                  onClick={linkEvent(community.id, this.handleSubscribe)}
-                >
-                  {i18n.t('subscribe')}
-                </button>
-              )}
-            </div>
+            <ul class="list-inline small community-stats-sidebar">
+              <li class="community-sidebar-item">
+                {this.props.community.number_of_posts.toString() +
+                  ' ' +
+                  i18n.t('posts')}
+              </li>
+              &nbsp;|&nbsp;
+              <li class="community-sidebar-item">
+                {this.props.community.number_of_comments.toString() +
+                  ' ' +
+                  i18n.t('comments')}
+              </li>
+              &nbsp;|&nbsp;
+              <li class="community-sidebar-item">
+                <a href={`/modlog/community/${this.props.community.id}`}>
+                  {i18n.t('modlog')}
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
-        {community.description && (
-          <div class="card border-secondary">
-            <div class="card-body">
-              <div
-                className="md-div"
-                dangerouslySetInnerHTML={mdToHtml(community.description)}
-              />
-            </div>
-          </div>
-        )}
       </div>
     );
   }
