@@ -77,6 +77,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
     super(props, context);
 
     this.tribute = setupTribute();
+    this.setupEmojiPicker();
 
     this.state = this.emptyState;
 

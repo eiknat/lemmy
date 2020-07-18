@@ -39,7 +39,6 @@ import {
 } from '../utils';
 import autosize from 'autosize';
 import Tribute from 'tributejs/src/Tribute.js';
-import emojiShortName from 'emoji-short-name';
 import Choices from 'choices.js';
 import { i18n } from '../i18next';
 import { cleanURL } from '../clean-url';
