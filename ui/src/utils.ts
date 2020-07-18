@@ -22,6 +22,9 @@ import 'moment/locale/tr';
 import 'moment/locale/hu';
 import 'moment/locale/uk';
 import 'moment/locale/sq';
+import 'moment/locale/km';
+import 'moment/locale/ga';
+import 'moment/locale/sr';
 
 import {
   UserOperation,
@@ -48,13 +51,13 @@ import Tribute from 'tributejs/src/Tribute.js';
 import markdown_it from 'markdown-it';
 import markdownitEmoji from 'markdown-it-emoji/light';
 import markdown_it_container from 'markdown-it-container';
-import twemoji from 'twemoji';
 import emojiShortName from 'emoji-short-name';
 import Toastify from 'toastify-js';
 import tippy from 'tippy.js';
 import EmojiButton from '@joeattardi/emoji-button';
 import { customEmojis, replaceEmojis } from './custom-emojis';
 import { match } from 'assert';
+import moment from 'moment';
 
 export const repoUrl = 'https://github.com/LemmyNet/lemmy';
 export const helpGuideUrl = '/docs/about_guide.html';
@@ -64,6 +67,7 @@ export const archiveUrl = 'https://archive.is';
 
 export const postRefetchSeconds: number = 60 * 1000;
 export const fetchLimit: number = 20;
+export const commentFetchLimit = 15;
 export const mentionDropdownFetchLimit = 10;
 
 export const languages = [
@@ -74,9 +78,11 @@ export const languages = [
   { code: 'eo', name: 'Esperanto' },
   { code: 'es', name: 'Español' },
   { code: 'de', name: 'Deutsch' },
+  { code: 'ga', name: 'Gaeilge' },
   { code: 'gl', name: 'Galego' },
   { code: 'hu', name: 'Magyar Nyelv' },
   { code: 'ka', name: 'ქართული ენა' },
+  { code: 'km', name: 'ភាសាខ្មែរ' },
   { code: 'hi', name: 'मानक हिन्दी' },
   { code: 'fa', name: 'فارسی' },
   { code: 'ja', name: '日本語' },
@@ -87,6 +93,7 @@ export const languages = [
   { code: 'fr', name: 'Français' },
   { code: 'sv', name: 'Svenska' },
   { code: 'sq', name: 'Shqip' },
+  { code: 'sr_Latn', name: 'srpski' },
   { code: 'tr', name: 'Türkçe' },
   { code: 'uk', name: 'Українська Mова' },
   { code: 'ru', name: 'Русский' },
@@ -113,11 +120,9 @@ export const themes = [
 ];
 
 export const emojiPicker = new EmojiButton({
-  // Use the emojiShortName from native
   style: 'twemoji',
   theme: 'dark',
   position: 'auto-start',
-  // TODO i18n
 });
 
 const DEFAULT_ALPHABET =
@@ -175,10 +180,6 @@ export const md = new markdown_it({
   .use(markdownitEmoji, {
     defs: objectFlip(emojiShortName),
   });
-
-md.renderer.rules.emoji = function (token, idx) {
-  return twemoji.parse(token[idx].content);
-};
 
 export function hotRankComment(comment: Comment): number {
   return hotRank(comment.score, comment.published);
@@ -431,6 +432,12 @@ export function getMomentLanguage(): string {
     lang = 'uk';
   } else if (lang.startsWith('sq')) {
     lang = 'sq';
+  } else if (lang.startsWith('km')) {
+    lang = 'km';
+  } else if (lang.startsWith('ga')) {
+    lang = 'ga';
+  } else if (lang.startsWith('sr')) {
+    lang = 'sr';
   } else {
     lang = 'en';
   }
@@ -497,8 +504,21 @@ export function pictrsAvatarThumbnail(src: string): string {
 
 export function showAvatars(): boolean {
   return (
-    (UserService.Instance.user && UserService.Instance.user.show_avatars) ||
+    //(UserService.Instance.user && UserService.Instance.user.show_avatars) ||
     !UserService.Instance.user
+  );
+}
+
+export function isCakeDay(published: string): boolean {
+  // moment(undefined) or moment.utc(undefined) returns the current date/time
+  // moment(null) or moment.utc(null) returns null
+  const userCreationDate = moment.utc(published || null).local();
+  const currentDate = moment(new Date());
+
+  return (
+    userCreationDate.date() === currentDate.date() &&
+    userCreationDate.month() === currentDate.month() &&
+    userCreationDate.year() !== currentDate.year()
   );
 }
 
@@ -564,9 +584,12 @@ export function messageToastify(
   router: any
 ) {
   let backgroundColor = `var(--light)`;
-  body = '<div class="notiication-text-container">' + body + '</div>';
+  body = '<div class="notification-text-container">' + body + '</div>';
+  if (!UserService.Instance.user || !UserService.Instance.user.show_nsfw) {
+    body = replaceImageEmbeds(body);
+  }
   let toast = Toastify({
-    text: `${body}<br />${creator}`,
+    text: `${body}${creator}`,
     avatar: avatar,
     backgroundColor: backgroundColor,
     className: 'text-dark',
@@ -583,6 +606,16 @@ export function messageToastify(
   }).showToast();
 }
 
+export function testMessageToast() {
+  messageToastify(
+    'example-user',
+    null,
+    '<p>Example toast. <img src="https://dev.chapo.chat/pictrs/image/YsYoLsoLaf.jpg" alt=""/> The quick brown fox jumped over the lazy dog. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    'dev.chapo.chat',
+    null
+  );
+}
+
 export function setupTribute(): Tribute {
   return new Tribute({
     noMatchTemplate: function () {
@@ -594,8 +627,7 @@ export function setupTribute(): Tribute {
         trigger: ':',
         menuItemTemplate: (item: any) => {
           let shortName = `:${item.original.key}:`;
-          let twemojiIcon = twemoji.parse(item.original.val);
-          return `${twemojiIcon} ${shortName}`;
+          return `${item.original.val} ${shortName}`;
         },
         selectTemplate: (item: any) => {
           return `:${item.original.key}:`;
@@ -1031,4 +1063,19 @@ export function imagesDownsize(
     '$& class="' + (very_low ? 'notification-image' : 'comment-image') + '"'
   );
   return html;
+}
+
+export function replaceImageEmbeds(html: string): string {
+  const imgTagRegex = new RegExp(/<img.*?src="(.*?)"[^>]+>/g);
+  html = html.replace(imgTagRegex, '<a href="$1">Embedded image</a>');
+  return html;
+}
+
+export function validTitle(title?: string): boolean {
+  // Initial title is null, minimum length is taken care of by textarea's minLength={3}
+  if (title === null || title.length < 3) return true;
+
+  const regex = new RegExp(/.*\S.*/, 'g');
+
+  return regex.test(title);
 }

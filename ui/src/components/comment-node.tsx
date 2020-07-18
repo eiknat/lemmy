@@ -27,12 +27,14 @@ import {
   setupTippy,
   colorList,
   imagesDownsize,
+  replaceImageEmbeds,
 } from '../utils';
 import moment from 'moment';
 import { MomentTime } from './moment-time';
 import { CommentForm } from './comment-form';
 import { CommentNodes } from './comment-nodes';
 import { UserListing } from './user-listing';
+import { CommunityLink } from './community-link';
 import { i18n } from '../i18next';
 import { replaceEmojis } from '../custom-emojis';
 
@@ -75,6 +77,7 @@ interface CommentNodeProps {
   showCommunity?: boolean;
   sort?: CommentSortType;
   sortType?: SortType;
+  enableDownvotes: boolean;
 }
 
 export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
@@ -174,9 +177,11 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                     id: node.comment.creator_id,
                     local: node.comment.creator_local,
                     actor_id: node.comment.creator_actor_id,
+                    published: node.comment.creator_published,
                   }}
                 />
               </span>
+
               {this.isMod && (
                 <div className="badge badge-light d-none d-sm-inline mr-2">
                   {i18n.t('mod')}
@@ -200,14 +205,38 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
               {this.props.showCommunity && (
                 <>
                   <span class="mx-1">{i18n.t('to')}</span>
-                  <Link class="mr-2" to={`/c/${node.comment.community_name}`}>
-                    {node.comment.community_name}
+                  <CommunityLink
+                    community={{
+                      name: node.comment.community_name,
+                      id: node.comment.community_id,
+                      local: node.comment.community_local,
+                      actor_id: node.comment.community_actor_id,
+                    }}
+                  />
+                  <span class="mx-2">•</span>
+                  <Link class="mr-2" to={`/post/${node.comment.post_id}`}>
+                    {node.comment.post_name}
                   </Link>
                 </>
               )}
-
-              <span
-                className={`unselectable pointer ${this.scoreColor}`}
+              <button
+                class="btn btn-sm text-muted"
+                onClick={linkEvent(this, this.handleCommentCollapse)}
+              >
+                {this.state.collapsed ? (
+                  <svg class="icon icon-inline">
+                    <use xlinkHref="#icon-plus-square"></use>
+                  </svg>
+                ) : (
+                  <svg class="icon icon-inline">
+                    <use xlinkHref="#icon-minus-square"></use>
+                  </svg>
+                )}
+              </button>
+              {/* This is an expanding spacer for mobile */}
+              <div className="mr-lg-4 flex-grow-1 flex-lg-grow-0 unselectable pointer mx-2"></div>
+              <button
+                className={`btn unselectable pointer ${this.scoreColor}`}
                 onClick={linkEvent(node, this.handleCommentUpvote)}
                 data-tippy-content={this.pointsTippy}
               >
@@ -215,7 +244,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   <use xlinkHref="#icon-zap"></use>
                 </svg>
                 <span class="mr-1">{this.state.score}</span>
-              </span>
+              </button>
               <span className="mr-1">•</span>
               <span>
                 <MomentTime data={node.comment} />
@@ -228,6 +257,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                 edit
                 onReplyCancel={this.handleReplyCancel}
                 disabled={this.props.locked}
+                focus
               />
             )}
             {!this.state.showEdit && !this.state.collapsed && (
@@ -237,13 +267,9 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                 ) : (
                   <div
                     className="md-div comment-text-container"
-                    dangerouslySetInnerHTML={{
-                      __html: imagesDownsize(
-                        String(mdToHtml(this.commentUnlessRemoved).__html),
-                        false,
-                        true
-                      ),
-                    }}
+                    dangerouslySetInnerHTML={this.formatInnerHTML(
+                      this.commentUnlessRemoved
+                    )}
                   />
                 )}
                 <div class="d-flex justify-content-between justify-content-lg-start flex-wrap text-muted font-weight-bold">
@@ -287,7 +313,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                           <span class="ml-1">{this.state.upvotes}</span>
                         )}
                       </button>
-                      {WebSocketService.Instance.site.enable_downvotes && (
+                      {this.props.enableDownvotes && (
                         <button
                           className={`btn btn-link btn-animate ${
                             this.state.my_vote == -1
@@ -700,6 +726,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
             node={node}
             onReplyCancel={this.handleReplyCancel}
             disabled={this.props.locked}
+            focus
           />
         )}
         {node.children && !this.state.collapsed && (
@@ -711,6 +738,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
             postCreatorId={this.props.postCreatorId}
             sort={this.props.sort}
             sortType={this.props.sortType}
+            enableDownvotes={this.props.enableDownvotes}
           />
         )}
         {/* A collapsed clearfix */}
@@ -825,6 +853,14 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
       : node.comment.deleted
       ? `*${i18n.t('deleted')}*`
       : node.comment.content;
+  }
+
+  formatInnerHTML(html: string) {
+    html = imagesDownsize(mdToHtml(html).__html, false, true);
+    if (!UserService.Instance.user || !UserService.Instance.user.show_nsfw) {
+      html = replaceImageEmbeds(html);
+    }
+    return { __html: html };
   }
 
   handleReplyClick(i: CommentNode) {

@@ -23,6 +23,8 @@ import {
   GetCommentsResponse,
   CommentResponse,
   WebSocketJsonResponse,
+  GetSiteResponse,
+  Site,
 } from '../interfaces';
 import { WebSocketService } from '../services';
 import { PostListings } from './post-listings';
@@ -60,6 +62,19 @@ interface State {
   dataType: DataType;
   sort: SortType;
   page: number;
+  site: Site;
+}
+
+interface CommunityProps {
+  dataType: DataType;
+  sort: SortType;
+  page: number;
+}
+
+interface UrlParams {
+  dataType?: string;
+  sort?: string;
+  page?: number;
 }
 
 export class Community extends Component<any, State> {
@@ -97,6 +112,20 @@ export class Community extends Component<any, State> {
     dataType: getDataTypeFromProps(this.props),
     sort: getSortTypeFromProps(this.props),
     page: getPageFromProps(this.props),
+    site: {
+      id: undefined,
+      name: undefined,
+      creator_id: undefined,
+      published: undefined,
+      creator_name: undefined,
+      number_of_users: undefined,
+      number_of_posts: undefined,
+      number_of_comments: undefined,
+      number_of_communities: undefined,
+      enable_downvotes: undefined,
+      open_registration: undefined,
+      enable_nsfw: undefined,
+    },
   };
 
   constructor(props: any, context: any) {
@@ -119,22 +148,28 @@ export class Community extends Component<any, State> {
       name: this.state.communityName ? this.state.communityName : null,
     };
     WebSocketService.Instance.getCommunity(form);
+    WebSocketService.Instance.getSite();
   }
 
   componentWillUnmount() {
     this.subscription.unsubscribe();
   }
 
-  // Necessary for back button for some reason
-  componentWillReceiveProps(nextProps: any) {
+  static getDerivedStateFromProps(props: any): CommunityProps {
+    return {
+      dataType: getDataTypeFromProps(props),
+      sort: getSortTypeFromProps(props),
+      page: getPageFromProps(props),
+    };
+  }
+
+  componentDidUpdate(_: any, lastState: State) {
     if (
-      nextProps.history.action == 'POP' ||
-      nextProps.history.action == 'PUSH'
+      lastState.dataType !== this.state.dataType ||
+      lastState.sort !== this.state.sort ||
+      lastState.page !== this.state.page
     ) {
-      this.state.dataType = getDataTypeFromProps(nextProps);
-      this.state.sort = getSortTypeFromProps(nextProps);
-      this.state.page = getPageFromProps(nextProps);
-      this.setState(this.state);
+      this.setState({ loading: true });
       this.fetchData();
     }
   }
@@ -174,6 +209,7 @@ export class Community extends Component<any, State> {
                 moderators={this.state.moderators}
                 admins={this.state.admins}
                 online={this.state.online}
+                enableNsfw={this.state.site.enable_nsfw}
               />
             </aside>
           </div>
@@ -188,6 +224,8 @@ export class Community extends Component<any, State> {
         posts={this.state.posts}
         removeDuplicates
         sort={this.state.sort}
+        enableDownvotes={this.state.site.enable_downvotes}
+        enableNsfw={this.state.site.enable_nsfw}
       />
     ) : (
       <CommentNodes
@@ -195,6 +233,7 @@ export class Community extends Component<any, State> {
         noIndent
         sortType={this.state.sort}
         showContext
+        enableDownvotes={this.state.site.enable_downvotes}
       />
     );
   }
@@ -238,7 +277,7 @@ export class Community extends Component<any, State> {
             {i18n.t('prev')}
           </button>
         )}
-        {this.state.posts.length == fetchLimit && (
+        {this.state.posts.length > 0 && (
           <button
             class="btn btn-sm btn-secondary"
             onClick={linkEvent(this, this.nextPage)}
@@ -251,46 +290,33 @@ export class Community extends Component<any, State> {
   }
 
   nextPage(i: Community) {
-    i.state.page++;
-    i.setState(i.state);
-    i.updateUrl();
-    i.fetchData();
+    i.updateUrl({ page: i.state.page + 1 });
     window.scrollTo(0, 0);
   }
 
   prevPage(i: Community) {
-    i.state.page--;
-    i.setState(i.state);
-    i.updateUrl();
-    i.fetchData();
+    i.updateUrl({ page: i.state.page - 1 });
     window.scrollTo(0, 0);
   }
 
   handleSortChange(val: SortType) {
-    this.state.sort = val;
-    this.state.page = 1;
-    this.state.loading = true;
-    this.setState(this.state);
-    this.updateUrl();
-    this.fetchData();
+    this.updateUrl({ sort: SortType[val].toLowerCase(), page: 1 });
     window.scrollTo(0, 0);
   }
 
   handleDataTypeChange(val: DataType) {
-    this.state.dataType = val;
-    this.state.page = 1;
-    this.state.loading = true;
-    this.setState(this.state);
-    this.updateUrl();
-    this.fetchData();
+    this.updateUrl({ dataType: DataType[val].toLowerCase(), page: 1 });
     window.scrollTo(0, 0);
   }
 
-  updateUrl() {
-    let dataTypeStr = DataType[this.state.dataType].toLowerCase();
-    let sortStr = SortType[this.state.sort].toLowerCase();
+  updateUrl(paramUpdates: UrlParams) {
+    const dataTypeStr =
+      paramUpdates.dataType || DataType[this.state.dataType].toLowerCase();
+    const sortStr =
+      paramUpdates.sort || SortType[this.state.sort].toLowerCase();
+    const page = paramUpdates.page || this.state.page;
     this.props.history.push(
-      `/c/${this.state.community.name}/data_type/${dataTypeStr}/sort/${sortStr}/page/${this.state.page}`
+      `/c/${this.state.community.name}/data_type/${dataTypeStr}/sort/${sortStr}/page/${page}`
     );
   }
 
@@ -331,7 +357,7 @@ export class Community extends Component<any, State> {
       this.state.moderators = data.moderators;
       this.state.admins = data.admins;
       this.state.online = data.online;
-      document.title = `/c/${this.state.community.name} - ${WebSocketService.Instance.site.name}`;
+      document.title = `/c/${this.state.community.name} - ${this.state.site.name}`;
       this.setState(this.state);
       this.fetchData();
     } else if (res.op == UserOperation.EditCommunity) {
@@ -398,6 +424,10 @@ export class Community extends Component<any, State> {
     } else if (res.op == UserOperation.CreateCommentLike) {
       let data = res.data as CommentResponse;
       createCommentLikeRes(data, this.state.comments);
+      this.setState(this.state);
+    } else if (res.op == UserOperation.GetSite) {
+      let data = res.data as GetSiteResponse;
+      this.state.site = data.site;
       this.setState(this.state);
     }
   }

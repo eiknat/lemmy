@@ -34,6 +34,7 @@ import {
   setupTippy,
   hostname,
   previewLines,
+  toast,
 } from '../utils';
 import { i18n } from '../i18next';
 
@@ -62,6 +63,8 @@ interface PostListingProps {
   showBody?: boolean;
   moderators?: Array<CommunityUser>;
   admins?: Array<UserView>;
+  enableDownvotes: boolean;
+  enableNsfw: boolean;
 }
 
 export function PostBody({ body }: { body: string }) {
@@ -130,6 +133,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               post={this.props.post}
               onEdit={this.handleEditPost}
               onCancel={this.handleEditCancel}
+              enableNsfw={this.props.enableNsfw}
+              enableDownvotes={this.props.enableDownvotes}
             />
           </div>
         )}
@@ -316,21 +321,19 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             >
               {this.state.score}
             </div>
-            {WebSocketService.Instance &&
-              WebSocketService.Instance.site &&
-              WebSocketService.Instance.site.enable_downvotes && (
-                <button
-                  className={`btn-animate btn btn-link p-0 ${
-                    this.state.my_vote == -1 ? 'text-danger' : 'text-muted'
-                  }`}
-                  onClick={linkEvent(this, this.handlePostDisLike)}
-                  data-tippy-content={i18n.t('downvote')}
-                >
-                  <svg class="icon downvote">
-                    <use xlinkHref="#icon-arrow-down1"></use>
-                  </svg>
-                </button>
-              )}
+            {this.props.enableDownvotes && (
+              <button
+                className={`btn-animate btn btn-link p-0 ${
+                  this.state.my_vote == -1 ? 'text-danger' : 'text-muted'
+                }`}
+                onClick={linkEvent(this, this.handlePostDisLike)}
+                data-tippy-content={i18n.t('downvote')}
+              >
+                <svg class="icon downvote">
+                  <use xlinkHref="#icon-arrow-down1"></use>
+                </svg>
+              </button>
+            )}
           </div>
           {/* show thumbnail when not expanded or content is a video */}
           {(!isMobile ||
@@ -531,11 +534,27 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       <MomentTime data={post} />
                     </span>
                   </li>
-                  {post.body && !isMobile && (
+                  <br />
+                  <div className="list-inline-item">
+                    <Link
+                      className="text-muted"
+                      title={i18n.t('number_of_comments', {
+                        count: post.number_of_comments,
+                      })}
+                      to={`/post/${post.id}`}
+                    >
+                      <svg class="mr-1 icon icon-inline">
+                        <use xlinkHref="#icon-message-square"></use>
+                      </svg>
+                      {i18n.t('number_of_comments', {
+                        count: post.number_of_comments,
+                      })}
+                    </Link>
+                  </div>
+                  {/* {post.body && !isMobile && (
                     <>
                       <li className="list-inline-item">•</li>
                       <li className="list-inline-item">
-                        {/* Using a link with tippy doesn't work on touch devices unfortunately */}
                         <Link
                           className="text-muted"
                           data-tippy-content={md.render(
@@ -550,8 +569,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         </Link>
                       </li>
                     </>
-                  )}
-                  <li className="list-inline-item">•</li>
+                  )} */}
+                  {/* <li className="list-inline-item">•</li> */}
                   {this.state.upvotes !== this.state.score && (
                     <>
                       <span
@@ -575,25 +594,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                           </span>
                         </li>
                       </span>
-                      <li className="list-inline-item">•</li>
                     </>
                   )}
-                  <li className="list-inline-item">
-                    <Link
-                      className="text-muted"
-                      title={i18n.t('number_of_comments', {
-                        count: post.number_of_comments,
-                      })}
-                      to={`/post/${post.id}`}
-                    >
-                      <svg class="mr-1 icon icon-inline">
-                        <use xlinkHref="#icon-message-square"></use>
-                      </svg>
-                      {i18n.t('number_of_comments', {
-                        count: post.number_of_comments,
-                      })}
-                    </Link>
-                  </li>
                 </ul>
                 {this.props.post.duplicates && (
                   <ul class="list-inline mb-1 small text-muted">
@@ -1113,6 +1115,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
   }
 
   handlePostLike(i: PostListing) {
+    if (!UserService.Instance.user) {
+      this.context.router.history.push(`/login`);
+    }
+
     let new_vote = i.state.my_vote == 1 ? 0 : 1;
 
     if (i.state.my_vote == 1) {
@@ -1140,6 +1146,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
   }
 
   handlePostDisLike(i: PostListing) {
+    if (!UserService.Instance.user) {
+      this.context.router.history.push(`/login`);
+    }
+
     let new_vote = i.state.my_vote == -1 ? 0 : -1;
 
     if (i.state.my_vote == 1) {
