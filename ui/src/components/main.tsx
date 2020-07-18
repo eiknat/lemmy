@@ -82,6 +82,20 @@ function getMoscowTime(): string {
   return moscowTime.toLocaleString().split(', ')[1];
 }
 
+interface MainProps {
+  listingType: ListingType;
+  dataType: DataType;
+  sort: SortType;
+  page: number;
+}
+
+interface UrlParams {
+  listingType?: string;
+  dataType?: string;
+  sort?: string;
+  page?: number;
+}
+
 export class Main extends Component<any, MainState> {
   private subscription: Subscription;
   private emptyState: MainState = {
@@ -154,17 +168,24 @@ export class Main extends Component<any, MainState> {
     this.subscription.unsubscribe();
   }
 
-  // Necessary for back button for some reason
-  componentWillReceiveProps(nextProps: any) {
+  static getDerivedStateFromProps(props: any): MainProps {
+    return {
+      listingType: getListingTypeFromProps(props),
+      dataType: getDataTypeFromProps(props),
+      sort: getSortTypeFromProps(props),
+      page: getPageFromProps(props),
+    };
+  }
+
+  componentDidUpdate(_: any, lastState: MainState) {
     if (
-      nextProps.history.action == 'POP' ||
-      nextProps.history.action == 'PUSH'
+      lastState.listingType !== this.state.listingType ||
+      lastState.dataType !== this.state.dataType ||
+      lastState.sort !== this.state.sort ||
+      lastState.page !== this.state.page
     ) {
-      this.state.listingType = getListingTypeFromProps(nextProps);
-      this.state.dataType = getDataTypeFromProps(nextProps);
-      this.state.sort = getSortTypeFromProps(nextProps);
-      this.state.page = getPageFromProps(nextProps);
-      this.setState(this.state);
+      this.setState({ loading: true });
+      this.fetchData();
     }
   }
 
@@ -270,12 +291,17 @@ export class Main extends Component<any, MainState> {
     );
   }
 
-  updateUrl() {
-    let listingTypeStr = ListingType[this.state.listingType].toLowerCase();
-    let dataTypeStr = DataType[this.state.dataType].toLowerCase();
-    let sortStr = SortType[this.state.sort].toLowerCase();
+  updateUrl(paramUpdates: UrlParams) {
+    const listingTypeStr =
+      paramUpdates.listingType ||
+      ListingType[this.state.listingType].toLowerCase();
+    const dataTypeStr =
+      paramUpdates.dataType || DataType[this.state.dataType].toLowerCase();
+    const sortStr =
+      paramUpdates.sort || SortType[this.state.sort].toLowerCase();
+    const page = paramUpdates.page || this.state.page;
     this.props.history.push(
-      `/home/data_type/${dataTypeStr}/listing_type/${listingTypeStr}/sort/${sortStr}/page/${this.state.page}`
+      `/home/data_type/${dataTypeStr}/listing_type/${listingTypeStr}/sort/${sortStr}/page/${page}`
     );
   }
 
@@ -419,17 +445,21 @@ export class Main extends Component<any, MainState> {
                 #
               </a>
               <a href="https://en.wikipedia.org/wiki/Fediverse">#</a>
-              <br></br>
+              <br class="big"></br>
               <code>#</code>
               <br></br>
               <b>#</b>
-              <br></br>
+              <br class="big"></br>
               <a href={repoUrl}>#</a>
-              <br></br>
+              <br class="big"></br>
               <a href="https://www.rust-lang.org">#</a>
               <a href="https://actix.rs/">#</a>
               <a href="https://infernojs.org">#</a>
               <a href="https://www.typescriptlang.org/">#</a>
+              <br class="big"></br>
+              <a href="https://github.com/LemmyNet/lemmy/graphs/contributors?type=a">
+                #
+              </a>
             </T>
           </p>
         </div>
@@ -464,6 +494,8 @@ export class Main extends Component<any, MainState> {
         showCommunity
         removeDuplicates
         sort={this.state.sort}
+        enableDownvotes={this.state.siteRes.site.enable_downvotes}
+        enableNsfw={this.state.siteRes.site.enable_nsfw}
       />
     ) : (
       <CommentNodes
@@ -472,6 +504,7 @@ export class Main extends Component<any, MainState> {
         showCommunity
         sortType={this.state.sort}
         showContext
+        enableDownvotes={this.state.siteRes.site.enable_downvotes}
       />
     );
   }
@@ -556,7 +589,7 @@ export class Main extends Component<any, MainState> {
             {i18n.t('prev')}
           </button>
         )}
-        {this.state.posts.length == fetchLimit && (
+        {this.state.posts.length > 0 && (
           <button
             class="btn btn-sm btn-secondary"
             onClick={linkEvent(this, this.nextPage)}
@@ -586,50 +619,27 @@ export class Main extends Component<any, MainState> {
   }
 
   nextPage(i: Main) {
-    i.state.page++;
-    i.state.loading = true;
-    i.setState(i.state);
-    i.updateUrl();
-    i.fetchData();
+    i.updateUrl({ page: i.state.page + 1 });
     window.scrollTo(0, 0);
   }
 
   prevPage(i: Main) {
-    i.state.page--;
-    i.state.loading = true;
-    i.setState(i.state);
-    i.updateUrl();
-    i.fetchData();
+    i.updateUrl({ page: i.state.page - 1 });
     window.scrollTo(0, 0);
   }
 
   handleSortChange(val: SortType) {
-    this.state.sort = val;
-    this.state.page = 1;
-    this.state.loading = true;
-    this.setState(this.state);
-    this.updateUrl();
-    this.fetchData();
+    this.updateUrl({ sort: SortType[val].toLowerCase(), page: 1 });
     window.scrollTo(0, 0);
   }
 
   handleListingTypeChange(val: ListingType) {
-    this.state.listingType = val;
-    this.state.page = 1;
-    this.state.loading = true;
-    this.setState(this.state);
-    this.updateUrl();
-    this.fetchData();
+    this.updateUrl({ listingType: ListingType[val].toLowerCase(), page: 1 });
     window.scrollTo(0, 0);
   }
 
   handleDataTypeChange(val: DataType) {
-    this.state.dataType = val;
-    this.state.page = 1;
-    this.state.loading = true;
-    this.setState(this.state);
-    this.updateUrl();
-    this.fetchData();
+    this.updateUrl({ dataType: DataType[val].toLowerCase(), page: 1 });
     window.scrollTo(0, 0);
   }
 
@@ -681,7 +691,7 @@ export class Main extends Component<any, MainState> {
       this.state.siteRes.banned = data.banned;
       this.state.siteRes.online = data.online;
       this.setState(this.state);
-      document.title = `${WebSocketService.Instance.site.name}`;
+      document.title = `${this.state.siteRes.site.name}`;
     } else if (res.op == UserOperation.EditSite) {
       let data = res.data as SiteResponse;
       this.state.siteRes.site = data.site;

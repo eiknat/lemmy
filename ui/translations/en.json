@@ -222,6 +222,7 @@
       "Lemmy is a <1>link aggregator</1> / reddit alternative.",
     "not_logged_in": "Not logged in.",
     "logged_in": "Logged in.",
+    "must_login": "You must <1>log in or register</1> to comment.",
     "site_saved": "Site Saved.",
     "community_ban": "You have been banned from this community.",
     "site_ban": "You have been banned from the site",
@@ -257,6 +258,7 @@
       "Couldn't find that username or email.",
     "password_incorrect": "Password incorrect.",
     "passwords_dont_match": "Passwords do not match.",
+    "no_password_reset": "You will not be able to reset your password without an email.",
     "invalid_username": "Invalid username.",
     "admin_already_created": "Sorry, there's already an admin.",
     "user_already_exists": "User already exists.",
@@ -278,5 +280,8 @@
     "missing_input_response": "Captcha was not completed ",
     "invalid_input_response": "Captcha validation failed. Please retry ",
     "invalid_or_already_seen_response": "Captcha validation failed. Please retry ",
-    "ago": "ago"
+    "ago": "ago",
+    "cake_day_title": "Cake day:",
+    "cake_day_info": "It's {{ creator_name }}'s cake day today!",
+    "invalid_post_title": "Invalid post title"
 }
