@@ -229,8 +229,6 @@ export class User extends Component<any, UserState> {
                 <span>/u/{this.state.username}</span>
               </h5>
               {this.selects()}
-            </main>
-            <aside class="col-12 col-md-4 sidebar">
               <UserDetails
                 user_id={this.state.user_id}
                 username={this.state.username}
@@ -242,13 +240,12 @@ export class User extends Component<any, UserState> {
                 view={this.state.view}
                 onPageChange={this.handlePageChange}
               />
-
-              <div class="col-12 col-md-4">
-                {this.userInfo()}
-                {this.isCurrentUser && this.userSettings()}
-                {this.moderates()}
-                {this.follows()}
-              </div>
+            </main>
+            <aside class="col-12 col-md-4 sidebar">
+              {this.userInfo()}
+              {this.isCurrentUser && this.userSettings()}
+              {this.moderates()}
+              {this.follows()}
             </aside>
           </div>
         )}

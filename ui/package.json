@@ -15,6 +15,7 @@
   },
   "keywords": [],
   "dependencies": {
+    "@joeattardi/emoji-button": "^3.1.1",
     "@types/autosize": "^3.0.6",
     "@types/js-cookie": "^2.2.6",
     "@types/jwt-decode": "^2.2.1",
