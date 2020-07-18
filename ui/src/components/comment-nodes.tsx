@@ -25,6 +25,7 @@ interface CommentNodesProps {
   sort?: CommentSortType;
   sortType?: SortType;
   enableDownvotes: boolean;
+  maxView?: number;
 }
 
 export class CommentNodes extends Component<
@@ -65,6 +66,10 @@ export class CommentNodes extends Component<
       commentSort(this.props.nodes, this.props.sort);
     } else if (this.props.sortType !== undefined) {
       commentSortSortType(this.props.nodes, this.props.sortType);
+    }
+
+    if (this.props.maxView) {
+      return this.props.nodes.slice(0, this.props.maxView);
     }
 
     return this.props.nodes;

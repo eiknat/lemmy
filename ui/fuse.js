@@ -18,8 +18,8 @@ Sparky.task('config', _ => {
     output: 'dist/$name.js',
     experimentalFeatures: true,
     cache: !isProduction,
-    sourceMaps: !isProduction,
-    // sourceMaps: true,
+    // sourceMaps: !isProduction,
+    sourceMaps: true,
     transformers: {
       before: [transformClasscat(), transformInferno()],
     },
