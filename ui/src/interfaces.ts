@@ -46,6 +46,8 @@ export enum UserOperation {
   GetSiteConfig,
   SaveSiteConfig,
   VerifyCaptcha,
+  GetCommunitySettings,
+  EditCommunitySettings,
 }
 
 export enum CommentSortType {
@@ -929,7 +931,8 @@ type ResponseType =
   | PrivateMessageResponse
   | PrivateMessagesResponse
   | GetSiteConfigResponse
-  | VerifyCaptchaResponse;
+  | VerifyCaptchaResponse
+  | CommunitySettingsResponse;
 
 export interface WebSocketResponse {
   op: UserOperation;
@@ -941,4 +944,24 @@ export interface WebSocketJsonResponse {
   data?: ResponseType;
   error?: string;
   reconnect?: boolean;
+}
+
+export interface EditCommunitySettingsForm {
+  community_id: number;
+  read_only: boolean;
+  private: boolean;
+  post_links: boolean;
+  comment_images: number;
+}
+
+export interface GetCommunitySettingsForm {
+  community_id: number;
+}
+
+export interface CommunitySettingsResponse {
+  read_only: boolean;
+  private: boolean;
+  post_links: boolean;
+  comment_images: number;
+  published: string;
 }

@@ -278,5 +278,10 @@
     "missing_input_response": "Captcha was not completed ",
     "invalid_input_response": "Captcha validation failed. Please retry ",
     "invalid_or_already_seen_response": "Captcha validation failed. Please retry ",
-    "ago": "ago"
+    "ago": "ago",
+    "community_settings": "Community Settings",
+    "community_read_only": "Read-only mode",
+    "community_private": "Private community",
+    "community_post_links": "Enable links posting",
+    "community_comment_images": "Amount of images per comment"
 }
