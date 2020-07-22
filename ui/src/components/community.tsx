@@ -190,15 +190,22 @@ export class Community extends Component<any, State> {
             <div className="row">
               <div className="community-header">
                 <div className="top-section">
-                  <h4>{this.state.community.title}</h4>
+                  <div className="header-names">
+                    <h4>{this.state.community.title}</h4>
+                    <h6> {'/c/' + this.state.community.name} </h6>
+                  </div>
                   <div className="header-right-section">
+                    <div className="community-stats">
+                      <p>{this.state.online}</p>
+                      <h6>Online</h6>
+                    </div>
                     <div className="community-stats">
                       <p>{this.state.community.number_of_subscribers}</p>
                       <h6>Members</h6>
                     </div>
                     {this.state.community.subscribed ? (
                       <button
-                        class="btn btn-secondary subscribe-button"
+                        class="btn btn-secondary unsubscribe-button"
                         onClick={linkEvent(
                           this.state.community.id,
                           this.handleUnsubscribe
@@ -217,6 +224,14 @@ export class Community extends Component<any, State> {
                         {i18n.t('subscribe')}
                       </button>
                     )}
+                    <div className="community-button-separator"></div>
+                    <Link
+                      className="btn btn-secondary create-post-button"
+                      to={`/create_post?community=${this.state.community.name}`}
+                    >
+                      {' '}
+                      Create Post{' '}
+                    </Link>
                   </div>
                 </div>
               </div>
