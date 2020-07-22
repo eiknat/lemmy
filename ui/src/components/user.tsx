@@ -219,41 +219,37 @@ export class User extends Component<any, UserState> {
           )}
           <span>/u/{this.state.username}</span>
         </h5>
-        {this.state.loading ? (
+        {this.state.loading && (
           <h5>
             <svg class="icon icon-spinner spin">
               <use xlinkHref="#icon-spinner"></use>
             </svg>
           </h5>
-        ) : (
-          <div class="row">
-            <main class="col-12 col-md-8" role="main">
-              <h5>
-                <svg class="icon icon-spinner spin">
-                  <use xlinkHref="#icon-spinner"></use>
-                </svg>
-              </h5>
-              {this.selects()}
-              <UserDetails
-                user_id={this.state.user_id}
-                username={this.state.username}
-                sort={SortType[this.state.sort]}
-                page={this.state.page}
-                limit={fetchLimit}
-                enableDownvotes={this.state.site.enable_downvotes}
-                enableNsfw={this.state.site.enable_nsfw}
-                view={this.state.view}
-                onPageChange={this.handlePageChange}
-              />
-            </main>
+        )}
+        <div class="row">
+          <main class="col-12 col-md-8" role="main">
+            {!this.state.loading && this.selects()}
+            <UserDetails
+              user_id={this.state.user_id}
+              username={this.state.username}
+              sort={SortType[this.state.sort]}
+              page={this.state.page}
+              limit={fetchLimit}
+              enableDownvotes={this.state.site.enable_downvotes}
+              enableNsfw={this.state.site.enable_nsfw}
+              view={this.state.view}
+              onPageChange={this.handlePageChange}
+            />
+          </main>
+          {!this.state.loading && (
             <aside class="col-12 col-md-4 sidebar">
               {this.userInfo()}
               {this.isCurrentUser && this.userSettings()}
               {this.moderates()}
               {this.follows()}
             </aside>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     );
   }
