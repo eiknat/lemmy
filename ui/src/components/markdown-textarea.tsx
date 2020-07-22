@@ -14,6 +14,7 @@ import { UserService } from '../services';
 import autosize from 'autosize';
 import Tribute from 'tributejs/src/Tribute.js';
 import { i18n } from '../i18next';
+import emojiShortName from 'emoji-short-name';
 
 interface MarkdownTextAreaProps {
   initialContent: string;
@@ -60,10 +61,7 @@ export class MarkdownTextArea extends Component<
     let textarea: any = document.getElementById(this.id);
     if (textarea) {
       autosize(textarea);
-      const isDesktop = window.innerWidth > 768;
-      if (isDesktop) {
-        textarea.focus();
-      }
+
       this.tribute.attach(textarea);
       textarea.addEventListener('tribute-replaced', () => {
         this.state.content = textarea.value;
@@ -73,7 +71,8 @@ export class MarkdownTextArea extends Component<
 
       this.quoteInsert();
 
-      if (this.props.focus) {
+      const isDesktop = window.innerWidth > 768;
+      if (this.props.focus || (this.props.focus && isDesktop)) {
         textarea.focus();
       }
 
@@ -228,15 +227,15 @@ export class MarkdownTextArea extends Component<
                 onChange={linkEvent(this, this.handleImageUpload)}
               />
             </form>
-            <span
+            <button
               onClick={linkEvent(this, this.handleEmojiPickerClick)}
-              class="pointer unselectable d-inline-block mr-3 float-right text-muted font-weight-bold"
+              class="btn btn-sm text-muted"
               data-tippy-content={i18n.t('emoji_picker')}
             >
               <svg class="icon icon-inline">
                 <use xlinkHref="#icon-smile"></use>
               </svg>
-            </span>
+            </button>
             <button
               class="btn btn-sm text-muted"
               data-tippy-content={i18n.t('header')}
@@ -317,7 +316,8 @@ export class MarkdownTextArea extends Component<
       el.innerHTML = twemojiHtmlStr;
       let nativeUnicode = (el.childNodes[0] as HTMLElement).getAttribute('alt');
       let shortName = `:${emojiShortName[nativeUnicode]}:`;
-      this.state.commentForm.content += shortName;
+
+      this.state.content += shortName;
       this.setState(this.state);
     });
   }
@@ -385,6 +385,7 @@ export class MarkdownTextArea extends Component<
   }
 
   handleEmojiPickerClick(_i: MarkdownTextArea, event: any) {
+    event.preventDefault();
     emojiPicker.togglePicker(event.target);
   }
 

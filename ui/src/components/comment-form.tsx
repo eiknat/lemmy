@@ -146,10 +146,8 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
     }
   }
 
-  handleCommentSubmit(val: string, event: any) {
+  handleCommentSubmit(val: string) {
     this.state.commentForm.content = val;
-
-    event.preventDefault();
 
     if (this.state.commentForm.content.trim() === '') {
       toast('Comment content cannot be blank', 'danger');
