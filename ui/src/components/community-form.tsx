@@ -8,29 +8,22 @@ import {
   Category,
   ListCategoriesResponse,
   CommunityResponse,
-  GetSiteResponse,
   WebSocketJsonResponse,
   CommunitySettingsResponse,
 } from '../interfaces';
 import { WebSocketService } from '../services';
-import {
-  wsJsonToRes,
-  capitalizeFirstLetter,
-  toast,
-  randomStr,
-  setupTribute,
-} from '../utils';
-import Tribute from 'tributejs/src/Tribute.js';
-import autosize from 'autosize';
+import { wsJsonToRes, capitalizeFirstLetter, toast, randomStr } from '../utils';
 import { i18n } from '../i18next';
 
 import { Community } from '../interfaces';
+import { MarkdownTextArea } from './markdown-textarea';
 
 interface CommunityFormProps {
   community?: Community; // If a community is given, that means this is an edit
   onCancel?(): any;
   onCreate?(community: Community): any;
   onEdit?(community: Community): any;
+  enableNsfw: boolean;
 }
 
 interface CommunityFormState {
@@ -52,7 +45,6 @@ export class CommunityForm extends Component<
   CommunityFormState
 > {
   private id = `community-form-${randomStr()}`;
-  private tribute: Tribute;
   private subscription: Subscription;
 
   private emptyState: CommunityFormState = {
@@ -71,8 +63,11 @@ export class CommunityForm extends Component<
   constructor(props: any, context: any) {
     super(props, context);
 
-    this.tribute = setupTribute();
     this.state = this.emptyState;
+
+    this.handleCommunityDescriptionChange = this.handleCommunityDescriptionChange.bind(
+      this
+    );
 
     if (this.props.community) {
       this.state.communityForm = {
@@ -105,19 +100,22 @@ export class CommunityForm extends Component<
     WebSocketService.Instance.getSite();
   }
 
-  componentDidMount() {
-    var textarea: any = document.getElementById(this.id);
-    autosize(textarea);
-    this.tribute.attach(textarea);
-    textarea.addEventListener('tribute-replaced', () => {
-      this.state.communityForm.description = textarea.value;
-      this.setState(this.state);
-      autosize.update(textarea);
-    });
+  componentDidUpdate() {
+    if (
+      !this.state.loading &&
+      (this.state.communityForm.name ||
+        this.state.communityForm.title ||
+        this.state.communityForm.description)
+    ) {
+      window.onbeforeunload = () => true;
+    } else {
+      window.onbeforeunload = undefined;
+    }
   }
 
   componentWillUnmount() {
     this.subscription.unsubscribe();
+    window.onbeforeunload = null;
   }
 
   render() {
@@ -133,26 +131,27 @@ export class CommunityForm extends Component<
           message={i18n.t('block_leaving')}
         />
         <form onSubmit={linkEvent(this, this.handleCreateCommunitySubmit)}>
-          <div class="form-group row">
-            <label class="col-12 col-form-label" htmlFor="community-name">
-              {i18n.t('name')}
-            </label>
-            <div class="col-12">
-              <input
-                type="text"
-                id="community-name"
-                class="form-control"
-                value={this.state.communityForm.name}
-                onInput={linkEvent(this, this.handleCommunityNameChange)}
-                required
-                minLength={3}
-                maxLength={20}
-                pattern="[a-z0-9_]+"
-                title={i18n.t('community_reqs')}
-              />
+          {!this.props.community && (
+            <div class="form-group row">
+              <label class="col-12 col-form-label" htmlFor="community-name">
+                {i18n.t('name')}
+              </label>
+              <div class="col-12">
+                <input
+                  type="text"
+                  id="community-name"
+                  class="form-control"
+                  value={this.state.communityForm.name}
+                  onInput={linkEvent(this, this.handleCommunityNameChange)}
+                  required
+                  minLength={3}
+                  maxLength={20}
+                  pattern="[a-z0-9_]+"
+                  title={i18n.t('community_reqs')}
+                />
+              </div>
             </div>
-          </div>
-
+          )}
           <div class="form-group row">
             <label class="col-12 col-form-label" htmlFor="community-title">
               {i18n.t('title')}
@@ -175,13 +174,9 @@ export class CommunityForm extends Component<
               {i18n.t('sidebar')}
             </label>
             <div class="col-12">
-              <textarea
-                id={this.id}
-                value={this.state.communityForm.description}
-                onInput={linkEvent(this, this.handleCommunityDescriptionChange)}
-                class="form-control"
-                rows={3}
-                maxLength={10000}
+              <MarkdownTextArea
+                initialContent={this.state.communityForm.description}
+                onContentChange={this.handleCommunityDescriptionChange}
               />
             </div>
           </div>
@@ -203,7 +198,7 @@ export class CommunityForm extends Component<
             </div>
           </div>
 
-          {this.state.enable_nsfw && (
+          {this.props.enableNsfw && (
             <div class="form-group row">
               <div class="col-12">
                 <div class="form-check">
@@ -366,9 +361,9 @@ export class CommunityForm extends Component<
     i.setState(i.state);
   }
 
-  handleCommunityDescriptionChange(i: CommunityForm, event: any) {
-    i.state.communityForm.description = event.target.value;
-    i.setState(i.state);
+  handleCommunityDescriptionChange(val: string) {
+    this.state.communityForm.description = val;
+    this.setState(this.state);
   }
 
   handleCommunityCategoryChange(i: CommunityForm, event: any) {
@@ -430,10 +425,6 @@ export class CommunityForm extends Component<
       let data = res.data as CommunityResponse;
       this.state.loading = false;
       this.props.onEdit(data.community);
-    } else if (res.op == UserOperation.GetSite) {
-      let data = res.data as GetSiteResponse;
-      this.state.enable_nsfw = data.site.enable_nsfw;
-      this.setState(this.state);
     }
     // Community settings
     else if (res.op == UserOperation.GetCommunitySettings) {
