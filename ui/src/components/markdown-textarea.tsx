@@ -122,7 +122,7 @@ export class MarkdownTextArea extends Component<
               className={`form-control ${this.state.previewMode && 'd-none'}`}
               value={this.state.content}
               onInput={linkEvent(this, this.handleContentChange)}
-              onPaste={linkEvent(this, this.handleImageUploadPaste)}
+              // onPaste={linkEvent(this, this.handleImageUploadPaste)}
               required
               disabled={this.props.disabled}
               rows={2}
@@ -201,7 +201,7 @@ export class MarkdownTextArea extends Component<
                 <use xlinkHref="#icon-link"></use>
               </svg>
             </button>
-            <form class="btn btn-sm text-muted font-weight-bold">
+            {/* <form class="btn btn-sm text-muted font-weight-bold">
               <label
                 htmlFor={`file-upload-${this.id}`}
                 className={`mb-0 ${UserService.Instance.user && 'pointer'}`}
@@ -224,9 +224,9 @@ export class MarkdownTextArea extends Component<
                 name="file"
                 class="d-none"
                 disabled={!UserService.Instance.user}
-                onChange={linkEvent(this, this.handleImageUpload)}
+                // onChange={linkEvent(this, this.handleImageUpload)}
               />
-            </form>
+            </form> */}
             <button
               onClick={linkEvent(this, this.handleEmojiPickerClick)}
               class="btn btn-sm text-muted"
@@ -322,67 +322,68 @@ export class MarkdownTextArea extends Component<
     });
   }
 
-  handleImageUploadPaste(i: MarkdownTextArea, event: any) {
-    let image = event.clipboardData.files[0];
-    if (image) {
-      i.handleImageUpload(i, image);
-    }
-  }
+  // handleImageUploadPaste(i: MarkdownTextArea, event: any) {
+  //   let image = event.clipboardData.files[0];
+  //   if (image) {
+  //     i.handleImageUpload(i, image);
+  //   }
+  // }
 
-  handleImageUpload(i: MarkdownTextArea, event: any) {
-    let file: any;
-    if (event.target) {
-      event.preventDefault();
-      file = event.target.files[0];
-    } else {
-      file = event;
-    }
+  // @TODO: Disabled until
+  // handleImageUpload(i: MarkdownTextArea, event: any) {
+  //   let file: any;
+  //   if (event.target) {
+  //     event.preventDefault();
+  //     file = event.target.files[0];
+  //   } else {
+  //     file = event;
+  //   }
 
-    const imageUploadUrl = `/pictrs/image`;
-    const formData = new FormData();
-    formData.append('images[]', file);
+  //   const imageUploadUrl = `/pictrs/image`;
+  //   const formData = new FormData();
+  //   formData.append('images[]', file);
 
-    i.state.imageLoading = true;
-    i.setState(i.state);
+  //   i.state.imageLoading = true;
+  //   i.setState(i.state);
 
-    fetch(imageUploadUrl, {
-      method: 'POST',
-      body: formData,
-    })
-      .then(res => res.json())
-      .then(res => {
-        console.log('pictrs upload:');
-        console.log(res);
-        if (res.msg == 'ok') {
-          let hash = res.files[0].file;
-          let url = `${window.location.origin}/pictrs/image/${hash}`;
-          let deleteToken = res.files[0].delete_token;
-          let deleteUrl = `${window.location.origin}/pictrs/image/delete/${deleteToken}/${hash}`;
-          let imageMarkdown = `![](${url})`;
-          let content = i.state.content;
-          content = content ? `${content}\n${imageMarkdown}` : imageMarkdown;
-          i.state.content = content;
-          i.state.imageLoading = false;
-          i.setState(i.state);
-          let textarea: any = document.getElementById(i.id);
-          autosize.update(textarea);
-          pictrsDeleteToast(
-            i18n.t('click_to_delete_picture'),
-            i18n.t('picture_deleted'),
-            deleteUrl
-          );
-        } else {
-          i.state.imageLoading = false;
-          i.setState(i.state);
-          toast(JSON.stringify(res), 'danger');
-        }
-      })
-      .catch(error => {
-        i.state.imageLoading = false;
-        i.setState(i.state);
-        toast(error, 'danger');
-      });
-  }
+  //   fetch(imageUploadUrl, {
+  //     method: 'POST',
+  //     body: formData,
+  //   })
+  //     .then(res => res.json())
+  //     .then(res => {
+  //       console.log('pictrs upload:');
+  //       console.log(res);
+  //       if (res.msg == 'ok') {
+  //         let hash = res.files[0].file;
+  //         let url = `${window.location.origin}/pictrs/image/${hash}`;
+  //         let deleteToken = res.files[0].delete_token;
+  //         let deleteUrl = `${window.location.origin}/pictrs/image/delete/${deleteToken}/${hash}`;
+  //         let imageMarkdown = `![](${url})`;
+  //         let content = i.state.content;
+  //         content = content ? `${content}\n${imageMarkdown}` : imageMarkdown;
+  //         i.state.content = content;
+  //         i.state.imageLoading = false;
+  //         i.setState(i.state);
+  //         let textarea: any = document.getElementById(i.id);
+  //         autosize.update(textarea);
+  //         pictrsDeleteToast(
+  //           i18n.t('click_to_delete_picture'),
+  //           i18n.t('picture_deleted'),
+  //           deleteUrl
+  //         );
+  //       } else {
+  //         i.state.imageLoading = false;
+  //         i.setState(i.state);
+  //         toast(JSON.stringify(res), 'danger');
+  //       }
+  //     })
+  //     .catch(error => {
+  //       i.state.imageLoading = false;
+  //       i.setState(i.state);
+  //       toast(error, 'danger');
+  //     });
+  // }
 
   handleEmojiPickerClick(_i: MarkdownTextArea, event: any) {
     event.preventDefault();
