@@ -192,7 +192,7 @@
     "yes": "oui",
     "no": "non",
     "powered_by": "Propulsé par",
-    "landing": "Lemmy est un <1>aggrégateur de liens</1>, similaire à Reddit et conçu pour fonctionner sur le <2>Fédivers</2>.<3></3>Il est auto-hébergeable, léger (<4>~80kB</4>), et se met à jour en temps réel. La fédération via ActivityPub est prévue dans sa feuille de route. <5></5>Lemmy est une <6>version beta très précoce</6> et de nombreuses fonctionnalités sont manquantes ou non fonctionnelles. <7></7>Vous pouvez signaler des bugs et suggérer de nouvelles fonctionnalités <8>ici.</8><9></9>Créé avec <10>Rust</10>, <11>Actix</11>, <12>Inferno</12>, <13>Typescript</13>.",
+    "landing": "Lemmy est un <1>aggrégateur de liens</1>, similaire à Reddit et conçu pour fonctionner sur le <2>Fédivers</2>.<3></3>Il est auto-hébergeable, se met à jour en direct et est léger (<4>~80kB</4>). La fédération via ActivityPub est prévue dans sa feuille de route. <5></5>Lemmy est une <6>version beta très précoce</6> et de nombreuses fonctionnalités sont manquantes ou non fonctionnelles. <7></7>Vous pouvez signaler des bugs et suggérer de nouvelles fonctionnalités <8>ici.</8><9></9>Créé avec <10>Rust</10>, <11>Actix</11>, <12>Inferno</12>, <13>Typescript</13>. <14></14> <15>Merci à nos contributeurs : </15> dessalines, Nutomic, asonix, zacanger, et iav.",
     "not_logged_in": "Vous n’êtes pas connecté.",
     "logged_in": "Vous êtes connecté.",
     "community_ban": "Vous avez été banni de cette communauté.",
@@ -259,5 +259,9 @@
     "picture_deleted": "Image supprimée.",
     "email_required": "Adresse mail requise.",
     "modlog_warning": "AVERTISSEMENT CONCERNANT LE CONTENU: Certaines publications supprimées sont susceptible de contenir du contenu choquant ou réservé aux adulte. Veuillez agir avec précaution.",
-    "invalid_login_credentials": "Authentification invalide."
+    "invalid_login_credentials": "Authentification invalide.",
+    "invalid_post_title": "Titre du post invalide",
+    "must_login": "Vous devez vous être <1>connecté ou enregistré</1> pour commenter.",
+    "no_password_reset": "Vous ne pourrez pas réinitialiser votre mot de passe sans un e-mail.",
+    "what_is": "Combien font"
 }

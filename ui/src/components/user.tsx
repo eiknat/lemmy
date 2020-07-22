@@ -93,7 +93,7 @@ export class User extends Component<any, UserState> {
     username: null,
     follows: [],
     moderates: [],
-    loading: false,
+    loading: true,
     avatarLoading: false,
     view: User.getViewFromProps(this.props.match.view),
     sort: User.getSortTypeFromProps(this.props.match.sort),
@@ -208,6 +208,17 @@ export class User extends Component<any, UserState> {
   render() {
     return (
       <div class="container">
+        <h5>
+          {this.state.user.avatar && showAvatars() && (
+            <img
+              height="80"
+              width="80"
+              src={this.state.user.avatar}
+              class="rounded-circle mr-2"
+            />
+          )}
+          <span>/u/{this.state.username}</span>
+        </h5>
         {this.state.loading ? (
           <h5>
             <svg class="icon icon-spinner spin">
@@ -218,15 +229,9 @@ export class User extends Component<any, UserState> {
           <div class="row">
             <main class="col-12 col-md-8" role="main">
               <h5>
-                {this.state.user.avatar && showAvatars() && (
-                  <img
-                    height="80"
-                    width="80"
-                    src={this.state.user.avatar}
-                    class="rounded-circle mr-2"
-                  />
-                )}
-                <span>/u/{this.state.username}</span>
+                <svg class="icon icon-spinner spin">
+                  <use xlinkHref="#icon-spinner"></use>
+                </svg>
               </h5>
               {this.selects()}
               <UserDetails
@@ -1042,6 +1047,7 @@ export class User extends Component<any, UserState> {
             UserService.Instance.user.show_avatars;
           this.state.userSettingsForm.matrix_user_id = this.state.user.matrix_user_id;
         }
+        this.state.loading = false;
         this.setState(this.state);
       }
     } else if (res.op == UserOperation.SaveUserSettings) {
