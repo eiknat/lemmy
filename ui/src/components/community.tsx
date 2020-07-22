@@ -1,4 +1,5 @@
 import { Component, linkEvent } from 'inferno';
+import { Link } from 'inferno-router';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
