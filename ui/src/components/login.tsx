@@ -231,6 +231,14 @@ export class Login extends Component<any, State> {
               onInput={linkEvent(this, this.handleRegisterEmailChange)}
               minLength={3}
             />
+            {!validEmail(this.state.registerForm.email) && (
+              <div class="mt-2 mb-0 alert alert-light" role="alert">
+                <svg class="icon icon-inline mr-2">
+                  <use xlinkHref="#icon-alert-triangle"></use>
+                </svg>
+                {i18n.t('no_password_reset')}
+              </div>
+            )}
           </div>
         </div>
 
@@ -468,9 +476,7 @@ export class Login extends Component<any, State> {
         let data = res.data as GetSiteResponse;
         this.state.enable_nsfw = data.site.enable_nsfw;
         this.setState(this.state);
-        document.title = `${i18n.t('login')} - ${
-          WebSocketService.Instance.site.name
-        }`;
+        document.title = `${i18n.t('login')} - ${data.site.name}`;
       }
     }
   }

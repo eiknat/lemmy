@@ -6,12 +6,10 @@ const {
   WebIndexPlugin,
   QuantumPlugin,
 } = require('fuse-box');
-// const transformInferno = require('../../dist').default
 const transformInferno = require('ts-transform-inferno').default;
 const transformClasscat = require('ts-transform-classcat').default;
 let fuse, app;
 let isProduction = false;
-// var setVersion = require('./set_version.js').setVersion;
 
 Sparky.task('config', _ => {
   fuse = new FuseBox({
@@ -20,8 +18,8 @@ Sparky.task('config', _ => {
     output: 'dist/$name.js',
     experimentalFeatures: true,
     cache: !isProduction,
-    sourceMaps: !isProduction,
-    // sourceMaps: true,
+    // sourceMaps: !isProduction,
+    sourceMaps: true,
     transformers: {
       before: [transformClasscat(), transformInferno()],
     },
@@ -46,18 +44,18 @@ Sparky.task('config', _ => {
   });
   app = fuse.bundle('app').instructions('>index.tsx');
 });
-// Sparky.task('version', _ => setVersion());
 Sparky.task('clean', _ => Sparky.src('dist/').clean('dist/'));
 Sparky.task('env', _ => (isProduction = true));
 Sparky.task('copy-assets', () =>
   Sparky.src('assets/**/**.*').dest(isProduction ? 'dist/' : 'dist/static')
 );
 Sparky.task('dev', ['clean', 'config', 'copy-assets'], _ => {
-  fuse.dev();
+  fuse.dev({
+    fallback: 'index.html',
+  });
   app.hmr().watch();
   return fuse.run();
 });
 Sparky.task('prod', ['clean', 'env', 'config', 'copy-assets'], _ => {
-  // fuse.dev({ reload: true }); // remove after demo
   return fuse.run();
 });
