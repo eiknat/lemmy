@@ -33,6 +33,7 @@ import { Sponsors } from './components/sponsors';
 import { Symbols } from './components/symbols';
 import { i18n } from './i18next';
 import { About } from './components/about';
+import { Reports } from './components/reports';
 
 import './custom.css';
 
@@ -121,6 +122,7 @@ class Index extends Component<any, any> {
 
                 <Route path={`/pbb`} component={PPB} />
                 <Route path={`/welcome`} component={WelcomePage} />
+                <Route path={`/reports`} component={Reports} />
                 <Route path="*" component={PPB} />
               </Switch>
               <Symbols />
