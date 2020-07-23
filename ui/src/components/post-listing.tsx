@@ -1281,24 +1281,6 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     i.setState(i.state);
   }
 
-  handleModRemoveSubmit(i: PostListing) {
-    event.preventDefault();
-    let form: PostFormI = {
-      name: i.props.post.name,
-      community_id: i.props.post.community_id,
-      edit_id: i.props.post.id,
-      creator_id: i.props.post.creator_id,
-      removed: !i.props.post.removed,
-      reason: i.state.removeReason,
-      nsfw: i.props.post.nsfw,
-      auth: null,
-    };
-    WebSocketService.Instance.editPost(form);
-
-    i.state.showRemoveDialog = false;
-    i.setState(i.state);
-  }
-
   handleModLock(i: PostListing) {
     let form: PostFormI = {
       name: i.props.post.name,

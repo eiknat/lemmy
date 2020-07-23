@@ -277,7 +277,7 @@ export interface PostReport {
   resolved: boolean;
   user_id: number;
   post_id: number;
-  post_text: string;
+  post_name: string;
   post_time: string;
   post_url: string;
   post_body: string;

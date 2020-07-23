@@ -49,6 +49,7 @@ import {
   ResolvePostReportForm,
   CreateCommentReportForm,
   CreatePostReportForm,
+  ListPostReportsForm,
 } from '../interfaces';
 import { UserService } from './';
 import { i18n } from '../i18next';
@@ -337,7 +338,7 @@ export class WebSocketService {
     this.ws.send(this.wsSendWrapper(UserOperation.ListCommentReports, form));
   }
 
-  public listPostReports(form: ListCommentReportsForm) {
+  public listPostReports(form: ListPostReportsForm) {
     this.setAuth(form);
     this.ws.send(this.wsSendWrapper(UserOperation.ListPostReports, form));
   }
