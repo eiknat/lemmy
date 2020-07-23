@@ -345,7 +345,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                         </svg>
                       </button>
                       <button
-                        class="btn btn-link btn-animate text-muted small"
+                        class="btn btn-sm btn-link btn-animate text-muted small"
                         onClick={linkEvent(this, this.handleReportComment)}
                         data-tippy-content={i18n.t('report')}
                       >
@@ -735,8 +735,11 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
         {this.state.showReportDialog && (
           <form onSubmit={linkEvent(this, this.handleReportSubmit)}>
             <div class="form-group row">
-              <label class="col-form-label">{i18n.t('reason')}</label>
+              <label class="col-form-label" htmlFor="comment-report-dialog">
+                {i18n.t('reason')}
+              </label>
               <input
+                id="comment-report-dialog"
                 type="text"
                 class="form-control mr-2"
                 placeholder={i18n.t('reason')}
