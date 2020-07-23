@@ -362,3 +362,8 @@ a.text-body {
 .community-sidebar-item {
   display: inline-block;
 }
+
+.report-handle-form {
+  max-width: 400px;
+  height: 50px;
+}
