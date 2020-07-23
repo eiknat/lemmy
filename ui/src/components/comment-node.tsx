@@ -45,12 +45,14 @@ interface CommentNodeState {
   removeReason: string;
   showBanDialog: boolean;
   banReason: string;
+  reportReason: string;
   banExpires: string;
   banType: BanType;
   showConfirmTransferSite: boolean;
   showConfirmTransferCommunity: boolean;
   showConfirmAppointAsMod: boolean;
   showConfirmAppointAsAdmin: boolean;
+  showReportDialog: boolean;
   collapsed: boolean;
   viewSource: boolean;
   showAdvanced: boolean;
@@ -88,6 +90,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     removeReason: null,
     showBanDialog: false,
     banReason: null,
+    reportReason: null,
     banExpires: null,
     banType: BanType.Community,
     collapsed: false,
@@ -97,6 +100,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     showConfirmTransferCommunity: false,
     showConfirmAppointAsMod: false,
     showConfirmAppointAsAdmin: false,
+    showReportDialog: false,
     my_vote: this.props.node.comment.my_vote,
     score: this.props.node.comment.score,
     upvotes: this.props.node.comment.upvotes,
@@ -339,6 +343,13 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                         <svg class="icon icon-inline">
                           <use xlinkHref="#icon-reply1"></use>
                         </svg>
+                      </button>
+                      <button
+                        class="btn btn-link btn-animate text-muted small"
+                        onClick={linkEvent(this, this.handleReportComment)}
+                        data-tippy-content={i18n.t('report')}
+                      >
+                        {i18n.t('report')}
                       </button>
                       {!this.state.showAdvanced ? (
                         <button
@@ -717,6 +728,25 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
             <div class="form-group row">
               <button type="submit" class="btn btn-secondary">
                 {i18n.t('ban')} {node.comment.creator_name}
+              </button>
+            </div>
+          </form>
+        )}
+        {this.state.showReportDialog && (
+          <form onSubmit={linkEvent(this, this.handleReportSubmit)}>
+            <div class="form-group row">
+              <label class="col-form-label">{i18n.t('reason')}</label>
+              <input
+                type="text"
+                class="form-control mr-2"
+                placeholder={i18n.t('reason')}
+                value={this.state.reportReason}
+                onInput={linkEvent(this, this.handleReportReasonChange)}
+              />
+            </div>
+            <div class="form-group row">
+              <button type="submit" class="btn btn-secondary">
+                {i18n.t('report')} {node.comment.creator_name}
               </button>
             </div>
           </form>
@@ -1154,6 +1184,30 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     };
     WebSocketService.Instance.transferSite(form);
     i.state.showConfirmTransferSite = false;
+    i.setState(i.state);
+  }
+
+  handleReportComment(i: CommentNode) {
+    i.state.showReportDialog = !i.state.showReportDialog;
+    i.setState(i.state);
+  }
+
+  handleReportReasonChange(i: CommentNode, event: any) {
+    i.state.reportReason = event.target.value;
+    i.setState(i.state);
+  }
+
+  handleReportSubmit(i: CommentNode, e: any) {
+    e.preventDefault();
+
+    WebSocketService.Instance.createCommentReport({
+      comment: i.props.node.comment.id,
+      reason: i.state.reportReason,
+    });
+
+    i.state.reportReason = null;
+    i.state.showReportDialog = false;
+
     i.setState(i.state);
   }
 
