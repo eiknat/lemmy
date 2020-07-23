@@ -38,7 +38,7 @@ export class Footer extends Component<any, any> {
               </a>
             </li>
             <li class="nav-item">
-              <Link class="nav-link" to="/sponsors">
+              <Link class="nav-link" to="/contributing">
                 {i18n.t('donate')}
               </Link>
             </li>

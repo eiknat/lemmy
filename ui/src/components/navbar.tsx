@@ -230,7 +230,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
             <li className="nav-item">
               <Link
                 class="nav-link"
-                to="/sponsors"
+                to="/contributing"
                 title={i18n.t('donate_to_lemmy')}
               >
                 <svg class="icon">
