@@ -339,7 +339,7 @@ export class WebSocketService {
 
   public listPostReports(form: ListCommentReportsForm) {
     this.setAuth(form);
-    this.ws.send(this.wsSendWrapper(UserOperation.ListCommentReports, form));
+    this.ws.send(this.wsSendWrapper(UserOperation.ListPostReports, form));
   }
 
   public getReportCount(form: GetReportCountForm) {
