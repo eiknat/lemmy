@@ -43,6 +43,8 @@ import {
   SiteConfigForm,
   MessageType,
   WebSocketJsonResponse,
+  GetCommunitySettingsForm,
+  EditCommunitySettingsForm,
 } from '../interfaces';
 import { UserService } from './';
 import { i18n } from '../i18next';
@@ -323,6 +325,16 @@ export class WebSocketService {
   public saveSiteConfig(form: SiteConfigForm) {
     this.setAuth(form);
     this.ws.send(this.wsSendWrapper(UserOperation.SaveSiteConfig, form));
+  }
+
+  public getCommunitySettings(form: GetCommunitySettingsForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.GetCommunitySettings, form));
+  }
+
+  public editCommunitySettings(form: EditCommunitySettingsForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.EditCommunitySettings, form));
   }
 
   private wsSendWrapper(op: UserOperation, data: MessageType) {
