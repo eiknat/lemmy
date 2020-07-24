@@ -443,7 +443,7 @@ export class User extends Component<any, UserState> {
           <div class="card-body">
             <h5>{i18n.t('settings')}</h5>
             <form onSubmit={linkEvent(this, this.handleUserSettingsSubmit)}>
-              <div class="form-group">
+              {/* <div class="form-group">
                 <label>{i18n.t('avatar')}</label>
                 <form class="d-inline">
                   <label
@@ -485,7 +485,7 @@ export class User extends Component<any, UserState> {
                     )}`}
                   </button>
                 </div>
-              )}
+              )} */}
               <div class="form-group">
                 <label>{i18n.t('language')}</label>
                 <select
