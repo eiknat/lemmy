@@ -37,6 +37,7 @@ import {
   toast,
 } from '../utils';
 import { i18n } from '../i18next';
+import { User } from './user';
 
 interface PostListingState {
   showEdit: boolean;
@@ -307,6 +308,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     let post = this.props.post;
 
     const isMobile = window.innerWidth < 768;
+
     return (
       <div>
         <div class="row">
@@ -542,7 +544,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     </span>
                   </li>
                   <br />
-                  <div className="list-inline-item">
+                  <div className="list-inline-item d-inline-flex align-items-center">
                     <Link
                       className="text-muted"
                       title={i18n.t('number_of_comments', {
@@ -557,6 +559,15 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         count: post.number_of_comments,
                       })}
                     </Link>
+                    {UserService.Instance.user && !this.props.showBody && (
+                      <button
+                        class="btn btn-sm btn-link btn-animate text-muted p-0 pl-3"
+                        onClick={linkEvent(this, this.handleReportPost)}
+                        data-tippy-content={i18n.t('report')}
+                      >
+                        {i18n.t('report')}
+                      </button>
+                    )}
                   </div>
                   {/* {post.body && !isMobile && (
                     <>

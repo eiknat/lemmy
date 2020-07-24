@@ -168,7 +168,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
               )}
               </div>*/}
             {community.description && (
-              <div class="card-body">
+              <div class="mb-3">
                 <div
                   className="md-div"
                   dangerouslySetInnerHTML={mdToHtml(community.description)}

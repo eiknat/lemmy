@@ -170,7 +170,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
     let res = wsJsonToRes(msg);
 
     if (msg.error) {
-      this.state.loading = false;
+      this.state.finished = true;
       this.setState(this.state);
       return;
     }

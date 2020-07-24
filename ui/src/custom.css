@@ -264,18 +264,25 @@ a.text-body {
 .header-names {
   padding-top: 5px;
   padding-left: 5%;
+  width: 55vw;
 }
 
 .header-names h4 {
   font-weight: 900;
   font-size: 24px;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-names h6 {
   color: #C0C5D8;
   padding-top: 3px;
   font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .top-section {

@@ -12,16 +12,16 @@ import {
   CommentForm,
   PostForm,
   GetReportCountResponse,
+  GetCommunityResponse,
+  Community as CommunityI,
 } from '../interfaces';
 import { UserService, WebSocketService } from '../services';
-import { retryWhen, delay, take, last } from 'rxjs/operators';
+import { retryWhen, delay, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { wsJsonToRes, toast, getUnixTime, setupTippy } from '../utils';
+import { wsJsonToRes, toast } from '../utils';
 import { i18n } from '../i18next';
 import { MomentTime } from './moment-time';
 import { Link } from 'inferno-router';
-import { report } from 'process';
-import tippy from 'tippy.js';
 
 interface ReportsState {
   moderates: Array<CommunityUser>;
@@ -42,6 +42,9 @@ interface ReportsState {
       postReports: number;
     };
   };
+  communitiesById: {
+    [communityId: number]: CommunityI;
+  };
 }
 
 export class Reports extends Component<{}, ReportsState> {
@@ -59,6 +62,7 @@ export class Reports extends Component<{}, ReportsState> {
       currentBanDialog: null,
       removeReason: '',
       currentRemoveDialog: null,
+      communitiesById: {},
     };
 
     this.handleToggleCommunityDisclosure = this.handleToggleCommunityDisclosure.bind(
@@ -91,6 +95,10 @@ export class Reports extends Component<{}, ReportsState> {
     ) {
       this.state.moderates.forEach(communityUser => {
         this.fetchReportCount(communityUser.community_id);
+        this.fetchCommunity(
+          communityUser.community_id,
+          communityUser.community_name
+        );
       });
     }
   }
@@ -117,6 +125,13 @@ export class Reports extends Component<{}, ReportsState> {
     });
   }
 
+  fetchCommunity(communityId, communityName) {
+    WebSocketService.Instance.getCommunity({
+      id: communityId,
+      name: communityName,
+    });
+  }
+
   fetchUserData() {
     const user_id = UserService.Instance.user.id;
 
@@ -138,6 +153,7 @@ export class Reports extends Component<{}, ReportsState> {
       currentRemoveDialog,
       removeReason,
       reportCountByCommunity,
+      communitiesById,
     } = this.state;
 
     return (
@@ -145,10 +161,23 @@ export class Reports extends Component<{}, ReportsState> {
         {moderates.map(communityUser => {
           const { community_id, community_name } = communityUser;
 
+          if (communitiesById[community_id] == null) {
+            return null;
+          }
+
+          if (
+            communitiesById[community_id].removed ||
+            communitiesById[community_id].deleted
+          ) {
+            return null;
+          }
+
           return (
             <div class="mx-3">
               <div class="row mb-2">
-                <h4>{community_name}</h4>
+                <h4>
+                  <Link to={`/c/${community_name}`}>{community_name}</Link>
+                </h4>
                 <button
                   class="btn btn-success ml-4"
                   onClick={() => {
@@ -214,12 +243,16 @@ export class Reports extends Component<{}, ReportsState> {
                               )}
                             </div>
                             <div style={{ display: 'flex' }}>
-                              <button
-                                onClick={() => this.handleOpenBanDialog(report)}
-                                class="btn"
-                              >
-                                ban
-                              </button>
+                              {this.canBan(report.creator_id) && (
+                                <button
+                                  onClick={() =>
+                                    this.handleOpenBanDialog(report)
+                                  }
+                                  class="btn"
+                                >
+                                  ban
+                                </button>
+                              )}
                               <button
                                 class="btn"
                                 onClick={() =>
@@ -295,12 +328,16 @@ export class Reports extends Component<{}, ReportsState> {
                               </p>
                             </div>
                             <div style={{ display: 'flex' }}>
-                              <button
-                                onClick={() => this.handleOpenBanDialog(report)}
-                                class="btn"
-                              >
-                                ban
-                              </button>
+                              {this.canBan(report.creator_id) && (
+                                <button
+                                  onClick={() =>
+                                    this.handleOpenBanDialog(report)
+                                  }
+                                  class="btn"
+                                >
+                                  ban
+                                </button>
+                              )}
                               <button
                                 class="btn"
                                 onClick={() =>
@@ -546,6 +583,10 @@ export class Reports extends Component<{}, ReportsState> {
     );
   }
 
+  canBan(userId: number) {
+    return UserService.Instance.user.id !== userId;
+  }
+
   parseMessage(msg: WebSocketJsonResponse) {
     console.log(msg);
     const res = wsJsonToRes(msg);
@@ -607,6 +648,15 @@ export class Reports extends Component<{}, ReportsState> {
             commentReports: data.comment_reports,
             postReports: data.post_reports,
           },
+        },
+      });
+    } else if (res.op === UserOperation.GetCommunity) {
+      const data = res.data as GetCommunityResponse;
+
+      this.setState({
+        communitiesById: {
+          ...this.state.communitiesById,
+          [data.community.id]: data.community,
         },
       });
     }
