@@ -10,7 +10,7 @@ import {
 import { i18n } from '../i18next';
 import { T } from 'inferno-i18next';
 import { repoUrl, wsJsonToRes, toast } from '../utils';
-import { PATREON_URL } from '../../constants';
+import { PATREON_URL } from '../constants';
 
 export class Sponsors extends Component<any, any> {
   private subscription: Subscription;
