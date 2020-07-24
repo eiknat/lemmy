@@ -9,15 +9,18 @@ import {
   ListCommentReportsResponse,
   ListPostReportsResponse,
   BanFromCommunityForm,
+  CommentForm,
+  PostForm,
 } from '../interfaces';
 import { UserService, WebSocketService } from '../services';
 import { retryWhen, delay, take, last } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { wsJsonToRes, toast, getUnixTime } from '../utils';
+import { wsJsonToRes, toast, getUnixTime, setupTippy } from '../utils';
 import { i18n } from '../i18next';
 import { MomentTime } from './moment-time';
 import { Link } from 'inferno-router';
 import { report } from 'process';
+import tippy from 'tippy.js';
 
 interface ReportsState {
   moderates: Array<CommunityUser>;
@@ -54,6 +57,7 @@ export class Reports extends Component<{}, ReportsState> {
       this
     );
     this.handleOpenBanDialog = this.handleOpenBanDialog.bind(this);
+    this.handleOpenRemoveDialog = this.handleOpenRemoveDialog.bind(this);
     this.handleResolvePostReport = this.handleResolvePostReport.bind(this);
     this.handleResolveCommentReport = this.handleResolveCommentReport.bind(
       this
@@ -100,8 +104,12 @@ export class Reports extends Component<{}, ReportsState> {
       open,
       postReportsByCommunity,
       commentReportsByCommunity,
+      banReason,
+      currentBanDialog,
+      currentRemoveDialog,
+      removeReason,
     } = this.state;
-
+    console.log(this.state);
     return (
       <div class="container">
         {moderates.map(communityUser => {
@@ -173,6 +181,14 @@ export class Reports extends Component<{}, ReportsState> {
                               <button
                                 class="btn"
                                 onClick={() =>
+                                  this.handleOpenRemoveDialog(report)
+                                }
+                              >
+                                remove
+                              </button>
+                              <button
+                                class="btn"
+                                onClick={() =>
                                   this.handleResolvePostReport(
                                     report.id,
                                     report.community_id
@@ -184,15 +200,21 @@ export class Reports extends Component<{}, ReportsState> {
                             </div>
                             {this.banDialog({
                               report,
-                              currentBanDialog: this.state.currentBanDialog,
-                              banReason: this.state.banReason,
+                              currentBanDialog,
+                              banReason,
+                            })}
+                            {this.removeDialog({
+                              report,
+                              currentRemoveDialog,
+                              removeReason,
+                              cb: this.handleRemovePostSubmit,
                             })}
                           </div>
                         ))
                       )}
                     </div>
                     <div class="col">
-                      <h5>comment reports</h5>
+                      <h5>Comment reports</h5>
                       {commentReportsByCommunity[community_id] == null ? (
                         <p>no reports</p>
                       ) : (
@@ -237,7 +259,14 @@ export class Reports extends Component<{}, ReportsState> {
                               >
                                 ban
                               </button>
-                              <button class="btn">remove</button>
+                              <button
+                                class="btn"
+                                onClick={() =>
+                                  this.handleOpenRemoveDialog(report)
+                                }
+                              >
+                                remove
+                              </button>
                               <button
                                 class="btn"
                                 onClick={() =>
@@ -252,8 +281,14 @@ export class Reports extends Component<{}, ReportsState> {
                             </div>
                             {this.banDialog({
                               report,
-                              currentBanDialog: this.state.currentBanDialog,
-                              banReason: this.state.banReason,
+                              currentBanDialog,
+                              banReason,
+                            })}
+                            {this.removeDialog({
+                              report,
+                              currentRemoveDialog,
+                              removeReason,
+                              cb: this.handleRemoveCommentSubmit,
                             })}
                           </div>
                         ))
@@ -284,10 +319,6 @@ export class Reports extends Component<{}, ReportsState> {
     this.setState({ currentBanDialog: report, banReason: '' });
   }
 
-  handleOpenRemoveDialog(report: PostReport | CommentReport) {
-    this.setState({ currentRemoveDialog: report, removeReason: '' });
-  }
-
   handleBanSubmit(i: Reports, event: any) {
     event.preventDefault();
 
@@ -309,6 +340,69 @@ export class Reports extends Component<{}, ReportsState> {
 
   handleBanReasonChange(i: Reports, event: any) {
     i.state.banReason = event.target.value;
+    i.setState(i.state);
+  }
+
+  handleOpenRemoveDialog(report: PostReport | CommentReport) {
+    this.setState({ currentRemoveDialog: report, removeReason: '' });
+  }
+
+  handleRemoveCommentSubmit(i: Reports, event: any) {
+    event.preventDefault();
+
+    const {
+      comment_text,
+      comment_id,
+      creator_id,
+      post_id,
+    } = i.state.currentRemoveDialog;
+
+    const form: CommentForm = {
+      content: comment_text,
+      edit_id: comment_id,
+      creator_id,
+      post_id,
+      removed: true,
+      reason: i.state.removeReason,
+      auth: null,
+    };
+
+    WebSocketService.Instance.editComment(form);
+
+    i.setState({
+      currentRemoveDialog: null,
+      removeReason: '',
+    });
+  }
+
+  handleRemovePostSubmit(i: Reports, event: any) {
+    event.preventDefault();
+
+    const {
+      post_name,
+      community_id,
+
+      creator_id,
+      post_id,
+    } = i.state.currentRemoveDialog;
+
+    let form: PostFormI = {
+      name: post_name,
+      community_id,
+      edit_id: post_id,
+      creator_id,
+      removed: true,
+      reason: i.state.removeReason,
+      auth: null,
+    };
+    WebSocketService.Instance.editPost(form);
+    i.state.currentRemoveDialog = null;
+    i.state.removeReason = null;
+    i.setState(i.state);
+  }
+
+  handleRemoveReasonChange(i: Reports, event: any) {
+    i.state.removeReason = event.target.value;
     i.setState(i.state);
   }
 
@@ -372,6 +466,38 @@ export class Reports extends Component<{}, ReportsState> {
     );
   }
 
+  removeDialog({
+    currentRemoveDialog,
+    report,
+    removeReason,
+    cb,
+  }: {
+    currentRemoveDialog: PostReport | CommentReport | null;
+    report: PostReport | CommentReport;
+    removeReason: string;
+    cb: (i: Reports, event: any) => void;
+  }) {
+    return (
+      currentRemoveDialog &&
+      currentRemoveDialog.id === report.id && (
+        <div style={{ display: 'flex' }}>
+          <form onSubmit={linkEvent(this, cb)}>
+            <textarea
+              placeholder={i18n.t('reason')}
+              class="form-control report-handle-form"
+              id="remove-reason"
+              onInput={linkEvent(this, this.handleRemoveReasonChange)}
+              value={removeReason}
+            />
+            <button class="btn btn-danger mt-1" type="submit">
+              {i18n.t('remove_comment')}
+            </button>
+          </form>
+        </div>
+      )
+    );
+  }
+
   parseMessage(msg: WebSocketJsonResponse) {
     console.log(msg);
     const res = wsJsonToRes(msg);
@@ -417,6 +543,12 @@ export class Reports extends Component<{}, ReportsState> {
           [community_id]: data.reports,
         },
       });
+    } else if (res.op === UserOperation.EditComment) {
+      toast(i18n.t('comment_removed'));
+    } else if (res.op === UserOperation.EditPost) {
+      toast(i18n.t('post_removed'));
+    } else if (res.op === UserOperation.BanFromCommunity) {
+      toast(i18n.t('user_banned'));
     }
   }
 }

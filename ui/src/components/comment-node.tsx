@@ -745,6 +745,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                 placeholder={i18n.t('reason')}
                 value={this.state.reportReason}
                 onInput={linkEvent(this, this.handleReportReasonChange)}
+                maxLength={600}
               />
             </div>
             <div class="form-group row">

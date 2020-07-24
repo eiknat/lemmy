@@ -1046,6 +1046,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         placeholder={i18n.t('reason')}
                         value={this.state.reportReason}
                         onInput={linkEvent(this, this.handleReportReasonChange)}
+                        maxLength={600}
                       />
                     </div>
                     <div class="form-group row">
@@ -1278,6 +1279,23 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
 
   handleModRemoveReasonChange(i: PostListing, event: any) {
     i.state.removeReason = event.target.value;
+    i.setState(i.state);
+  }
+
+  handleModRemoveSubmit(i: PostListing) {
+    event.preventDefault();
+    let form: PostFormI = {
+      name: i.props.post.name,
+      community_id: i.props.post.community_id,
+      edit_id: i.props.post.id,
+      creator_id: i.props.post.creator_id,
+      removed: !i.props.post.removed,
+      reason: i.state.removeReason,
+      nsfw: i.props.post.nsfw,
+      auth: null,
+    };
+    WebSocketService.Instance.editPost(form);
+    i.state.showRemoveDialog = false;
     i.setState(i.state);
   }
 
