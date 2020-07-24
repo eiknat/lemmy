@@ -11,6 +11,7 @@ import {
   BanFromCommunityForm,
   CommentForm,
   PostForm,
+  GetReportCountResponse,
 } from '../interfaces';
 import { UserService, WebSocketService } from '../services';
 import { retryWhen, delay, take, last } from 'rxjs/operators';
@@ -35,6 +36,12 @@ interface ReportsState {
   banReason: string;
   currentRemoveDialog: CommentReport | PostReport | null;
   removeReason: string;
+  reportCountByCommunity: {
+    [communityId: number]: {
+      commentReports: number;
+      postReports: number;
+    };
+  };
 }
 
 export class Reports extends Component<{}, ReportsState> {
@@ -47,6 +54,7 @@ export class Reports extends Component<{}, ReportsState> {
       open: [],
       postReportsByCommunity: {},
       commentReportsByCommunity: {},
+      reportCountByCommunity: {},
       banReason: '',
       currentBanDialog: null,
       removeReason: '',
@@ -76,6 +84,17 @@ export class Reports extends Component<{}, ReportsState> {
     this.fetchUserData();
   }
 
+  componentDidUpdate(_, lastState) {
+    if (
+      JSON.stringify(lastState.moderates) !==
+      JSON.stringify(this.state.moderates)
+    ) {
+      this.state.moderates.forEach(communityUser => {
+        this.fetchReportCount(communityUser.community_id);
+      });
+    }
+  }
+
   fetchReports(communityId: number) {
     WebSocketService.Instance.listCommentReports({
       community: communityId,
@@ -85,6 +104,16 @@ export class Reports extends Component<{}, ReportsState> {
     WebSocketService.Instance.listPostReports({
       community: communityId,
       limit: 200,
+    });
+
+    WebSocketService.Instance.getReportCount({
+      community: communityId,
+    });
+  }
+
+  fetchReportCount(communityId) {
+    WebSocketService.Instance.getReportCount({
+      community: communityId,
     });
   }
 
@@ -108,8 +137,9 @@ export class Reports extends Component<{}, ReportsState> {
       currentBanDialog,
       currentRemoveDialog,
       removeReason,
+      reportCountByCommunity,
     } = this.state;
-    console.log(this.state);
+
     return (
       <div class="container">
         {moderates.map(communityUser => {
@@ -117,10 +147,10 @@ export class Reports extends Component<{}, ReportsState> {
 
           return (
             <div class="mx-3">
-              <div class="row">
+              <div class="row mb-2">
                 <h4>{community_name}</h4>
                 <button
-                  class="btn btn-sm"
+                  class="btn btn-success ml-4"
                   onClick={() => {
                     this.fetchReports(community_id);
                     this.handleToggleCommunityDisclosure(community_id);
@@ -129,6 +159,18 @@ export class Reports extends Component<{}, ReportsState> {
                   {i18n.t('show')}
                 </button>
               </div>
+              <p>
+                Post reports:{' '}
+                {reportCountByCommunity[community_id]
+                  ? reportCountByCommunity[community_id].postReports
+                  : 0}
+              </p>
+              <p>
+                Comment reports:{' '}
+                {reportCountByCommunity[community_id]
+                  ? reportCountByCommunity[community_id].commentReports
+                  : 0}
+              </p>
               {open.includes(community_id) && (
                 <div class="container">
                   <div class="row">
@@ -297,6 +339,7 @@ export class Reports extends Component<{}, ReportsState> {
                   </div>
                 </div>
               )}
+              <hr />
             </div>
           );
         })}
@@ -381,12 +424,11 @@ export class Reports extends Component<{}, ReportsState> {
     const {
       post_name,
       community_id,
-
       creator_id,
       post_id,
     } = i.state.currentRemoveDialog;
 
-    let form: PostFormI = {
+    let form: PostForm = {
       name: post_name,
       community_id,
       edit_id: post_id,
@@ -395,6 +437,7 @@ export class Reports extends Component<{}, ReportsState> {
       reason: i.state.removeReason,
       auth: null,
     };
+
     WebSocketService.Instance.editPost(form);
     i.state.currentRemoveDialog = null;
     i.state.removeReason = null;
@@ -419,6 +462,8 @@ export class Reports extends Component<{}, ReportsState> {
         ),
       },
     });
+
+    this.fetchReportCount(communityId);
   }
 
   handleResolveCommentReport(reportId: string, communityId: number) {
@@ -434,6 +479,8 @@ export class Reports extends Component<{}, ReportsState> {
         ),
       },
     });
+
+    this.fetchReportCount(communityId);
   }
 
   banDialog({
@@ -549,6 +596,18 @@ export class Reports extends Component<{}, ReportsState> {
       toast(i18n.t('post_removed'));
     } else if (res.op === UserOperation.BanFromCommunity) {
       toast(i18n.t('user_banned'));
+    } else if (res.op === UserOperation.GetReportCount) {
+      const data = res.data as GetReportCountResponse;
+
+      this.setState({
+        reportCountByCommunity: {
+          ...this.state.reportCountByCommunity,
+          [data.community]: {
+            commentReports: data.comment_reports,
+            postReports: data.post_reports,
+          },
+        },
+      });
     }
   }
 }

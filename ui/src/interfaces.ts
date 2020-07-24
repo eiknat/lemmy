@@ -668,7 +668,7 @@ export interface PostForm {
   creator_id: number;
   removed?: boolean;
   deleted?: boolean;
-  nsfw: boolean;
+  nsfw?: boolean;
   locked?: boolean;
   stickied?: boolean;
   reason?: string;
