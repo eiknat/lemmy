@@ -114,6 +114,7 @@ class Index extends Component<any, any> {
                 />
                 <Route path={`/search`} component={Search} />
                 <Route path={`/sponsors`} component={Sponsors} />
+                <Route path={`/contributing`} component={Sponsors} />
                 <Route
                   path={`/password_change/:token`}
                   component={PasswordChange}
