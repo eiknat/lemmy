@@ -55,7 +55,7 @@ import {
 } from '../utils';
 import { i18n } from '../i18next';
 import { T } from 'inferno-i18next';
-import { PATREON_URL } from '../../constants';
+import { PATREON_URL } from '../constants';
 
 interface MainState {
   subscribedCommunities: Array<CommunityUser>;
