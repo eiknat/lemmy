@@ -308,6 +308,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     let post = this.props.post;
 
     const isMobile = window.innerWidth < 768;
+
     return (
       <div>
         <div class="row">
