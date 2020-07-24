@@ -241,7 +241,6 @@ export class Community extends Component<any, State> {
               <main class="col-12 col-md-8" role="main">
                 {this.selects()}
                 <h5>
-                  {this.state.community.title}
                   {this.state.community.removed && (
                     <small className="ml-2 text-muted font-italic">
                       {i18n.t('removed')}
