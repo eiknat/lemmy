@@ -214,12 +214,16 @@ export class Reports extends Component<{}, ReportsState> {
                               )}
                             </div>
                             <div style={{ display: 'flex' }}>
-                              <button
-                                onClick={() => this.handleOpenBanDialog(report)}
-                                class="btn"
-                              >
-                                ban
-                              </button>
+                              {this.canBan(report.creator_id) && (
+                                <button
+                                  onClick={() =>
+                                    this.handleOpenBanDialog(report)
+                                  }
+                                  class="btn"
+                                >
+                                  ban
+                                </button>
+                              )}
                               <button
                                 class="btn"
                                 onClick={() =>
@@ -295,12 +299,16 @@ export class Reports extends Component<{}, ReportsState> {
                               </p>
                             </div>
                             <div style={{ display: 'flex' }}>
-                              <button
-                                onClick={() => this.handleOpenBanDialog(report)}
-                                class="btn"
-                              >
-                                ban
-                              </button>
+                              {this.canBan(report.creator_id) && (
+                                <button
+                                  onClick={() =>
+                                    this.handleOpenBanDialog(report)
+                                  }
+                                  class="btn"
+                                >
+                                  ban
+                                </button>
+                              )}
                               <button
                                 class="btn"
                                 onClick={() =>
@@ -544,6 +552,10 @@ export class Reports extends Component<{}, ReportsState> {
         </div>
       )
     );
+  }
+
+  canBan(userId: number) {
+    return UserService.Instance.user.id !== userId;
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
