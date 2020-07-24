@@ -259,23 +259,30 @@ export interface Comment {
 }
 
 export interface CommentReport {
-  id: string;
-  time: string;
-  reason: string;
-  resolved: boolean;
-  user_id: number;
   comment_id: number;
   comment_text: string;
   comment_time: string;
   community_id: number;
+  creator_id: number;
+  creator_name: string;
+  id: string;
+  post_id: number;
+  time: string;
+  reason: string;
+  resolved: boolean;
+  user_id: number;
+  user_name: string;
 }
 
 export interface PostReport {
+  creator_id: number;
+  creator_name: string;
   id: string;
   time: string;
   reason: string;
   resolved: boolean;
   user_id: number;
+  user_name: string;
   post_id: number;
   post_name: string;
   post_time: string;
