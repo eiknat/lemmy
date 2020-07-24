@@ -289,10 +289,16 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
               </li>
               &nbsp;|&nbsp;
               <li class="community-sidebar-item">
-                <a href={`/modlog/community/${this.props.community.id}`}>
+                <Link to={`/modlog/community/${this.props.community.id}`}>
                   {i18n.t('modlog')}
-                </a>
+                </Link>
               </li>
+              &nbsp;|&nbsp;
+              {this.canMod && (
+                <li class="community-sidebar-item">
+                  <Link to={`/reports}`}>{i18n.t('reports')}</Link>
+                </li>
+              )}
             </ul>
           </div>
         </div>
