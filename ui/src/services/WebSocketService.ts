@@ -50,6 +50,8 @@ import {
   CreateCommentReportForm,
   CreatePostReportForm,
   ListPostReportsForm,
+  GetCommunitySettingsForm,
+  EditCommunitySettingsForm,
 } from '../interfaces';
 import { UserService } from './';
 import { i18n } from '../i18next';
@@ -366,6 +368,16 @@ export class WebSocketService {
   public createPostReport(form: CreatePostReportForm) {
     this.setAuth(form);
     this.ws.send(this.wsSendWrapper(UserOperation.CreatePostReport, form));
+  }
+
+  public getCommunitySettings(form: GetCommunitySettingsForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.GetCommunitySettings, form));
+  }
+
+  public editCommunitySettings(form: EditCommunitySettingsForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.EditCommunitySettings, form));
   }
 
   private wsSendWrapper(op: UserOperation, data: MessageType) {

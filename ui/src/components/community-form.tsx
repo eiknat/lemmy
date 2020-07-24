@@ -9,6 +9,7 @@ import {
   ListCategoriesResponse,
   CommunityResponse,
   WebSocketJsonResponse,
+  CommunitySettingsResponse,
 } from '../interfaces';
 import { WebSocketService } from '../services';
 import { wsJsonToRes, capitalizeFirstLetter, toast, randomStr } from '../utils';
@@ -29,6 +30,14 @@ interface CommunityFormState {
   communityForm: CommunityFormI;
   categories: Array<Category>;
   loading: boolean;
+  enable_nsfw: boolean;
+  community_settings?: {
+    read_only: boolean;
+    private: boolean;
+    post_links: boolean;
+    comment_images: number;
+    published: string;
+  };
 }
 
 export class CommunityForm extends Component<
@@ -47,6 +56,8 @@ export class CommunityForm extends Component<
     },
     categories: [],
     loading: false,
+    enable_nsfw: null,
+    community_settings: null,
   };
 
   constructor(props: any, context: any) {
@@ -79,6 +90,14 @@ export class CommunityForm extends Component<
       );
 
     WebSocketService.Instance.listCategories();
+
+    if (this.props.community) {
+      WebSocketService.Instance.getCommunitySettings({
+        community_id: this.props.community.id,
+      });
+    }
+
+    WebSocketService.Instance.getSite();
   }
 
   componentDidUpdate() {
@@ -197,6 +216,11 @@ export class CommunityForm extends Component<
               </div>
             </div>
           )}
+
+          {this.props.community &&
+            this.state.community_settings &&
+            this.communitySettings()}
+
           <div class="form-group row">
             <div class="col-12">
               <button
@@ -230,11 +254,97 @@ export class CommunityForm extends Component<
     );
   }
 
+  communitySettings() {
+    return (
+      <section class="my-4">
+        <p class="h5 mb-3">{i18n.t('community_settings')}</p>
+        {/* <p class="text-muted mb-3">
+          <small>{this.state.community_settings.published}</small>
+        </p> */}
+        <div class="form-group row">
+          <div class="col-12">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                id="community-read-only"
+                type="checkbox"
+                checked={this.state.community_settings.read_only}
+                onChange={linkEvent(this, this.handleCommunityReadOnlyChange)}
+              />
+              <label class="form-check-label" htmlFor="community-read-only">
+                {i18n.t('community_read_only')}
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-12">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                id="community-private"
+                type="checkbox"
+                checked={this.state.community_settings.private}
+                onChange={linkEvent(this, this.handleCommunityPrivateChange)}
+              />
+              <label class="form-check-label" htmlFor="community-private">
+                {i18n.t('community_private')}
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row mb-3">
+          <div class="col-12">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                id="community-post-links"
+                type="checkbox"
+                checked={this.state.community_settings.post_links}
+                onChange={linkEvent(this, this.handleCommunityPostLinksChange)}
+              />
+              <label class="form-check-label" htmlFor="community-post-links">
+                {i18n.t('community_post_links')}
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label
+            class="col-12 col-form-label pt-0"
+            htmlFor="community-comment-images"
+          >
+            {i18n.t('community_comment_images')}
+          </label>
+          <div class="col-12">
+            <input
+              class="form-control"
+              id="community-comment-images"
+              type="number"
+              value={this.state.community_settings.comment_images}
+              onInput={linkEvent(this, this.handleCommunityCommentImagesChange)}
+            />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   handleCreateCommunitySubmit(i: CommunityForm, event: any) {
     event.preventDefault();
     i.state.loading = true;
     if (i.props.community) {
       WebSocketService.Instance.editCommunity(i.state.communityForm);
+
+      const {
+        published,
+        ...communitySettingsForm
+      } = i.state.community_settings;
+
+      WebSocketService.Instance.editCommunitySettings({
+        ...communitySettingsForm,
+        community_id: i.props.community.id,
+      });
     } else {
       WebSocketService.Instance.createCommunity(i.state.communityForm);
     }
@@ -263,6 +373,26 @@ export class CommunityForm extends Component<
 
   handleCommunityNsfwChange(i: CommunityForm, event: any) {
     i.state.communityForm.nsfw = event.target.checked;
+    i.setState(i.state);
+  }
+
+  handleCommunityReadOnlyChange(i: CommunityForm, event: any) {
+    i.state.community_settings.read_only = event.target.checked;
+    i.setState(i.state);
+  }
+
+  handleCommunityPrivateChange(i: CommunityForm, event: any) {
+    i.state.community_settings.private = event.target.checked;
+    i.setState(i.state);
+  }
+
+  handleCommunityPostLinksChange(i: CommunityForm, event: any) {
+    i.state.community_settings.post_links = event.target.checked;
+    i.setState(i.state);
+  }
+
+  handleCommunityCommentImagesChange(i: CommunityForm, event: any) {
+    i.state.community_settings.comment_images = event.target.value;
     i.setState(i.state);
   }
 
@@ -295,6 +425,16 @@ export class CommunityForm extends Component<
       let data = res.data as CommunityResponse;
       this.state.loading = false;
       this.props.onEdit(data.community);
+    }
+    // Community settings
+    else if (res.op == UserOperation.GetCommunitySettings) {
+      let data = res.data as CommunitySettingsResponse;
+      this.state.community_settings = data;
+      this.setState(this.state);
+    } else if (res.op == UserOperation.EditCommunitySettings) {
+      let data = res.data as CommunitySettingsResponse;
+      this.state.community_settings = data;
+      this.setState(this.state);
     }
   }
 }
