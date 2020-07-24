@@ -435,6 +435,7 @@ export class Reports extends Component<{}, ReportsState> {
       creator_id,
       removed: true,
       reason: i.state.removeReason,
+      nsfw: true,
       auth: null,
     };
 
@@ -537,7 +538,7 @@ export class Reports extends Component<{}, ReportsState> {
               value={removeReason}
             />
             <button class="btn btn-danger mt-1" type="submit">
-              {i18n.t('remove_comment')}
+              {i18n.t('remove')}
             </button>
           </form>
         </div>
