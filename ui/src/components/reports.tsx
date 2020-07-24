@@ -12,8 +12,8 @@ import {
   CommentForm,
   PostForm,
   GetReportCountResponse,
-  GetCommunityForm,
   GetCommunityResponse,
+  Community as CommunityI,
 } from '../interfaces';
 import { UserService, WebSocketService } from '../services';
 import { retryWhen, delay, take } from 'rxjs/operators';
@@ -43,7 +43,7 @@ interface ReportsState {
     };
   };
   communitiesById: {
-    [communityId: number]: {};
+    [communityId: number]: CommunityI;
   };
 }
 
