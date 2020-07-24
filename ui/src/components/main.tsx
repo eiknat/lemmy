@@ -311,13 +311,17 @@ export class Main extends Component<any, MainState> {
       <div>
         <div class="card border-secondary mb-3">
           <div class="card-body">
-            <img src="/static/assets/welcome.gif" className="m-4 img-fluid" />
+            <h5 class="mb-4 text-center h3">{`${this.state.siteRes.site.name}`}</h5>
             <img
               className="img-fluid mb-2"
               src="/static/assets/hexbear-logo.png"
               alt="hexbear logo"
             />
-            <h5 class="mb-0">{`${this.state.siteRes.site.name}`}</h5>
+            <img
+              src="/static/assets/welcome.gif"
+              className="img-fluid"
+              style={{ width: '100%' }}
+            />
             {this.canAdmin && (
               <ul class="list-inline mb-1 text-muted font-weight-bold">
                 <li className="list-inline-item-action">
@@ -333,16 +337,8 @@ export class Main extends Component<any, MainState> {
                 </li>
               </ul>
             )}
-            <img src="/static/assets/warning.jpg" className="my-3 img-fluid" />
-            <img src="/static/assets/construction.gif" className="img-fluid" />
             <div className="my-2">
               It is currently {getMoscowTime()} in Moscow
-            </div>
-            <div className="my-2">
-              Please send any thoughts, suggestions, memes or complaints to{' '}
-              <a href="mailto:chapotraphouse@gmail.com?subject=ChapoTrapHouse Memes">
-                Matt Christman.
-              </a>
             </div>
             <ul class="my-2 list-inline">
               {/*

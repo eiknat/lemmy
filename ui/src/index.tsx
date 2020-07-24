@@ -124,7 +124,6 @@ class Index extends Component<any, any> {
                 <Route path={`/pbb`} component={PPB} />
                 <Route path={`/welcome`} component={WelcomePage} />
                 <Route path={`/reports`} component={Reports} />
-                <Route path="*" component={PPB} />
               </Switch>
               <Symbols />
             </div>
