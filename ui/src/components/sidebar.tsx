@@ -296,7 +296,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
               &nbsp;|&nbsp;
               {this.canMod && (
                 <li class="community-sidebar-item">
-                  <Link to={`/reports}`}>{i18n.t('reports')}</Link>
+                  <Link to={`/reports`}>{i18n.t('reports')}</Link>
                 </li>
               )}
             </ul>
