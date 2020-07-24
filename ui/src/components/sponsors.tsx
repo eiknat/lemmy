@@ -10,6 +10,7 @@ import {
 import { i18n } from '../i18next';
 import { T } from 'inferno-i18next';
 import { repoUrl, wsJsonToRes, toast } from '../utils';
+import { PATREON_URL } from '../../constants';
 
 export class Sponsors extends Component<any, any> {
   private subscription: Subscription;
@@ -50,10 +51,7 @@ export class Sponsors extends Component<any, any> {
             building an independent space for solidarity and true
             democratization on the internet.
           </p>
-          <a
-            class="btn btn-secondary ml-2"
-            href="https://www.patreon.com/dessalines"
-          >
+          <a class="btn btn-secondary ml-2" href={PATREON_URL}>
             {i18n.t('support_on_patreon')}
           </a>
         </div>

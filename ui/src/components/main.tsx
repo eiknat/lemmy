@@ -55,6 +55,7 @@ import {
 } from '../utils';
 import { i18n } from '../i18next';
 import { T } from 'inferno-i18next';
+import { PATREON_URL } from '../../constants';
 
 interface MainState {
   subscribedCommunities: Array<CommunityUser>;
@@ -415,7 +416,7 @@ export class Main extends Component<any, MainState> {
         <div class="card-body">
           <h5>
             Support us through
-            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"> Patreon!</a>
+            <a href={PATREON_URL}> Patreon!</a>
           </h5>
           <p class="mb-0">
             Our Soros donations only get us so far, and that&apos;s where your
