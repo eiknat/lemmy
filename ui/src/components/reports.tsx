@@ -54,6 +54,10 @@ export class Reports extends Component<{}, ReportsState> {
       this
     );
     this.handleOpenBanDialog = this.handleOpenBanDialog.bind(this);
+    this.handleResolvePostReport = this.handleResolvePostReport.bind(this);
+    this.handleResolveCommentReport = this.handleResolveCommentReport.bind(
+      this
+    );
 
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
@@ -97,7 +101,7 @@ export class Reports extends Component<{}, ReportsState> {
       postReportsByCommunity,
       commentReportsByCommunity,
     } = this.state;
-    console.log(this.state);
+
     return (
       <div class="container">
         {moderates.map(communityUser => {
@@ -142,7 +146,7 @@ export class Reports extends Component<{}, ReportsState> {
                                 />
                               </p>
                               <Link to={`/post/${report.post_id}`}>
-                                View Original
+                                View Context
                               </Link>
                             </div>
                             <p class="my-0">{report.reason}</p>
@@ -166,37 +170,23 @@ export class Reports extends Component<{}, ReportsState> {
                               >
                                 ban
                               </button>
-                              <button class="btn">resolve</button>
+                              <button
+                                class="btn"
+                                onClick={() =>
+                                  this.handleResolvePostReport(
+                                    report.id,
+                                    report.community_id
+                                  )
+                                }
+                              >
+                                resolve
+                              </button>
                             </div>
-                            {this.state.currentBanDialog &&
-                              this.state.currentBanDialog.id === report.id && (
-                                <div style={{ display: 'flex' }}>
-                                  <form
-                                    onSubmit={linkEvent(
-                                      this,
-                                      this.handleBanSubmit
-                                    )}
-                                  >
-                                    <textarea
-                                      placeholder={i18n.t('reason')}
-                                      class="form-control report-handle-form"
-                                      id="ban-reason"
-                                      onInput={linkEvent(
-                                        this,
-                                        this.handleBanReasonChange
-                                      )}
-                                      value={this.state.banReason}
-                                    ></textarea>
-                                    <button
-                                      class="btn btn-danger mt-1"
-                                      type="submit"
-                                    >
-                                      {i18n.t('ban')}{' '}
-                                      {this.state.currentBanDialog.creator_name}
-                                    </button>
-                                  </form>
-                                </div>
-                              )}
+                            {this.banDialog({
+                              report,
+                              currentBanDialog: this.state.currentBanDialog,
+                              banReason: this.state.banReason,
+                            })}
                           </div>
                         ))
                       )}
@@ -216,17 +206,29 @@ export class Reports extends Component<{}, ReportsState> {
                               }}
                             >
                               <p class="small my-0">
-                                submitted{' '}
+                                {report.user_name} submitted{' '}
                                 <MomentTime
                                   data={{ published: report.time }}
                                   showAgo={true}
                                 />
-                                {' • '}
                               </p>
+                              <Link
+                                to={`/post/${report.post_id}/comment/${report.comment_id}`}
+                              >
+                                View Context
+                              </Link>
                             </div>
                             <p class="my-0">{report.reason}</p>
                             <div class="card p-1">
-                              <p class="mb-0">{report.comment_text}</p>
+                              <p class="mb-0">
+                                Comment Text: {report.comment_text}
+                              </p>
+                              <p class="mb-0">
+                                Submitted by:{' '}
+                                <Link to={`/u/${report.creator_name}`}>
+                                  {report.creator_name}
+                                </Link>
+                              </p>
                             </div>
                             <div style={{ display: 'flex' }}>
                               <button
@@ -236,32 +238,23 @@ export class Reports extends Component<{}, ReportsState> {
                                 ban
                               </button>
                               <button class="btn">remove</button>
-                              <button class="btn">resolve</button>
+                              <button
+                                class="btn"
+                                onClick={() =>
+                                  this.handleResolveCommentReport(
+                                    report.id,
+                                    report.community_id
+                                  )
+                                }
+                              >
+                                resolve
+                              </button>
                             </div>
-                            {this.state.currentBanDialog &&
-                              this.state.currentBanDialog.id === report.id && (
-                                <div style={{ display: 'flex' }}>
-                                  <form
-                                    onSubmit={linkEvent(
-                                      this,
-                                      this.handleBanSubmit
-                                    )}
-                                  >
-                                    <textarea
-                                      placeholder={i18n.t('reason')}
-                                      class="form-control report-handle-form"
-                                      onChange={linkEvent(
-                                        this,
-                                        this.handleBanReasonChange
-                                      )}
-                                      value={this.state.banReason}
-                                    ></textarea>
-                                    <button class="btn" type="submit">
-                                      ban
-                                    </button>
-                                  </form>
-                                </div>
-                              )}
+                            {this.banDialog({
+                              report,
+                              currentBanDialog: this.state.currentBanDialog,
+                              banReason: this.state.banReason,
+                            })}
                           </div>
                         ))
                       )}
@@ -317,6 +310,66 @@ export class Reports extends Component<{}, ReportsState> {
   handleBanReasonChange(i: Reports, event: any) {
     i.state.banReason = event.target.value;
     i.setState(i.state);
+  }
+
+  handleResolvePostReport(reportId: string, communityId: number) {
+    WebSocketService.Instance.resolvePostReport({
+      report: reportId,
+    });
+
+    this.setState({
+      postReportsByCommunity: {
+        ...this.state.postReportsByCommunity,
+        [communityId]: this.state.postReportsByCommunity[communityId].filter(
+          report => report.id !== reportId
+        ),
+      },
+    });
+  }
+
+  handleResolveCommentReport(reportId: string, communityId: number) {
+    WebSocketService.Instance.resolveCommentReport({
+      report: reportId,
+    });
+
+    this.setState({
+      commentReportsByCommunity: {
+        ...this.state.commentReportsByCommunity,
+        [communityId]: this.state.commentReportsByCommunity[communityId].filter(
+          report => report.id !== reportId
+        ),
+      },
+    });
+  }
+
+  banDialog({
+    currentBanDialog,
+    report,
+    banReason,
+  }: {
+    currentBanDialog: PostReport | CommentReport | null;
+    report: PostReport | CommentReport;
+    banReason: string;
+  }) {
+    return (
+      currentBanDialog &&
+      currentBanDialog.id === report.id && (
+        <div style={{ display: 'flex' }}>
+          <form onSubmit={linkEvent(this, this.handleBanSubmit)}>
+            <textarea
+              placeholder={i18n.t('reason')}
+              class="form-control report-handle-form"
+              id="ban-reason"
+              onInput={linkEvent(this, this.handleBanReasonChange)}
+              value={banReason}
+            />
+            <button class="btn btn-danger mt-1" type="submit">
+              {i18n.t('ban')} {this.state.currentBanDialog.creator_name}
+            </button>
+          </form>
+        </div>
+      )
+    );
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
