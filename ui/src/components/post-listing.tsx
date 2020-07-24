@@ -46,6 +46,8 @@ interface PostListingState {
   banReason: string;
   banExpires: string;
   banType: BanType;
+  reportReason: string;
+  showReportDialog: boolean;
   showConfirmTransferSite: boolean;
   showConfirmTransferCommunity: boolean;
   imageExpanded: boolean;
@@ -85,6 +87,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     banReason: null,
     banExpires: null,
     banType: BanType.Community,
+    reportReason: null,
+    showReportDialog: false,
     showConfirmTransferSite: false,
     showConfirmTransferCommunity: false,
     imageExpanded: false,
@@ -652,6 +656,15 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                               </svg>
                             </Link>
                           </li>
+                          <li className="list-inline-item">
+                            <button
+                              class="btn btn-sm btn-link btn-animate text-muted"
+                              onClick={linkEvent(this, this.handleReportPost)}
+                              data-tippy-content={i18n.t('report')}
+                            >
+                              {i18n.t('report')}
+                            </button>
+                          </li>
                         </>
                       )}
                       {this.myPost && this.props.showBody && (
@@ -1017,6 +1030,32 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     </div>
                   </form>
                 )}
+                {this.state.showReportDialog && (
+                  <form onSubmit={linkEvent(this, this.handleReportSubmit)}>
+                    <div class="form-group row">
+                      <label
+                        class="col-form-label"
+                        htmlFor="post-listing-report-reason"
+                      >
+                        {i18n.t('reason')}
+                      </label>
+                      <input
+                        type="text"
+                        id="post-listing-report-reason"
+                        class="form-control mr-2"
+                        placeholder={i18n.t('reason')}
+                        value={this.state.reportReason}
+                        onInput={linkEvent(this, this.handleReportReasonChange)}
+                        maxLength={600}
+                      />
+                    </div>
+                    <div class="form-group row">
+                      <button type="submit" class="btn btn-secondary">
+                        {i18n.t('report')} {post.creator_name}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
           </div>
@@ -1256,7 +1295,6 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
       auth: null,
     };
     WebSocketService.Instance.editPost(form);
-
     i.state.showRemoveDialog = false;
     i.setState(i.state);
   }
@@ -1412,6 +1450,30 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
 
   handleViewSource(i: PostListing) {
     i.state.viewSource = !i.state.viewSource;
+    i.setState(i.state);
+  }
+
+  handleReportPost(i: PostListing) {
+    i.state.showReportDialog = !i.state.showReportDialog;
+    i.setState(i.state);
+  }
+
+  handleReportReasonChange(i: PostListing, event: any) {
+    i.state.reportReason = event.target.value;
+    i.setState(i.state);
+  }
+
+  handleReportSubmit(i: PostListing, e: any) {
+    e.preventDefault();
+
+    WebSocketService.Instance.createPostReport({
+      post: i.props.post.id,
+      reason: i.state.reportReason,
+    });
+
+    i.state.reportReason = null;
+    i.state.showReportDialog = false;
+
     i.setState(i.state);
   }
 

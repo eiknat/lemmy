@@ -43,6 +43,13 @@ import {
   SiteConfigForm,
   MessageType,
   WebSocketJsonResponse,
+  ListCommentReportsForm,
+  GetReportCountForm,
+  ResolveCommentReportForm,
+  ResolvePostReportForm,
+  CreateCommentReportForm,
+  CreatePostReportForm,
+  ListPostReportsForm,
   GetCommunitySettingsForm,
   EditCommunitySettingsForm,
 } from '../interfaces';
@@ -52,6 +59,7 @@ import { toast } from '../utils';
 import { Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import { User } from '../components/user';
 
 export class WebSocketService {
   private static _instance: WebSocketService;
@@ -325,6 +333,41 @@ export class WebSocketService {
   public saveSiteConfig(form: SiteConfigForm) {
     this.setAuth(form);
     this.ws.send(this.wsSendWrapper(UserOperation.SaveSiteConfig, form));
+  }
+
+  public listCommentReports(form: ListCommentReportsForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.ListCommentReports, form));
+  }
+
+  public listPostReports(form: ListPostReportsForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.ListPostReports, form));
+  }
+
+  public getReportCount(form: GetReportCountForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.GetReportCount, form));
+  }
+
+  public resolveCommentReport(form: ResolveCommentReportForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.ResolveCommentReport, form));
+  }
+
+  public resolvePostReport(form: ResolvePostReportForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.ResolvePostReport, form));
+  }
+
+  public createCommentReport(form: CreateCommentReportForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.CreateCommentReport, form));
+  }
+
+  public createPostReport(form: CreatePostReportForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.CreatePostReport, form));
   }
 
   public getCommunitySettings(form: GetCommunitySettingsForm) {

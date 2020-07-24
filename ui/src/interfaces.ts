@@ -46,6 +46,13 @@ export enum UserOperation {
   GetSiteConfig,
   SaveSiteConfig,
   VerifyCaptcha,
+  ListCommentReports,
+  ListPostReports,
+  GetReportCount,
+  ResolveCommentReport,
+  ResolvePostReport,
+  CreateCommentReport,
+  CreatePostReport,
   GetCommunitySettings,
   EditCommunitySettings,
 }
@@ -251,6 +258,39 @@ export interface Comment {
   recipient_actor_id?: string;
   recipient_local?: boolean;
   depth?: number;
+}
+
+export interface CommentReport {
+  comment_id: number;
+  comment_text: string;
+  comment_time: string;
+  community_id: number;
+  creator_id: number;
+  creator_name: string;
+  id: string;
+  post_id: number;
+  time: string;
+  reason: string;
+  resolved: boolean;
+  user_id: number;
+  user_name: string;
+}
+
+export interface PostReport {
+  creator_id: number;
+  creator_name: string;
+  id: string;
+  time: string;
+  reason: string;
+  resolved: boolean;
+  user_id: number;
+  user_name: string;
+  post_id: number;
+  post_name: string;
+  post_time: string;
+  post_url: string;
+  post_body: string;
+  community_id: number;
 }
 
 export interface Category {
@@ -876,6 +916,71 @@ export interface VerifyCaptchaResponse {
   success: boolean;
 }
 
+export interface ListCommentReportsForm {
+  page?: number;
+  limit?: number;
+  community: number;
+}
+
+export interface ListPostReportsForm {
+  page?: number;
+  limit?: number;
+  community: number;
+}
+
+export interface CreateCommentReportForm {
+  comment: number;
+  reason?: string;
+}
+
+export interface CreatePostReportForm {
+  post: number;
+  reason?: string;
+}
+
+export interface ResolveCommentReportForm {
+  report: string;
+}
+
+export interface ResolvePostReportForm {
+  report: string;
+}
+
+export interface ListCommentReportsResponse {
+  reports: CommentReport[];
+}
+
+export interface ListPostReportsResponse {
+  reports: PostReport[];
+}
+export interface CreateCommentReportResponse {
+  success: boolean;
+}
+
+export interface CreatePostReportResponse {
+  success: boolean;
+}
+
+export interface ResolveCommentReportResponse {
+  report: string;
+  resolved: boolean;
+}
+
+export interface ResolvePostReportResponse {
+  report: string;
+  resolved: boolean;
+}
+
+export interface GetReportCountForm {
+  community: number; // community_id
+}
+
+export interface GetReportCountResponse {
+  community: number; // community_id
+  comment_reports: number;
+  post_reports: number;
+}
+
 export type MessageType =
   | EditPrivateMessageForm
   | LoginForm
@@ -915,7 +1020,14 @@ export type MessageType =
   | EditPrivateMessageForm
   | GetPrivateMessagesForm
   | SiteConfigForm
-  | VerifyCaptchaForm;
+  | VerifyCaptchaForm
+  | ListCommentReportsForm
+  | ListPostReportsForm
+  | GetReportCountForm
+  | ResolveCommentReportForm
+  | ResolvePostReportForm
+  | CreateCommentReportForm
+  | CreatePostReportForm;
 
 type ResponseType =
   | SiteResponse
@@ -940,6 +1052,13 @@ type ResponseType =
   | PrivateMessagesResponse
   | GetSiteConfigResponse
   | VerifyCaptchaResponse
+  | ListCommentReportsResponse
+  | ListPostReportsResponse
+  | GetReportCountResponse
+  | ResolveCommentReportResponse
+  | ResolvePostReportResponse
+  | CreateCommentReportResponse
+  | CreatePostReportResponse
   | CommunitySettingsResponse;
 
 export interface WebSocketResponse {
