@@ -390,7 +390,7 @@ const Tos = () => (
           their rights, including by following these Terms and the Code of
           Conduct, so that we all may continue to use and enjoy the Services. We
           support the responsible reporting of security vulnerabilities. To
-          report a security issue, please send an email to [email here].
+          report a security issue, please send an email to contact@chapo.chat.
         </span>
       </p>
       <p

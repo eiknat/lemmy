@@ -113,6 +113,7 @@ export class Main extends Component<any, MainState> {
         number_of_posts: null,
         number_of_comments: null,
         number_of_communities: null,
+        enable_create_communities: null,
         enable_downvotes: null,
         open_registration: null,
         enable_nsfw: null,
@@ -238,12 +239,14 @@ export class Main extends Component<any, MainState> {
                       </ul>
                     </div>
                   )}
-                <Link
-                  class="btn btn-sm btn-secondary btn-block"
-                  to="/create_community"
-                >
-                  {i18n.t('create_a_community')}
-                </Link>
+                {this.showCreateCommunity() && (
+                  <Link
+                    class="btn btn-sm btn-secondary btn-block"
+                    to="/create_community"
+                  >
+                    {i18n.t('create_a_community')}
+                  </Link>
+                )}
               </div>
             </div>
             {this.sidebar()}
@@ -598,7 +601,14 @@ export class Main extends Component<any, MainState> {
     );
   }
 
-  get canAdmin(): boolean {}
+  get canAdmin(): boolean {
+    return (
+      UserService.Instance.user &&
+      this.state.siteRes.admins
+        .map(a => a.id)
+        .includes(UserService.Instance.user.id)
+    );
+  }
 
   toggleMobileFilters(i: Main) {
     i.state.filtersOpen = !i.state.filtersOpen;
@@ -658,6 +668,12 @@ export class Main extends Component<any, MainState> {
       };
       WebSocketService.Instance.getComments(getCommentsForm);
     }
+  }
+
+  showCreateCommunity() {
+    if (this.canAdmin) return true;
+
+    return this.state.siteRes.site.enable_create_communities;
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
