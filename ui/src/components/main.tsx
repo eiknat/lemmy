@@ -410,14 +410,9 @@ export class Main extends Component<any, MainState> {
     return (
       <div class="card border-secondary mb-3">
         <div class="card-body">
-          <h5>
-            Support us through
-            <a href={PATREON_URL}> Patreon!</a>
-          </h5>
           <p class="mb-0">
-            Our Soros donations only get us so far, and that&apos;s where your
-            donations help. It costs [replace-me] per month to show you yet
-            another post of pig poop balls, so pitch in today!
+            Our Soros stipend only gets us so far.{' '}
+            <a href={PATREON_URL}>Pitch in to keep the party going.</a>
           </p>
         </div>
       </div>
