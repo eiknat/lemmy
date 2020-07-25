@@ -125,6 +125,7 @@ export class Community extends Component<any, State> {
       number_of_comments: undefined,
       number_of_communities: undefined,
       enable_downvotes: undefined,
+      enable_create_communities: undefined,
       open_registration: undefined,
       enable_nsfw: undefined,
     },

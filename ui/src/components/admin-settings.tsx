@@ -20,7 +20,7 @@ interface AdminSettingsState {
   siteRes: GetSiteResponse;
   siteConfigRes: GetSiteConfigResponse;
   siteConfigForm: SiteConfigForm;
-  loading: boolean;
+  siteLoading: boolean;
   siteConfigLoading: boolean;
 }
 
@@ -40,6 +40,7 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
         number_of_comments: null,
         number_of_communities: null,
         enable_downvotes: null,
+        enable_create_communities: null,
         open_registration: null,
         enable_nsfw: null,
       },
@@ -54,8 +55,8 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
     siteConfigRes: {
       config_hjson: null,
     },
-    loading: true,
-    siteConfigLoading: null,
+    siteLoading: true,
+    siteConfigLoading: true,
   };
 
   constructor(props: any, context: any) {
@@ -80,9 +81,10 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
   }
 
   render() {
+    console.log(this.state.siteRes.site);
     return (
       <div class="container">
-        {this.state.loading ? (
+        {this.state.siteLoading || this.state.siteConfigLoading ? (
           <h5>
             <svg class="icon icon-spinner spin">
               <use xlinkHref="#icon-spinner"></use>
@@ -206,7 +208,8 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
       this.context.router.history.push('/');
-      this.state.loading = false;
+      this.state.siteLoading = false;
+      this.state.siteConfigLoading = false;
       this.setState(this.state);
       return;
     } else if (msg.reconnect) {
@@ -218,6 +221,7 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
         this.context.router.history.push('/setup');
       }
       this.state.siteRes = data;
+      this.state.siteLoading = false;
       this.setState(this.state);
       document.title = `${i18n.t('admin_settings')} - ${
         this.state.siteRes.site.name
@@ -230,7 +234,7 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
     } else if (res.op == UserOperation.GetSiteConfig) {
       let data = res.data as GetSiteConfigResponse;
       this.state.siteConfigRes = data;
-      this.state.loading = false;
+      this.state.siteConfigLoading = false;
       this.state.siteConfigForm.config_hjson = this.state.siteConfigRes.config_hjson;
       this.setState(this.state);
       var textarea: any = document.getElementById(this.siteConfigTextAreaId);

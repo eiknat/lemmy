@@ -21,6 +21,7 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
   private emptyState: SiteFormState = {
     siteForm: {
       enable_downvotes: true,
+      enable_create_communities: true,
       open_registration: true,
       enable_nsfw: true,
       name: null,
@@ -35,12 +36,13 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
     this.handleSiteDescriptionChange = this.handleSiteDescriptionChange.bind(
       this
     );
-
+    console.log(this.props.site);
     if (this.props.site) {
       this.state.siteForm = {
         name: this.props.site.name,
         description: this.props.site.description,
         enable_downvotes: this.props.site.enable_downvotes,
+        enable_create_communities: this.props.site.enable_create_communities,
         open_registration: this.props.site.open_registration,
         enable_nsfw: this.props.site.enable_nsfw,
       };
@@ -176,6 +178,28 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
           </div>
           <div class="form-group row">
             <div class="col-12">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  id="create-site-create-communities"
+                  type="checkbox"
+                  checked={this.state.siteForm.enable_create_communities}
+                  onChange={linkEvent(
+                    this,
+                    this.handleSiteEnableCreateCommunitiesChange
+                  )}
+                />
+                <label
+                  class="form-check-label"
+                  htmlFor="create-site-create-communities"
+                >
+                  {i18n.t('enable_create_communities')}
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-12">
               <button
                 type="submit"
                 class="btn btn-secondary mr-2"
@@ -240,6 +264,11 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
 
   handleSiteEnableDownvotesChange(i: SiteForm, event: any) {
     i.state.siteForm.enable_downvotes = event.target.checked;
+    i.setState(i.state);
+  }
+
+  handleSiteEnableCreateCommunitiesChange(i: SiteForm, event: any) {
+    i.state.siteForm.enable_create_communities = event.target.checked;
     i.setState(i.state);
   }
 
