@@ -59,7 +59,7 @@ import { customEmojis, replaceEmojis } from './custom-emojis';
 import { match } from 'assert';
 import moment from 'moment';
 
-export const repoUrl = 'https://github.com/LemmyNet/lemmy';
+export const repoUrl = 'https://gitlab.com/chapo-sandbox/production';
 export const helpGuideUrl = '/docs/about_guide.html';
 export const markdownHelpUrl = `${helpGuideUrl}#markdown-guide`;
 export const sortingHelpUrl = `${helpGuideUrl}#sorting`;
