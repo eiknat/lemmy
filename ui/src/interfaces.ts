@@ -311,6 +311,7 @@ export interface Site {
   number_of_comments: number;
   number_of_communities: number;
   enable_downvotes: boolean;
+  enable_create_communities: boolean;
   open_registration: boolean;
   enable_nsfw: boolean;
 }
@@ -780,6 +781,7 @@ export interface SiteForm {
   name: string;
   description?: string;
   enable_downvotes: boolean;
+  enable_create_communities: boolean;
   open_registration: boolean;
   enable_nsfw: boolean;
   auth?: string;

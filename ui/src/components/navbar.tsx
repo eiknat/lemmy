@@ -33,6 +33,7 @@ import {
 } from '../utils';
 import { version } from '../version';
 import { i18n } from '../i18next';
+import { User } from './user';
 
 interface NavbarState {
   isLoggedIn: boolean;
@@ -45,6 +46,7 @@ interface NavbarState {
   admins: Array<UserView>;
   searchParam: string;
   toggleSearch: boolean;
+  creatingCommunitiesEnabled: boolean;
 }
 
 class UnwrappedNavbar extends Component<any, NavbarState> {
@@ -62,6 +64,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     admins: [],
     searchParam: '',
     toggleSearch: false,
+    creatingCommunitiesEnabled: false,
   };
 
   constructor(props: any, context: any) {
@@ -154,6 +157,12 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     this.userSub.unsubscribe();
   }
 
+  showCreateCommunityNav() {
+    if (this.canAdmin) return true;
+
+    return this.state.creatingCommunitiesEnabled;
+  }
+
   // TODO class active corresponding to current page
   navbar() {
     return (
@@ -218,15 +227,17 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                 {i18n.t('create_post')}
               </Link>
             </li>
-            <li class="nav-item">
-              <Link
-                class="nav-link"
-                to="/create_community"
-                title={i18n.t('create_community')}
-              >
-                {i18n.t('create_community')}
-              </Link>
-            </li>
+            {this.showCreateCommunityNav() && (
+              <li class="nav-item">
+                <Link
+                  class="nav-link"
+                  to="/create_community"
+                  title={i18n.t('create_community')}
+                >
+                  {i18n.t('create_community')}
+                </Link>
+              </li>
+            )}
             <li className="nav-item">
               <Link
                 class="nav-link"
@@ -415,6 +426,8 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
       if (data.site && !this.state.siteName) {
         this.state.siteName = data.site.name;
         this.state.admins = data.admins;
+        this.state.creatingCommunitiesEnabled =
+          data.site.enable_create_communities;
         this.setState(this.state);
       }
     }
