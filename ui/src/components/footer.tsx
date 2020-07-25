@@ -22,6 +22,16 @@ export class Footer extends Component<any, any> {
                 {i18n.t('about')}
               </Link>
             </li>
+            <li class="nav-item">
+              <Link class="nav-link" to="/privacy_policy">
+                {i18n.t('privacy_policy')}
+              </Link>
+            </li>
+            <li class="nav-item">
+              <Link class="nav-link" to="/tos">
+                {i18n.t('terms_of_service')}
+              </Link>
+            </li>
             <li>
               <Link class="nav-link" to="/ppb">
                 {i18n.t('PPB')}

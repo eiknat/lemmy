@@ -34,6 +34,8 @@ import { Symbols } from './components/symbols';
 import { i18n } from './i18next';
 import { About } from './components/about';
 import { Reports } from './components/reports';
+import Tos from './components/tos';
+import PrivacyPolicy from './components/privacy-policy';
 
 import './custom.css';
 
@@ -120,10 +122,11 @@ class Index extends Component<any, any> {
                   path={`/password_change/:token`}
                   component={PasswordChange}
                 />
-
                 <Route path={`/pbb`} component={PPB} />
                 <Route path={`/welcome`} component={WelcomePage} />
                 <Route path={`/reports`} component={Reports} />
+                <Route path={`/tos`} component={Tos} />
+                <Route path={`/privacy_policy`} component={PrivacyPolicy} />
               </Switch>
               <Symbols />
             </div>
