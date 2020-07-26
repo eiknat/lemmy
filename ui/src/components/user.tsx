@@ -16,6 +16,7 @@ import {
   Site,
   UserDetailsView,
   UserDetailsResponse,
+  BanUserForm,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import {
@@ -55,6 +56,9 @@ interface UserState {
   deleteAccountShowConfirm: boolean;
   deleteAccountForm: DeleteAccountForm;
   site: Site;
+  admins: Array<UserView>;
+  banUserShow: boolean;
+  banReason: string;
 }
 
 interface UserProps {
@@ -128,6 +132,9 @@ export class User extends Component<any, UserState> {
       open_registration: undefined,
       enable_nsfw: undefined,
     },
+    admins: [],
+    banUserShow: false,
+    banReason: null,
   };
 
   constructor(props: any, context: any) {
@@ -763,6 +770,30 @@ export class User extends Component<any, UserState> {
     );
   }
 
+  modActions(){
+    return (
+      <div>
+        <div class="card border-secondary mb-3">
+          <div class="card-body">
+            <h5>Admin Actions</h5>
+            <button class="btn btn-secondary"
+              onClick={linkEvent(this, this.handleBanUserShow)}
+            > Ban Sitewide
+            </button>
+            {this.state.banUserShow && (
+              <form onSubmit={linkEvent(this, this.handleSitewideBan)}>
+                <div style="display: flex">
+                  <input id="reason" placeholder="reason" onChange={linkEvent(this, this.handleBanReasonChange)}></input>
+                  <button class="btn btn-secondary" type="submit"></button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   moderates() {
     return (
       <div>
@@ -807,6 +838,15 @@ export class User extends Component<any, UserState> {
         )}
       </div>
     );
+  }
+
+  get isViewingAdmin(): boolean{
+    this.state.admins.forEach(admin => {
+      if (UserService.Instance.user.id == admin.id){
+        return true;
+      }
+    });
+    return false;
   }
 
   updateUrl(paramUpdates: UrlParams) {
@@ -1001,6 +1041,28 @@ export class User extends Component<any, UserState> {
     WebSocketService.Instance.deleteAccount(i.state.deleteAccountForm);
   }
 
+  handleBanUserShow(i: User){
+    i.state.banUserShow = !i.state.banUserShow;
+    i.setState(i.state);
+  }
+
+  handleBanReasonChange(i: User, event: any){
+    i.state.banReason = event.target.value;
+    i.setState(i.state);
+  }
+
+  handleSitewideBan(i: User, event: any){
+    event.preventDefault();
+    if (i.isViewingAdmin){
+      const form: BanUserForm = {
+        user_id: i.state.user_id,
+        ban: true,
+        reason: i.state.banReason,
+      }
+      WebSocketService.Instance.banUser(form);
+    }
+  }
+
   parseMessage(msg: WebSocketJsonResponse) {
     console.log(msg);
     const res = wsJsonToRes(msg);
@@ -1019,7 +1081,6 @@ export class User extends Component<any, UserState> {
       // Since the UserDetails contains posts/comments as well as some general user info we listen here as well
       // and set the parent state if it is not set or differs
       const data = res.data as UserDetailsResponse;
-
       if (this.state.user.id !== data.user.id) {
         this.state.user = data.user;
         this.state.follows = data.follows;
@@ -1063,6 +1124,7 @@ export class User extends Component<any, UserState> {
       const data = res.data as GetSiteResponse;
       this.setState({
         site: data.site,
+        admins: data.admins,
       });
     }
   }
