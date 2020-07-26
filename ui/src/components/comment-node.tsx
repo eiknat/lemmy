@@ -223,22 +223,8 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   </Link>
                 </>
               )}
-              <button
-                class="btn btn-sm text-muted"
-                onClick={linkEvent(this, this.handleCommentCollapse)}
-              >
-                {this.state.collapsed ? (
-                  <svg class="icon icon-inline">
-                    <use xlinkHref="#icon-plus-square"></use>
-                  </svg>
-                ) : (
-                  <svg class="icon icon-inline">
-                    <use xlinkHref="#icon-minus-square"></use>
-                  </svg>
-                )}
-              </button>
               {/* This is an expanding spacer for mobile */}
-              <div className="mr-lg-4 flex-grow-1 flex-lg-grow-0 unselectable pointer mx-2"></div>
+              {/* <div className="mr-lg-4 flex-grow-1 flex-lg-grow-0 unselectable pointer mx-2"></div> */}
               <button
                 className={`btn unselectable pointer ${this.scoreColor}`}
                 onClick={linkEvent(node, this.handleCommentUpvote)}
