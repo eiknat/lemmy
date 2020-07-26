@@ -16,6 +16,8 @@ import {
   Site,
   UserDetailsView,
   UserDetailsResponse,
+  GetSiteModeratorsResponse,
+  CommunityModsState,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import {
@@ -29,6 +31,7 @@ import {
   showAvatars,
   toast,
   setupTippy,
+  mapSiteModeratorsResponse,
 } from '../utils';
 import { UserListing } from './user-listing';
 import { SortSelect } from './sort-select';
@@ -55,6 +58,7 @@ interface UserState {
   deleteAccountShowConfirm: boolean;
   deleteAccountForm: DeleteAccountForm;
   site: Site;
+  siteModerators: CommunityModsState | null;
 }
 
 interface UserProps {
@@ -124,10 +128,12 @@ export class User extends Component<any, UserState> {
       number_of_posts: undefined,
       number_of_comments: undefined,
       number_of_communities: undefined,
+      enable_create_communities: undefined,
       enable_downvotes: undefined,
       open_registration: undefined,
       enable_nsfw: undefined,
     },
+    siteModerators: null,
   };
 
   constructor(props: any, context: any) {
@@ -155,6 +161,7 @@ export class User extends Component<any, UserState> {
       );
 
     WebSocketService.Instance.getSite();
+    WebSocketService.Instance.getSiteModerators();
   }
 
   get isCurrentUser() {
@@ -239,6 +246,7 @@ export class User extends Component<any, UserState> {
               enableNsfw={this.state.site.enable_nsfw}
               view={this.state.view}
               onPageChange={this.handlePageChange}
+              siteModerators={this.state.siteModerators}
             />
           </main>
           {!this.state.loading && (
@@ -1063,6 +1071,12 @@ export class User extends Component<any, UserState> {
       const data = res.data as GetSiteResponse;
       this.setState({
         site: data.site,
+      });
+    } else if (res.op == UserOperation.GetSiteModerators) {
+      const data = res.data as GetSiteModeratorsResponse;
+
+      this.setState({
+        siteModerators: mapSiteModeratorsResponse(data),
       });
     }
   }

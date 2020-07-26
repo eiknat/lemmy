@@ -55,6 +55,7 @@ export enum UserOperation {
   CreatePostReport,
   GetCommunitySettings,
   EditCommunitySettings,
+  GetSiteModerators,
 }
 
 export enum CommentSortType {
@@ -1061,7 +1062,8 @@ type ResponseType =
   | ResolvePostReportResponse
   | CreateCommentReportResponse
   | CreatePostReportResponse
-  | CommunitySettingsResponse;
+  | CommunitySettingsResponse
+  | GetSiteModeratorsResponse;
 
 export interface WebSocketResponse {
   op: UserOperation;
@@ -1093,6 +1095,19 @@ export interface CommunitySettingsResponse {
   post_links: boolean;
   comment_images: number;
   published: string;
+}
+
+export interface CommunityMods {
+  community: Community;
+  moderators: number[];
+}
+
+export interface CommunityModsState {
+  [communityId: number]: CommunityMods;
+}
+
+export interface GetSiteModeratorsResponse {
+  communities: CommunityMods[];
 }
 
 export enum UserDetailsView {

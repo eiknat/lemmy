@@ -380,6 +380,10 @@ export class WebSocketService {
     this.ws.send(this.wsSendWrapper(UserOperation.EditCommunitySettings, form));
   }
 
+  public getSiteModerators() {
+    this.ws.send(this.wsSendWrapper(UserOperation.GetSiteModerators, {}));
+  }
+
   private wsSendWrapper(op: UserOperation, data: MessageType) {
     let send = { op: UserOperation[op], data: data };
     console.log(send);

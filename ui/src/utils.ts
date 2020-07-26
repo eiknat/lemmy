@@ -44,6 +44,8 @@ import {
   SearchResponse,
   CommentResponse,
   PostResponse,
+  GetSiteModeratorsResponse,
+  CommunityModsState,
 } from './interfaces';
 import { UserService, WebSocketService } from './services';
 
@@ -1084,3 +1086,47 @@ export function validTitle(title?: string): boolean {
 
   return regex.test(title);
 }
+
+export const mapSiteModeratorsResponse = (
+  data: GetSiteModeratorsResponse
+): CommunityModsState => {
+  return data.communities.reduce((agg, item) => {
+    agg[item.community.id] = item;
+    return agg;
+  }, {});
+};
+
+interface DoesUserModerateCommunityArgs {
+  moderatorId: number;
+  communityId: number;
+  siteModerators: CommunityModsState;
+}
+
+export const doesUserModerateCommunity = ({
+  moderatorId,
+  communityId,
+  siteModerators,
+}: DoesUserModerateCommunityArgs) => {
+  if (siteModerators[communityId] == null) return false;
+
+  return siteModerators[communityId].moderators.includes(moderatorId);
+};
+
+export const getAllUserModeratedCommunities = ({
+  moderatorId,
+  siteModerators,
+}) => {
+  return Object.keys(siteModerators).reduce((agg, communityId) => {
+    if (
+      doesUserModerateCommunity({
+        moderatorId,
+        communityId: +communityId,
+        siteModerators,
+      })
+    ) {
+      agg.push(communityId);
+    }
+
+    return agg;
+  }, []);
+};
