@@ -296,9 +296,16 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             !this.props.showBody && linkEvent(this, this.handleImageExpandClick)
           }
         >
-          <svg class="icon thumbnail">
-            <use xlinkHref="#icon-message-square"></use>
+          {post.nsfw ? (
+            <svg class="icon thumbnail">
+              <use xlinkHref="#icon-warning-post"></use>
           </svg>
+          ) : (
+            <svg class="icon thumbnail">
+              <use xlinkHref="#icon-message-square"></use>
+            </svg>
+          )}
+          
         </button>
       );
     }
