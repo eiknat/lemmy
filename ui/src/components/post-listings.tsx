@@ -22,30 +22,34 @@ export class PostListings extends Component<PostListingsProps, any> {
 
   render() {
     return (
-      <div>
-        {this.props.posts.length > 0 ? (
-          this.outer().map(post => (
-            <>
-              <PostListing
-                post={post}
-                showCommunity={this.props.showCommunity}
-                enableDownvotes={this.props.enableDownvotes}
-                enableNsfw={this.props.enableNsfw}
-              />
-              <hr class="my-2" />
-            </>
-          ))
+        this.props.posts.length > 0 ? (
+          <>
+            <div $HasKeyedChildren>
+              {this.outer().map(post => (
+                <div key={post.id}>
+                  <PostListing
+                    post={post}
+                    showCommunity={this.props.showCommunity}
+                    enableDownvotes={this.props.enableDownvotes}
+                    enableNsfw={this.props.enableNsfw}
+                  />
+                  <hr class="my-2" />
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <>
-            <div>{i18n.t('no_posts')}</div>
-            {this.props.showCommunity !== undefined && (
-              <T i18nKey="subscribe_to_communities">
-                #<Link to="/communities">#</Link>
-              </T>
-            )}
+            <div>
+              <div>{i18n.t('no_posts')}</div>
+              {this.props.showCommunity !== undefined && (
+                <T i18nKey="subscribe_to_communities">
+                  #<Link to="/communities">#</Link>
+                </T>
+              )}
+            </div>
           </>
-        )}
-      </div>
+        )
     );
   }
 
