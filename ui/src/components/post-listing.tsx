@@ -252,7 +252,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
           data-tippy-content={i18n.t('expand_here')}
           onClick={linkEvent(this, this.handleImageExpandClick)}
         >
-          <svg class="icon thumbnail">
+          <svg class="icon thumbnail" style="margin-top: 4px">
             <use xlinkHref="#icon-external-link"></use>
           </svg>
         </span>
@@ -274,30 +274,32 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
         );
       } else {
         return (
-          <a
-            className="text-body"
-            href={post.url}
-            target="_blank"
-            title={post.url}
-            rel="noopener"
-          >
-            <svg class="icon thumbnail">
-              <use xlinkHref="#icon-external-link"></use>
-            </svg>
-          </a>
+          <div class="post-listing-box">
+            <a
+              className="text-body"
+              href={post.url}
+              target="_blank"
+              title={post.url}
+              rel="noopener"
+            >
+              <svg class="icon thumbnail" style="margin-top: 4px">
+                <use xlinkHref="#icon-external-link"></use>
+              </svg>
+            </a>
+          </div>
         );
       }
     } else {
       return (
         <button
-          className="text-body post-body-expand-button"
+          className="text-body post-body-expand-button post-listing-box"
           title={i18n.t('expand_here')}
           onClick={
             !this.props.showBody && linkEvent(this, this.handleImageExpandClick)
           }
         >
           {post.nsfw ? (
-            <svg class="icon thumbnail">
+            <svg class="icon thumbnail" style="margin-top:-3px">
               <use xlinkHref="#icon-warning-post"></use>
           </svg>
           ) : (
