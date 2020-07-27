@@ -122,6 +122,7 @@ export class MarkdownTextArea extends Component<
               className={`form-control ${this.state.previewMode && 'd-none'}`}
               value={this.state.content}
               onInput={linkEvent(this, this.handleContentChange)}
+              onKeyDown={linkEvent(this, this.handleKeydown)}
               // onPaste={linkEvent(this, this.handleImageUploadPaste)}
               required
               disabled={this.props.disabled}
@@ -391,6 +392,7 @@ export class MarkdownTextArea extends Component<
   }
 
   handleContentChange(i: MarkdownTextArea, event: any) {
+    console.log({ event });
     i.state.content = event.target.value.replace(/israel/i, 'palestine');
     i.setState(i.state);
     if (i.props.onContentChange) {
@@ -409,6 +411,19 @@ export class MarkdownTextArea extends Component<
     i.state.loading = true;
     i.setState(i.state);
     i.props.onSubmit(i.state.content);
+  }
+
+  handleKeydown(i: MarkdownTextArea, event: any) {
+    // if enter was pressed
+    if (event.keyCode === 13) {
+      // while command (mac) or ctrl is pressed
+      if (event.metaKey || event.ctrlKey) {
+        // submit comment
+        i.state.loading = true;
+        i.setState(i.state);
+        i.props.onSubmit(i.state.content);
+      }
+    }
   }
 
   handleReplyCancel(i: MarkdownTextArea) {
