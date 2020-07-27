@@ -148,10 +148,12 @@ export class Post extends Component<any, PostState> {
       var elmnt = document.getElementById(
         `comment-${this.state.scrolled_comment_id}`
       );
-      elmnt.scrollIntoView();
-      elmnt.classList.add('mark');
-      this.state.scrolled = true;
-      this.markScrolledAsRead(this.state.scrolled_comment_id);
+      if (elmnt) {
+        elmnt.scrollIntoView();
+        elmnt.classList.add('mark');
+        this.state.scrolled = true;
+        this.markScrolledAsRead(this.state.scrolled_comment_id);
+      }
     }
 
     // Necessary if you are on a post and you click another post (same route)

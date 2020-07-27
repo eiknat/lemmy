@@ -494,7 +494,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   requestNotificationPermission() {
     if (UserService.Instance.user) {
       document.addEventListener('DOMContentLoaded', function () {
-        if (!Notification) {
+        if (typeof Notification === 'undefined') {
           toast(i18n.t('notifications_error'), 'danger');
           return;
         }
