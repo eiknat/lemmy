@@ -292,6 +292,15 @@ a.text-body {
   width: 100%;
 }
 
+.community-stat-section {
+  display: flex;
+}
+
+.community-button-separator {
+  border-right: 3px solid #323232;
+  margin: 0 15px;
+}
+
 @media only screen and (max-width: 992px) {
   .community-header, .top-section {
     flex-direction: column;
@@ -304,8 +313,16 @@ a.text-body {
   }
 
   .community-stat-section {
-    display: flex;
     width: 100%;
+  }
+
+  .header-names {
+    padding-left: 25px;
+  }
+
+  .community-button-separator {
+    border-right: 0;
+    margin: 0 7.5px;
   }
 }
 
@@ -332,11 +349,6 @@ a.text-body {
   border-radius: 6px;
   border: 2px solid #323232;
   background-color: rgba(0, 0, 0, 0);
-}
-
-.community-button-separator{
-  border-right: 3px solid #323232;
-  margin: 0 15px;
 }
 
 .create-post-button{
