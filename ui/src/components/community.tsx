@@ -178,6 +178,7 @@ export class Community extends Component<any, State> {
   }
 
   render() {
+    const isMobile = window.innerWidth < 992;
     return (
       <div class="container">
         {this.state.loading ? (
@@ -197,13 +198,15 @@ export class Community extends Component<any, State> {
                     <h6> {'/c/' + this.state.community.name} </h6>
                   </div>
                   <div className="header-right-section">
-                    <div className="community-stats">
-                      <p>{this.state.online}</p>
-                      <h6>Online</h6>
-                    </div>
-                    <div className="community-stats">
-                      <p>{this.state.community.number_of_subscribers}</p>
-                      <h6>Members</h6>
+                    <div className="community-stat-section">
+                      <div className="community-stats">
+                        <p>{this.state.online}</p>
+                        <h6>Online</h6>
+                      </div>
+                      <div className="community-stats">
+                        <p>{this.state.community.number_of_subscribers}</p>
+                        <h6>Members</h6>
+                      </div>
                     </div>
                     {this.state.community.subscribed ? (
                       <button
@@ -231,8 +234,7 @@ export class Community extends Component<any, State> {
                       className="btn btn-secondary create-post-button"
                       to={`/create_post?community=${this.state.community.name}`}
                     >
-                      {' '}
-                      Create Post{' '}
+                      {isMobile ? '+' : 'Create Post'}
                     </Link>
                   </div>
                 </div>
@@ -295,12 +297,12 @@ export class Community extends Component<any, State> {
   selects() {
     return (
       <div class="mb-3">
-        <span class="mr-3">
+        <div class="mr-3 mb-2">
           <DataTypeSelect
             type_={this.state.dataType}
             onChange={this.handleDataTypeChange}
           />
-        </span>
+        </div>
         <span class="mr-2">
           <SortSelect sort={this.state.sort} onChange={this.handleSortChange} />
         </span>

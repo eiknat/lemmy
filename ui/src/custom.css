@@ -295,10 +295,16 @@ a.text-body {
 @media only screen and (max-width: 992px) {
   .community-header, .top-section {
     flex-direction: column;
+    align-items: flex-start;
   }
 
   .header-right-section {
     justify-content: space-between;
+    width: 100%;
+  }
+
+  .community-stat-section {
+    display: flex;
     width: 100%;
   }
 }
