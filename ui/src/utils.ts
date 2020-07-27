@@ -181,7 +181,8 @@ export const md = new markdown_it({
   })
   .use(markdownitEmoji, {
     defs: objectFlip(emojiShortName),
-  });
+  })
+  .disable('image');
 
 export function hotRankComment(comment: Comment): number {
   return hotRank(comment.score, comment.published);
