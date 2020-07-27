@@ -392,7 +392,6 @@ export class MarkdownTextArea extends Component<
   }
 
   handleContentChange(i: MarkdownTextArea, event: any) {
-    console.log({ event });
     i.state.content = event.target.value.replace(/israel/i, 'palestine');
     i.setState(i.state);
     if (i.props.onContentChange) {
