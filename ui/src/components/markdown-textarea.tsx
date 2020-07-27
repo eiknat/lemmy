@@ -122,6 +122,7 @@ export class MarkdownTextArea extends Component<
               className={`form-control ${this.state.previewMode && 'd-none'}`}
               value={this.state.content}
               onInput={linkEvent(this, this.handleContentChange)}
+              onKeyDown={linkEvent(this, this.handleKeydown)}
               // onPaste={linkEvent(this, this.handleImageUploadPaste)}
               required
               disabled={this.props.disabled}
@@ -409,6 +410,19 @@ export class MarkdownTextArea extends Component<
     i.state.loading = true;
     i.setState(i.state);
     i.props.onSubmit(i.state.content);
+  }
+
+  handleKeydown(i: MarkdownTextArea, event: any) {
+    // if enter was pressed
+    if (event.keyCode === 13) {
+      // while command (mac) or ctrl is pressed
+      if (event.metaKey || event.ctrlKey) {
+        // submit comment
+        i.state.loading = true;
+        i.setState(i.state);
+        i.props.onSubmit(i.state.content);
+      }
+    }
   }
 
   handleReplyCancel(i: MarkdownTextArea) {
