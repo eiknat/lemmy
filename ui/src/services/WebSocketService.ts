@@ -261,6 +261,7 @@ export class WebSocketService {
   }
 
   public getModlog(form: GetModlogForm) {
+    this.setAuth(form);
     this.ws.send(this.wsSendWrapper(UserOperation.GetModlog, form));
   }
 
@@ -378,6 +379,10 @@ export class WebSocketService {
   public editCommunitySettings(form: EditCommunitySettingsForm) {
     this.setAuth(form);
     this.ws.send(this.wsSendWrapper(UserOperation.EditCommunitySettings, form));
+  }
+
+  public getSiteModerators() {
+    this.ws.send(this.wsSendWrapper(UserOperation.GetSiteModerators, {}));
   }
 
   private wsSendWrapper(op: UserOperation, data: MessageType) {

@@ -572,9 +572,9 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       <button
                         class="btn btn-sm btn-link btn-animate text-muted p-0 pl-3"
                         onClick={linkEvent(this, this.handleReportPost)}
-                        data-tippy-content={i18n.t('report')}
+                        data-tippy-content={i18n.t('snitch')}
                       >
-                        {i18n.t('report')}
+                        {i18n.t('snitch')}
                       </button>
                     )}
                   </div>
@@ -680,9 +680,9 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                             <button
                               class="btn btn-sm btn-link btn-animate text-muted"
                               onClick={linkEvent(this, this.handleReportPost)}
-                              data-tippy-content={i18n.t('report')}
+                              data-tippy-content={i18n.t('snitch')}
                             >
-                              {i18n.t('report')}
+                              {i18n.t('snitch')}
                             </button>
                           </li>
                         </>
@@ -1071,7 +1071,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     </div>
                     <div class="form-group row">
                       <button type="submit" class="btn btn-secondary">
-                        {i18n.t('report')} {post.creator_name}
+                        {i18n.t('snitch')} {post.creator_name}
                       </button>
                     </div>
                   </form>

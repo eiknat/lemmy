@@ -17,6 +17,7 @@ import {
   BanUserResponse,
   PostResponse,
   AddAdminResponse,
+  CommunityModsState,
 } from '../interfaces';
 import {
   wsJsonToRes,
@@ -41,6 +42,7 @@ interface UserDetailsProps {
   enableNsfw: boolean;
   view: UserDetailsView;
   onPageChange(page: number): number | any;
+  siteModerators: CommunityModsState | null;
 }
 
 interface UserDetailsState {

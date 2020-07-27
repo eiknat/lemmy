@@ -298,5 +298,7 @@
     "invalid_post_title": "Invalid post title",
     "invalid_url": "Invalid URL.",
     "privacy_policy": "Privacy Policy",
-    "terms_of_service": "Terms of Service"
+    "terms_of_service": "Terms of Service",
+    "ban_from_my_communities": "Ban from my communities",
+    "enable_create_communities": "Enable community creation"
 }
