@@ -549,8 +549,8 @@ export class User extends Component<any, UserState> {
                   <div class="mr-2">{i18n.t('type')}</div>
                 </label>
                 <SortSelect
-                  // @ts-ignore
                   sort={parseInt(
+                    // @ts-ignore
                     this.state.userSettingsForm.default_sort_type,
                     10
                   )}
