@@ -50,6 +50,7 @@ import {
   setupTippy,
 } from '../utils';
 import { i18n } from '../i18next';
+import { Icon } from './icon';
 
 interface State {
   community: CommunityI;
@@ -314,9 +315,7 @@ export class Community extends Component<any, State> {
           title="RSS"
           rel="noopener"
         >
-          <svg class="icon text-muted small">
-            <use xlinkHref="#icon-rss">#</use>
-          </svg>
+          <Icon className="icon text-muted small" name="rss" />
         </a>
       </div>
     );

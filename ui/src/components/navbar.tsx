@@ -243,9 +243,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                 to="/contributing"
                 title={i18n.t('donate_to_lemmy')}
               >
-                <svg class="icon">
-                  <use xlinkHref="#icon-coffee"></use>
-                </svg>
+                <Icon name="contribute" />
               </Link>
             </li>
           </ul>

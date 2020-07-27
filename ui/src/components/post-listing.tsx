@@ -575,9 +575,6 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         onClick={linkEvent(this, this.handleReportPost)}
                         data-tippy-content={i18n.t('snitch')}
                       >
-                        {/* <svg class="icon icon-inline">
-                          <use xlinkHref="#flag"></use>
-                        </svg> */}
                         <Icon name="report" />
                       </button>
                     )}
@@ -745,13 +742,12 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         post.saved ? i18n.t('unsave') : i18n.t('save')
                       }
                     >
-                      <svg
+                      <Icon
+                        name="star"
                         class={`icon icon-inline ${
                           post.saved && 'text-warning'
                         }`}
-                      >
-                        <use xlinkHref="#icon-star"></use>
-                      </svg>
+                      />
                     </button>
                   </li>
                   <li className="list-inline-item">
@@ -771,9 +767,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       onClick={linkEvent(this, this.handleReportPost)}
                       data-tippy-content={i18n.t('snitch')}
                     >
-                      <svg class="icon icon-inline">
-                        <use xlinkHref="#flag"></use>
-                      </svg>
+                      <Icon name="report" />
                     </button>
                   </li>
                 </>
@@ -786,9 +780,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       onClick={linkEvent(this, this.handleEditClick)}
                       data-tippy-content={i18n.t('edit')}
                     >
-                      <svg class="icon icon-inline">
-                        <use xlinkHref="#icon-edit"></use>
-                      </svg>
+                      <Icon name="edit" />
                     </button>
                   </li>
                   <li className="list-inline-item">
@@ -818,9 +810,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     onClick={linkEvent(this, this.handleShowAdvanced)}
                     data-tippy-content={i18n.t('more')}
                   >
-                    <svg class="icon icon-inline">
-                      <use xlinkHref="#icon-more-vertical"></use>
-                    </svg>
+                    <Icon name="more" />
                   </button>
                 </li>
               ) : (
