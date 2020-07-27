@@ -38,6 +38,7 @@ import {
 } from '../utils';
 import { i18n } from '../i18next';
 import { User } from './user';
+import { Icon } from './icon';
 
 interface PostListingState {
   showEdit: boolean;
@@ -328,9 +329,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               onClick={linkEvent(this, this.handlePostLike)}
               data-tippy-content={i18n.t('upvote')}
             >
-              <svg class="icon upvote">
+              {/* <svg class="icon upvote">
                 <use xlinkHref="#icon-arrow-up1"></use>
-              </svg>
+              </svg> */}
+              <Icon name="upvote" className="icon upvote" />
             </button>
             <div
               class={`unselectable pointer font-weight-bold text-muted px-1`}
@@ -346,9 +348,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                 onClick={linkEvent(this, this.handlePostDisLike)}
                 data-tippy-content={i18n.t('downvote')}
               >
-                <svg class="icon downvote">
+                {/* <svg class="icon downvote">
                   <use xlinkHref="#icon-arrow-down1"></use>
-                </svg>
+                </svg> */}
+                <Icon name="downvote" className="icon downvote" />
               </button>
             )}
           </div>
@@ -560,9 +563,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       })}
                       to={`/post/${post.id}`}
                     >
-                      <svg class="mr-1 icon icon-inline">
+                      {/* <svg class="mr-1 icon icon-inline">
                         <use xlinkHref="#icon-message-square"></use>
-                      </svg>
+                      </svg> */}
+                      <Icon name="comment" className="icon icon-inline mr-1" />
                       {i18n.t('number_of_comments', {
                         count: post.number_of_comments,
                       })}
@@ -573,9 +577,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         onClick={linkEvent(this, this.handleReportPost)}
                         data-tippy-content={i18n.t('snitch')}
                       >
-                        <svg class="icon icon-inline">
+                        {/* <svg class="icon icon-inline">
                           <use xlinkHref="#flag"></use>
-                        </svg>
+                        </svg> */}
+                        <Icon name="report" />
                       </button>
                     )}
                   </div>
@@ -607,17 +612,25 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       >
                         <li className="list-inline-item">
                           <span className="text-muted">
-                            <svg class="small icon icon-inline mr-1">
+                            {/* <svg class="small icon icon-inline mr-1">
                               <use xlinkHref="#icon-arrow-up"></use>
-                            </svg>
+                            </svg> */}
+                            <Icon
+                              name="upvote"
+                              className="small icon icon-inline mr-1"
+                            />
                             {this.state.upvotes}
                           </span>
                         </li>
                         <li className="list-inline-item">
                           <span className="text-muted">
-                            <svg class="small icon icon-inline mr-1">
+                            {/* <svg class="small icon icon-inline mr-1">
                               <use xlinkHref="#icon-arrow-down"></use>
-                            </svg>
+                            </svg> */}
+                            <Icon
+                              name="downvote"
+                              className="small icon icon-inline mr-1"
+                            />
                             {this.state.downvotes}
                           </span>
                         </li>
