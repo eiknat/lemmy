@@ -1124,7 +1124,7 @@ export const getAllUserModeratedCommunities = ({
         siteModerators,
       })
     ) {
-      agg.push(communityId);
+      agg.push(+communityId);
     }
 
     return agg;

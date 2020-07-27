@@ -333,9 +333,9 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                       <button
                         class="btn btn-sm btn-link btn-animate text-muted small"
                         onClick={linkEvent(this, this.handleReportComment)}
-                        data-tippy-content={i18n.t('report')}
+                        data-tippy-content={i18n.t('snitch')}
                       >
-                        {i18n.t('report')}
+                        {i18n.t('snitch')}
                       </button>
                       {!this.state.showAdvanced ? (
                         <button
@@ -736,7 +736,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
             </div>
             <div class="form-group row">
               <button type="submit" class="btn btn-secondary">
-                {i18n.t('report')} {node.comment.creator_name}
+                {i18n.t('snitch')} {node.comment.creator_name}
               </button>
             </div>
           </form>

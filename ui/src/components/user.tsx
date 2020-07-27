@@ -18,6 +18,7 @@ import {
   UserDetailsResponse,
   GetSiteModeratorsResponse,
   CommunityModsState,
+  BanUserForm,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import {
@@ -32,6 +33,8 @@ import {
   toast,
   setupTippy,
   mapSiteModeratorsResponse,
+  canMod,
+  getAllUserModeratedCommunities,
 } from '../utils';
 import { UserListing } from './user-listing';
 import { SortSelect } from './sort-select';
@@ -59,6 +62,9 @@ interface UserState {
   deleteAccountForm: DeleteAccountForm;
   site: Site;
   siteModerators: CommunityModsState | null;
+  admins: Array<UserView>;
+  banUserShow: boolean;
+  banReason: string;
 }
 
 interface UserProps {
@@ -134,6 +140,9 @@ export class User extends Component<any, UserState> {
       enable_nsfw: undefined,
     },
     siteModerators: null,
+    admins: [],
+    banUserShow: false,
+    banReason: null,
   };
 
   constructor(props: any, context: any) {
@@ -148,6 +157,7 @@ export class User extends Component<any, UserState> {
       this
     );
     this.handlePageChange = this.handlePageChange.bind(this);
+    this.isModerator = this.isModerator.bind(this);
 
     this.state.user_id = Number(this.props.match.params.id) || null;
     this.state.username = this.props.match.params.username;
@@ -251,6 +261,9 @@ export class User extends Component<any, UserState> {
           </main>
           {!this.state.loading && (
             <aside class="col-12 col-md-4 sidebar">
+              {(this.canAdmin || this.isModerator()) &&
+                !this.isCurrentUser &&
+                this.modActions()}
               {this.userInfo()}
               {this.isCurrentUser && this.userSettings()}
               {this.moderates()}
@@ -771,6 +784,45 @@ export class User extends Component<any, UserState> {
     );
   }
 
+  modActions() {
+    return (
+      <div>
+        <div class="card border-secondary mb-3">
+          <div class="card-body">
+            <h5>Mod Actions</h5>
+            {(this.canAdmin || this.isModerator()) && (
+              <button
+                class="btn btn-secondary"
+                onClick={linkEvent(this, this.handleBanUserShow)}
+              >
+                {this.isModerator
+                  ? i18n.t('ban_from_my_communities')
+                  : i18n.t('ban_from_site')}
+              </button>
+            )}
+            {this.state.banUserShow && (
+              <form onSubmit={linkEvent(this, this.handleBan)}>
+                <div style="display: flex">
+                  <input
+                    id="reason"
+                    placeholder="reason"
+                    onChange={linkEvent(this, this.handleBanReasonChange)}
+                  ></input>
+                  <button
+                    class="btn btn-secondary btn-danger ml-2"
+                    type="submit"
+                  >
+                    Ban
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   moderates() {
     return (
       <div>
@@ -814,6 +866,26 @@ export class User extends Component<any, UserState> {
           </div>
         )}
       </div>
+    );
+  }
+
+  get canAdmin(): boolean {
+    return (
+      this.state.admins &&
+      canMod(
+        UserService.Instance.user,
+        this.state.admins.map(a => a.id),
+        this.state.user_id
+      )
+    );
+  }
+
+  isModerator() {
+    return (
+      getAllUserModeratedCommunities({
+        siteModerators: this.state.siteModerators || {},
+        moderatorId: UserService.Instance.user.id,
+      }).length > 0
     );
   }
 
@@ -1009,6 +1081,49 @@ export class User extends Component<any, UserState> {
     WebSocketService.Instance.deleteAccount(i.state.deleteAccountForm);
   }
 
+  handleBanUserShow(i: User) {
+    i.state.banUserShow = !i.state.banUserShow;
+    i.setState(i.state);
+  }
+
+  handleBanReasonChange(i: User, event: any) {
+    i.state.banReason = event.target.value;
+    i.setState(i.state);
+  }
+
+  handleBan(i: User, event: any) {
+    event.preventDefault();
+    if (i.canAdmin) {
+      const form: BanUserForm = {
+        user_id: i.state.user.id,
+        ban: true,
+        reason: i.state.banReason,
+      };
+      WebSocketService.Instance.banUser(form);
+    }
+
+    if (i.isModerator()) {
+      const communityIds = getAllUserModeratedCommunities({
+        siteModerators: i.state.siteModerators,
+        moderatorId: UserService.Instance.user.id,
+      });
+
+      communityIds.forEach(communityId => {
+        WebSocketService.Instance.banFromCommunity({
+          community_id: communityId,
+          user_id: i.state.user.id,
+          ban: true,
+          reason: i.state.banReason,
+        });
+      });
+    }
+
+    i.state.banReason = null;
+    i.state.banUserShow = false;
+
+    i.setState(i.state);
+  }
+
   parseMessage(msg: WebSocketJsonResponse) {
     console.log(msg);
     const res = wsJsonToRes(msg);
@@ -1027,7 +1142,6 @@ export class User extends Component<any, UserState> {
       // Since the UserDetails contains posts/comments as well as some general user info we listen here as well
       // and set the parent state if it is not set or differs
       const data = res.data as UserDetailsResponse;
-
       if (this.state.user.id !== data.user.id) {
         this.state.user = data.user;
         this.state.follows = data.follows;
@@ -1071,6 +1185,7 @@ export class User extends Component<any, UserState> {
       const data = res.data as GetSiteResponse;
       this.setState({
         site: data.site,
+        admins: data.admins,
       });
     } else if (res.op == UserOperation.GetSiteModerators) {
       const data = res.data as GetSiteModeratorsResponse;
