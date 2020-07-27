@@ -226,7 +226,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
               {/* This is an expanding spacer for mobile */}
               {/* <div className="mr-lg-4 flex-grow-1 flex-lg-grow-0 unselectable pointer mx-2"></div> */}
               <button
-                className={`btn unselectable pointer ${this.scoreColor}`}
+                className={`btn unselectable pointer px-2 ${this.scoreColor}`}
                 onClick={linkEvent(node, this.handleCommentUpvote)}
                 data-tippy-content={this.pointsTippy}
               >
@@ -335,7 +335,10 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                         onClick={linkEvent(this, this.handleReportComment)}
                         data-tippy-content={i18n.t('snitch')}
                       >
-                        {i18n.t('snitch')}
+                        {/* {i18n.t('snitch')} */}
+                        <svg class="icon icon-inline">
+                          <use xlinkHref="#flag"></use>
+                        </svg>
                       </button>
                       {!this.state.showAdvanced ? (
                         <button

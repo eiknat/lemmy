@@ -271,7 +271,9 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
               <button
                 name="search-btn"
                 onClick={linkEvent(this, this.handleSearchBtn)}
-                class="btn btn-link"
+                class={`btn btn-link ${
+                  this.state.toggleSearch ? 'px-2' : 'px-0'
+                }`}
                 style="color: var(--gray)"
               >
                 <svg class="icon">

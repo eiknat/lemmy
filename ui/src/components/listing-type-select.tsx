@@ -36,7 +36,7 @@ export class ListingTypeSelect extends Component<
     return (
       <div class="btn-group btn-group-toggle">
         <label
-          className={`btn btn-sm btn-secondary 
+          className={`btn btn-sm btn-secondary
             ${this.state.type_ == ListingType.Subscribed && 'active'}
             ${UserService.Instance.user == undefined ? 'disabled' : 'pointer'}
           `}
