@@ -208,6 +208,9 @@ export class Symbols extends Component<any, any> {
             <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
             <line x1="4" y1="22" x2="4" y2="15"></line>
           </symbol>
+          <symbol id="icon-cancel" viewBox="0 0 24 24">
+            <path d="M6,19.25a1.21,1.21,0,0,1-.88-.37,1.24,1.24,0,0,1,0-1.76l12-12a1.24,1.24,0,0,1,1.76,1.76l-12,12A1.21,1.21,0,0,1,6,19.25Z" />
+          </symbol>
         </defs>
       </svg>
     );

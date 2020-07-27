@@ -34,6 +34,7 @@ import {
 import { version } from '../version';
 import { i18n } from '../i18next';
 import { User } from './user';
+import { CommunityDropdown } from './community-dropdown';
 
 interface NavbarState {
   isLoggedIn: boolean;
@@ -47,6 +48,7 @@ interface NavbarState {
   searchParam: string;
   toggleSearch: boolean;
   creatingCommunitiesEnabled: boolean;
+  communityDropdownShown: boolean;
 }
 
 class UnwrappedNavbar extends Component<any, NavbarState> {
@@ -65,6 +67,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     searchParam: '',
     toggleSearch: false,
     creatingCommunitiesEnabled: false,
+    communityDropdownShown: false,
   };
 
   constructor(props: any, context: any) {
@@ -207,13 +210,14 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
         >
           <ul class="navbar-nav my-2 mr-auto">
             <li class="nav-item">
-              <Link
-                class="nav-link"
-                to="/communities"
+              <button
+                class="nav-link btn btn-inline "
+                //to="/communities"
                 title={i18n.t('communities')}
+                onClick={linkEvent(this, this.showCommunityDropdown)}
               >
                 {i18n.t('communities')}
-              </Link>
+              </button>
             </li>
             <li class="nav-item">
               <Link
@@ -355,12 +359,22 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
             </ul>
           )}
         </div>
+        {this.state.communityDropdownShown && (
+          <CommunityDropdown
+            removeDropdown={() => this.showCommunityDropdown(this)}
+          ></CommunityDropdown>
+        )}
       </nav>
     );
   }
 
   expandNavbar(i: Navbar) {
     i.state.expanded = !i.state.expanded;
+    i.setState(i.state);
+  }
+
+  showCommunityDropdown(i: Navbar) {
+    i.state.communityDropdownShown = !i.state.communityDropdownShown;
     i.setState(i.state);
   }
 
