@@ -267,7 +267,7 @@ export class WebSocketService {
   }
 
   public getModlog(form: GetModlogForm) {
-    this.setAuth(form);
+    this.setAuth(form, false);
     this.ws.send(this.wsSendWrapper(UserOperation.GetModlog, form));
   }
 
