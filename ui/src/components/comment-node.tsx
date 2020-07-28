@@ -37,6 +37,7 @@ import { UserListing } from './user-listing';
 import { CommunityLink } from './community-link';
 import { i18n } from '../i18next';
 import { replaceEmojis } from '../custom-emojis';
+import { Icon } from './icon';
 
 interface CommentNodeState {
   showReply: boolean;
@@ -296,9 +297,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                         onClick={linkEvent(node, this.handleCommentUpvote)}
                         data-tippy-content={i18n.t('upvote')}
                       >
-                        <svg class="icon icon-inline">
-                          <use xlinkHref="#icon-arrow-up"></use>
-                        </svg>
+                        <Icon name="upvote" />
                         {this.state.upvotes !== this.state.score && (
                           <span class="ml-1">{this.state.upvotes}</span>
                         )}
@@ -313,9 +312,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                           onClick={linkEvent(node, this.handleCommentDownvote)}
                           data-tippy-content={i18n.t('downvote')}
                         >
-                          <svg class="icon icon-inline">
-                            <use xlinkHref="#icon-arrow-down"></use>
-                          </svg>
+                          <Icon name="downvote" />
                           {this.state.upvotes !== this.state.score && (
                             <span class="ml-1">{this.state.downvotes}</span>
                           )}
@@ -326,19 +323,14 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                         onClick={linkEvent(this, this.handleReplyClick)}
                         data-tippy-content={i18n.t('reply')}
                       >
-                        <svg class="icon icon-inline">
-                          <use xlinkHref="#icon-reply1"></use>
-                        </svg>
+                        <Icon name="reply" />
                       </button>
                       <button
                         class="btn btn-sm btn-link btn-animate text-muted small"
                         onClick={linkEvent(this, this.handleReportComment)}
                         data-tippy-content={i18n.t('snitch')}
                       >
-                        {/* {i18n.t('snitch')} */}
-                        <svg class="icon icon-inline">
-                          <use xlinkHref="#flag"></use>
-                        </svg>
+                        <Icon name="report" />
                       </button>
                       {!this.state.showAdvanced ? (
                         <button
@@ -346,9 +338,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                           onClick={linkEvent(this, this.handleShowAdvanced)}
                           data-tippy-content={i18n.t('more')}
                         >
-                          <svg class="icon icon-inline">
-                            <use xlinkHref="#icon-more-vertical"></use>
-                          </svg>
+                          <Icon name="more" />
                         </button>
                       ) : (
                         <>
@@ -381,13 +371,12 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                             {this.state.saveLoading ? (
                               this.loadingIcon
                             ) : (
-                              <svg
+                              <Icon
                                 class={`icon icon-inline ${
                                   node.comment.saved && 'text-warning'
                                 }`}
-                              >
-                                <use xlinkHref="#icon-star"></use>
-                              </svg>
+                                name="star"
+                              />
                             )}
                           </button>
                           <button
@@ -410,9 +399,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                 onClick={linkEvent(this, this.handleEditClick)}
                                 data-tippy-content={i18n.t('edit')}
                               >
-                                <svg class="icon icon-inline">
-                                  <use xlinkHref="#icon-edit"></use>
-                                </svg>
+                                <Icon name="edit" />
                               </button>
                               <button
                                 class="btn btn-link btn-animate text-muted"

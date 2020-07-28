@@ -43,6 +43,7 @@ import { MomentTime } from './moment-time';
 import { i18n } from '../i18next';
 import moment from 'moment';
 import { UserDetails } from './user-details';
+import { Icon } from './icon';
 
 interface UserState {
   user: UserView;
@@ -351,9 +352,7 @@ export class User extends Component<any, UserState> {
           rel="noopener"
           title="RSS"
         >
-          <svg class="icon mx-2 text-muted small">
-            <use xlinkHref="#icon-rss">#</use>
-          </svg>
+          <Icon name="rss" className="icon mx-2 text-muted small" />
         </a>
       </div>
     );

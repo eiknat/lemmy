@@ -56,6 +56,7 @@ import {
 import { i18n } from '../i18next';
 import { T } from 'inferno-i18next';
 import { PATREON_URL } from '../constants';
+import { Icon } from './icon';
 
 interface MainState {
   subscribedCommunities: Array<CommunityUser>;
@@ -333,9 +334,7 @@ export class Main extends Component<any, MainState> {
                     onClick={linkEvent(this, this.handleEditClick)}
                     data-tippy-content={i18n.t('edit')}
                   >
-                    <svg class="icon icon-inline">
-                      <use xlinkHref="#icon-edit"></use>
-                    </svg>
+                    <Icon name="edit" />
                   </span>
                 </li>
               </ul>
@@ -522,9 +521,7 @@ export class Main extends Component<any, MainState> {
               title="RSS"
               rel="noopener"
             >
-              <svg class="icon text-muted small">
-                <use xlinkHref="#icon-rss">#</use>
-              </svg>
+              <Icon name="rss" />
             </a>
           )}
           {UserService.Instance.user &&
@@ -536,9 +533,7 @@ export class Main extends Component<any, MainState> {
                 target="_blank"
                 title="RSS"
               >
-                <svg class="icon text-muted small">
-                  <use xlinkHref="#icon-rss">#</use>
-                </svg>
+                <Icon name="rss" className="icon text-muted small" />
               </a>
             )}
           {isMobile && (

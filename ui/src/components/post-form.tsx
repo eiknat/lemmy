@@ -38,6 +38,7 @@ import {
 import Choices from 'choices.js';
 import { i18n } from '../i18next';
 import { cleanURL } from '../clean-url';
+import { Icon } from './icon';
 
 export const MAX_POST_TITLE_LENGTH = 160;
 export const MAX_POST_BODY_LENGTH = 20000;
@@ -230,9 +231,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                     } d-inline-block float-right text-muted font-weight-bold image-upload-icon m-0`}
                     data-tippy-content={i18n.t('upload_image')}
                   >
-                    <svg class="icon icon-inline">
-                      <use xlinkHref="#icon-image"></use>
-                    </svg>
+                    <Icon name="image" size="30px" />
                   </label>
                   <input
                     id="file-upload"

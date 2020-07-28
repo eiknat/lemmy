@@ -34,6 +34,7 @@ import {
 import { version } from '../version';
 import { i18n } from '../i18next';
 import { User } from './user';
+import { Icon } from './icon';
 import { CommunityDropdown } from './community-dropdown';
 
 interface NavbarState {
@@ -186,9 +187,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
             to="/inbox"
             title={i18n.t('inbox')}
           >
-            <svg class="icon">
-              <use xlinkHref="#icon-bell"></use>
-            </svg>
+            <Icon name="notification" />
             {this.state.unreadCount > 0 && (
               <span class="ml-1 badge badge-light">
                 {this.state.unreadCount}
@@ -249,9 +248,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                 to="/contributing"
                 title={i18n.t('donate_to_lemmy')}
               >
-                <svg class="icon">
-                  <use xlinkHref="#icon-coffee"></use>
-                </svg>
+                <Icon name="contribute" />
               </Link>
             </li>
           </ul>
@@ -281,9 +278,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                 }`}
                 style="color: var(--gray)"
               >
-                <svg class="icon">
-                  <use xlinkHref="#icon-search"></use>
-                </svg>
+                <Icon name="search" />
               </button>
             </form>
           )}
@@ -311,9 +306,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                     to="/inbox"
                     title={i18n.t('inbox')}
                   >
-                    <svg class="icon">
-                      <use xlinkHref="#icon-bell"></use>
-                    </svg>
+                    <Icon name="notification" />
                     {this.state.unreadCount > 0 && (
                       <span class="ml-1 badge badge-light">
                         {this.state.unreadCount}
