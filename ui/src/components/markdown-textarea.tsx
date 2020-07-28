@@ -392,6 +392,7 @@ export class MarkdownTextArea extends Component<
   }
 
   handleContentChange(i: MarkdownTextArea, event: any) {
+    i.state.content = event.target.value;
     i.setState(i.state);
     if (i.props.onContentChange) {
       i.props.onContentChange(i.state.content);
