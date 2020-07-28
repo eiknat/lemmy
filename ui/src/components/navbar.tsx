@@ -34,6 +34,7 @@ import {
 import { version } from '../version';
 import { i18n } from '../i18next';
 import { User } from './user';
+import { CommunityDropdown } from './community-dropdown';
 
 interface NavbarState {
   isLoggedIn: boolean;
@@ -47,6 +48,7 @@ interface NavbarState {
   searchParam: string;
   toggleSearch: boolean;
   creatingCommunitiesEnabled: boolean;
+  communityDropdownShown: boolean;
 }
 
 class UnwrappedNavbar extends Component<any, NavbarState> {
@@ -65,6 +67,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     searchParam: '',
     toggleSearch: false,
     creatingCommunitiesEnabled: false,
+    communityDropdownShown: false,
   };
 
   constructor(props: any, context: any) {
@@ -207,13 +210,15 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
         >
           <ul class="navbar-nav my-2 mr-auto">
             <li class="nav-item">
-              <Link
-                class="nav-link"
-                to="/communities"
+              <button
+                class="nav-link btn btn-inline "
+                //to="/communities"
                 title={i18n.t('communities')}
+                id="community-button"
+                onClick={linkEvent(this, this.showCommunityDropdown)}
               >
                 {i18n.t('communities')}
-              </Link>
+              </button>
             </li>
             <li class="nav-item">
               <Link
@@ -271,7 +276,9 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
               <button
                 name="search-btn"
                 onClick={linkEvent(this, this.handleSearchBtn)}
-                class="btn btn-link"
+                class={`btn btn-link ${
+                  this.state.toggleSearch ? 'px-2' : 'px-0'
+                }`}
                 style="color: var(--gray)"
               >
                 <svg class="icon">
@@ -353,12 +360,23 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
             </ul>
           )}
         </div>
+        {this.state.communityDropdownShown && (
+          <CommunityDropdown
+            posX={this.communityButtonLoc}
+            removeDropdown={() => this.showCommunityDropdown(this)}
+          ></CommunityDropdown>
+        )}
       </nav>
     );
   }
 
   expandNavbar(i: Navbar) {
     i.state.expanded = !i.state.expanded;
+    i.setState(i.state);
+  }
+
+  showCommunityDropdown(i: Navbar) {
+    i.state.communityDropdownShown = !i.state.communityDropdownShown;
     i.setState(i.state);
   }
 
@@ -467,6 +485,11 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     return this.context.router.history.location.pathname;
   }
 
+  get communityButtonLoc() {
+    let doc = document.getElementById('community-button');
+    return doc.getBoundingClientRect().left;
+  }
+
   sendUnreadCount() {
     UserService.Instance.user.unreadCount = this.state.unreadCount;
     UserService.Instance.sub.next({
@@ -492,7 +515,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   requestNotificationPermission() {
     if (UserService.Instance.user) {
       document.addEventListener('DOMContentLoaded', function () {
-        if (!Notification) {
+        if (typeof Notification === 'undefined') {
           toast(i18n.t('notifications_error'), 'danger');
           return;
         }

@@ -14,26 +14,26 @@ interface SortSelectState {
 }
 
 export class SortSelect extends Component<SortSelectProps, SortSelectState> {
-  private emptyState: SortSelectState = {
-    sort: this.props.sort,
-  };
+  // private emptyState: SortSelectState = {
+  //   sort: this.props.sort,
+  // };
 
   constructor(props: any, context: any) {
     super(props, context);
-    this.state = this.emptyState;
+    // this.state = this.emptyState;
   }
 
-  static getDerivedStateFromProps(props: any): SortSelectState {
-    return {
-      sort: props.sort,
-    };
-  }
+  // static getDerivedStateFromProps(props: any): SortSelectState {
+  //   return {
+  //     sort: props.sort,
+  //   };
+  // }
 
   render() {
     return (
       <>
         <select
-          value={this.state.sort}
+          value={this.props.sort}
           onChange={linkEvent(this, this.handleSortChange)}
           class="custom-select custom-select-sm w-auto mr-2"
         >

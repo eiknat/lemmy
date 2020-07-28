@@ -75,7 +75,13 @@ export class WebSocketService {
 
     this.subject = Observable.create((obs: any) => {
       this.ws.onmessage = e => {
-        obs.next(JSON.parse(e.data));
+        try {
+          obs.next(JSON.parse(e.data));
+        } catch (error) {
+          console.warn('Failed to parse websocket message');
+          console.warn(e.data);
+          throw new Error(error);
+        }
       };
       this.ws.onopen = () => {
         console.log(`Connected to ${wsUri}`);
@@ -261,7 +267,7 @@ export class WebSocketService {
   }
 
   public getModlog(form: GetModlogForm) {
-    this.setAuth(form);
+    this.setAuth(form, false);
     this.ws.send(this.wsSendWrapper(UserOperation.GetModlog, form));
   }
 
