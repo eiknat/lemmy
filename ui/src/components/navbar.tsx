@@ -214,6 +214,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                 class="nav-link btn btn-inline "
                 //to="/communities"
                 title={i18n.t('communities')}
+                id="community-button"
                 onClick={linkEvent(this, this.showCommunityDropdown)}
               >
                 {i18n.t('communities')}
@@ -361,6 +362,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
         </div>
         {this.state.communityDropdownShown && (
           <CommunityDropdown
+            posX={this.communityButtonLoc}
             removeDropdown={() => this.showCommunityDropdown(this)}
           ></CommunityDropdown>
         )}
@@ -481,6 +483,11 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
 
   get currentLocation() {
     return this.context.router.history.location.pathname;
+  }
+
+  get communityButtonLoc() {
+    let doc = document.getElementById('community-button');
+    return doc.getBoundingClientRect().left;
   }
 
   sendUnreadCount() {

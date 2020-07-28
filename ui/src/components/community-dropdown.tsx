@@ -32,6 +32,7 @@ interface CommunityDropdownState {
 }
 
 interface CommunityDropdownProps {
+  posX: number;
   removeDropdown(): any;
 }
 
@@ -62,10 +63,7 @@ export class CommunityDropdown extends Component<
         err => console.error(err),
         () => console.log('complete')
       );
-
     this.fetch();
-    this.mainElement = document.querySelector('floating-container');
-    disableBodyScroll(this.mainElement);
   }
 
   componentWillUnmount() {
@@ -75,8 +73,12 @@ export class CommunityDropdown extends Component<
   render() {
     return (
       <>
-        <div class="dropdown-block"></div>
-        <div class="floating-container" id="floating-container">
+        <div class="dropdown-block" id="blocking-element"></div>
+        <div
+          class="floating-container"
+          style={this.getContainerLoc()}
+          id="floating-container"
+        >
           {!this.state.loading && (
             <div class="dropdown-content">
               <div style="display:flex">
@@ -188,6 +190,23 @@ export class CommunityDropdown extends Component<
     return color;
   }
 
+  onLoadingComplete() {
+    /*are we on mobile?*/
+    if (window.matchMedia('only screen and (max-width: 728px)').matches) {
+      disableBodyScroll(this.mainElement);
+    }
+  }
+
+  getContainerLoc() {
+    if (!window.matchMedia('only screen and (max-width: 728px)').matches) {
+      return {
+        left: Math.round(this.props.posX).toString() + 'px',
+      };
+    } else {
+      return {};
+    }
+  }
+
   handleDropdownClose(i: CommunityDropdown, event: any) {
     clearAllBodyScrollLocks();
     i.props.removeDropdown();
@@ -214,6 +233,7 @@ export class CommunityDropdown extends Component<
       this.state.subscriptions = data.follows;
       this.state.loading = false;
       this.setState(this.state);
+      this.onLoadingComplete();
     }
   }
 }

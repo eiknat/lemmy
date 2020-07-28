@@ -418,7 +418,7 @@ a.text-body {
   left: 123px;
   top: 40px;
   background-color: #2f2f37;
-  width: 230px;
+  width: 275px;
   border-radius: 7px;
 }
 
@@ -428,12 +428,21 @@ a.text-body {
 
 .dropdown-categories {
   padding: 0px 10px 5px;
+  max-height: 400px;
+  overflow: scroll;
+  overflow-x: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.dropdown-categories::-webkit-scrollbar {
+  display: none;
 }
 
 .community-icon {
   float: left;
-  width: 20px;
-  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
   margin-right: 7px;
   border-radius: 3px;
 }
@@ -464,7 +473,7 @@ a.text-body {
 }
 
 .dropdown-filter {
-  margin: 7px auto 0;
+  margin: 7px auto 10px;
   height: 35px;
   background-color: #1c1c21;
   border: 1px #42424c;
