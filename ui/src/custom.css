@@ -494,6 +494,13 @@ a.text-body {
   margin-left: -12px;
 }
 
+.dropdown-subtext {
+  font-size: 13px;
+  color: #AAA;
+  float: right;
+  margin: -5px 2px 2px 0;
+}
+
 @media only screen and (max-width: 728px) {
   .dropdown-block{
     display: block;

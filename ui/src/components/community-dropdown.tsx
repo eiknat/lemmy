@@ -153,6 +153,13 @@ export class CommunityDropdown extends Component<
                     ))}
                 </div>
               </div>
+              <Link
+                class="dropdown-subtext"
+                to="/communities"
+                onClick={linkEvent(this, this.handleDropdownClose)}
+              >
+                More detail
+              </Link>
             </div>
           )}
         </div>
