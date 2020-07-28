@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/require-array-sort-compare: 0 */
+
 import {
   Community,
   ListCommunitiesForm,
@@ -103,7 +105,7 @@ export class CommunityDropdown extends Component<
                     .filter(community =>
                       community.community_name.startsWith(this.state.filter)
                     )
-                    .sort(undefined)
+                    .sort()
                     .map(community => (
                       <>
                         <div class="community-listing">
