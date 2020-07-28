@@ -130,9 +130,17 @@ export class CommunityDropdown extends Component<
                 <div class="dropdown-category">
                   <h6>Communities</h6>
                   {this.state.communities
-                    .filter(community =>
-                      community.name.startsWith(this.state.filter)
-                    )
+                    .filter(community => {
+                      // don't show subscribed communities twice
+                      const isSubscribed = this.state.subscriptions.some(
+                        subscription =>
+                          subscription.community_id === community.id
+                      );
+                      return (
+                        community.name.startsWith(this.state.filter) &&
+                        !isSubscribed
+                      );
+                    })
                     .map(community => (
                       <>
                         <div class="community-listing">

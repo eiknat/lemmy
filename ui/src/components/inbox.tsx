@@ -121,12 +121,12 @@ export class Inbox extends Component<any, InboxState> {
               this.state.unreadOrAll == UnreadOrAll.Unread && (
                 <ul class="list-inline mb-1 text-muted small font-weight-bold">
                   <li className="list-inline-item">
-                    <span
-                      class="pointer"
+                    <button
+                      class="btn btn-secondary pointer mb-2"
                       onClick={linkEvent(this, this.markAllAsRead)}
                     >
                       {i18n.t('mark_all_as_read')}
-                    </span>
+                    </button>
                   </li>
                 </ul>
               )}
