@@ -114,12 +114,11 @@ export class Inbox extends Component<any, InboxState> {
                 </a>
               </small>
             </h5>
-            {(this.state.replies.length +
+            {this.state.replies.length +
               this.state.mentions.length +
               this.state.messages.length >
               0 &&
-              this.state.unreadOrAll == UnreadOrAll.Unread) ||
-              (true && (
+              this.state.unreadOrAll == UnreadOrAll.Unread && (
                 <ul class="list-inline mb-1 text-muted small font-weight-bold">
                   <li className="list-inline-item">
                     <button
@@ -130,7 +129,7 @@ export class Inbox extends Component<any, InboxState> {
                     </button>
                   </li>
                 </ul>
-              ))}
+              )}
             {this.selects()}
             {this.state.messageType == MessageType.All && this.all()}
             {this.state.messageType == MessageType.Replies && this.replies()}
