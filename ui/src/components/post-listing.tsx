@@ -610,7 +610,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                             {/* <svg class="small icon icon-inline mr-1">
                               <use xlinkHref="#icon-arrow-up"></use>
                             </svg> */}
-                            <Icon name="upvote" className="mr-1" />
+                            <Icon name="upvote" className="icon mr-1" />
                             {this.state.upvotes}
                           </span>
                         </li>
