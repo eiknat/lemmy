@@ -398,3 +398,139 @@ a.text-body {
   border-radius: 4px;
   height: 50px
 }
+
+.dropdown-block {
+  display: none;
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  background: #444;
+  z-index: 4;
+  opacity: 0.5;
+}
+
+.floating-container {
+  display: block;
+  z-index: 5;
+  position: absolute;
+  left: 123px;
+  top: 40px;
+  background-color: #2f2f37;
+  width: 275px;
+  border-radius: 7px;
+}
+
+.dropdown-content {
+  padding: 2px 5px 5px;
+}
+
+.dropdown-categories {
+  padding: 0px 10px 5px;
+  max-height: 400px;
+  overflow: scroll;
+  overflow-x: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.dropdown-categories::-webkit-scrollbar {
+  display: none;
+}
+
+.community-icon {
+  float: left;
+  min-width: 20px;
+  min-height: 20px;
+  margin-right: 7px;
+  border-radius: 3px;
+}
+
+.dropdown-content h6{
+  font-size: 13px;
+  color: #AAA;
+  margin-bottom: 8px;
+  margin-top: 12px;
+}
+
+.community-listing-title {
+  color: #DDD;
+  margin-left: 2px;
+}
+
+.community-listing-title:hover {
+  color: #AAA;
+  text-decoration: none;
+}
+
+.community-listing {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 20px;
+  margin-bottom: 7px;
+}
+
+.dropdown-filter {
+  margin: 7px auto 10px;
+  height: 35px;
+  background-color: #1c1c21;
+  border: 1px #42424c;
+}
+
+.dropdown-filter:focus {
+  background-color: #27272C;
+}
+
+.dropdown-filter::placeholder {
+  color: #555;
+}
+
+.dropdown-exit {
+  display: none;
+  float: right;
+  width: 10px;
+  margin-left: -12px;
+}
+
+.dropdown-subtext {
+  font-size: 13px;
+  color: #AAA;
+  float: right;
+  margin: -5px 2px 2px 0;
+}
+
+@media only screen and (max-width: 728px) {
+  .dropdown-block{
+    display: block;
+  }
+
+  .dropdown-exit{
+    display: inline;
+  }
+
+  .floating-container {
+    left: 50%;
+    margin-left: -150px;
+    top: 100px;
+    width: 300px;
+  }
+
+  .dropdown-content {
+    padding: 4px;
+  }
+
+  .dropdown-filter {
+    height: 40px;
+    margin-left: 2px;
+  }
+
+  .dropdown-categories {
+    margin-top: 10px;
+  }
+
+  .community-listing {
+    margin-bottom: 13px;
+  }
+}
