@@ -179,8 +179,6 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
   }
 
   render() {
-    console.log(this.state);
-    console.log(this.props);
     const postTitleBlank =
       this.state.postForm.name === null ||
       this.state.postForm.name.trim() === '';
