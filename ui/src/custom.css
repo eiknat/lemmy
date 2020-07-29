@@ -539,14 +539,10 @@ a.text-body {
   background-color: #DA1B9A !important;
 }
 
-.inline-vote-count {
-  display: inline-flex;
-  align-items: center;
-}
-
 .post-listing-details {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   height: 26px;
 }
 
