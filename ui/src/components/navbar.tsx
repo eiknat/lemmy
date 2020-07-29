@@ -249,7 +249,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                   to="/contributing"
                   title={i18n.t('donate_to_lemmy')}
                 >
-                  <Icon name="contribute" />
+                  <Icon name="contribute" /> {i18n.t('donate')}
                 </Link>
               </li>
             </ul>
