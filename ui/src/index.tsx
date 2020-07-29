@@ -38,6 +38,7 @@ import Tos from './components/tos';
 import PrivacyPolicy from './components/privacy-policy';
 
 import './custom.css';
+import './variables.css';
 
 const container = document.getElementById('app');
 

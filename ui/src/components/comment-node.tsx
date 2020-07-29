@@ -227,9 +227,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                 onClick={linkEvent(node, this.handleCommentUpvote)}
                 data-tippy-content={this.pointsTippy}
               >
-                <svg class="icon icon-inline mr-1">
-                  <use xlinkHref="#icon-zap"></use>
-                </svg>
+                <Icon name="hexbear" class="icon mr-1 mb-1" />
                 <span class="mr-1">{this.state.score}</span>
               </button>
               <span className="mr-1">•</span>

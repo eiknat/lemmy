@@ -1,0 +1,11 @@
+:root {
+  --chapo-primary: #DA1B9A;
+  --chapo-secondary: #2030DF;
+  --chapo-accent: #F3B90C;
+}
+
+/* helper classes */
+
+.bg-accent {
+  background-color: var(--chapo-accent) !important;
+}
