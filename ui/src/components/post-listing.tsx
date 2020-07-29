@@ -492,9 +492,9 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     </small>
                   )}
                   {post.nsfw && (
-                    <small className="ml-2 text-muted font-italic">
+                    <div className="badge ml-2 mb-2 nsfw-badge">
                       {i18n.t('nsfw')}
-                    </small>
+                    </div>
                   )}
                 </div>
               </div>

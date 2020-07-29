@@ -553,3 +553,27 @@ a.text-body {
 .post-title a:visited {
   color: #999 !important
 }
+
+.badge-light {
+  background-color: var(--chapo-secondary);
+  color: #fff;
+  font-size: 12px;
+}
+
+.main-navbar {
+  position: fixed;
+  top: 0;
+  background-color: #222;
+  padding: 0.5rem 1rem !important;
+  margin-top: 0 !important;
+  z-index: 50;
+}
+
+.navbar-spacer {
+  margin-bottom: 90px;
+}
+
+.nsfw-badge {
+   background-color: var(--chapo-accent) !important;
+   color: #333;
+}

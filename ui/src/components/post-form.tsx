@@ -179,6 +179,8 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
   }
 
   render() {
+    console.log(this.state);
+    console.log(this.props);
     const postTitleBlank =
       this.state.postForm.name === null ||
       this.state.postForm.name.trim() === '';
@@ -420,11 +422,11 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     }
 
     // Coerce empty url string to undefined
-    if (i.state.postForm.url && i.state.postForm.url === '') {
+    if (i.state.postForm.hasOwnProperty('url') && i.state.postForm.url === '') {
       i.state.postForm.url = undefined;
     }
 
-    if (i.state.postForm.url !== '' && !!i.state.postForm.url) {
+    if (i.state.postForm.url !== undefined && !!i.state.postForm.url) {
       // remove trackers from URL
       const cleanedURL = cleanURL({ url: i.state.postForm.url });
 
@@ -450,6 +452,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
   }
 
   handlePostUrlChange(i: PostForm, event: any) {
+    console.log(event.target.value);
     i.state.postForm.url = event.target.value;
     i.setState(i.state);
     i.fetchPageTitle();
