@@ -6,6 +6,10 @@
 
 /* helper classes */
 
+.bg-secondary {
+  background-color: var(--chapo-secondary) !important;
+}
+
 .bg-accent {
   background-color: var(--chapo-accent) !important;
 }
