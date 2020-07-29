@@ -233,6 +233,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               href={post.url}
               target="_blank"
               title={post.url}
+              rel="noreferrer"
             >
               {this.imgThumb(this.getImage(true))}
               <Icon className="icon mini-overlay" name="link" />
@@ -277,7 +278,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               href={post.url}
               target="_blank"
               title={post.url}
-              rel="noopener"
+              rel="noreferrer"
             >
               <Icon
                 className="icon thumbnail mini-overlay"
@@ -379,6 +380,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         href={post.url}
                         target="_blank"
                         title={post.url}
+                        rel="noreferrer"
                       >
                         {post.name}
                       </a>
@@ -400,6 +402,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                           href={post.url}
                           target="_blank"
                           title={post.url}
+                          rel="noreferrer"
                         >
                           {hostname(post.url)}
                           <Icon

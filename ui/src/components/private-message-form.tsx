@@ -169,7 +169,7 @@ export class PrivateMessageForm extends Component<
                     <a
                       class="alert-link"
                       target="_blank"
-                      rel="noopener"
+                      rel="noreferrer"
                       href="https://element.io/get-started"
                     >
                       #
