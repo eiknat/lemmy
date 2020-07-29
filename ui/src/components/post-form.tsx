@@ -450,7 +450,6 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
   }
 
   handlePostUrlChange(i: PostForm, event: any) {
-    console.log(event.target.value);
     i.state.postForm.url = event.target.value;
     i.setState(i.state);
     i.fetchPageTitle();
