@@ -327,13 +327,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               onClick={linkEvent(this, this.handlePostLike)}
               data-tippy-content={i18n.t('upvote')}
             >
-              {/* <svg class="icon upvote">
-                <use xlinkHref="#icon-arrow-up1"></use>
-              </svg> */}
               <Icon name="upvote" className="icon upvote" />
             </button>
             <div
-              class={`unselectable pointer font-weight-bold text-muted px-1`}
+              class={`unselectable pointer font-weight-bold text-muted px-1 py-1`}
               data-tippy-content={this.pointsTippy}
             >
               {this.state.score}
@@ -346,9 +343,6 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                 onClick={linkEvent(this, this.handlePostDisLike)}
                 data-tippy-content={i18n.t('downvote')}
               >
-                {/* <svg class="icon downvote">
-                  <use xlinkHref="#icon-arrow-down1"></use>
-                </svg> */}
                 <Icon name="downvote" className="icon downvote" />
               </button>
             )}
@@ -552,83 +546,6 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       <MomentTime data={post} />
                     </span>
                   </li>
-                  <br />
-                  <div className="list-inline-item d-inline-flex align-items-center">
-                    <Link
-                      className="text-muted"
-                      title={i18n.t('number_of_comments', {
-                        count: post.number_of_comments,
-                      })}
-                      to={`/post/${post.id}`}
-                    >
-                      {/* <svg class="mr-1 icon icon-inline">
-                        <use xlinkHref="#icon-message-square"></use>
-                      </svg> */}
-                      <Icon name="comment" className="icon icon-inline mr-1" />
-                      {i18n.t('number_of_comments', {
-                        count: post.number_of_comments,
-                      })}
-                    </Link>
-                    {UserService.Instance.user && !this.props.showBody && (
-                      <button
-                        class="btn btn-sm btn-link btn-animate text-muted p-0 pl-3"
-                        onClick={linkEvent(this, this.handleReportPost)}
-                        data-tippy-content={i18n.t('snitch')}
-                      >
-                        <Icon name="report" />
-                      </button>
-                    )}
-                  </div>
-                  {/* {post.body && !isMobile && (
-                    <>
-                      <li className="list-inline-item">•</li>
-                      <li className="list-inline-item">
-                        <Link
-                          className="text-muted"
-                          data-tippy-content={md.render(
-                            previewLines(post.body)
-                          )}
-                          data-tippy-allowHtml={true}
-                          to={`/post/${post.id}`}
-                        >
-                          <svg class="mr-1 icon icon-inline">
-                            <use xlinkHref="#icon-book-open"></use>
-                          </svg>
-                        </Link>
-                      </li>
-                    </>
-                  )} */}
-                  {/* <li className="list-inline-item">•</li> */}
-                  {this.state.upvotes !== this.state.score && (
-                    <>
-                      <span
-                        class="unselectable pointer mr-2"
-                        data-tippy-content={this.pointsTippy}
-                      >
-                        <li className="list-inline-item">
-                          <span className="text-muted">
-                            {/* <svg class="small icon icon-inline mr-1">
-                              <use xlinkHref="#icon-arrow-up"></use>
-                            </svg> */}
-                            <Icon name="upvote" className="icon mr-1" />
-                            {this.state.upvotes}
-                          </span>
-                        </li>
-                        <li className="list-inline-item">
-                          <span className="text-muted">
-                            {/* <svg class="small icon icon-inline mr-1">
-                              <use xlinkHref="#icon-arrow-down"></use>
-                            </svg> */}
-                            <Icon
-                              name="downvote"
-                              className="small icon icon-inline mr-1"
-                            />
-                            {this.state.downvotes}
-                          </span>
-                        </li>
-                      </span>
-                    </>
-                  )}
                 </ul>
                 {this.props.post.duplicates && (
                   <ul class="list-inline mb-1 small text-muted">
@@ -725,6 +642,49 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     </div>
                   </form>
                 )}
+                <div className="post-listing-details">
+                  <Link
+                    className="text-muted"
+                    title={i18n.t('number_of_comments', {
+                      count: post.number_of_comments,
+                    })}
+                    to={`/post/${post.id}`}
+                  >
+                    {/* <svg class="mr-1 icon icon-inline">
+                        <use xlinkHref="#icon-message-square"></use>
+                      </svg> */}
+                    <Icon name="comment" className="icon mr-1" />
+                    {i18n.t('number_of_comments', {
+                      count: post.number_of_comments,
+                    })}
+                  </Link>
+                  {UserService.Instance.user && !this.props.showBody && (
+                    <button
+                      class="btn btn-sm btn-link btn-animate text-muted p-0 px-2"
+                      onClick={linkEvent(this, this.handleReportPost)}
+                      data-tippy-content={i18n.t('snitch')}
+                    >
+                      <Icon name="report" />
+                    </button>
+                  )}
+                  {this.state.upvotes !== this.state.score && (
+                    <>
+                      <span
+                        class="unselectable pointer mr-2 mb-1 inline-vote-details"
+                        data-tippy-content={this.pointsTippy}
+                      >
+                        <div className="list-inline-item text-muted">
+                          <Icon name="upvote" className="icon mr-1" />
+                          {this.state.upvotes}
+                        </div>
+                        <div className="list-inline-item text-muted">
+                          <Icon name="downvote" className="icon mr-1" />
+                          {this.state.downvotes}
+                        </div>
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>
