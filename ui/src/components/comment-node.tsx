@@ -184,17 +184,13 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
               </span>
 
               {this.isMod && (
-                <div className="badge badge-light d-none d-sm-inline mr-2">
-                  {i18n.t('mod')}
-                </div>
+                <div className="badge badge-light mr-2">{i18n.t('mod')}</div>
               )}
               {this.isAdmin && (
-                <div className="badge badge-light d-none d-sm-inline mr-2">
-                  {i18n.t('admin')}
-                </div>
+                <div className="badge badge-light mr-2">{i18n.t('admin')}</div>
               )}
               {this.isPostCreator && (
-                <div className="badge badge-light d-none d-sm-inline mr-2">
+                <div className="badge badge-light mr-2">
                   {i18n.t('creator')}
                 </div>
               )}

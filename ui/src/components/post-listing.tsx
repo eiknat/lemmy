@@ -319,7 +319,11 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     return (
       <div>
         <div class="row">
-          <div className={`vote-bar col-1 pr-0 small text-center`}>
+          <div
+            className={`vote-bar col-1 pr-0 small text-center ${
+              post.stickied ? 'stickied-border' : ''
+            }`}
+          >
             <button
               className={`btn-animate btn btn-link p-0 ${
                 this.state.my_vote == 1 ? 'text-info' : 'text-muted'
@@ -471,26 +475,6 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       </svg>
                     </small>
                   )}
-                  {post.locked && (
-                    <small
-                      className="unselectable pointer ml-2 text-muted font-italic"
-                      data-tippy-content={i18n.t('locked')}
-                    >
-                      <svg class={`icon icon-inline text-danger`}>
-                        <use xlinkHref="#icon-lock"></use>
-                      </svg>
-                    </small>
-                  )}
-                  {post.stickied && (
-                    <small
-                      className="unselectable pointer ml-2 text-muted font-italic"
-                      data-tippy-content={i18n.t('stickied')}
-                    >
-                      <svg class={`icon icon-inline text-success`}>
-                        <use xlinkHref="#icon-pin"></use>
-                      </svg>
-                    </small>
-                  )}
                   {post.nsfw && (
                     <div className="badge ml-2 mb-2 nsfw-badge">
                       {i18n.t('nsfw')}
@@ -548,6 +532,26 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       <MomentTime data={post} />
                     </span>
                   </li>
+                  {post.stickied && (
+                    <small
+                      className="unselectable pointer ml-1 font-italic"
+                      data-tippy-content={i18n.t('stickied')}
+                    >
+                      <svg class={`icon custom-icon text-success`}>
+                        <use xlinkHref="#icon-pin"></use>
+                      </svg>
+                    </small>
+                  )}
+                  {post.locked && (
+                    <small
+                      className="unselectable pointer ml-1 text-muted font-italic"
+                      data-tippy-content={i18n.t('locked')}
+                    >
+                      <svg class={`icon custom-icon text-danger`}>
+                        <use xlinkHref="#icon-lock"></use>
+                      </svg>
+                    </small>
+                  )}
                 </ul>
                 {this.props.post.duplicates && (
                   <ul class="list-inline mb-1 small text-muted">

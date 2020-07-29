@@ -585,3 +585,12 @@ a.text-body {
    background-color: var(--chapo-accent) !important;
    color: #333;
 }
+
+.custom-icon {
+  height: 14px;
+  width: 14px;
+}
+
+.stickied-border {
+  border-right: 2px solid var(--chapo-success) !important;
+}
