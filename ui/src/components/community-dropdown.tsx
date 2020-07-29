@@ -11,18 +11,14 @@ import {
   UserDetailsResponse,
   CommunityUser,
 } from '../interfaces';
-import { Component, linkEvent } from 'inferno';
+import { Component, linkEvent, createRef } from 'inferno';
 import { Subscription } from 'rxjs';
 import { WebSocketService, UserService } from '../services';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { wsJsonToRes, toast } from '../utils';
 import { i18n } from '../i18next';
 import { Link } from 'inferno-router';
-import {
-  disableBodyScroll,
-  enableBodyScroll,
-  clearAllBodyScrollLocks,
-} from 'body-scroll-lock';
+import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 
 interface CommunityDropdownState {
   favorites: Array<Community> /*not used right now */;
@@ -43,6 +39,7 @@ export class CommunityDropdown extends Component<
   CommunityDropdownState
 > {
   private maxLoad = 100;
+  private thisRef;
   private mainElement;
 
   private subscription: Subscription;
@@ -66,10 +63,18 @@ export class CommunityDropdown extends Component<
         () => console.log('complete')
       );
     this.fetch();
+
+    this.thisRef = createRef();
+    this.handleClickOutside = this.handleClickOutside.bind(this);
+  }
+
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleClickOutside);
   }
 
   componentWillUnmount() {
     clearAllBodyScrollLocks();
+    document.removeEventListener('mousedown', this.handleClickOutside);
   }
 
   render() {
@@ -80,6 +85,7 @@ export class CommunityDropdown extends Component<
           class="floating-container"
           style={this.getContainerLoc()}
           id="floating-container"
+          ref={this.thisRef}
         >
           {!this.state.loading && (
             <div class="dropdown-content">
@@ -98,50 +104,39 @@ export class CommunityDropdown extends Component<
                   </svg>
                 </button>
               </div>
-              <div class="dropdown-categories">
-                <div class="dropdown-category">
-                  <h6>Subscribed</h6>
-                  {this.state.subscriptions
-                    .filter(community =>
-                      community.community_name.startsWith(this.state.filter)
-                    )
-                    .sort()
-                    .map(community => (
-                      <>
-                        <div class="community-listing">
-                          <span
-                            class="community-icon"
-                            style={
-                              'background: ' +
-                              this.generateColor(community.community_name)
-                            }
-                          ></span>
-                          <Link
-                            class="community-listing-title"
-                            to={`/c/${community.community_name}`}
-                            onClick={linkEvent(this, this.handleDropdownClose)}
-                          >
-                            {community.community_name}
-                          </Link>
-                        </div>
-                      </>
-                    ))}
-                </div>
-                <div class="dropdown-category">
-                  <h6>Communities</h6>
-                  {this.state.communities
-                    .filter(community => {
-                      // don't show subscribed communities twice
-                      const isSubscribed = this.state.subscriptions.some(
-                        subscription =>
-                          subscription.community_id === community.id
-                      );
-                      return (
-                        community.name.startsWith(this.state.filter) &&
-                        !isSubscribed
-                      );
-                    })
-                    .map(community => (
+              {this.sortedCommunities.length > 0 ? (
+                <div class="dropdown-categories">
+                  {this.sortedSubscriptions.length > 0 && (
+                    <div class="dropdown-category">
+                      <h6>Subscribed</h6>
+                      {this.sortedSubscriptions.map(community => (
+                        <>
+                          <div class="community-listing">
+                            <span
+                              class="community-icon"
+                              style={
+                                'background: ' +
+                                this.generateColor(community.community_name)
+                              }
+                            ></span>
+                            <Link
+                              class="community-listing-title"
+                              to={`/c/${community.community_name}`}
+                              onClick={linkEvent(
+                                this,
+                                this.handleDropdownClose
+                              )}
+                            >
+                              {community.community_name}
+                            </Link>
+                          </div>
+                        </>
+                      ))}
+                    </div>
+                  )}
+                  <div class="dropdown-category">
+                    <h6>Communities</h6>
+                    {this.sortedCommunities.map(community => (
                       <>
                         <div class="community-listing">
                           <span
@@ -161,8 +156,25 @@ export class CommunityDropdown extends Component<
                         </div>
                       </>
                     ))}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div>
+                  <h5>
+                    Yikes! Community &apos;{this.state.filter}&apos; does not
+                    exist
+                  </h5>
+                  <p>
+                    Suggest new communities to be added on{' '}
+                    <Link
+                      to="/c/commrequest"
+                      onClick={linkEvent(this, this.handleDropdownClose)}
+                    >
+                      /c/commrequest
+                    </Link>
+                  </p>
+                </div>
+              )}
               <Link
                 class="dropdown-subtext"
                 to="/communities"
@@ -194,6 +206,30 @@ export class CommunityDropdown extends Component<
     WebSocketService.Instance.getUserDetails(getUserDetailsForm);
   }
 
+  get sortedSubscriptions(): Array<CommunityUser> {
+    if (this.state.subscriptions) {
+      return this.state.subscriptions
+        .filter(community =>
+          community.community_name.startsWith(this.state.filter)
+        )
+        .sort();
+    }
+    return this.state.subscriptions;
+  }
+
+  get sortedCommunities(): Array<Community> {
+    return this.state.communities.filter(community => {
+      // don't show subscribed communities twice
+      let isSubscribed: boolean;
+      if (this.state.subscriptions) {
+        isSubscribed = this.state.subscriptions.some(
+          subscription => subscription.community_id === community.id
+        );
+      }
+      return community.name.startsWith(this.state.filter) && !isSubscribed;
+    });
+  }
+
   generateColor(str: string): string {
     var hash = 0;
     for (var i = 0; i < str.length; i++) {
@@ -208,7 +244,7 @@ export class CommunityDropdown extends Component<
   }
 
   onLoadingComplete() {
-    /*are we on mobile?*/
+    //are we on mobile?
     if (window.matchMedia('only screen and (max-width: 728px)').matches) {
       disableBodyScroll(this.mainElement);
     }
@@ -231,8 +267,17 @@ export class CommunityDropdown extends Component<
 
   handleFilterChange(i: CommunityDropdown, event: any) {
     i.state.filter = event.target.value;
-    console.log('filter changed to ' + i.state.filter);
     i.setState(i.state);
+  }
+
+  handleClickOutside(event: any) {
+    if (
+      this.thisRef &&
+      !this.thisRef.current.contains(event.target) &&
+      event.target.id != 'community-button'
+    ) {
+      this.handleDropdownClose(this, event);
+    }
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
