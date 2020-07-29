@@ -44,7 +44,7 @@ export class Sponsors extends Component<any, any> {
       <div>
         <div>
           <h4 class="my-2">
-            Support Chapo.chat and the Chapo Collective on Patreon
+            Support Chapo.chat and the Chapo Collective on Liberapay
           </h4>
           <p>
             The Chapo Cooperative is a collective of leftist software developers
@@ -52,7 +52,7 @@ export class Sponsors extends Component<any, any> {
             democratization on the internet.
           </p>
           <a class="btn btn-secondary ml-2" href={PATREON_URL}>
-            {i18n.t('support_on_patreon')}
+            Support on Liberapay
           </a>
         </div>
         <hr />
