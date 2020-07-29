@@ -547,5 +547,9 @@ a.text-body {
 }
 
 .inline-vote-details {
-  margin-top: -2px;
+  /* margin-top: -2px; */
+}
+
+.post-title a:visited {
+  color: #999 !important
 }

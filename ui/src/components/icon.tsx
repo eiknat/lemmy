@@ -97,6 +97,28 @@ const icons = {
       <path d="M13.29,6.71,4,16v4H8l9.29-9.29Z" />
     </>
   ),
+  plus: (
+    <>
+      <path d="M12,20.25A1.25,1.25,0,0,1,10.75,19V5a1.25,1.25,0,0,1,2.5,0V19A1.25,1.25,0,0,1,12,20.25Z" />
+      <path d="M19,13.25H5a1.25,1.25,0,0,1,0-2.5H19a1.25,1.25,0,0,1,0,2.5Z" />
+    </>
+  ),
+  minus: (
+    <path d="M19,13.25H5a1.25,1.25,0,0,1,0-2.5H19a1.25,1.25,0,0,1,0,2.5Z" />
+  ),
+  link: (
+    <>
+      <path d="M11,6H6A2,2,0,0,0,4,8V18a2,2,0,0,0,2,2H16a2,2,0,0,0,2-2V13H16v5H6V8h5V6Z" />
+      <polygon points="20 11 18 11 18 6 13 6 13 4 20 4 20 11" />
+      <rect
+        x="9.34"
+        y="8"
+        width="11.31"
+        height="2"
+        transform="translate(-1.97 13.24) rotate(-45)"
+      />
+    </>
+  ),
 };
 
 interface IconProps {
@@ -115,7 +137,10 @@ interface IconProps {
     | 'icon'
     | 'star'
     | 'more'
-    | 'edit';
+    | 'edit'
+    | 'plus'
+    | 'minus'
+    | 'link';
   size?: number | string;
 }
 
