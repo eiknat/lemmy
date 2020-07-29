@@ -49,7 +49,7 @@ export class IFramelyCard extends Component<
                           class="text-body"
                           target="_blank"
                           href={post.url}
-                          rel="noopener"
+                          rel="noreferrer"
                         >
                           {post.embed_title}
                         </a>
@@ -61,7 +61,7 @@ export class IFramelyCard extends Component<
                       class="text-muted font-italic"
                       target="_blank"
                       href={post.url}
-                      rel="noopener"
+                      rel="noreferrer"
                     >
                       {new URL(post.url).hostname}
                       {/* <svg class="ml-1 icon">

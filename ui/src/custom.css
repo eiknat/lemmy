@@ -572,13 +572,19 @@ a.text-body {
   position: fixed;
   top: 0;
   background-color: #222;
-  padding: 0.5rem 1rem !important;
+  /* padding: 0.5rem 1rem !important; */
   margin-top: 0 !important;
   z-index: 50;
 }
 
 .navbar-spacer {
-  margin-bottom: 90px;
+  margin-bottom: 80px;
+}
+
+@media (max-width: 992px) {
+  .navbar-spacer {
+    margin-bottom: 65px;
+  }
 }
 
 .nsfw-badge {
