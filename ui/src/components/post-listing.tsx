@@ -320,7 +320,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
       <div>
         <div class="row">
           <div
-            className={`vote-bar col-1 pr-0 small text-center ${
+            className={`vote-bar col-2 pr-0 small text-center ${
               post.stickied ? 'stickied-border' : ''
             }`}
           >
