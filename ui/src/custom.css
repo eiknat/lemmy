@@ -538,3 +538,14 @@ a.text-body {
 .badge-pink {
   background-color: #DA1B9A !important;
 }
+
+.post-listing-details {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  height: 26px;
+}
+
+.inline-vote-details {
+  margin-top: -2px;
+}
