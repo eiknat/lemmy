@@ -225,9 +225,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               onClick={linkEvent(this, this.handleImageExpandClick)}
             >
               {this.imgThumb(this.getImage(true))}
-              <svg class="icon mini-overlay">
-                <use xlinkHref="#icon-external-link"></use>
-              </svg>
+              <Icon className="icon mini-overlay" name="link" />
             </span>
           ) : (
             <a
@@ -237,9 +235,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               title={post.url}
             >
               {this.imgThumb(this.getImage(true))}
-              <svg class="icon mini-overlay">
-                <use xlinkHref="#icon-external-link"></use>
-              </svg>
+              <Icon className="icon mini-overlay" name="link" />
             </a>
           )}
         </>
@@ -251,9 +247,11 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
           data-tippy-content={i18n.t('expand_here')}
           onClick={linkEvent(this, this.handleImageExpandClick)}
         >
-          <svg class="icon thumbnail" style="margin-top: 4px">
-            <use xlinkHref="#icon-external-link"></use>
-          </svg>
+          <Icon
+            className="icon thumbnail mini-overlay"
+            style="margin-top: 4px"
+            name="link"
+          />
         </span>
       );
     } else if (post.url) {
@@ -281,9 +279,11 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               title={post.url}
               rel="noopener"
             >
-              <svg class="icon thumbnail" style="margin-top: 4px">
-                <use xlinkHref="#icon-external-link"></use>
-              </svg>
+              <Icon
+                className="icon thumbnail mini-overlay"
+                style="margin-top: 4px"
+                name="link"
+              />
             </a>
           </div>
         );
@@ -398,9 +398,11 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                           title={post.url}
                         >
                           {hostname(post.url)}
-                          <svg class="ml-1 icon icon-inline">
-                            <use xlinkHref="#icon-external-link"></use>
-                          </svg>
+                          <Icon
+                            className="ml-1 icon icon-inline"
+                            name="link"
+                            size="14px"
+                          />
                         </a>
                       </small>
                     )}
@@ -670,7 +672,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                   {this.state.upvotes !== this.state.score && (
                     <>
                       <span
-                        class="unselectable pointer mr-2 mb-1 inline-vote-details"
+                        class="unselectable pointer mx-1 inline-vote-details"
                         data-tippy-content={this.pointsTippy}
                       >
                         <div className="list-inline-item text-muted">

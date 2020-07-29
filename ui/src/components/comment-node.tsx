@@ -165,13 +165,9 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                 onClick={linkEvent(this, this.handleCommentCollapse)}
               >
                 {this.state.collapsed ? (
-                  <svg class="icon icon-inline">
-                    <use xlinkHref="#icon-plus-square"></use>
-                  </svg>
+                  <Icon name="plus" size="16px" />
                 ) : (
-                  <svg class="icon icon-inline">
-                    <use xlinkHref="#icon-minus-square"></use>
-                  </svg>
+                  <Icon name="minus" size="16px" />
                 )}
               </div>
               <span class="mr-2">
