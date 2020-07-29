@@ -189,7 +189,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
           >
             <Icon name="notification" />
             {this.state.unreadCount > 0 && (
-              <span class="ml-1 badge badge-light">
+              <span class="ml-1 badge badge-light badge-pink">
                 {this.state.unreadCount}
               </span>
             )}
@@ -308,7 +308,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                   >
                     <Icon name="notification" />
                     {this.state.unreadCount > 0 && (
-                      <span class="ml-1 badge badge-light">
+                      <span class="ml-1 badge badge-light badge-pink">
                         {this.state.unreadCount}
                       </span>
                     )}
@@ -508,7 +508,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   requestNotificationPermission() {
     if (UserService.Instance.user) {
       document.addEventListener('DOMContentLoaded', function () {
-        if (typeof Notification === 'undefined') {
+        if (typeof Notification === 'undefined' && window.innerWidth > 768) {
           toast(i18n.t('notifications_error'), 'danger');
           return;
         }

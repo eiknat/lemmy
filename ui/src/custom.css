@@ -534,3 +534,7 @@ a.text-body {
     margin-bottom: 13px;
   }
 }
+
+.badge-pink {
+  background-color: #DA1B9A !important;
+}
