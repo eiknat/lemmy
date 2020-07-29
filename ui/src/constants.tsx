@@ -1,1 +1,1 @@
-export const PATREON_URL = 'https://www.patreon.com/chapo_cooperative';
+export const PATREON_URL = 'https://liberapay.com/chapo';
