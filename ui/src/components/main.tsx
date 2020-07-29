@@ -343,11 +343,10 @@ export class Main extends Component<any, MainState> {
               It is currently {getMoscowTime()} in Moscow
             </div>
             <ul class="my-2 list-inline">
-              {/*
-              <li className="list-inline-item badge badge-secondary">
+              <li className="list-inline-item badge badge-secondary bg-secondary">
                 {i18n.t('number_online', { count: this.state.siteRes.online })}
               </li>
-              */}
+              <br />
               <li className="list-inline-item badge badge-secondary">
                 {i18n.t('number_of_users', {
                   count: this.state.siteRes.site.number_of_users,
@@ -412,10 +411,11 @@ export class Main extends Component<any, MainState> {
     return (
       <div class="card border-secondary mb-3">
         <div class="card-body">
-          <p class="mb-0">
-            Our Soros stipend only gets us so far.{' '}
-            <a href={PATREON_URL}>Pitch in to keep the party going.</a>
-          </p>
+          <p>Our Soros stipend only gets us so far.</p>
+
+          <a href={PATREON_URL}>
+            <h4>Support Us on Liberapay</h4>
+          </a>
         </div>
       </div>
     );

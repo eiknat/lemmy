@@ -551,7 +551,7 @@ a.text-body {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  height: 26px;
+  min-height: 26px;
 }
 
 .inline-vote-details {
