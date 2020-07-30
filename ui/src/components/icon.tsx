@@ -124,54 +124,35 @@ const icons = {
   ),
 };
 
-interface IconProps {
-  name:
-    | 'report'
-    | 'comment'
-    | 'upvote'
-    | 'downvote'
-    | 'notification'
-    | 'search'
-    | 'image'
-    | 'contribute'
-    | 'rss'
-    | 'help'
-    | 'reply'
-    | 'icon'
-    | 'star'
-    | 'more'
-    | 'edit'
-    | 'plus'
-    | 'minus'
-    | 'link'
-    | 'hexbear';
+type Icons = typeof icons;
+
+export function Icon<T extends keyof Icons>({
+  name,
+  size = 20,
+  ...props
+}: {
+  name: T;
   size?: number | string;
-}
-
-export class Icon extends Component<IconProps, any> {
-  render() {
-    const { name, size = 20, ...props } = this.props;
-
-    if (!Object.keys(icons).includes(this.props.name)) {
-      console.warn(`Icon ${name} not found`);
-      return null;
-    }
-
-    return (
-      <svg
-        class="icon custom-icon"
-        viewBox="0 0 24 24"
-        aria-labelledby={name}
-        fill="currentColor"
-        style={{
-          width: size,
-          height: size,
-        }}
-        {...props}
-      >
-        <title id="title">{name}</title>
-        {icons[name]}
-      </svg>
-    );
+}): Icons[T] {
+  if (!Object.keys(icons).includes(name)) {
+    console.warn(`Icon ${name} not found`);
+    return null;
   }
+
+  return (
+    <svg
+      class="icon custom-icon"
+      viewBox="0 0 24 24"
+      aria-labelledby={name}
+      fill="currentColor"
+      style={{
+        width: size,
+        height: size,
+      }}
+      {...props}
+    >
+      <title id="title">{name}</title>
+      {icons[name]}
+    </svg>
+  );
 }

@@ -105,6 +105,10 @@ a.text-body {
   font-size: 24px;
 }
 
+.comment-expand-button {
+  margin-top: -3px;
+}
+
 @media (max-width: 768px) {
   .image-upload-icon {
     font-size: 40px;
