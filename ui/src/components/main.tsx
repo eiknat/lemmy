@@ -343,7 +343,7 @@ export class Main extends Component<any, MainState> {
               It is currently {getMoscowTime()} in Moscow
             </div>
             <ul class="my-2 list-inline">
-              <li className="list-inline-item badge badge-secondary bg-secondary">
+              <li className="list-inline-item badge badge-secondary chapo-bg-secondary">
                 {i18n.t('number_online', { count: this.state.siteRes.online })}
               </li>
               <br />
