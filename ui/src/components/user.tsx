@@ -947,7 +947,8 @@ export class User extends Component<any, UserState> {
   }
 
   handleUserSettingsSortTypeChange(val: SortType) {
-    this.state.userSettingsForm.default_sort_type = val;
+    // @ts-ignore
+    this.state.userSettingsForm.default_sort_type = parseInt(val, 10);
     this.setState(this.state);
   }
 

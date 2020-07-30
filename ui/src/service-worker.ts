@@ -1,7 +1,7 @@
 import { register } from 'register-service-worker';
 
 register('/service-worker.js', {
-  registrationOptions: { scope: './' },
+  registrationOptions: { scope: '/' },
   ready(registration) {
     console.log('Service worker is active.');
   },

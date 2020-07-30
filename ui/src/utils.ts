@@ -53,6 +53,7 @@ import Tribute from 'tributejs/src/Tribute.js';
 import markdown_it from 'markdown-it';
 import markdownitEmoji from 'markdown-it-emoji/light';
 import markdown_it_container from 'markdown-it-container';
+import iterator from 'markdown-it-for-inline';
 import emojiShortName from 'emoji-short-name';
 import Toastify from 'toastify-js';
 import tippy from 'tippy.js';
@@ -181,6 +182,11 @@ export const md = new markdown_it({
   })
   .use(markdownitEmoji, {
     defs: objectFlip(emojiShortName),
+  })
+  .use(iterator, 'url_new_win', 'link_open', function (tokens, idx) {
+    // make sure all inline links open in a new window and don't include the referrer
+    tokens[idx].attrPush(['target', '_blank']);
+    tokens[idx].attrPush(['rel', 'noreferrer']);
   })
   .disable('image');
 
