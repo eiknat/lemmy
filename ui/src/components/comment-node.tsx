@@ -193,15 +193,14 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   {i18n.t('mod')[0]}
                 </div>
               )}
-              {this.isAdmin ||
-                (true && (
-                  <div
-                    className="badge badge-light mr-1 comment-badge admin-badge"
-                    data-tippy-content={i18n.t('admin')}
-                  >
-                    {i18n.t('admin')[0]}
-                  </div>
-                ))}
+              {this.isAdmin && (
+                <div
+                  className="badge badge-light mr-1 comment-badge admin-badge"
+                  data-tippy-content={i18n.t('admin')}
+                >
+                  {i18n.t('admin')[0]}
+                </div>
+              )}
               {this.isPostCreator && (
                 <div
                   className="badge badge-light mr-2 creator-badge"
