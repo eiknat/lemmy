@@ -184,14 +184,28 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
               </span>
 
               {this.isMod && (
-                <div className="badge badge-light mr-2">{i18n.t('mod')}</div>
+                <div
+                  className="badge badge-light mr-1 comment-badge mod-badge"
+                  data-tippy-content={i18n.t('mod')}
+                >
+                  {i18n.t('mod')[0]}
+                </div>
               )}
-              {this.isAdmin && (
-                <div className="badge badge-light mr-2">{i18n.t('admin')}</div>
-              )}
+              {this.isAdmin ||
+                (true && (
+                  <div
+                    className="badge badge-light mr-1 comment-badge admin-badge"
+                    data-tippy-content={i18n.t('admin')}
+                  >
+                    {i18n.t('admin')[0]}
+                  </div>
+                ))}
               {this.isPostCreator && (
-                <div className="badge badge-light mr-2">
-                  {i18n.t('creator')}
+                <div
+                  className="badge badge-light mr-2 creator-badge"
+                  data-tippy-content={i18n.t('creator')}
+                >
+                  <Icon name="hexagon" />
                 </div>
               )}
               {(node.comment.banned_from_community || node.comment.banned) && (
@@ -315,13 +329,6 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                       >
                         <Icon name="reply" />
                       </button>
-                      <button
-                        class="btn btn-sm btn-link btn-animate text-muted small"
-                        onClick={linkEvent(this, this.handleReportComment)}
-                        data-tippy-content={i18n.t('snitch')}
-                      >
-                        <Icon name="report" />
-                      </button>
                       {!this.state.showAdvanced ? (
                         <button
                           className="btn btn-link btn-animate text-muted"
@@ -410,6 +417,16 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                 >
                                   <use xlinkHref="#icon-trash"></use>
                                 </svg>
+                              </button>
+                              <button
+                                class="btn btn-sm btn-link btn-animate text-muted small"
+                                onClick={linkEvent(
+                                  this,
+                                  this.handleReportComment
+                                )}
+                                data-tippy-content={i18n.t('snitch')}
+                              >
+                                <Icon name="report" />
                               </button>
                             </>
                           )}
