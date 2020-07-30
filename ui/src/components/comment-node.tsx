@@ -180,6 +180,8 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                     actor_id: node.comment.creator_actor_id,
                     published: node.comment.creator_published,
                   }}
+                  isMod={this.isMod}
+                  isAdmin={this.isAdmin}
                 />
               </span>
 
@@ -191,15 +193,14 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   {i18n.t('mod')[0]}
                 </div>
               )}
-              {this.isAdmin ||
-                (true && (
-                  <div
-                    className="badge badge-light mr-1 comment-badge admin-badge"
-                    data-tippy-content={i18n.t('admin')}
-                  >
-                    {i18n.t('admin')[0]}
-                  </div>
-                ))}
+              {this.isAdmin && (
+                <div
+                  className="badge badge-light mr-1 comment-badge admin-badge"
+                  data-tippy-content={i18n.t('admin')}
+                >
+                  {i18n.t('admin')[0]}
+                </div>
+              )}
               {this.isPostCreator && (
                 <div
                   className="badge badge-light mr-2 creator-badge"

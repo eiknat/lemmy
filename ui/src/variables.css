@@ -18,6 +18,14 @@
   background-color: var(--chapo-accent) !important;
 }
 
+.mod-text {
+  color: var(--chapo-mod);
+}
+
+.admin-text {
+  color: #F37171 !important;
+}
+
 .mod-badge {
   background-color: var(--chapo-mod);
   color: #145234 !important;
