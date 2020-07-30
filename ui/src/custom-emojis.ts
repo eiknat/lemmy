@@ -142,7 +142,8 @@ export function replaceEmojis(html) {
   let newHtml = html;
   customEmojis.forEach(emoji => {
     if (html.includes(`:${emoji.key}:`)) {
-      newHtml = newHtml.replace(`:${emoji.key}:`, emoji.val);
+      const regex = new RegExp(`:${emoji.key}:`, 'g');
+      newHtml = newHtml.replace(regex, emoji.val);
     }
   });
 
