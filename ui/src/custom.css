@@ -604,3 +604,10 @@ a.text-body {
 .stickied-border {
   border-right: 2px solid var(--chapo-success) !important;
 }
+
+.comment-badge {
+  text-transform: uppercase;
+  font-size: 10px !important;
+  font-weight: bold;
+  padding: 3px 5px;
+}
