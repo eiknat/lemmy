@@ -180,6 +180,8 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                     actor_id: node.comment.creator_actor_id,
                     published: node.comment.creator_published,
                   }}
+                  isMod={this.isMod}
+                  isAdmin={this.isAdmin}
                 />
               </span>
 
