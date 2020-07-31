@@ -533,6 +533,9 @@ export class User extends Component<any, UserState> {
                     <option value={theme}>{theme}</option>
                   ))}
                 </select>
+                <div className="small alert alert-warning my-2">
+                  Stick with Darkly for the best ChapoChat experience. Themes are bugged right now, but we'll be rebuilding themes soon so they're extra fancy.
+                </div>
               </div>
               <form className="form-group">
                 <label>
