@@ -63,6 +63,7 @@ interface PostFormState {
   suggestedTitle: string;
   suggestedPosts: Array<Post>;
   crossPosts: Array<Post>;
+  crosspostCommunityId?: number;
 }
 
 export const TextAreaWithCounter = ({ maxLength, ...props }) => {
@@ -129,6 +130,8 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       };
     }
 
+    const queryParams = new URLSearchParams(window.location.search);
+
     if (this.props.params) {
       this.state.postForm.name = this.props.params.name;
       if (this.props.params.url) {
@@ -137,6 +140,12 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       if (this.props.params.body) {
         this.state.postForm.body = this.props.params.body;
       }
+    }
+
+    const crosspostCommunityId = queryParams.get('community_id');
+
+    if (crosspostCommunityId) {
+      this.state.crosspostCommunityId = parseInt(crosspostCommunityId, 10);
     }
 
     this.subscription = WebSocketService.Instance.subject
@@ -344,13 +353,25 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                   onInput={linkEvent(this, this.handlePostCommunityChange)}
                 >
                   <option>{i18n.t('select_a_community')}</option>
-                  {this.state.communities.map(community => (
-                    <option value={community.id}>
-                      {community.local
-                        ? community.name
-                        : `${hostname(community.actor_id)}/${community.name}`}
-                    </option>
-                  ))}
+                  {this.state.communities
+                    .filter(community => {
+                      // don't allow crossposting to same community as original
+                      if (this.state.crosspostCommunityId) {
+                        return community.id !== this.state.crosspostCommunityId;
+                      }
+
+                      // remove main community
+                      const MAIN_COMMUNITY_ID = 2;
+
+                      return community.id !== MAIN_COMMUNITY_ID;
+                    })
+                    .map(community => (
+                      <option value={community.id}>
+                        {community.local
+                          ? community.name
+                          : `${hostname(community.actor_id)}/${community.name}`}
+                      </option>
+                    ))}
                 </select>
               </div>
             </div>
