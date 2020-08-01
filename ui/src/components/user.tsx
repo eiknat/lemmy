@@ -19,6 +19,7 @@ import {
   GetSiteModeratorsResponse,
   CommunityModsState,
   BanUserForm,
+  UserTagResponse,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import {
@@ -65,6 +66,7 @@ interface UserState {
   admins: Array<UserView>;
   banUserShow: boolean;
   banReason: string;
+  pronouns: string | null;
 }
 
 interface UserProps {
@@ -143,6 +145,7 @@ export class User extends Component<any, UserState> {
     admins: [],
     banUserShow: false,
     banReason: null,
+    pronouns: null,
   };
 
   constructor(props: any, context: any) {
@@ -158,6 +161,7 @@ export class User extends Component<any, UserState> {
     );
     this.handlePageChange = this.handlePageChange.bind(this);
     this.isModerator = this.isModerator.bind(this);
+    this.handlePronounsChange = this.handlePronounsChange.bind(this);
 
     this.state.user_id = Number(this.props.match.params.id) || null;
     this.state.username = this.props.match.params.username;
@@ -507,6 +511,19 @@ export class User extends Component<any, UserState> {
                   </button>
                 </div>
               )} */}
+              <div class="form-group row">
+                <label class="col-lg-5 col-form-label" htmlFor="user-pronouns">
+                  {i18n.t('pronouns')}
+                </label>
+                <div class="col-lg-7">
+                  <input
+                    id="user-pronouns"
+                    class="form-control"
+                    value={this.state.pronouns}
+                    onInput={this.handlePronounsChange}
+                  />
+                </div>
+              </div>
               <div class="form-group">
                 <label>{i18n.t('language')}</label>
                 <select
@@ -1059,6 +1076,22 @@ export class User extends Component<any, UserState> {
     i.setState(i.state);
 
     WebSocketService.Instance.saveUserSettings(i.state.userSettingsForm);
+
+    if (i.state.pronouns === '' || i.state.pronouns === null) {
+      WebSocketService.Instance.setUserTags({
+        tag: 'pronouns',
+        value: null,
+      });
+    } else {
+      WebSocketService.Instance.setUserTags({
+        tag: 'pronouns',
+        value: i.state.pronouns,
+      });
+    }
+  }
+
+  handlePronounsChange(e: any) {
+    this.setState({ pronouns: e.target.value });
   }
 
   handleDeleteAccountShowConfirmToggle(i: User, event: any) {
@@ -1151,6 +1184,8 @@ export class User extends Component<any, UserState> {
         this.state.follows = data.follows;
         this.state.moderates = data.moderates;
 
+        WebSocketService.Instance.getUserTags({ user: data.user.id });
+
         if (this.isCurrentUser) {
           this.state.userSettingsForm.show_nsfw =
             UserService.Instance.user.show_nsfw;
@@ -1196,6 +1231,12 @@ export class User extends Component<any, UserState> {
 
       this.setState({
         siteModerators: mapSiteModeratorsResponse(data),
+      });
+    } else if (res.op == UserOperation.GetUserTag) {
+      const data = res.data as UserTagResponse;
+
+      this.setState({
+        pronouns: data.tags.pronouns || null,
       });
     }
   }

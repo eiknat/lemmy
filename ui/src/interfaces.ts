@@ -56,6 +56,8 @@ export enum UserOperation {
   GetCommunitySettings,
   EditCommunitySettings,
   GetSiteModerators,
+  GetUserTag,
+  SetUserTag,
 }
 
 export enum CommentSortType {
@@ -1030,7 +1032,9 @@ export type MessageType =
   | ResolveCommentReportForm
   | ResolvePostReportForm
   | CreateCommentReportForm
-  | CreatePostReportForm;
+  | CreatePostReportForm
+  | GetUserTagForm
+  | SetUserTagForm;
 
 type ResponseType =
   | SiteResponse
@@ -1063,7 +1067,8 @@ type ResponseType =
   | CreateCommentReportResponse
   | CreatePostReportResponse
   | CommunitySettingsResponse
-  | GetSiteModeratorsResponse;
+  | GetSiteModeratorsResponse
+  | UserTagResponse;
 
 export interface WebSocketResponse {
   op: UserOperation;
@@ -1108,6 +1113,24 @@ export interface CommunityModsState {
 
 export interface GetSiteModeratorsResponse {
   communities: CommunityMods[];
+}
+
+export interface GetUserTagForm {
+  user: number;
+  community?: number;
+}
+
+export interface SetUserTagForm {
+  tag: string;
+  value?: string | null; //null removes tag
+  community?: number;
+}
+
+export interface UserTagResponse {
+  user: number;
+  tags: {
+    [tag: string]: string;
+  };
 }
 
 export enum UserDetailsView {
