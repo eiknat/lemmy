@@ -617,3 +617,9 @@ a.text-body {
   font-weight: bold;
   padding: 3px 5px;
 }
+
+@media only screen and (max-width: 992px) {
+  .post-sidebar-container {
+    width: 100%;
+  }
+}

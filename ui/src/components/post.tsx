@@ -229,7 +229,7 @@ export class Post extends Component<any, PostState> {
               {this.state.commentViewType == CommentViewType.Chat &&
                 this.commentsFlat()}
             </div>
-            <div class="flex-1">
+            <div class="flex-1 post-sidebar-container">
               {/* {this.state.comments.length > 0 && this.newComments()} */}
               {this.sidebar()}
             </div>
