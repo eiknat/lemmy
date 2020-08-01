@@ -390,7 +390,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                               <use xlinkHref="#icon-file-text"></use>
                             </svg>
                           </button>
-                          {this.myComment && (
+                          {this.myComment ? (
                             <>
                               <button
                                 class="btn btn-link btn-animate text-muted"
@@ -419,17 +419,18 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                   <use xlinkHref="#icon-trash"></use>
                                 </svg>
                               </button>
-                              <button
-                                class="btn btn-sm btn-link btn-animate text-muted small"
-                                onClick={linkEvent(
-                                  this,
-                                  this.handleReportComment
-                                )}
-                                data-tippy-content={i18n.t('snitch')}
-                              >
-                                <Icon name="report" />
-                              </button>
                             </>
+                          ) : (
+                            <button
+                              class="btn btn-sm btn-link btn-animate text-muted small"
+                              onClick={linkEvent(
+                                this,
+                                this.handleReportComment
+                              )}
+                              data-tippy-content={i18n.t('snitch')}
+                            >
+                              <Icon name="report" />
+                            </button>
                           )}
                           {/* Admins and mods can remove comments */}
                           {(this.canMod || this.canAdmin) && (

@@ -321,7 +321,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
       <div>
         <div class="row">
           <div
-            className={`vote-bar col-2 pr-0 small text-center ${
+            className={`vote-bar small text-center ${
               post.stickied ? 'stickied-border' : ''
             }`}
           >
@@ -1231,6 +1231,9 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     }
     if (this.props.post.body) {
       params += `&body=${this.props.post.body}`;
+    }
+    if (post.community_id) {
+      params += `&community_id=${this.props.post.community_id}`;
     }
     return params;
   }

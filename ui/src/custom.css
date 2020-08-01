@@ -61,7 +61,13 @@ a.text-body {
 }
 
 .vote-bar {
-  max-width: 75px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30px;
+  box-sizing: content-box;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
 .sidebar-content {
@@ -610,4 +616,10 @@ a.text-body {
   font-size: 10px !important;
   font-weight: bold;
   padding: 3px 5px;
+}
+
+@media only screen and (max-width: 992px) {
+  .post-sidebar-container {
+    width: 100%;
+  }
 }
