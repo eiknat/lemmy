@@ -549,7 +549,7 @@ export class Main extends Component<any, MainState> {
           )}
         </span>
         {(!isMobile || (isMobile && this.state.filtersOpen)) && (
-          <span className="listing-select-group my-3">
+          <span className="listing-select-group my-3 ml-2">
             <span class="mr-3">
               <ListingTypeSelect
                 type_={this.state.listingType}

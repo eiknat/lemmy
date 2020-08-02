@@ -300,5 +300,6 @@
     "privacy_policy": "Privacy Policy",
     "terms_of_service": "Terms of Service",
     "ban_from_my_communities": "Ban from my communities",
-    "enable_create_communities": "Enable community creation"
+    "enable_create_communities": "Enable community creation",
+    "submit_report": "Submit Report"
 }

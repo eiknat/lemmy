@@ -718,7 +718,10 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
           </form>
         )}
         {this.state.showReportDialog && (
-          <form onSubmit={linkEvent(this, this.handleReportSubmit)}>
+          <form
+            onSubmit={linkEvent(this, this.handleReportSubmit)}
+            class="px-2"
+          >
             <div class="form-group row">
               <label class="col-form-label" htmlFor="comment-report-dialog">
                 {i18n.t('reason')}
@@ -735,7 +738,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
             </div>
             <div class="form-group row">
               <button type="submit" class="btn btn-secondary">
-                {i18n.t('snitch')} {node.comment.creator_name}
+                {i18n.t('submit_report')}
               </button>
             </div>
           </form>
