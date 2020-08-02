@@ -90,7 +90,7 @@ export class CommunityDropdown extends Component<
         >
           {!this.state.loading && (
             <div className="dropdown-content">
-              <div style="display:flex">
+              <div style={{ display: 'flex' }}>
                 <input
                   className="dropdown-filter form-control"
                   placeholder="Filter"

@@ -252,7 +252,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
         >
           <Icon
             className="icon thumbnail mini-overlay"
-            style="margin-top: 4px"
+            style={{ marginTop: '4px' }}
             name="link"
           />
         </span>
