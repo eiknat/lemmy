@@ -357,13 +357,15 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                     .filter(community => {
                       // don't allow crossposting to same community as original
                       if (this.state.crosspostCommunityId) {
-                        return community.id !== this.state.crosspostCommunityId;
+                        // remove main community
+                        const MAIN_COMMUNITY_ID = 2;
+                        return (
+                          community.id !== this.state.crosspostCommunityId &&
+                          community.id != MAIN_COMMUNITY_ID
+                        );
                       }
 
-                      // remove main community
-                      const MAIN_COMMUNITY_ID = 2;
-
-                      return community.id !== MAIN_COMMUNITY_ID;
+                      return true;
                     })
                     .map(community => (
                       <option value={community.id}>
