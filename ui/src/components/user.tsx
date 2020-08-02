@@ -823,7 +823,9 @@ export class User extends Component<any, UserState> {
             )}
             {this.state.banUserShow && (
               <form onSubmit={linkEvent(this, this.handleBan)}>
-                <div style="display: flex">
+                <div style={{
+                  display: "flex"
+                }}>
                   <input
                     id="reason"
                     placeholder="reason"

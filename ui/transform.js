@@ -27,7 +27,7 @@ export const getStyleObjectFromString = str => {
 
 function transformStyleAttribute(path) {
   const attributeName = path.node.name.name
-  const attributeType = path.node.value.type
+  const attributeType = path.node && path.node.value && path.node.value.type
 
   if (attributeName === 'style' && attributeType === 'StringLiteral') {
     // TRANSFORM
@@ -59,18 +59,13 @@ function transformStyleAttribute(path) {
   }
 }
 
+// convert all string style attributes to JSX style objects
 module.exports = function (fileInfo, api, options) {
   const j = api.jscodeshift;
 
-  // transform `fileInfo.source` here
-  // ...
-  // return changed source
-  // console.log(Object.keys(api.jscodeshift))
-  // console.log(j.JSXIdentifier)
   const root = j(fileInfo.source);
-  // console.log({ root })
+
   const attributes = root.find(j.JSXAttribute)
   attributes.forEach(transformStyleAttribute)
-  // const identifier
   return root.toSource();
 };
