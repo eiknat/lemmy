@@ -38,6 +38,7 @@ import {
 import Choices from 'choices.js';
 import { i18n } from '../i18next';
 import { cleanURL } from '../clean-url';
+import { Icon } from './icon';
 
 export const MAX_POST_TITLE_LENGTH = 160;
 export const MAX_POST_BODY_LENGTH = 20000;
@@ -230,9 +231,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                     } d-inline-block float-right text-muted font-weight-bold image-upload-icon m-0`}
                     data-tippy-content={i18n.t('upload_image')}
                   >
-                    <svg class="icon icon-inline">
-                      <use xlinkHref="#icon-image"></use>
-                    </svg>
+                    <Icon name="image" size="30px" />
                   </label>
                   <input
                     id="file-upload"
@@ -421,11 +420,11 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     }
 
     // Coerce empty url string to undefined
-    if (i.state.postForm.url && i.state.postForm.url === '') {
+    if (i.state.postForm.hasOwnProperty('url') && i.state.postForm.url === '') {
       i.state.postForm.url = undefined;
     }
 
-    if (i.state.postForm.url !== '' && !!i.state.postForm.url) {
+    if (i.state.postForm.url !== undefined && !!i.state.postForm.url) {
       // remove trackers from URL
       const cleanedURL = cleanURL({ url: i.state.postForm.url });
 
