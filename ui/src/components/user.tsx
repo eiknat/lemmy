@@ -67,6 +67,7 @@ interface UserState {
   banUserShow: boolean;
   banReason: string;
   pronouns: string | null;
+  additionalPronouns: string | null;
 }
 
 interface UserProps {
@@ -145,7 +146,8 @@ export class User extends Component<any, UserState> {
     admins: [],
     banUserShow: false,
     banReason: null,
-    pronouns: null,
+    pronouns: 'none',
+    additionalPronouns: 'none',
   };
 
   constructor(props: any, context: any) {
@@ -162,6 +164,9 @@ export class User extends Component<any, UserState> {
     this.handlePageChange = this.handlePageChange.bind(this);
     this.isModerator = this.isModerator.bind(this);
     this.handlePronounsChange = this.handlePronounsChange.bind(this);
+    this.handleAdditionalPronounsChange = this.handleAdditionalPronounsChange.bind(
+      this
+    );
 
     this.state.user_id = Number(this.props.match.params.id) || null;
     this.state.username = this.props.match.params.username;
@@ -227,6 +232,7 @@ export class User extends Component<any, UserState> {
   }
 
   render() {
+    console.log(this.state);
     return (
       <div class="container">
         <h5>
@@ -516,14 +522,47 @@ export class User extends Component<any, UserState> {
                   {i18n.t('pronouns')}
                 </label>
                 <div class="col-lg-7">
-                  <input
+                  <select
                     id="user-pronouns"
-                    class="form-control"
                     value={this.state.pronouns}
-                    onInput={this.handlePronounsChange}
-                  />
+                    class="custom-select custom-select-sm"
+                    onChange={this.handlePronounsChange}
+                  >
+                    <option value="none">none</option>
+                    <option value="they/them">they/them</option>
+                    <option value="she/her">she/her</option>
+                    <option value="he/him">he/him</option>
+                    <option value="any pronoun">any</option>
+                  </select>
                 </div>
               </div>
+
+              {!(
+                this.state.pronouns === '' || this.state.pronouns === 'none'
+              ) && (
+                <div class="form-group row">
+                  <label
+                    class="col-lg-5 col-form-label"
+                    htmlFor="user-secondary-pronouns"
+                  >
+                    {i18n.t('additional_pronouns')}
+                  </label>
+                  <div class="col-lg-7">
+                    <select
+                      id="user-secondary-pronouns"
+                      value={this.state.additionalPronouns}
+                      class="custom-select custom-select-sm"
+                      onChange={this.handleAdditionalPronounsChange}
+                    >
+                      <option value="none">none</option>
+                      <option value="they/them">they/them</option>
+                      <option value="she/her">she/her</option>
+                      <option value="he/him">he/him</option>
+                      <option value="any pronoun">any</option>
+                    </select>
+                  </div>
+                </div>
+              )}
               <div class="form-group">
                 <label>{i18n.t('language')}</label>
                 <select
@@ -1077,21 +1116,31 @@ export class User extends Component<any, UserState> {
 
     WebSocketService.Instance.saveUserSettings(i.state.userSettingsForm);
 
-    if (i.state.pronouns === '' || i.state.pronouns === null) {
-      WebSocketService.Instance.setUserTags({
-        tag: 'pronouns',
-        value: null,
-      });
-    } else {
-      WebSocketService.Instance.setUserTags({
-        tag: 'pronouns',
-        value: i.state.pronouns,
-      });
+    let pronounsValue = null;
+
+    if (i.state.pronouns !== 'none' && i.state.pronouns !== '') {
+      pronounsValue = i.state.pronouns;
+
+      if (
+        i.state.additionalPronouns !== 'none' &&
+        i.state.additionalPronouns !== ''
+      ) {
+        pronounsValue += `,${i.state.additionalPronouns}`;
+      }
     }
+
+    WebSocketService.Instance.setUserTags({
+      tag: 'pronouns',
+      value: pronounsValue,
+    });
   }
 
   handlePronounsChange(e: any) {
     this.setState({ pronouns: e.target.value });
+  }
+
+  handleAdditionalPronounsChange(e: any) {
+    this.setState({ additionalPronouns: e.target.value });
   }
 
   handleDeleteAccountShowConfirmToggle(i: User, event: any) {
@@ -1234,9 +1283,12 @@ export class User extends Component<any, UserState> {
       });
     } else if (res.op == UserOperation.GetUserTag) {
       const data = res.data as UserTagResponse;
+      const pronouns = data.tags.pronouns == null ? '' : data.tags.pronouns;
+      const pronounsArray = pronouns.split(',');
 
       this.setState({
-        pronouns: data.tags.pronouns || null,
+        pronouns: pronounsArray[0] || 'none',
+        additionalPronouns: pronounsArray[1] || 'none',
       });
     }
   }

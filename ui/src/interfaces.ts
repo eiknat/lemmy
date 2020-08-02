@@ -595,6 +595,7 @@ export interface RegisterForm {
   admin: boolean;
   show_nsfw: boolean;
   captcha_id: string;
+  pronouns?: string;
 }
 
 export interface LoginResponse {
