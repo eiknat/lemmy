@@ -39,6 +39,7 @@ import {
 import { i18n } from '../i18next';
 import { User } from './user';
 import { Icon } from './icon';
+import { RoleBadge } from './comment-node';
 
 interface PostListingState {
   showEdit: boolean;
@@ -500,15 +501,15 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         actor_id: post.creator_actor_id,
                       }}
                     />
-                    {this.isMod && (
-                      <span className="mx-1 badge badge-light">
-                        {i18n.t('mod')}
-                      </span>
-                    )}
                     {this.isAdmin && (
-                      <span className="mx-1 badge badge-light">
-                        {i18n.t('admin')}
-                      </span>
+                      <RoleBadge role="admin" tooltipText={i18n.t('admin')}>
+                        {i18n.t('admin')[0]}
+                      </RoleBadge>
+                    )}
+                    {this.isMod && !this.isAdmin && (
+                      <RoleBadge role="mod" tooltipText={i18n.t('mod')}>
+                        {i18n.t('mod')[0]}
+                      </RoleBadge>
                     )}
                     {(post.banned_from_community || post.banned) && (
                       <span className="mx-1 badge badge-danger">

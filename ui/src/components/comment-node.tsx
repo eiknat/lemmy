@@ -83,6 +83,25 @@ interface CommentNodeProps {
   enableDownvotes: boolean;
 }
 
+export function RoleBadge({
+  role,
+  tooltipText,
+  children,
+}: {
+  role: 'mod' | 'admin' | 'creator';
+  children: any;
+  tooltipText: string;
+}) {
+  return (
+    <div
+      className={`badge badge-light mx-1 comment-badge ${role}-badge`}
+      data-tippy-content={tooltipText}
+    >
+      {children}
+    </div>
+  );
+}
+
 export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   private emptyState: CommentNodeState = {
     showReply: false,
@@ -184,30 +203,20 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   isAdmin={this.isAdmin}
                 />
               </span>
-
-              {this.isMod && (
-                <div
-                  className="badge badge-light mr-1 comment-badge mod-badge"
-                  data-tippy-content={i18n.t('mod')}
-                >
-                  {i18n.t('mod')[0]}
-                </div>
-              )}
               {this.isAdmin && (
-                <div
-                  className="badge badge-light mr-1 comment-badge admin-badge"
-                  data-tippy-content={i18n.t('admin')}
-                >
+                <RoleBadge role="admin" tooltipText={i18n.t('admin')}>
                   {i18n.t('admin')[0]}
-                </div>
+                </RoleBadge>
+              )}
+              {this.isMod && !this.isAdmin && (
+                <RoleBadge role="mod" tooltipText={i18n.t('mod')}>
+                  {i18n.t('mod')[0]}
+                </RoleBadge>
               )}
               {this.isPostCreator && (
-                <div
-                  className="badge badge-light mr-2 creator-badge"
-                  data-tippy-content={i18n.t('creator')}
-                >
+                <RoleBadge role="creator" tooltipText={i18n.t('creator')}>
                   <Icon name="hexagon" />
-                </div>
+                </RoleBadge>
               )}
               {(node.comment.banned_from_community || node.comment.banned) && (
                 <div className="badge badge-danger mr-2">
