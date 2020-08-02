@@ -3,7 +3,7 @@
 // helpers from inferno-shared
 // https://github.com/infernojs/inferno/blob/master/packages/inferno-shared/src/index.ts
 export function isFunction(o: any): o is Function {
-  return typeof o === "function";
+  return typeof o === 'function';
 }
 
 export function isNull(o: any): o is null {
@@ -23,15 +23,16 @@ export interface LinkedEvent<T, E extends Event> {
  */
 export function linkEvent<T, E extends Event>(
   data: T,
-  event: (data: T, event: E) => void,
-): LinkedEvent<T, E> | null {
+  event: (data: T, event: E) => void
+  // @TODO: Properly type this at some point, but i have no idea how to do it with curried functions like this
+): any {
   if (isFunction(event)) {
-    return (evt) => event(data, evt)
+    return evt => event(data, evt);
   }
   return null; // Return null when event is invalid, to avoid creating unnecessary event handlers
 }
 
 // object.event should always be function, otherwise its badly created object.
 export function isLinkEventObject(o): o is LinkedEvent<any, any> {
-  return !isNull(o) && typeof o === "object";
+  return !isNull(o) && typeof o === 'object';
 }

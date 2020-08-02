@@ -54,7 +54,7 @@ import {
   setupTippy,
 } from '../utils';
 import { i18n } from '../i18next';
-import { Trans } from 'react-i18next';
+import { Trans, withTranslation } from 'react-i18next';
 import { PATREON_URL } from '../constants';
 import { Icon } from './icon';
 import { linkEvent } from '../linkEvent';
@@ -99,7 +99,7 @@ interface UrlParams {
   page?: number;
 }
 
-export class Main extends Component<any, MainState> {
+class Main extends Component<any, MainState> {
   private subscription: Subscription;
   private emptyState: MainState = {
     subscribedCommunities: [],
@@ -195,7 +195,7 @@ export class Main extends Component<any, MainState> {
 
   render() {
     return (
-      <div className="container" style={{ 'maxWidth': '100%' }}>
+      <div className="container" style={{ maxWidth: '100%' }}>
         <div className="row">
           <main role="main" className="col-12 col-md-8">
             {this.posts()}
@@ -227,7 +227,7 @@ export class Main extends Component<any, MainState> {
                       </h5>
                       <ul className="list-inline">
                         {this.state.subscribedCommunities.map(community => (
-                          <li id={community.id} className="list-inline-item">
+                          <li key={community.id} className="list-inline-item">
                             <CommunityLink
                               community={{
                                 name: community.community_name,
@@ -377,7 +377,7 @@ export class Main extends Component<any, MainState> {
             <ul className="mt-1 list-inline small mb-0">
               <li className="list-inline-item">{i18n.t('admins')}:</li>
               {this.state.siteRes.admins.map(admin => (
-                <li className="list-inline-item">
+                <li key={admin.id} className="list-inline-item">
                   <UserListing
                     user={{
                       name: admin.name,
@@ -804,3 +804,5 @@ export class Main extends Component<any, MainState> {
     }
   }
 }
+
+export default withTranslation()(Main);

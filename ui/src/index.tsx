@@ -12,7 +12,7 @@ import React, { Component } from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
-import { Main } from './components/main';
+import Main from './components/main';
 import { Navbar } from './components/navbar';
 import { Footer } from './components/footer';
 import { Login } from './components/login';
