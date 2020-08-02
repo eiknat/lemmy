@@ -167,9 +167,9 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
             this.isCommentNew ? 'mark' : ''
           }`}
           style={
-            !this.props.noIndent &&
-            this.props.node.comment.parent_id &&
-            `border-left: 2px ${this.state.borderColor} solid !important`
+            !this.props.noIndent && this.props.node.comment.parent_id
+              ? { borderLeft: `2px ${this.state.borderColor} solid !important` }
+              : {}
           }
         >
           <div

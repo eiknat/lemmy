@@ -1,4 +1,4 @@
-import React, { Component,  } from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
@@ -83,6 +83,20 @@ interface UrlParams {
   page?: number;
 }
 
+function getViewFromProps(view: any): UserDetailsView {
+  return view
+    ? UserDetailsView[capitalizeFirstLetter(view)]
+    : UserDetailsView.Overview;
+}
+
+function getSortTypeFromProps(sort: any): SortType {
+  return sort ? routeSortTypeToEnum(sort) : SortType.New;
+}
+
+function getPageFromProps(page: any): number {
+  return page ? Number(page) : 1;
+}
+
 export class User extends Component<any, UserState> {
   private subscription: Subscription;
   private emptyState: UserState = {
@@ -107,9 +121,9 @@ export class User extends Component<any, UserState> {
     moderates: [],
     loading: true,
     avatarLoading: false,
-    view: User.getViewFromProps(this.props.match.view),
-    sort: User.getSortTypeFromProps(this.props.match.sort),
-    page: User.getPageFromProps(this.props.match.page),
+    view: getViewFromProps(this.props.match.view),
+    sort: getSortTypeFromProps(this.props.match.sort),
+    page: getPageFromProps(this.props.match.page),
     userSettingsForm: {
       show_nsfw: null,
       theme: null,
@@ -183,29 +197,15 @@ export class User extends Component<any, UserState> {
     );
   }
 
-  static getViewFromProps(view: any): UserDetailsView {
-    return view
-      ? UserDetailsView[capitalizeFirstLetter(view)]
-      : UserDetailsView.Overview;
-  }
-
-  static getSortTypeFromProps(sort: any): SortType {
-    return sort ? routeSortTypeToEnum(sort) : SortType.New;
-  }
-
-  static getPageFromProps(page: any): number {
-    return page ? Number(page) : 1;
-  }
-
   componentWillUnmount() {
     this.subscription.unsubscribe();
   }
 
   static getDerivedStateFromProps(props: any): UserProps {
     return {
-      view: this.getViewFromProps(props.match.params.view),
-      sort: this.getSortTypeFromProps(props.match.params.sort),
-      page: this.getPageFromProps(props.match.params.page),
+      view: getViewFromProps(props.match.params.view),
+      sort: getSortTypeFromProps(props.match.params.sort),
+      page: getPageFromProps(props.match.params.page),
       user_id: Number(props.match.params.id) || null,
       username: props.match.params.username,
     };
@@ -535,7 +535,9 @@ export class User extends Component<any, UserState> {
                   ))}
                 </select>
                 <div className="small alert alert-warning my-2">
-                  Stick with Darkly for the best ChapoChat experience. Themes are bugged right now, but we'll be rebuilding themes soon so they're extra fancy.
+                  Stick with Darkly for the best ChapoChat experience. Themes
+                  are bugged right now, but we'll be rebuilding themes soon so
+                  they're extra fancy.
                 </div>
               </div>
               <form className="form-group">
@@ -604,7 +606,10 @@ export class User extends Component<any, UserState> {
                 </div>
               </div>
               <div className="form-group row">
-                <label className="col-lg-5 col-form-label" htmlFor="user-password">
+                <label
+                  className="col-lg-5 col-form-label"
+                  htmlFor="user-password"
+                >
                   {i18n.t('new_password')}
                 </label>
                 <div className="col-lg-7">
@@ -676,7 +681,10 @@ export class User extends Component<any, UserState> {
                         this.handleUserSettingsShowNsfwChange
                       )}
                     />
-                    <label className="form-check-label" htmlFor="user-show-nsfw">
+                    <label
+                      className="form-check-label"
+                      htmlFor="user-show-nsfw"
+                    >
                       {i18n.t('show_nsfw')}
                     </label>
                   </div>
@@ -694,7 +702,10 @@ export class User extends Component<any, UserState> {
                       this.handleUserSettingsShowAvatarsChange
                     )}
                   />
-                  <label className="form-check-label" htmlFor="user-show-avatars">
+                  <label
+                    className="form-check-label"
+                    htmlFor="user-show-avatars"
+                  >
                     {i18n.t('show_avatars')}
                   </label>
                 </div>
@@ -723,7 +734,10 @@ export class User extends Component<any, UserState> {
                 </div>
               </div>
               <div className="form-group">
-                <button type="submit" className="btn btn-block btn-secondary mr-4">
+                <button
+                  type="submit"
+                  className="btn btn-block btn-secondary mr-4"
+                >
                   {this.state.userSettingsLoading ? (
                     <svg className="icon icon-spinner spin">
                       <use xlinkHref="#icon-spinner"></use>
