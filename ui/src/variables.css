@@ -1,0 +1,44 @@
+:root {
+  --chapo-primary: #DA1B9A;
+  --chapo-secondary: #2030DF;
+  --chapo-accent: #F3B90C;
+  --chapo-success: #00bc8c;
+  --chapo-mod: #08D673;
+  --chapo-admin: #F37171;
+  --chapo-creator: #F471C8;
+}
+
+/* helper classes */
+
+.chapo-bg-secondary {
+  background-color: var(--chapo-secondary) !important;
+}
+
+.bg-accent {
+  background-color: var(--chapo-accent) !important;
+}
+
+.mod-text {
+  color: var(--chapo-mod);
+}
+
+.admin-text {
+  color: #F37171 !important;
+}
+
+.mod-badge {
+  background-color: var(--chapo-mod);
+  color: #145234 !important;
+}
+
+.admin-badge {
+  background-color: #F37171 !important;
+  color: #711919!important;
+}
+
+.creator-badge {
+  color: #F471C8 !important;
+  background-color: transparent !important;
+  /* margin-left: -4px; */
+  padding-left: 0;
+}

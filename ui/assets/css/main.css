@@ -11,16 +11,18 @@
   opacity: 0.65;
 }
 
-.upvote:hover {
- color: var(--info);
-}
-
 .upvote {
   margin-bottom: -5px;
 }
 
-.downvote:hover {
-  color: var(--danger);
+@media only screen and (min-width: 768px) {
+  .upvote:hover {
+   color: var(--info);
+  }
+
+  .downvote:hover {
+    color: var(--danger);
+  }
 }
 
 .downvote {
@@ -205,7 +207,7 @@ hr {
   top: 0;
   right: 0;
   padding: 2px;
-  height: 1.5em;  
+  height: 1.5em;
   width: 1.5em;
   background: rgba(0,0,0,.4);
   border-bottom-left-radius: 0.25rem !important;
@@ -227,7 +229,7 @@ hr {
   padding: 10px;
   background: rgba(0,0,0,.6);
 }
-  
+
 .placeholder {
   height: 50px;
   width: 50px;

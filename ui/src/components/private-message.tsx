@@ -16,6 +16,7 @@ import {
 import { MomentTime } from './moment-time';
 import { PrivateMessageForm } from './private-message-form';
 import { i18n } from '../i18next';
+import { Icon } from './icon';
 
 interface PrivateMessageState {
   showReply: boolean;
@@ -162,9 +163,7 @@ export class PrivateMessage extends Component<
                         onClick={linkEvent(this, this.handleReplyClick)}
                         data-tippy-content={i18n.t('reply')}
                       >
-                        <svg class="icon icon-inline">
-                          <use xlinkHref="#icon-reply1"></use>
-                        </svg>
+                        <Icon name="reply" />
                       </button>
                     </li>
                   </>
@@ -177,9 +176,7 @@ export class PrivateMessage extends Component<
                         onClick={linkEvent(this, this.handleEditClick)}
                         data-tippy-content={i18n.t('edit')}
                       >
-                        <svg class="icon icon-inline">
-                          <use xlinkHref="#icon-edit"></use>
-                        </svg>
+                        <Icon name="edit" />
                       </button>
                     </li>
                     <li className="list-inline-item">

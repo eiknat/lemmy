@@ -38,6 +38,8 @@ import {
 } from '../utils';
 import { i18n } from '../i18next';
 import { User } from './user';
+import { Icon } from './icon';
+import { RoleBadge } from './comment-node';
 
 interface PostListingState {
   showEdit: boolean;
@@ -211,9 +213,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
           onClick={linkEvent(this, this.handleImageExpandClick)}
         >
           {this.imgThumb(this.getImage(true))}
-          <svg class="icon mini-overlay">
-            <use xlinkHref="#icon-image"></use>
-          </svg>
+          <Icon name="image" class="icon mini-overlay" />
         </span>
       );
     } else if (post.thumbnail_url) {
@@ -226,9 +226,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               onClick={linkEvent(this, this.handleImageExpandClick)}
             >
               {this.imgThumb(this.getImage(true))}
-              <svg class="icon mini-overlay">
-                <use xlinkHref="#icon-external-link"></use>
-              </svg>
+              <Icon className="icon mini-overlay" name="link" />
             </span>
           ) : (
             <a
@@ -236,11 +234,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               href={post.url}
               target="_blank"
               title={post.url}
+              rel="noreferrer"
             >
               {this.imgThumb(this.getImage(true))}
-              <svg class="icon mini-overlay">
-                <use xlinkHref="#icon-external-link"></use>
-              </svg>
+              <Icon className="icon mini-overlay" name="link" />
             </a>
           )}
         </>
@@ -252,9 +249,11 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
           data-tippy-content={i18n.t('expand_here')}
           onClick={linkEvent(this, this.handleImageExpandClick)}
         >
-          <svg class="icon thumbnail" style="margin-top: 4px">
-            <use xlinkHref="#icon-external-link"></use>
-          </svg>
+          <Icon
+            className="icon thumbnail mini-overlay"
+            style="margin-top: 4px"
+            name="link"
+          />
         </span>
       );
     } else if (post.url) {
@@ -280,11 +279,13 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               href={post.url}
               target="_blank"
               title={post.url}
-              rel="noopener"
+              rel="noreferrer"
             >
-              <svg class="icon thumbnail" style="margin-top: 4px">
-                <use xlinkHref="#icon-external-link"></use>
-              </svg>
+              <Icon
+                className="icon thumbnail mini-overlay"
+                style="margin-top: 4px"
+                name="link"
+              />
             </a>
           </div>
         );
@@ -320,7 +321,11 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     return (
       <div>
         <div class="row">
-          <div className={`vote-bar col-1 pr-0 small text-center`}>
+          <div
+            className={`vote-bar small text-center ${
+              post.stickied ? 'stickied-border' : ''
+            }`}
+          >
             <button
               className={`btn-animate btn btn-link p-0 ${
                 this.state.my_vote == 1 ? 'text-info' : 'text-muted'
@@ -328,12 +333,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               onClick={linkEvent(this, this.handlePostLike)}
               data-tippy-content={i18n.t('upvote')}
             >
-              <svg class="icon upvote">
-                <use xlinkHref="#icon-arrow-up1"></use>
-              </svg>
+              <Icon name="upvote" className="icon upvote" />
             </button>
             <div
-              class={`unselectable pointer font-weight-bold text-muted px-1`}
+              class={`unselectable pointer font-weight-bold text-muted px-1 py-1`}
               data-tippy-content={this.pointsTippy}
             >
               {this.state.score}
@@ -346,9 +349,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                 onClick={linkEvent(this, this.handlePostDisLike)}
                 data-tippy-content={i18n.t('downvote')}
               >
-                <svg class="icon downvote">
-                  <use xlinkHref="#icon-arrow-down1"></use>
-                </svg>
+                <Icon name="downvote" className="icon downvote" />
               </button>
             )}
           </div>
@@ -380,6 +381,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         href={post.url}
                         target="_blank"
                         title={post.url}
+                        rel="noreferrer"
                       >
                         {post.name}
                       </a>
@@ -401,11 +403,14 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                           href={post.url}
                           target="_blank"
                           title={post.url}
+                          rel="noreferrer"
                         >
                           {hostname(post.url)}
-                          <svg class="ml-1 icon icon-inline">
-                            <use xlinkHref="#icon-external-link"></use>
-                          </svg>
+                          <Icon
+                            className="ml-1 icon icon-inline"
+                            name="link"
+                            size="14px"
+                          />
                         </a>
                       </small>
                     )}
@@ -474,30 +479,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       </svg>
                     </small>
                   )}
-                  {post.locked && (
-                    <small
-                      className="unselectable pointer ml-2 text-muted font-italic"
-                      data-tippy-content={i18n.t('locked')}
-                    >
-                      <svg class={`icon icon-inline text-danger`}>
-                        <use xlinkHref="#icon-lock"></use>
-                      </svg>
-                    </small>
-                  )}
-                  {post.stickied && (
-                    <small
-                      className="unselectable pointer ml-2 text-muted font-italic"
-                      data-tippy-content={i18n.t('stickied')}
-                    >
-                      <svg class={`icon icon-inline text-success`}>
-                        <use xlinkHref="#icon-pin"></use>
-                      </svg>
-                    </small>
-                  )}
                   {post.nsfw && (
-                    <small className="ml-2 text-muted font-italic">
+                    <div className="badge ml-2 mb-2 nsfw-badge">
                       {i18n.t('nsfw')}
-                    </small>
+                    </div>
                   )}
                 </div>
               </div>
@@ -516,15 +501,15 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         actor_id: post.creator_actor_id,
                       }}
                     />
-                    {this.isMod && (
-                      <span className="mx-1 badge badge-light">
-                        {i18n.t('mod')}
-                      </span>
-                    )}
                     {this.isAdmin && (
-                      <span className="mx-1 badge badge-light">
-                        {i18n.t('admin')}
-                      </span>
+                      <RoleBadge role="admin" tooltipText={i18n.t('admin')}>
+                        {i18n.t('admin')[0]}
+                      </RoleBadge>
+                    )}
+                    {this.isMod && !this.isAdmin && (
+                      <RoleBadge role="mod" tooltipText={i18n.t('mod')}>
+                        {i18n.t('mod')[0]}
+                      </RoleBadge>
                     )}
                     {(post.banned_from_community || post.banned) && (
                       <span className="mx-1 badge badge-danger">
@@ -551,78 +536,26 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       <MomentTime data={post} />
                     </span>
                   </li>
-                  <br />
-                  <div className="list-inline-item d-inline-flex align-items-center">
-                    <Link
-                      className="text-muted"
-                      title={i18n.t('number_of_comments', {
-                        count: post.number_of_comments,
-                      })}
-                      to={`/post/${post.id}`}
+                  {post.stickied && (
+                    <small
+                      className="unselectable pointer ml-1 font-italic"
+                      data-tippy-content={i18n.t('stickied')}
                     >
-                      <svg class="mr-1 icon icon-inline">
-                        <use xlinkHref="#icon-message-square"></use>
+                      {/* <svg class={`icon custom-icon text-success`}>
+                        <use xlinkHref="#icon-pin"></use>
+                      </svg> */}
+                      <Icon className="icon text-success" name="pin" />
+                    </small>
+                  )}
+                  {post.locked && (
+                    <small
+                      className="unselectable pointer ml-1 text-muted font-italic"
+                      data-tippy-content={i18n.t('locked')}
+                    >
+                      <svg class={`icon custom-icon text-danger`}>
+                        <use xlinkHref="#icon-lock"></use>
                       </svg>
-                      {i18n.t('number_of_comments', {
-                        count: post.number_of_comments,
-                      })}
-                    </Link>
-                    {UserService.Instance.user && !this.props.showBody && (
-                      <button
-                        class="btn btn-sm btn-link btn-animate text-muted p-0 pl-3"
-                        onClick={linkEvent(this, this.handleReportPost)}
-                        data-tippy-content={i18n.t('snitch')}
-                      >
-                        <svg class="icon icon-inline">
-                          <use xlinkHref="#flag"></use>
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                  {/* {post.body && !isMobile && (
-                    <>
-                      <li className="list-inline-item">•</li>
-                      <li className="list-inline-item">
-                        <Link
-                          className="text-muted"
-                          data-tippy-content={md.render(
-                            previewLines(post.body)
-                          )}
-                          data-tippy-allowHtml={true}
-                          to={`/post/${post.id}`}
-                        >
-                          <svg class="mr-1 icon icon-inline">
-                            <use xlinkHref="#icon-book-open"></use>
-                          </svg>
-                        </Link>
-                      </li>
-                    </>
-                  )} */}
-                  {/* <li className="list-inline-item">•</li> */}
-                  {this.state.upvotes !== this.state.score && (
-                    <>
-                      <span
-                        class="unselectable pointer mr-2"
-                        data-tippy-content={this.pointsTippy}
-                      >
-                        <li className="list-inline-item">
-                          <span className="text-muted">
-                            <svg class="small icon icon-inline mr-1">
-                              <use xlinkHref="#icon-arrow-up"></use>
-                            </svg>
-                            {this.state.upvotes}
-                          </span>
-                        </li>
-                        <li className="list-inline-item">
-                          <span className="text-muted">
-                            <svg class="small icon icon-inline mr-1">
-                              <use xlinkHref="#icon-arrow-down"></use>
-                            </svg>
-                            {this.state.downvotes}
-                          </span>
-                        </li>
-                      </span>
-                    </>
+                    </small>
                   )}
                 </ul>
                 {this.props.post.duplicates && (
@@ -692,7 +625,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                   </form>
                 )}
                 {this.state.showReportDialog && (
-                  <form onSubmit={linkEvent(this, this.handleReportSubmit)}>
+                  <form
+                    className="mt-2"
+                    onSubmit={linkEvent(this, this.handleReportSubmit)}
+                  >
                     <div class="form-group row">
                       <label
                         class="col-form-label"
@@ -712,14 +648,54 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     </div>
                     <div class="form-group row">
                       <button type="submit" class="btn btn-secondary">
-                        <svg class="icon icon-inline">
-                          <use xlinkHref="#flag"></use>
-                        </svg>{' '}
-                        {post.creator_name}
+                        {i18n.t('submit_report')}
                       </button>
                     </div>
                   </form>
                 )}
+                <div className="post-listing-details">
+                  <Link
+                    className="text-muted"
+                    title={i18n.t('number_of_comments', {
+                      count: post.number_of_comments,
+                    })}
+                    to={`/post/${post.id}`}
+                  >
+                    {/* <svg class="mr-1 icon icon-inline">
+                        <use xlinkHref="#icon-message-square"></use>
+                      </svg> */}
+                    <Icon name="comment" className="icon mr-1" />
+                    {i18n.t('number_of_comments', {
+                      count: post.number_of_comments,
+                    })}
+                  </Link>
+                  {UserService.Instance.user && !this.props.showBody && (
+                    <button
+                      class="btn btn-sm btn-link btn-animate text-muted p-0 px-2"
+                      onClick={linkEvent(this, this.handleReportPost)}
+                      data-tippy-content={i18n.t('snitch')}
+                    >
+                      <Icon name="report" />
+                    </button>
+                  )}
+                  {this.state.upvotes !== this.state.score && (
+                    <>
+                      <span
+                        class="unselectable pointer mx-1 inline-vote-details"
+                        data-tippy-content={this.pointsTippy}
+                      >
+                        <div className="list-inline-item text-muted">
+                          <Icon name="upvote" className="icon mr-1" />
+                          {this.state.upvotes}
+                        </div>
+                        <div className="list-inline-item text-muted">
+                          <Icon name="downvote" className="icon mr-1" />
+                          {this.state.downvotes}
+                        </div>
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -737,13 +713,12 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         post.saved ? i18n.t('unsave') : i18n.t('save')
                       }
                     >
-                      <svg
+                      <Icon
+                        name="star"
                         class={`icon icon-inline ${
                           post.saved && 'text-warning'
                         }`}
-                      >
-                        <use xlinkHref="#icon-star"></use>
-                      </svg>
+                      />
                     </button>
                   </li>
                   <li className="list-inline-item">
@@ -763,9 +738,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       onClick={linkEvent(this, this.handleReportPost)}
                       data-tippy-content={i18n.t('snitch')}
                     >
-                      <svg class="icon icon-inline">
-                        <use xlinkHref="#flag"></use>
-                      </svg>
+                      <Icon name="report" />
                     </button>
                   </li>
                 </>
@@ -778,9 +751,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       onClick={linkEvent(this, this.handleEditClick)}
                       data-tippy-content={i18n.t('edit')}
                     >
-                      <svg class="icon icon-inline">
-                        <use xlinkHref="#icon-edit"></use>
-                      </svg>
+                      <Icon name="edit" />
                     </button>
                   </li>
                   <li className="list-inline-item">
@@ -810,9 +781,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     onClick={linkEvent(this, this.handleShowAdvanced)}
                     data-tippy-content={i18n.t('more')}
                   >
-                    <svg class="icon icon-inline">
-                      <use xlinkHref="#icon-more-vertical"></use>
-                    </svg>
+                    <Icon name="more" />
                   </button>
                 </li>
               ) : (
@@ -1264,6 +1233,9 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     }
     if (this.props.post.body) {
       params += `&body=${this.props.post.body}`;
+    }
+    if (post.community_id) {
+      params += `&community_id=${this.props.post.community_id}`;
     }
     return params;
   }

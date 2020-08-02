@@ -229,7 +229,7 @@ export class Post extends Component<any, PostState> {
               {this.state.commentViewType == CommentViewType.Chat &&
                 this.commentsFlat()}
             </div>
-            <div class="flex-1">
+            <div class="flex-1 post-sidebar-container">
               {/* {this.state.comments.length > 0 && this.newComments()} */}
               {this.sidebar()}
             </div>
@@ -296,7 +296,7 @@ export class Post extends Component<any, PostState> {
             />
           </label>
         </div>
-        <div class="btn-group btn-group-toggle mb-2">
+        {/* <div class="btn-group btn-group-toggle mb-2">
           <label
             className={`btn btn-sm btn-secondary pointer ${
               this.state.commentViewType === CommentViewType.Chat && 'active'
@@ -310,7 +310,7 @@ export class Post extends Component<any, PostState> {
               onChange={linkEvent(this, this.handleCommentViewTypeChange)}
             />
           </label>
-        </div>
+        </div> */}
       </>
     );
   }

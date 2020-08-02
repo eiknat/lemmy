@@ -2,6 +2,7 @@ import { Component, linkEvent } from 'inferno';
 import { Post } from '../interfaces';
 import { mdToHtml } from '../utils';
 import { i18n } from '../i18next';
+import { Icon } from './icon';
 
 interface FramelyCardProps {
   post: Post;
@@ -48,7 +49,7 @@ export class IFramelyCard extends Component<
                           class="text-body"
                           target="_blank"
                           href={post.url}
-                          rel="noopener"
+                          rel="noreferrer"
                         >
                           {post.embed_title}
                         </a>
@@ -60,12 +61,13 @@ export class IFramelyCard extends Component<
                       class="text-muted font-italic"
                       target="_blank"
                       href={post.url}
-                      rel="noopener"
+                      rel="noreferrer"
                     >
                       {new URL(post.url).hostname}
-                      <svg class="ml-1 icon">
+                      {/* <svg class="ml-1 icon">
                         <use xlinkHref="#icon-external-link"></use>
-                      </svg>
+                      </svg> */}
+                      <Icon className="ml-1 icon" name="link" />
                     </a>
                     {
                       //post.embed_html && (     Commented out - all iframely embeds are working on the post listing instead.

@@ -293,7 +293,7 @@
     "community_private": "Private community",
     "community_post_links": "Enable links posting",
     "community_comment_images": "Amount of images per comment",
-    "cake_day_title": "Cake day:",
+    "cake_day_title": "Join Date:",
     "cake_day_info": "It's {{ creator_name }}'s cake day today!",
     "invalid_post_title": "Invalid post title",
     "invalid_url": "Invalid URL.",
@@ -303,4 +303,5 @@
     "enable_create_communities": "Enable community creation",
     "pronouns": "Pronouns",
     "additional_pronouns": "Additional Pronouns"
+    "submit_report": "Submit Report"
 }

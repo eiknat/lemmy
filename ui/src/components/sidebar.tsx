@@ -13,6 +13,7 @@ import { CommunityForm } from './community-form';
 import { UserListing } from './user-listing';
 import { CommunityLink } from './community-link';
 import { i18n } from '../i18next';
+import { Icon } from './icon';
 
 interface SidebarProps {
   community: Community;
@@ -184,9 +185,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
                       onClick={linkEvent(this, this.handleEditClick)}
                       data-tippy-content={i18n.t('edit')}
                     >
-                      <svg class="icon icon-inline">
-                        <use xlinkHref="#icon-edit"></use>
-                      </svg>
+                      <Icon name="edit" />
                     </span>
                   </li>
                   {this.amCreator && (

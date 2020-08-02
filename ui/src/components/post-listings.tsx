@@ -15,41 +15,60 @@ interface PostListingsProps {
   enableNsfw: boolean;
 }
 
-export class PostListings extends Component<PostListingsProps, any> {
+interface PostListingsState {
+  //to be used when rendering to prevent scroll to top of page
+  scrollPos: number;
+}
+
+export class PostListings extends Component<
+  PostListingsProps,
+  PostListingsState
+> {
+  emptyState: PostListingsState = {
+    scrollPos: window.scrollY,
+  };
+
   constructor(props: any, context: any) {
     super(props, context);
+
+    this.state = this.emptyState;
+  }
+
+  //are we getting updated post array? save current scroll pos
+  componentWillReceiveProps() {
+    this.state.scrollPos = window.scrollY;
+    this.setState(this.state);
+  }
+
+  //have we updated? revert scroll to top (bug on inferno side?) - scroll back to previous pos
+  componentDidUpdate() {
+    window.scrollTo(0, this.state.scrollPos);
   }
 
   render() {
-    return (
-        this.props.posts.length > 0 ? (
-          <>
-            <div $HasKeyedChildren>
-              {this.outer().map(post => (
-                <div key={post.id}>
-                  <PostListing
-                    post={post}
-                    showCommunity={this.props.showCommunity}
-                    enableDownvotes={this.props.enableDownvotes}
-                    enableNsfw={this.props.enableNsfw}
-                  />
-                  <hr class="my-2" />
-                </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          <>
-            <div>
-              <div>{i18n.t('no_posts')}</div>
-              {this.props.showCommunity !== undefined && (
-                <T i18nKey="subscribe_to_communities">
-                  #<Link to="/communities">#</Link>
-                </T>
-              )}
-            </div>
-          </>
-        )
+    return this.props.posts.length > 0 ? (
+      <div $HasKeyedChildren>
+        {this.outer().map(post => (
+          <div key={post.id}>
+            <PostListing
+              post={post}
+              showCommunity={this.props.showCommunity}
+              enableDownvotes={this.props.enableDownvotes}
+              enableNsfw={this.props.enableNsfw}
+            />
+            <hr class="my-2" />
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div>
+        <div>{i18n.t('no_posts')}</div>
+        {this.props.showCommunity !== undefined && (
+          <T i18nKey="subscribe_to_communities">
+            #<Link to="/communities">#</Link>
+          </T>
+        )}
+      </div>
     );
   }
 

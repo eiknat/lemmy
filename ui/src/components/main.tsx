@@ -56,6 +56,7 @@ import {
 import { i18n } from '../i18next';
 import { T } from 'inferno-i18next';
 import { PATREON_URL } from '../constants';
+import { Icon } from './icon';
 
 interface MainState {
   subscribedCommunities: Array<CommunityUser>;
@@ -333,9 +334,7 @@ export class Main extends Component<any, MainState> {
                     onClick={linkEvent(this, this.handleEditClick)}
                     data-tippy-content={i18n.t('edit')}
                   >
-                    <svg class="icon icon-inline">
-                      <use xlinkHref="#icon-edit"></use>
-                    </svg>
+                    <Icon name="edit" />
                   </span>
                 </li>
               </ul>
@@ -344,11 +343,10 @@ export class Main extends Component<any, MainState> {
               It is currently {getMoscowTime()} in Moscow
             </div>
             <ul class="my-2 list-inline">
-              {/*
-              <li className="list-inline-item badge badge-secondary">
+              <li className="list-inline-item badge badge-secondary chapo-bg-secondary">
                 {i18n.t('number_online', { count: this.state.siteRes.online })}
               </li>
-              */}
+              <br />
               <li className="list-inline-item badge badge-secondary">
                 {i18n.t('number_of_users', {
                   count: this.state.siteRes.site.number_of_users,
@@ -413,10 +411,11 @@ export class Main extends Component<any, MainState> {
     return (
       <div class="card border-secondary mb-3">
         <div class="card-body">
-          <p class="mb-0">
-            Our Soros stipend only gets us so far.{' '}
-            <a href={PATREON_URL}>Pitch in to keep the party going.</a>
-          </p>
+          <p>Our Soros stipend only gets us so far.</p>
+
+          <a href={PATREON_URL}>
+            <h4>Support Us on Liberapay</h4>
+          </a>
         </div>
       </div>
     );
@@ -522,9 +521,7 @@ export class Main extends Component<any, MainState> {
               title="RSS"
               rel="noopener"
             >
-              <svg class="icon text-muted small">
-                <use xlinkHref="#icon-rss">#</use>
-              </svg>
+              <Icon name="rss" />
             </a>
           )}
           {UserService.Instance.user &&
@@ -536,9 +533,7 @@ export class Main extends Component<any, MainState> {
                 target="_blank"
                 title="RSS"
               >
-                <svg class="icon text-muted small">
-                  <use xlinkHref="#icon-rss">#</use>
-                </svg>
+                <Icon name="rss" className="icon text-muted small" />
               </a>
             )}
           {isMobile && (
@@ -554,7 +549,7 @@ export class Main extends Component<any, MainState> {
           )}
         </span>
         {(!isMobile || (isMobile && this.state.filtersOpen)) && (
-          <span className="listing-select-group my-3">
+          <span className="listing-select-group my-3 ml-2">
             <span class="mr-3">
               <ListingTypeSelect
                 type_={this.state.listingType}

@@ -15,6 +15,7 @@ import autosize from 'autosize';
 import Tribute from 'tributejs/src/Tribute.js';
 import { i18n } from '../i18next';
 import emojiShortName from 'emoji-short-name';
+import { Icon } from './icon';
 
 interface MarkdownTextAreaProps {
   initialContent: string;
@@ -298,9 +299,7 @@ export class MarkdownTextArea extends Component<
               title={i18n.t('formatting_help')}
               rel="noopener"
             >
-              <svg class="icon icon-inline">
-                <use xlinkHref="#icon-help-circle"></use>
-              </svg>
+              <Icon name="help" />
             </a>
           </div>
         </div>
@@ -392,7 +391,7 @@ export class MarkdownTextArea extends Component<
   }
 
   handleContentChange(i: MarkdownTextArea, event: any) {
-    i.state.content = event.target.value.replace(/israel/i, 'palestine');
+    i.state.content = event.target.value;
     i.setState(i.state);
     if (i.props.onContentChange) {
       i.props.onContentChange(i.state.content);

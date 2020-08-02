@@ -37,6 +37,7 @@ import { UserListing } from './user-listing';
 import { CommunityLink } from './community-link';
 import { i18n } from '../i18next';
 import { replaceEmojis } from '../custom-emojis';
+import { Icon } from './icon';
 
 interface CommentNodeState {
   showReply: boolean;
@@ -80,6 +81,25 @@ interface CommentNodeProps {
   sort?: CommentSortType;
   sortType?: SortType;
   enableDownvotes: boolean;
+}
+
+export function RoleBadge({
+  role,
+  tooltipText,
+  children,
+}: {
+  role: 'mod' | 'admin' | 'creator';
+  children: any;
+  tooltipText: string;
+}) {
+  return (
+    <div
+      className={`badge badge-light mx-1 comment-badge ${role}-badge`}
+      data-tippy-content={tooltipText}
+    >
+      {children}
+    </div>
+  );
 }
 
 export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
@@ -164,13 +184,9 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                 onClick={linkEvent(this, this.handleCommentCollapse)}
               >
                 {this.state.collapsed ? (
-                  <svg class="icon icon-inline">
-                    <use xlinkHref="#icon-plus-square"></use>
-                  </svg>
+                  <Icon name="plus" size="16px" />
                 ) : (
-                  <svg class="icon icon-inline">
-                    <use xlinkHref="#icon-minus-square"></use>
-                  </svg>
+                  <Icon name="minus" size="16px" />
                 )}
               </div>
               <span class="mr-2">
@@ -183,23 +199,24 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                     actor_id: node.comment.creator_actor_id,
                     published: node.comment.creator_published,
                   }}
+                  isMod={this.isMod}
+                  isAdmin={this.isAdmin}
                 />
               </span>
-
-              {this.isMod && (
-                <div className="badge badge-light d-none d-sm-inline mr-2">
-                  {i18n.t('mod')}
-                </div>
-              )}
               {this.isAdmin && (
-                <div className="badge badge-light d-none d-sm-inline mr-2">
-                  {i18n.t('admin')}
-                </div>
+                <RoleBadge role="admin" tooltipText={i18n.t('admin')}>
+                  {i18n.t('admin')[0]}
+                </RoleBadge>
+              )}
+              {this.isMod && !this.isAdmin && (
+                <RoleBadge role="mod" tooltipText={i18n.t('mod')}>
+                  {i18n.t('mod')[0]}
+                </RoleBadge>
               )}
               {this.isPostCreator && (
-                <div className="badge badge-light d-none d-sm-inline mr-2">
-                  {i18n.t('creator')}
-                </div>
+                <RoleBadge role="creator" tooltipText={i18n.t('creator')}>
+                  <Icon name="hexagon" />
+                </RoleBadge>
               )}
               {(node.comment.banned_from_community || node.comment.banned) && (
                 <div className="badge badge-danger mr-2">
@@ -230,9 +247,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                 onClick={linkEvent(node, this.handleCommentUpvote)}
                 data-tippy-content={this.pointsTippy}
               >
-                <svg class="icon icon-inline mr-1">
-                  <use xlinkHref="#icon-zap"></use>
-                </svg>
+                <Icon name="hexbear" class="icon mr-1 mb-1" />
                 <span class="mr-1">{this.state.score}</span>
               </button>
               <span className="mr-1">•</span>
@@ -296,9 +311,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                         onClick={linkEvent(node, this.handleCommentUpvote)}
                         data-tippy-content={i18n.t('upvote')}
                       >
-                        <svg class="icon icon-inline">
-                          <use xlinkHref="#icon-arrow-up"></use>
-                        </svg>
+                        <Icon name="upvote" />
                         {this.state.upvotes !== this.state.score && (
                           <span class="ml-1">{this.state.upvotes}</span>
                         )}
@@ -313,9 +326,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                           onClick={linkEvent(node, this.handleCommentDownvote)}
                           data-tippy-content={i18n.t('downvote')}
                         >
-                          <svg class="icon icon-inline">
-                            <use xlinkHref="#icon-arrow-down"></use>
-                          </svg>
+                          <Icon name="downvote" />
                           {this.state.upvotes !== this.state.score && (
                             <span class="ml-1">{this.state.downvotes}</span>
                           )}
@@ -326,19 +337,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                         onClick={linkEvent(this, this.handleReplyClick)}
                         data-tippy-content={i18n.t('reply')}
                       >
-                        <svg class="icon icon-inline">
-                          <use xlinkHref="#icon-reply1"></use>
-                        </svg>
-                      </button>
-                      <button
-                        class="btn btn-sm btn-link btn-animate text-muted small"
-                        onClick={linkEvent(this, this.handleReportComment)}
-                        data-tippy-content={i18n.t('snitch')}
-                      >
-                        {/* {i18n.t('snitch')} */}
-                        <svg class="icon icon-inline">
-                          <use xlinkHref="#flag"></use>
-                        </svg>
+                        <Icon name="reply" />
                       </button>
                       {!this.state.showAdvanced ? (
                         <button
@@ -346,9 +345,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                           onClick={linkEvent(this, this.handleShowAdvanced)}
                           data-tippy-content={i18n.t('more')}
                         >
-                          <svg class="icon icon-inline">
-                            <use xlinkHref="#icon-more-vertical"></use>
-                          </svg>
+                          <Icon name="more" />
                         </button>
                       ) : (
                         <>
@@ -381,13 +378,12 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                             {this.state.saveLoading ? (
                               this.loadingIcon
                             ) : (
-                              <svg
+                              <Icon
                                 class={`icon icon-inline ${
                                   node.comment.saved && 'text-warning'
                                 }`}
-                              >
-                                <use xlinkHref="#icon-star"></use>
-                              </svg>
+                                name="star"
+                              />
                             )}
                           </button>
                           <button
@@ -403,16 +399,14 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                               <use xlinkHref="#icon-file-text"></use>
                             </svg>
                           </button>
-                          {this.myComment && (
+                          {this.myComment ? (
                             <>
                               <button
                                 class="btn btn-link btn-animate text-muted"
                                 onClick={linkEvent(this, this.handleEditClick)}
                                 data-tippy-content={i18n.t('edit')}
                               >
-                                <svg class="icon icon-inline">
-                                  <use xlinkHref="#icon-edit"></use>
-                                </svg>
+                                <Icon name="edit" />
                               </button>
                               <button
                                 class="btn btn-link btn-animate text-muted"
@@ -435,6 +429,17 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                 </svg>
                               </button>
                             </>
+                          ) : (
+                            <button
+                              class="btn btn-sm btn-link btn-animate text-muted small"
+                              onClick={linkEvent(
+                                this,
+                                this.handleReportComment
+                              )}
+                              data-tippy-content={i18n.t('snitch')}
+                            >
+                              <Icon name="report" />
+                            </button>
                           )}
                           {/* Admins and mods can remove comments */}
                           {(this.canMod || this.canAdmin) && (
@@ -722,7 +727,10 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
           </form>
         )}
         {this.state.showReportDialog && (
-          <form onSubmit={linkEvent(this, this.handleReportSubmit)}>
+          <form
+            onSubmit={linkEvent(this, this.handleReportSubmit)}
+            class="px-2"
+          >
             <div class="form-group row">
               <label class="col-form-label" htmlFor="comment-report-dialog">
                 {i18n.t('reason')}
@@ -739,7 +747,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
             </div>
             <div class="form-group row">
               <button type="submit" class="btn btn-secondary">
-                {i18n.t('snitch')} {node.comment.creator_name}
+                {i18n.t('submit_report')}
               </button>
             </div>
           </form>
