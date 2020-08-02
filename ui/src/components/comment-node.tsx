@@ -201,6 +201,11 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   {i18n.t('admin')[0]}
                 </div>
               )}
+              {node.comment.creator_tags.pronouns ? (
+                <span className="badge mr-1 comment-badge pronouns-badge">
+                  {node.comment.creator_tags.pronouns.split(',').join('/')}
+                </span>
+              ) : null}
               {this.isPostCreator && (
                 <div
                   className="badge badge-light mr-2 creator-badge"

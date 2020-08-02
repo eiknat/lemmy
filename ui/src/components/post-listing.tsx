@@ -501,15 +501,20 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       }}
                     />
                     {this.isMod && (
-                      <span className="mx-1 badge badge-light">
-                        {i18n.t('mod')}
+                      <span className="badge badge-light mx-1 comment-badge mod-badge">
+                        {i18n.t('mod')[0]}
                       </span>
                     )}
                     {this.isAdmin && (
-                      <span className="mx-1 badge badge-light">
-                        {i18n.t('admin')}
+                      <span className="badge badge-light mr-1 comment-badge admin-badge">
+                        {i18n.t('admin')[0]}
                       </span>
                     )}
+                    {post.creator_tags.pronouns ? (
+                      <span className="badge mx-1 comment-badge pronouns-badge">
+                        {post.creator_tags.pronouns.split(',').join('/')}
+                      </span>
+                    ) : null}
                     {(post.banned_from_community || post.banned) && (
                       <span className="mx-1 badge badge-danger">
                         {i18n.t('banned')}
