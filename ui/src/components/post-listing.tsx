@@ -540,9 +540,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       className="unselectable pointer ml-1 font-italic"
                       data-tippy-content={i18n.t('stickied')}
                     >
-                      <svg class={`icon custom-icon text-success`}>
+                      {/* <svg class={`icon custom-icon text-success`}>
                         <use xlinkHref="#icon-pin"></use>
-                      </svg>
+                      </svg> */}
+                      <Icon className="icon text-success" name="pin" />
                     </small>
                   )}
                   {post.locked && (
@@ -623,7 +624,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                   </form>
                 )}
                 {this.state.showReportDialog && (
-                  <form onSubmit={linkEvent(this, this.handleReportSubmit)}>
+                  <form
+                    className="mt-2"
+                    onSubmit={linkEvent(this, this.handleReportSubmit)}
+                  >
                     <div class="form-group row">
                       <label
                         class="col-form-label"
@@ -643,10 +647,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     </div>
                     <div class="form-group row">
                       <button type="submit" class="btn btn-secondary">
-                        <svg class="icon icon-inline">
-                          <use xlinkHref="#flag"></use>
-                        </svg>{' '}
-                        {post.creator_name}
+                        {i18n.t('submit_report')}
                       </button>
                     </div>
                   </form>
