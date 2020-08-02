@@ -1,8 +1,9 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { SortType } from '../interfaces';
 import { sortingHelpUrl } from '../utils';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
 
 interface SortSelectProps {
   sort: SortType;
@@ -36,7 +37,7 @@ export class SortSelect extends Component<SortSelectProps, SortSelectState> {
         <select
           value={this.props.sort}
           onChange={linkEvent(this, this.handleSortChange)}
-          class="custom-select custom-select-sm w-auto mr-2"
+          className="custom-select custom-select-sm w-auto mr-2"
         >
           <option disabled>{i18n.t('sort_type')}</option>
           {!this.props.hideHot && (

@@ -1,10 +1,11 @@
-import { Component, linkEvent } from 'inferno';
-import { Prompt } from 'inferno-router';
+import React, { Component } from 'react';
+import { Prompt } from 'react-router-dom';
 import { MarkdownTextArea } from './markdown-textarea';
 import { Site, SiteForm as SiteFormI } from '../interfaces';
 import { WebSocketService } from '../services';
 import { capitalizeFirstLetter, randomStr } from '../utils';
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
 
 interface SiteFormProps {
   site?: Site; // If a site is given, that means this is an edit
@@ -88,15 +89,15 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
               ? capitalizeFirstLetter(i18n.t('save'))
               : capitalizeFirstLetter(i18n.t('name'))
           } ${i18n.t('your_site')}`}</h5>
-          <div class="form-group row">
-            <label class="col-12 col-form-label" htmlFor="create-site-name">
+          <div className="form-group row">
+            <label className="col-12 col-form-label" htmlFor="create-site-name">
               {i18n.t('name')}
             </label>
-            <div class="col-12">
+            <div className="col-12">
               <input
                 type="text"
                 id="create-site-name"
-                class="form-control"
+                className="form-control"
                 value={this.state.siteForm.name}
                 onInput={linkEvent(this, this.handleSiteNameChange)}
                 required
@@ -105,22 +106,22 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
               />
             </div>
           </div>
-          <div class="form-group row">
-            <label class="col-12 col-form-label" htmlFor={this.id}>
+          <div className="form-group row">
+            <label className="col-12 col-form-label" htmlFor={this.id}>
               {i18n.t('sidebar')}
             </label>
-            <div class="col-12">
+            <div className="col-12">
               <MarkdownTextArea
                 initialContent={this.state.siteForm.description}
                 onContentChange={this.handleSiteDescriptionChange}
               />
             </div>
           </div>
-          <div class="form-group row">
-            <div class="col-12">
-              <div class="form-check">
+          <div className="form-group row">
+            <div className="col-12">
+              <div className="form-check">
                 <input
-                  class="form-check-input"
+                  className="form-check-input"
                   id="create-site-downvotes"
                   type="checkbox"
                   checked={this.state.siteForm.enable_downvotes}
@@ -129,24 +130,24 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
                     this.handleSiteEnableDownvotesChange
                   )}
                 />
-                <label class="form-check-label" htmlFor="create-site-downvotes">
+                <label className="form-check-label" htmlFor="create-site-downvotes">
                   {i18n.t('enable_downvotes')}
                 </label>
               </div>
             </div>
           </div>
-          <div class="form-group row">
-            <div class="col-12">
-              <div class="form-check">
+          <div className="form-group row">
+            <div className="col-12">
+              <div className="form-check">
                 <input
-                  class="form-check-input"
+                  className="form-check-input"
                   id="create-site-enable-nsfw"
                   type="checkbox"
                   checked={this.state.siteForm.enable_nsfw}
                   onChange={linkEvent(this, this.handleSiteEnableNsfwChange)}
                 />
                 <label
-                  class="form-check-label"
+                  className="form-check-label"
                   htmlFor="create-site-enable-nsfw"
                 >
                   {i18n.t('enable_nsfw')}
@@ -154,11 +155,11 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
               </div>
             </div>
           </div>
-          <div class="form-group row">
-            <div class="col-12">
-              <div class="form-check">
+          <div className="form-group row">
+            <div className="col-12">
+              <div className="form-check">
                 <input
-                  class="form-check-input"
+                  className="form-check-input"
                   id="create-site-open-registration"
                   type="checkbox"
                   checked={this.state.siteForm.open_registration}
@@ -168,7 +169,7 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
                   )}
                 />
                 <label
-                  class="form-check-label"
+                  className="form-check-label"
                   htmlFor="create-site-open-registration"
                 >
                   {i18n.t('open_registration')}
@@ -176,11 +177,11 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
               </div>
             </div>
           </div>
-          <div class="form-group row">
-            <div class="col-12">
-              <div class="form-check">
+          <div className="form-group row">
+            <div className="col-12">
+              <div className="form-check">
                 <input
-                  class="form-check-input"
+                  className="form-check-input"
                   id="create-site-create-communities"
                   type="checkbox"
                   checked={this.state.siteForm.enable_create_communities}
@@ -190,7 +191,7 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
                   )}
                 />
                 <label
-                  class="form-check-label"
+                  className="form-check-label"
                   htmlFor="create-site-create-communities"
                 >
                   {i18n.t('enable_create_communities')}
@@ -198,15 +199,15 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
               </div>
             </div>
           </div>
-          <div class="form-group row">
-            <div class="col-12">
+          <div className="form-group row">
+            <div className="col-12">
               <button
                 type="submit"
-                class="btn btn-secondary mr-2"
+                className="btn btn-secondary mr-2"
                 disabled={this.state.loading}
               >
                 {this.state.loading ? (
-                  <svg class="icon icon-spinner spin">
+                  <svg className="icon icon-spinner spin">
                     <use xlinkHref="#icon-spinner"></use>
                   </svg>
                 ) : this.props.site ? (
@@ -218,7 +219,7 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
               {this.props.site && (
                 <button
                   type="button"
-                  class="btn btn-secondary"
+                  className="btn btn-secondary"
                   onClick={linkEvent(this, this.handleCancel)}
                 >
                   {i18n.t('cancel')}

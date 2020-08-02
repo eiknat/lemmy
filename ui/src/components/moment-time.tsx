@@ -1,4 +1,4 @@
-import { Component } from 'inferno';
+import React, { Component } from 'react';
 import moment from 'moment';
 import { getMomentLanguage, capitalizeFirstLetter } from '../utils';
 import { i18n } from '../i18next';

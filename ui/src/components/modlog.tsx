@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -23,6 +23,7 @@ import { wsJsonToRes, addTypeInfo, fetchLimit, toast } from '../utils';
 import { MomentTime } from './moment-time';
 import moment from 'moment';
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
 
 interface ModlogState {
   combined: Array<{
@@ -340,10 +341,10 @@ export class Modlog extends Component<any, ModlogState> {
 
   render() {
     return (
-      <div class="container">
+      <div className="container">
         {this.state.loading ? (
-          <h5 class="">
-            <svg class="icon icon-spinner spin">
+          <h5 className="">
+            <svg className="icon icon-spinner spin">
               <use xlinkHref="#icon-spinner"></use>
             </svg>
           </h5>
@@ -369,9 +370,9 @@ export class Modlog extends Component<any, ModlogState> {
                 </h6>
               </div>
             </div>
-            <div class="table-responsive">
-              <table id="modlog_table" class="table table-sm table-hover">
-                <thead class="pointer">
+            <div className="table-responsive">
+              <table id="modlog_table" className="table table-sm table-hover">
+                <thead className="pointer">
                   <tr>
                     <th> {i18n.t('time')}</th>
                     <th>{i18n.t('mod')}</th>
@@ -390,17 +391,17 @@ export class Modlog extends Component<any, ModlogState> {
 
   paginator() {
     return (
-      <div class="mt-2">
+      <div className="mt-2">
         {this.state.page > 1 && (
           <button
-            class="btn btn-sm btn-secondary mr-1"
+            className="btn btn-sm btn-secondary mr-1"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
           </button>
         )}
         <button
-          class="btn btn-sm btn-secondary"
+          className="btn btn-sm btn-secondary"
           onClick={linkEvent(this, this.nextPage)}
         >
           {i18n.t('next')}

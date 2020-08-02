@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -51,6 +51,7 @@ import {
 } from '../utils';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
 
 interface State {
   community: CommunityI;
@@ -181,10 +182,10 @@ export class Community extends Component<any, State> {
   render() {
     const isMobile = window.innerWidth < 992;
     return (
-      <div class="container">
+      <div className="container">
         {this.state.loading ? (
           <h5>
-            <svg class="icon icon-spinner spin">
+            <svg className="icon icon-spinner spin">
               <use xlinkHref="#icon-spinner"></use>
             </svg>
           </h5>
@@ -211,7 +212,7 @@ export class Community extends Component<any, State> {
                     </div>
                     {this.state.community.subscribed ? (
                       <button
-                        class="btn btn-secondary unsubscribe-button"
+                        className="btn btn-secondary unsubscribe-button"
                         onClick={linkEvent(
                           this.state.community.id,
                           this.handleUnsubscribe
@@ -221,7 +222,7 @@ export class Community extends Component<any, State> {
                       </button>
                     ) : (
                       <button
-                        class="btn btn-secondary subscribe-button"
+                        className="btn btn-secondary subscribe-button"
                         onClick={linkEvent(
                           this.state.community.id,
                           this.handleSubscribe
@@ -241,8 +242,8 @@ export class Community extends Component<any, State> {
                 </div>
               </div>
             </div>
-            <div class="row">
-              <main class="col-12 col-md-8" role="main">
+            <div className="row">
+              <main className="col-12 col-md-8" role="main">
                 {this.selects()}
                 <h5>
                   {this.state.community.removed && (
@@ -259,7 +260,7 @@ export class Community extends Component<any, State> {
                 {this.listings()}
                 {this.paginator()}
               </main>
-              <aside class="col-12 col-md-4 sidebar">
+              <aside className="col-12 col-md-4 sidebar">
                 <Sidebar
                   community={this.state.community}
                   moderators={this.state.moderators}
@@ -297,14 +298,14 @@ export class Community extends Component<any, State> {
 
   selects() {
     return (
-      <div class="mb-3">
-        <div class="mr-3 mb-2">
+      <div className="mb-3">
+        <div className="mr-3 mb-2">
           <DataTypeSelect
             type_={this.state.dataType}
             onChange={this.handleDataTypeChange}
           />
         </div>
-        <span class="mr-2">
+        <span className="mr-2">
           <SortSelect sort={this.state.sort} onChange={this.handleSortChange} />
         </span>
         <a
@@ -323,10 +324,10 @@ export class Community extends Component<any, State> {
 
   paginator() {
     return (
-      <div class="my-2">
+      <div className="my-2">
         {this.state.page > 1 && (
           <button
-            class="btn btn-sm btn-secondary mr-1"
+            className="btn btn-sm btn-secondary mr-1"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
@@ -334,7 +335,7 @@ export class Community extends Component<any, State> {
         )}
         {this.state.posts.length > 0 && (
           <button
-            class="btn btn-sm btn-secondary"
+            className="btn btn-sm btn-secondary"
             onClick={linkEvent(this, this.nextPage)}
           >
             {i18n.t('next')}

@@ -1,5 +1,5 @@
-import { Component } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -12,7 +12,7 @@ import {
 import { capitalizeFirstLetter, wsJsonToRes, toast } from '../utils';
 import { WebSocketService, UserService } from '../services';
 import { i18n } from '../i18next';
-import { T } from 'inferno-i18next';
+import { Trans } from 'react-i18next';
 import { MarkdownTextArea } from './markdown-textarea';
 
 interface CommentFormProps {
@@ -91,7 +91,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
         this.state.commentForm.content.trim() === '') ||
       this.state.commentForm.content === null;
     return (
-      <div class="mb-3">
+      <div className="mb-3">
         {UserService.Instance.user ? (
           <MarkdownTextArea
             initialContent={this.state.commentForm.content}
@@ -104,16 +104,16 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
             onReplyCancel={this.handleReplyCancel}
           />
         ) : (
-          <div class="alert alert-light" role="alert">
-            <svg class="icon icon-inline mr-2">
+          <div className="alert alert-light" role="alert">
+            <svg className="icon icon-inline mr-2">
               <use xlinkHref="#icon-alert-triangle"></use>
             </svg>
-            <T i18nKey="must_login" class="d-inline">
+            <Trans i18nKey="must_login" className="d-inline">
               #
-              <Link class="alert-link" to="/login">
+              <Link className="alert-link" to="/login">
                 #
               </Link>
-            </T>
+            </Trans>
           </div>
         )}
       </div>

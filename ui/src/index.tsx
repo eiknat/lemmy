@@ -8,9 +8,10 @@ if (process.env.NODE_ENV !== 'development') {
   });
 }
 
-import { render, Component } from 'inferno';
-import { BrowserRouter, Route, Switch } from 'inferno-router';
-import { Provider } from 'inferno-i18next';
+import React, { Component } from 'react';
+import { render } from 'react-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { I18nextProvider } from 'react-i18next';
 import { Main } from './components/main';
 import { Navbar } from './components/navbar';
 import { Footer } from './components/footer';
@@ -37,8 +38,8 @@ import { Reports } from './components/reports';
 import Tos from './components/tos';
 import PrivacyPolicy from './components/privacy-policy';
 
-import './custom.css';
-import './variables.css';
+// import './custom.css';
+// import './variables.css';
 
 const container = document.getElementById('app');
 
@@ -61,11 +62,11 @@ class Index extends Component<any, any> {
 
   render() {
     return (
-      <Provider i18next={i18n}>
+      <I18nextProvider i18next={i18n}>
         <BrowserRouter>
           <div>
             <Navbar />
-            <div class="mt-4 p-0 fl-1">
+            <div className="mt-4 p-0 fl-1">
               <Switch>
                 <Route exact path={`/`} component={Main} />
                 {/* <Route exact path={`/`} component={WelcomePage} /> */}
@@ -134,7 +135,7 @@ class Index extends Component<any, any> {
             <Footer />
           </div>
         </BrowserRouter>
-      </Provider>
+      </I18nextProvider>
     );
   }
 }

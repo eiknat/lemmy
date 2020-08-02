@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -35,6 +35,7 @@ import { PrivateMessage } from './private-message';
 import { SortSelect } from './sort-select';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
 
 enum UnreadOrAll {
   Unread,
@@ -98,10 +99,10 @@ export class Inbox extends Component<any, InboxState> {
 
   render() {
     return (
-      <div class="container">
-        <div class="row">
-          <div class="col-12">
-            <h5 class="mb-1">
+      <div className="container">
+        <div className="row">
+          <div className="col-12">
+            <h5 className="mb-1">
               {i18n.t('inbox')}
               <small>
                 <a
@@ -119,10 +120,10 @@ export class Inbox extends Component<any, InboxState> {
               this.state.messages.length >
               0 &&
               this.state.unreadOrAll == UnreadOrAll.Unread && (
-                <ul class="list-inline mb-1 text-muted small font-weight-bold">
+                <ul className="list-inline mb-1 text-muted small font-weight-bold">
                   <li className="list-inline-item">
                     <button
-                      class="btn btn-secondary pointer mb-2"
+                      className="btn btn-secondary pointer mb-2"
                       onClick={linkEvent(this, this.markAllAsRead)}
                     >
                       {i18n.t('mark_all_as_read')}
@@ -144,7 +145,7 @@ export class Inbox extends Component<any, InboxState> {
 
   unreadOrAllRadios() {
     return (
-      <div class="btn-group btn-group-toggle">
+      <div className="btn-group btn-group-toggle">
         <label
           className={`btn btn-sm btn-secondary pointer
             ${this.state.unreadOrAll == UnreadOrAll.Unread && 'active'}
@@ -177,7 +178,7 @@ export class Inbox extends Component<any, InboxState> {
 
   messageTypeRadios() {
     return (
-      <div class="btn-group btn-group-toggle">
+      <div className="btn-group btn-group-toggle">
         <label
           className={`btn btn-sm btn-secondary pointer btn-outline-light
             ${this.state.messageType == MessageType.All && 'active'}
@@ -237,8 +238,8 @@ export class Inbox extends Component<any, InboxState> {
   selects() {
     return (
       <div className="mb-2">
-        <span class="mr-3">{this.unreadOrAllRadios()}</span>
-        <div class="mr-3 my-2 user-view-toggle">{this.messageTypeRadios()}</div>
+        <span className="mr-3">{this.unreadOrAllRadios()}</span>
+        <div className="mr-3 my-2 user-view-toggle">{this.messageTypeRadios()}</div>
         <SortSelect
           sort={this.state.sort}
           onChange={this.handleSortChange}
@@ -322,10 +323,10 @@ export class Inbox extends Component<any, InboxState> {
 
   paginator() {
     return (
-      <div class="mt-2">
+      <div className="mt-2">
         {this.state.page > 1 && (
           <button
-            class="btn btn-sm btn-secondary mr-1"
+            className="btn btn-sm btn-secondary mr-1"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
@@ -333,7 +334,7 @@ export class Inbox extends Component<any, InboxState> {
         )}
         {this.unreadCount() > 0 && (
           <button
-            class="btn btn-sm btn-secondary"
+            className="btn btn-sm btn-secondary"
             onClick={linkEvent(this, this.nextPage)}
           >
             {i18n.t('next')}

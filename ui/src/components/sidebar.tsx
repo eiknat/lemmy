@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Community,
   CommunityUser,
@@ -14,6 +14,7 @@ import { UserListing } from './user-listing';
 import { CommunityLink } from './community-link';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
 
 interface SidebarProps {
   community: Community;
@@ -75,8 +76,8 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
     }
     return (
       <div className="sidebar-content">
-        <div class="card border-secondary mb-3">
-          <div class="card-body">
+        <div className="card border-secondary mb-3">
+          <div className="card-body">
             {/*<h5 className="mb-0">
               <span>{community.title}</span>
               {community.removed && (
@@ -91,7 +92,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
               )}
               </h5>
               <CommunityLink community={community} realLink />
-            <ul class="my-1 list-inline">
+            <ul className="my-1 list-inline">
               {
               <li className="list-inline-item badge badge-secondary">
                 {i18n.t('number_online', { count: this.props.online })}
@@ -126,10 +127,10 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
                 </Link>
               </li>
             </ul>
-            <ul class="list-inline small">
-              <li class="list-inline-item">{i18n.t('mods')}: </li>
+            <ul className="list-inline small">
+              <li className="list-inline-item">{i18n.t('mods')}: </li>
               {this.props.moderators.map(mod => (
-                <li class="list-inline-item">
+                <li className="list-inline-item">
                   <UserListing
                     user={{
                       name: mod.user_name,
@@ -144,7 +145,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
             </ul>*/}
             {/* TODO the to= needs to be able to handle community_ids as well, since they're federated */}
             {/*<Link
-              class={`btn btn-sm btn-secondary btn-block mb-3 ${
+              className={`btn btn-sm btn-secondary btn-block mb-3 ${
                 (community.deleted || community.removed) && 'no-click'
               }`}
               to={`/create_post?community=${community.name}`}
@@ -154,14 +155,14 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
             <div>
               {community.subscribed ? (
                 <button
-                  class="btn btn-sm btn-secondary btn-block"
+                  className="btn btn-sm btn-secondary btn-block"
                   onClick={linkEvent(community.id, this.handleUnsubscribe)}
                 >
                   {i18n.t('unsubscribe')}
                 </button>
               ) : (
                 <button
-                  class="btn btn-sm btn-secondary btn-block"
+                  className="btn btn-sm btn-secondary btn-block"
                   onClick={linkEvent(community.id, this.handleSubscribe)}
                 >
                   {i18n.t('subscribe')}
@@ -169,19 +170,19 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
               )}
               </div>*/}
             {community.description && (
-              <div class="mb-3">
+              <div className="mb-3">
                 <div
                   className="md-div"
                   dangerouslySetInnerHTML={mdToHtml(community.description)}
                 />
               </div>
             )}
-            <ul class="list-inline mb-1 text-muted font-weight-bold">
+            <ul className="list-inline mb-1 text-muted font-weight-bold">
               {this.canMod && (
                 <>
                   <li className="list-inline-item-action">
                     <span
-                      class="pointer"
+                      className="pointer"
                       onClick={linkEvent(this, this.handleEditClick)}
                       data-tippy-content={i18n.t('edit')}
                     >
@@ -191,7 +192,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
                   {this.amCreator && (
                     <li className="list-inline-item-action">
                       <span
-                        class="pointer"
+                        className="pointer"
                         onClick={linkEvent(this, this.handleDeleteClick)}
                         data-tippy-content={
                           !community.deleted
@@ -200,7 +201,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
                         }
                       >
                         <svg
-                          class={`icon icon-inline ${
+                          className={`icon icon-inline ${
                             community.deleted && 'text-danger'
                           }`}
                         >
@@ -215,14 +216,14 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
                 <li className="list-inline-item">
                   {!this.props.community.removed ? (
                     <span
-                      class="pointer"
+                      className="pointer"
                       onClick={linkEvent(this, this.handleModRemoveShow)}
                     >
                       {i18n.t('remove')}
                     </span>
                   ) : (
                     <span
-                      class="pointer"
+                      className="pointer"
                       onClick={linkEvent(this, this.handleModRemoveSubmit)}
                     >
                       {i18n.t('restore')}
@@ -233,35 +234,35 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
             </ul>
             {this.state.showRemoveDialog && (
               <form onSubmit={linkEvent(this, this.handleModRemoveSubmit)}>
-                <div class="form-group row">
-                  <label class="col-form-label" htmlFor="remove-reason">
+                <div className="form-group row">
+                  <label className="col-form-label" htmlFor="remove-reason">
                     {i18n.t('reason')}
                   </label>
                   <input
                     type="text"
                     id="remove-reason"
-                    class="form-control mr-2"
+                    className="form-control mr-2"
                     placeholder={i18n.t('optional')}
                     value={this.state.removeReason}
                     onInput={linkEvent(this, this.handleModRemoveReasonChange)}
                   />
                 </div>
                 {/* TODO hold off on expires for now */}
-                {/* <div class="form-group row"> */}
-                {/*   <label class="col-form-label">Expires</label> */}
-                {/*   <input type="date" class="form-control mr-2" placeholder={i18n.t('expires')} value={this.state.removeExpires} onInput={linkEvent(this, this.handleModRemoveExpiresChange)} /> */}
+                {/* <div className="form-group row"> */}
+                {/*   <label className="col-form-label">Expires</label> */}
+                {/*   <input type="date" className="form-control mr-2" placeholder={i18n.t('expires')} value={this.state.removeExpires} onInput={linkEvent(this, this.handleModRemoveExpiresChange)} /> */}
                 {/* </div> */}
-                <div class="form-group row">
-                  <button type="submit" class="btn btn-secondary">
+                <div className="form-group row">
+                  <button type="submit" className="btn btn-secondary">
                     {i18n.t('remove_community')}
                   </button>
                 </div>
               </form>
             )}
-            <ul class="list-inline small community-stats-sidebar">
-              <li class="list-inline-item">{i18n.t('mods')}: </li>
+            <ul className="list-inline small community-stats-sidebar">
+              <li className="list-inline-item">{i18n.t('mods')}: </li>
               {this.props.moderators.map(mod => (
-                <li class="list-inline-item">
+                <li key={mod.id} className="list-inline-item">
                   <UserListing
                     user={{
                       name: mod.user_name,
@@ -274,27 +275,27 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
                 </li>
               ))}
             </ul>
-            <ul class="list-inline small community-stats-sidebar">
-              <li class="community-sidebar-item">
+            <ul className="list-inline small community-stats-sidebar">
+              <li className="community-sidebar-item">
                 {this.props.community.number_of_posts.toString() +
                   ' ' +
                   i18n.t('posts')}
               </li>
               &nbsp;|&nbsp;
-              <li class="community-sidebar-item">
+              <li className="community-sidebar-item">
                 {this.props.community.number_of_comments.toString() +
                   ' ' +
                   i18n.t('comments')}
               </li>
               &nbsp;|&nbsp;
-              <li class="community-sidebar-item">
+              <li className="community-sidebar-item">
                 <Link to={`/modlog/community/${this.props.community.id}`}>
                   {i18n.t('modlog')}
                 </Link>
               </li>
               &nbsp;|&nbsp;
               {this.canMod && (
-                <li class="community-sidebar-item">
+                <li className="community-sidebar-item">
                   <Link to={`/reports`}>{i18n.t('reports')}</Link>
                 </li>
               )}

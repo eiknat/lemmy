@@ -1,5 +1,5 @@
-import { Component } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { repoUrl } from '../utils';
 import { version } from '../version';
 import { i18n } from '../i18next';
@@ -11,49 +11,49 @@ export class Footer extends Component<any, any> {
 
   render() {
     return (
-      <nav class="container navbar navbar-expand-md navbar-light navbar-bg p-0 px-3 mt-2">
+      <nav className="container navbar navbar-expand-md navbar-light navbar-bg p-0 px-3 mt-2">
         <div className="navbar-collapse">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <span class="navbar-text">{version}</span>
+          <ul className="navbar-nav ml-auto">
+            <li className="nav-item">
+              <span className="navbar-text">{version}</span>
             </li>
-            <li class="nav-item">
-              <Link class="nav-link" to="/about">
+            <li className="nav-item">
+              <Link className="nav-link" to="/about">
                 {i18n.t('about')}
               </Link>
             </li>
-            <li class="nav-item">
-              <Link class="nav-link" to="/privacy_policy">
+            <li className="nav-item">
+              <Link className="nav-link" to="/privacy_policy">
                 {i18n.t('privacy_policy')}
               </Link>
             </li>
-            <li class="nav-item">
-              <Link class="nav-link" to="/tos">
+            <li className="nav-item">
+              <Link className="nav-link" to="/tos">
                 {i18n.t('terms_of_service')}
               </Link>
             </li>
             <li>
-              <Link class="nav-link" to="/ppb">
+              <Link className="nav-link" to="/ppb">
                 {i18n.t('PPB')}
               </Link>
             </li>
-            <li class="nav-item">
-              <Link class="nav-link" to="/modlog">
+            <li className="nav-item">
+              <Link className="nav-link" to="/modlog">
                 {i18n.t('modlog')}
               </Link>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href={'/docs/index.html'}>
+            <li className="nav-item">
+              <a className="nav-link" href={'/docs/index.html'}>
                 {i18n.t('docs')}
               </a>
             </li>
-            <li class="nav-item">
-              <Link class="nav-link" to="/contributing">
+            <li className="nav-item">
+              <Link className="nav-link" to="/contributing">
                 {i18n.t('donate')}
               </Link>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href={repoUrl}>
+            <li className="nav-item">
+              <a className="nav-link" href={repoUrl}>
                 {i18n.t('code')}
               </a>
             </li>

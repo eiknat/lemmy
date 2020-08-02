@@ -133,7 +133,7 @@ const EMOJI_DIR_PATH = '/static/assets/emojis/';
 
 export const customEmojis = emojiPaths.map(path => ({
   key: path.split('.')[0],
-  val: `<img class="icon icon-navbar" src="${EMOJI_DIR_PATH + path}" alt="${
+  val: `<img className="icon icon-navbar" src="${EMOJI_DIR_PATH + path}" alt="${
     path.split('.')[0]
   }" />`,
 }));

@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component,  } from 'react';
+import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -44,6 +44,7 @@ import { i18n } from '../i18next';
 import moment from 'moment';
 import { UserDetails } from './user-details';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
 
 interface UserState {
   user: UserView;
@@ -225,27 +226,27 @@ export class User extends Component<any, UserState> {
 
   render() {
     return (
-      <div class="container">
+      <div className="container">
         <h5>
           {this.state.user.avatar && showAvatars() && (
             <img
               height="80"
               width="80"
               src={this.state.user.avatar}
-              class="rounded-circle mr-2"
+              className="rounded-circle mr-2"
             />
           )}
           <span>/u/{this.state.username}</span>
         </h5>
         {this.state.loading && (
           <h5>
-            <svg class="icon icon-spinner spin">
+            <svg className="icon icon-spinner spin">
               <use xlinkHref="#icon-spinner"></use>
             </svg>
           </h5>
         )}
-        <div class="row">
-          <main class="col-12 col-md-8" role="main">
+        <div className="row">
+          <main className="col-12 col-md-8" role="main">
             {!this.state.loading && this.selects()}
             <UserDetails
               user_id={this.state.user_id}
@@ -261,7 +262,7 @@ export class User extends Component<any, UserState> {
             />
           </main>
           {!this.state.loading && (
-            <aside class="col-12 col-md-4 sidebar">
+            <aside className="col-12 col-md-4 sidebar">
               {(this.canAdmin || this.isModerator()) &&
                 !this.isCurrentUser &&
                 this.modActions()}
@@ -278,7 +279,7 @@ export class User extends Component<any, UserState> {
 
   viewRadios() {
     return (
-      <div class="btn-group btn-group-toggle">
+      <div className="btn-group btn-group-toggle">
         <label
           className={`btn btn-sm btn-secondary pointer btn-outline-light
             ${this.state.view == UserDetailsView.Overview && 'active'}
@@ -338,7 +339,7 @@ export class User extends Component<any, UserState> {
   selects() {
     return (
       <div className="mb-2">
-        <div class="mr-3 mb-2 user-view-toggle">{this.viewRadios()}</div>
+        <div className="mr-3 mb-2 user-view-toggle">{this.viewRadios()}</div>
         <SortSelect
           sort={this.state.sort}
           onChange={this.handleSortChange}
@@ -362,10 +363,10 @@ export class User extends Component<any, UserState> {
     let user = this.state.user;
     return (
       <div>
-        <div class="card border-secondary mb-3">
-          <div class="card-body">
+        <div className="card border-secondary mb-3">
+          <div className="card-body">
             <h5>
-              <ul class="list-inline mb-0">
+              <ul className="list-inline mb-0">
                 <li className="list-inline-item">
                   <UserListing user={user} realLink />
                 </li>
@@ -377,7 +378,7 @@ export class User extends Component<any, UserState> {
               </ul>
             </h5>
             <div className="d-flex align-items-center mb-2">
-              <svg class="icon">
+              <svg className="icon">
                 <use xlinkHref="#icon-cake"></use>
               </svg>
               <span className="ml-2">
@@ -388,11 +389,11 @@ export class User extends Component<any, UserState> {
             <div>
               {i18n.t('joined')} <MomentTime data={user} showAgo />
             </div>
-            <div class="table-responsive mt-1">
-              <table class="table table-bordered table-sm mt-2 mb-0">
+            <div className="table-responsive mt-1">
+              <table className="table table-bordered table-sm mt-2 mb-0">
                 {/*
                 <tr>
-                  <td class="text-center" colSpan={2}>
+                  <td className="text-center" colSpan={2}>
                     {i18n.t('number_of_points', {
                       count: user.post_score + user.comment_score,
                     })}
@@ -425,7 +426,7 @@ export class User extends Component<any, UserState> {
             </div>
             {this.isCurrentUser ? (
               <button
-                class="btn btn-block btn-secondary mt-3"
+                className="btn btn-block btn-secondary mt-3"
                 onClick={linkEvent(this, this.handleLogoutClick)}
               >
                 {i18n.t('logout')}
@@ -443,7 +444,7 @@ export class User extends Component<any, UserState> {
                   {i18n.t('send_secure_message')}
                 </a>
                 <Link
-                  class="btn btn-block btn-secondary mt-3"
+                  className="btn btn-block btn-secondary mt-3"
                   to={`/create_private_message?recipient_id=${this.state.user.id}`}
                 >
                   {i18n.t('send_message')}
@@ -459,19 +460,19 @@ export class User extends Component<any, UserState> {
   userSettings() {
     return (
       <div>
-        <div class="card border-secondary mb-3">
-          <div class="card-body">
+        <div className="card border-secondary mb-3">
+          <div className="card-body">
             <h5>{i18n.t('settings')}</h5>
             <form onSubmit={linkEvent(this, this.handleUserSettingsSubmit)}>
-              {/* <div class="form-group">
+              {/* <div className="form-group">
                 <label>{i18n.t('avatar')}</label>
-                <form class="d-inline">
+                <form className="d-inline">
                   <label
                     htmlFor="file-upload"
-                    class="pointer ml-4 text-muted small font-weight-bold"
+                    className="pointer ml-4 text-muted small font-weight-bold"
                   >
                     {!this.checkSettingsAvatar ? (
-                      <span class="btn btn-sm btn-secondary">
+                      <span className="btn btn-sm btn-secondary">
                         {i18n.t('upload_avatar')}
                       </span>
                     ) : (
@@ -479,7 +480,7 @@ export class User extends Component<any, UserState> {
                         height="80"
                         width="80"
                         src={this.state.userSettingsForm.avatar}
-                        class="rounded-circle"
+                        className="rounded-circle"
                       />
                     )}
                   </label>
@@ -488,16 +489,16 @@ export class User extends Component<any, UserState> {
                     type="file"
                     accept="image/*,video/*"
                     name="file"
-                    class="d-none"
+                    className="d-none"
                     disabled={!UserService.Instance.user}
                     onChange={linkEvent(this, this.handleImageUpload)}
                   />
                 </form>
               </div>
               {this.checkSettingsAvatar && (
-                <div class="form-group">
+                <div className="form-group">
                   <button
-                    class="btn btn-secondary btn-block"
+                    className="btn btn-secondary btn-block"
                     onClick={linkEvent(this, this.removeAvatar)}
                   >
                     {`${capitalizeFirstLetter(i18n.t('remove'))} ${i18n.t(
@@ -506,12 +507,12 @@ export class User extends Component<any, UserState> {
                   </button>
                 </div>
               )} */}
-              <div class="form-group">
+              <div className="form-group">
                 <label>{i18n.t('language')}</label>
                 <select
                   value={this.state.userSettingsForm.lang}
                   onChange={linkEvent(this, this.handleUserSettingsLangChange)}
-                  class="ml-2 custom-select custom-select-sm w-auto"
+                  className="ml-2 custom-select custom-select-sm w-auto"
                 >
                   <option disabled>{i18n.t('language')}</option>
                   <option value="browser">{i18n.t('browser_default')}</option>
@@ -521,12 +522,12 @@ export class User extends Component<any, UserState> {
                   ))}
                 </select>
               </div>
-              <div class="form-group">
+              <div className="form-group">
                 <label>{i18n.t('theme')}</label>
                 <select
                   value={this.state.userSettingsForm.theme}
                   onChange={linkEvent(this, this.handleUserSettingsThemeChange)}
-                  class="ml-2 custom-select custom-select-sm w-auto"
+                  className="ml-2 custom-select custom-select-sm w-auto"
                 >
                   <option disabled>{i18n.t('theme')}</option>
                   {themes.map(theme => (
@@ -539,7 +540,7 @@ export class User extends Component<any, UserState> {
               </div>
               <form className="form-group">
                 <label>
-                  <div class="mr-2">{i18n.t('sort_type')}</div>
+                  <div className="mr-2">{i18n.t('sort_type')}</div>
                 </label>
                 <ListingTypeSelect
                   type_={this.state.userSettingsForm.default_listing_type}
@@ -548,7 +549,7 @@ export class User extends Component<any, UserState> {
               </form>
               <form className="form-group">
                 <label>
-                  <div class="mr-2">{i18n.t('type')}</div>
+                  <div className="mr-2">{i18n.t('type')}</div>
                 </label>
                 <SortSelect
                   sort={parseInt(
@@ -559,15 +560,15 @@ export class User extends Component<any, UserState> {
                   onChange={this.handleUserSettingsSortTypeChange}
                 />
               </form>
-              <div class="form-group row">
-                <label class="col-lg-3 col-form-label" htmlFor="user-email">
+              <div className="form-group row">
+                <label className="col-lg-3 col-form-label" htmlFor="user-email">
                   {i18n.t('email')}
                 </label>
-                <div class="col-lg-9">
+                <div className="col-lg-9">
                   <input
                     type="email"
                     id="user-email"
-                    class="form-control"
+                    className="form-control"
                     placeholder={i18n.t('optional')}
                     value={this.state.userSettingsForm.email}
                     onInput={linkEvent(
@@ -578,8 +579,8 @@ export class User extends Component<any, UserState> {
                   />
                 </div>
               </div>
-              <div class="form-group row">
-                <label class="col-lg-5 col-form-label">
+              <div className="form-group row">
+                <label className="col-lg-5 col-form-label">
                   <a
                     href="https://about.riot.im/"
                     target="_blank"
@@ -588,10 +589,10 @@ export class User extends Component<any, UserState> {
                     {i18n.t('matrix_user_id')}
                   </a>
                 </label>
-                <div class="col-lg-7">
+                <div className="col-lg-7">
                   <input
                     type="text"
-                    class="form-control"
+                    className="form-control"
                     placeholder="@user:example.com"
                     value={this.state.userSettingsForm.matrix_user_id}
                     onInput={linkEvent(
@@ -602,15 +603,15 @@ export class User extends Component<any, UserState> {
                   />
                 </div>
               </div>
-              <div class="form-group row">
-                <label class="col-lg-5 col-form-label" htmlFor="user-password">
+              <div className="form-group row">
+                <label className="col-lg-5 col-form-label" htmlFor="user-password">
                   {i18n.t('new_password')}
                 </label>
-                <div class="col-lg-7">
+                <div className="col-lg-7">
                   <input
                     type="password"
                     id="user-password"
-                    class="form-control"
+                    className="form-control"
                     value={this.state.userSettingsForm.new_password}
                     autoComplete="new-password"
                     onInput={linkEvent(
@@ -620,18 +621,18 @@ export class User extends Component<any, UserState> {
                   />
                 </div>
               </div>
-              <div class="form-group row">
+              <div className="form-group row">
                 <label
-                  class="col-lg-5 col-form-label"
+                  className="col-lg-5 col-form-label"
                   htmlFor="user-verify-password"
                 >
                   {i18n.t('verify_password')}
                 </label>
-                <div class="col-lg-7">
+                <div className="col-lg-7">
                   <input
                     type="password"
                     id="user-verify-password"
-                    class="form-control"
+                    className="form-control"
                     value={this.state.userSettingsForm.new_password_verify}
                     autoComplete="new-password"
                     onInput={linkEvent(
@@ -641,18 +642,18 @@ export class User extends Component<any, UserState> {
                   />
                 </div>
               </div>
-              <div class="form-group row">
+              <div className="form-group row">
                 <label
-                  class="col-lg-5 col-form-label"
+                  className="col-lg-5 col-form-label"
                   htmlFor="user-old-password"
                 >
                   {i18n.t('old_password')}
                 </label>
-                <div class="col-lg-7">
+                <div className="col-lg-7">
                   <input
                     type="password"
                     id="user-old-password"
-                    class="form-control"
+                    className="form-control"
                     value={this.state.userSettingsForm.old_password}
                     autoComplete="new-password"
                     onInput={linkEvent(
@@ -663,10 +664,10 @@ export class User extends Component<any, UserState> {
                 </div>
               </div>
               {this.state.site.enable_nsfw && (
-                <div class="form-group">
-                  <div class="form-check">
+                <div className="form-group">
+                  <div className="form-check">
                     <input
-                      class="form-check-input"
+                      className="form-check-input"
                       id="user-show-nsfw"
                       type="checkbox"
                       checked={this.state.userSettingsForm.show_nsfw}
@@ -675,16 +676,16 @@ export class User extends Component<any, UserState> {
                         this.handleUserSettingsShowNsfwChange
                       )}
                     />
-                    <label class="form-check-label" htmlFor="user-show-nsfw">
+                    <label className="form-check-label" htmlFor="user-show-nsfw">
                       {i18n.t('show_nsfw')}
                     </label>
                   </div>
                 </div>
               )}
-              <div class="form-group">
-                <div class="form-check">
+              <div className="form-group">
+                <div className="form-check">
                   <input
-                    class="form-check-input"
+                    className="form-check-input"
                     id="user-show-avatars"
                     type="checkbox"
                     checked={this.state.userSettingsForm.show_avatars}
@@ -693,15 +694,15 @@ export class User extends Component<any, UserState> {
                       this.handleUserSettingsShowAvatarsChange
                     )}
                   />
-                  <label class="form-check-label" htmlFor="user-show-avatars">
+                  <label className="form-check-label" htmlFor="user-show-avatars">
                     {i18n.t('show_avatars')}
                   </label>
                 </div>
               </div>
-              <div class="form-group">
-                <div class="form-check">
+              <div className="form-group">
+                <div className="form-check">
                   <input
-                    class="form-check-input"
+                    className="form-check-input"
                     id="user-send-notifications-to-email"
                     type="checkbox"
                     disabled={!this.state.user.email}
@@ -714,17 +715,17 @@ export class User extends Component<any, UserState> {
                     )}
                   />
                   <label
-                    class="form-check-label"
+                    className="form-check-label"
                     htmlFor="user-send-notifications-to-email"
                   >
                     {i18n.t('send_notifications_to_email')}
                   </label>
                 </div>
               </div>
-              <div class="form-group">
-                <button type="submit" class="btn btn-block btn-secondary mr-4">
+              <div className="form-group">
+                <button type="submit" className="btn btn-block btn-secondary mr-4">
                   {this.state.userSettingsLoading ? (
-                    <svg class="icon icon-spinner spin">
+                    <svg className="icon icon-spinner spin">
                       <use xlinkHref="#icon-spinner"></use>
                     </svg>
                   ) : (
@@ -733,9 +734,9 @@ export class User extends Component<any, UserState> {
                 </button>
               </div>
               <hr />
-              <div class="form-group mb-0">
+              <div className="form-group mb-0">
                 <button
-                  class="btn btn-block btn-danger"
+                  className="btn btn-block btn-danger"
                   onClick={linkEvent(
                     this,
                     this.handleDeleteAccountShowConfirmToggle
@@ -745,7 +746,7 @@ export class User extends Component<any, UserState> {
                 </button>
                 {this.state.deleteAccountShowConfirm && (
                   <>
-                    <div class="my-2 alert alert-danger" role="alert">
+                    <div className="my-2 alert alert-danger" role="alert">
                       {i18n.t('delete_account_confirm')}
                     </div>
                     <input
@@ -756,15 +757,15 @@ export class User extends Component<any, UserState> {
                         this,
                         this.handleDeleteAccountPasswordChange
                       )}
-                      class="form-control my-2"
+                      className="form-control my-2"
                     />
                     <button
-                      class="btn btn-danger mr-4"
+                      className="btn btn-danger mr-4"
                       disabled={!this.state.deleteAccountForm.password}
                       onClick={linkEvent(this, this.handleDeleteAccount)}
                     >
                       {this.state.deleteAccountLoading ? (
-                        <svg class="icon icon-spinner spin">
+                        <svg className="icon icon-spinner spin">
                           <use xlinkHref="#icon-spinner"></use>
                         </svg>
                       ) : (
@@ -772,7 +773,7 @@ export class User extends Component<any, UserState> {
                       )}
                     </button>
                     <button
-                      class="btn btn-secondary"
+                      className="btn btn-secondary"
                       onClick={linkEvent(
                         this,
                         this.handleDeleteAccountShowConfirmToggle
@@ -793,12 +794,12 @@ export class User extends Component<any, UserState> {
   modActions() {
     return (
       <div>
-        <div class="card border-secondary mb-3">
-          <div class="card-body">
+        <div className="card border-secondary mb-3">
+          <div className="card-body">
             <h5>Mod Actions</h5>
             {(this.canAdmin || this.isModerator()) && (
               <button
-                class="btn btn-secondary"
+                className="btn btn-secondary"
                 onClick={linkEvent(this, this.handleBanUserShow)}
               >
                 {this.isModerator
@@ -815,7 +816,7 @@ export class User extends Component<any, UserState> {
                     onChange={linkEvent(this, this.handleBanReasonChange)}
                   ></input>
                   <button
-                    class="btn btn-secondary btn-danger ml-2"
+                    className="btn btn-secondary btn-danger ml-2"
                     type="submit"
                   >
                     Ban
@@ -833,10 +834,10 @@ export class User extends Component<any, UserState> {
     return (
       <div>
         {this.state.moderates.length > 0 && (
-          <div class="card border-secondary mb-3">
-            <div class="card-body">
+          <div className="card border-secondary mb-3">
+            <div className="card-body">
               <h5>{i18n.t('moderates')}</h5>
-              <ul class="list-unstyled mb-0">
+              <ul className="list-unstyled mb-0">
                 {this.state.moderates.map(community => (
                   <li>
                     <Link to={`/c/${community.community_name}`}>
@@ -856,10 +857,10 @@ export class User extends Component<any, UserState> {
     return (
       <div>
         {this.state.follows.length > 0 && (
-          <div class="card border-secondary mb-3">
-            <div class="card-body">
+          <div className="card border-secondary mb-3">
+            <div className="card-body">
               <h5>{i18n.t('subscribed')}</h5>
-              <ul class="list-unstyled mb-0">
+              <ul className="list-unstyled mb-0">
                 {this.state.follows.map(community => (
                   <li>
                     <Link to={`/c/${community.community_name}`}>

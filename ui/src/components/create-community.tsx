@@ -1,4 +1,4 @@
-import { Component } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { CommunityForm } from './community-form';
@@ -48,9 +48,9 @@ export class CreateCommunity extends Component<any, CreateCommunityState> {
 
   render() {
     return (
-      <div class="container">
-        <div class="row">
-          <div class="col-12 col-lg-6 offset-lg-3 mb-4">
+      <div className="container">
+        <div className="row">
+          <div className="col-12 col-lg-6 offset-lg-3 mb-4">
             <h5>{i18n.t('create_community')}</h5>
             <CommunityForm
               onCreate={this.handleCommunityCreate}

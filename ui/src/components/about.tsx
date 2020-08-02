@@ -1,7 +1,7 @@
-import { Component } from 'inferno';
+import React, { Component } from 'react';
 import { WebSocketService } from '../services';
 import { i18n } from '../i18next';
-import { T } from 'inferno-i18next';
+import { Trans } from 'react-i18next';
 import { repoUrl } from '../utils';
 
 export class About extends Component<any, any> {
@@ -18,8 +18,8 @@ export class About extends Component<any, any> {
 
   render() {
     return (
-      <div class="about-container">
-        <div class="about-header">
+      <div className="about-container">
+        <div className="about-header">
           <img
             src="/static/assets/banner.png"
             className="img-fluid"

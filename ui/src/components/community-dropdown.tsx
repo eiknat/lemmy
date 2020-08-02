@@ -11,14 +11,15 @@ import {
   UserDetailsResponse,
   CommunityUser,
 } from '../interfaces';
-import { Component, linkEvent, createRef } from 'inferno';
+import React, { Component, createRef } from 'react';
 import { Subscription } from 'rxjs';
 import { WebSocketService, UserService } from '../services';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { wsJsonToRes, toast } from '../utils';
 import { i18n } from '../i18next';
-import { Link } from 'inferno-router';
+import { Link } from 'react-router-dom';
 import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
+import { linkEvent } from '../linkEvent';
 
 interface CommunityDropdownState {
   favorites: Array<Community> /*not used right now */;
@@ -80,47 +81,47 @@ export class CommunityDropdown extends Component<
   render() {
     return (
       <>
-        <div class="dropdown-block" id="blocking-element"></div>
+        <div className="dropdown-block" id="blocking-element"></div>
         <div
-          class="floating-container"
+          className="floating-container"
           style={this.getContainerLoc()}
           id="floating-container"
           ref={this.thisRef}
         >
           {!this.state.loading && (
-            <div class="dropdown-content">
+            <div className="dropdown-content">
               <div style="display:flex">
                 <input
-                  class="dropdown-filter form-control"
+                  className="dropdown-filter form-control"
                   placeholder="Filter"
                   onInput={linkEvent(this, this.handleFilterChange)}
                 ></input>
                 <button
-                  class="dropdown-exit btn"
+                  className="dropdown-exit btn"
                   onClick={linkEvent(this, this.handleDropdownClose)}
                 >
-                  <svg class="icon icon-inline">
+                  <svg className="icon icon-inline">
                     <use xlinkHref="#icon-cancel"></use>
                   </svg>
                 </button>
               </div>
               {this.sortedCommunities.length > 0 ? (
-                <div class="dropdown-categories">
+                <div className="dropdown-categories">
                   {this.sortedSubscriptions.length > 0 && (
-                    <div class="dropdown-category">
+                    <div className="dropdown-category">
                       <h6>Subscribed</h6>
                       {this.sortedSubscriptions.map(community => (
                         <>
-                          <div class="community-listing">
+                          <div className="community-listing">
                             <span
-                              class="community-icon"
+                              className="community-icon"
                               style={
                                 'background: ' +
                                 this.generateColor(community.community_name)
                               }
                             ></span>
                             <Link
-                              class="community-listing-title"
+                              className="community-listing-title"
                               to={`/c/${community.community_name}`}
                               onClick={linkEvent(
                                 this,
@@ -134,20 +135,20 @@ export class CommunityDropdown extends Component<
                       ))}
                     </div>
                   )}
-                  <div class="dropdown-category">
+                  <div className="dropdown-category">
                     <h6>Communities</h6>
                     {this.sortedCommunities.map(community => (
                       <>
-                        <div class="community-listing">
+                        <div className="community-listing">
                           <span
-                            class="community-icon"
+                            className="community-icon"
                             style={
                               'background: ' +
                               this.generateColor(community.name)
                             }
                           ></span>
                           <Link
-                            class="community-listing-title"
+                            className="community-listing-title"
                             to={`/c/${community.name}`}
                             onClick={linkEvent(this, this.handleDropdownClose)}
                           >
@@ -176,7 +177,7 @@ export class CommunityDropdown extends Component<
                 </div>
               )}
               <Link
-                class="dropdown-subtext"
+                className="dropdown-subtext"
                 to="/communities"
                 onClick={linkEvent(this, this.handleDropdownClose)}
               >

@@ -1,6 +1,6 @@
 const Tos = () => (
   <div style={{ background: 'white' }}>
-    <div class="mx-5">
+    <div className="mx-5">
       <h1
         dir="ltr"
         style="line-height:1.333332;background-color:#ffffff;margin-top:0pt;margin-bottom:0pt;padding:0pt 0pt 23pt 0pt;"

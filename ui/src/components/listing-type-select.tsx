@@ -1,8 +1,9 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { ListingType } from '../interfaces';
 import { UserService } from '../services';
 
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
 
 interface ListingTypeSelectProps {
   type_: ListingType;
@@ -34,7 +35,7 @@ export class ListingTypeSelect extends Component<
 
   render() {
     return (
-      <div class="btn-group btn-group-toggle">
+      <div className="btn-group btn-group-toggle">
         <label
           className={`btn btn-sm btn-secondary
             ${this.state.type_ == ListingType.Subscribed && 'active'}

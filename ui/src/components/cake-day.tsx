@@ -1,4 +1,4 @@
-import { Component } from 'inferno';
+import React, { Component } from 'react';
 import { i18n } from '../i18next';
 
 interface CakeDayProps {
@@ -12,7 +12,7 @@ export class CakeDay extends Component<CakeDayProps, any> {
         className={`mx-2 d-inline-block unselectable pointer`}
         data-tippy-content={this.cakeDayTippy()}
       >
-        <svg class="icon icon-inline">
+        <svg className="icon icon-inline">
           <use xlinkHref="#icon-cake"></use>
         </svg>
       </div>

@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -36,6 +36,7 @@ import { CommunityLink } from './community-link';
 import { SortSelect } from './sort-select';
 import { CommentNodes } from './comment-nodes';
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
 
 interface SearchState {
   q: string;
@@ -158,7 +159,7 @@ export class Search extends Component<any, SearchState> {
 
   render() {
     return (
-      <div class="container">
+      <div className="container">
         <h5>{i18n.t('search')}</h5>
         {this.selects()}
         {this.searchForm()}
@@ -176,21 +177,21 @@ export class Search extends Component<any, SearchState> {
   searchForm() {
     return (
       <form
-        class="form-inline"
+        className="form-inline"
         onSubmit={linkEvent(this, this.handleSearchSubmit)}
       >
         <input
           type="text"
-          class="form-control mr-2"
+          className="form-control mr-2"
           value={this.state.searchText}
           placeholder={`${i18n.t('search')}...`}
           onInput={linkEvent(this, this.handleQChange)}
           required
           minLength={3}
         />
-        <button type="submit" class="btn btn-secondary mr-2">
+        <button type="submit" className="btn btn-secondary mr-2">
           {this.state.loading ? (
-            <svg class="icon icon-spinner spin">
+            <svg className="icon icon-spinner spin">
               <use xlinkHref="#icon-spinner"></use>
             </svg>
           ) : (
@@ -207,7 +208,7 @@ export class Search extends Component<any, SearchState> {
         <select
           value={this.state.type_}
           onChange={linkEvent(this, this.handleTypeChange)}
-          class="custom-select custom-select-sm w-auto"
+          className="custom-select custom-select-sm w-auto"
         >
           <option disabled>{i18n.t('type')}</option>
           <option value={SearchType.All}>{i18n.t('all')}</option>
@@ -218,7 +219,7 @@ export class Search extends Component<any, SearchState> {
           </option>
           <option value={SearchType.Users}>{i18n.t('users')}</option>
         </select>
-        <span class="ml-2">
+        <span className="ml-2">
           <SortSelect
             sort={this.state.sort}
             onChange={this.handleSortChange}
@@ -270,8 +271,8 @@ export class Search extends Component<any, SearchState> {
     return (
       <div>
         {combined.map(i => (
-          <div class="row">
-            <div class="col-12">
+          <div className="row">
+            <div className="col-12">
               {i.type_ == 'posts' && (
                 <PostListing
                   post={i.data as Post}
@@ -329,8 +330,8 @@ export class Search extends Component<any, SearchState> {
     return (
       <>
         {this.state.searchResponse.posts.map(post => (
-          <div class="row">
-            <div class="col-12">
+          <div className="row">
+            <div className="col-12">
               <PostListing
                 post={post}
                 showCommunity
@@ -349,8 +350,8 @@ export class Search extends Component<any, SearchState> {
     return (
       <>
         {this.state.searchResponse.communities.map(community => (
-          <div class="row">
-            <div class="col-12">{this.communityListing(community)}</div>
+          <div className="row">
+            <div className="col-12">{this.communityListing(community)}</div>
           </div>
         ))}
       </>
@@ -363,7 +364,7 @@ export class Search extends Component<any, SearchState> {
         <span>
           <CommunityLink community={community} />
         </span>
-        <span>{` - ${community.title} - 
+        <span>{` - ${community.title} -
         ${i18n.t('number_of_subscribers', {
           count: community.number_of_subscribers,
         })}
@@ -376,8 +377,8 @@ export class Search extends Component<any, SearchState> {
     return (
       <>
         {this.state.searchResponse.users.map(user => (
-          <div class="row">
-            <div class="col-12">
+          <div className="row">
+            <div className="col-12">
               <span>
                 @
                 <UserListing
@@ -399,10 +400,10 @@ export class Search extends Component<any, SearchState> {
 
   paginator() {
     return (
-      <div class="mt-2">
+      <div className="mt-2">
         {this.state.page > 1 && (
           <button
-            class="btn btn-sm btn-secondary mr-1"
+            className="btn btn-sm btn-secondary mr-1"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
@@ -411,7 +412,7 @@ export class Search extends Component<any, SearchState> {
 
         {this.resultsCount() > 0 && (
           <button
-            class="btn btn-sm btn-secondary"
+            className="btn btn-sm btn-secondary"
             onClick={linkEvent(this, this.nextPage)}
           >
             {i18n.t('next')}

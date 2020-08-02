@@ -1,4 +1,4 @@
-import { Component } from 'inferno';
+import React from 'react';
 
 const icons = {
   report: (
@@ -74,7 +74,7 @@ const icons = {
     <>
       <defs>
         <symbol id="a" viewBox="0 0 48 48">
-          <rect width="48" height="48" style="fill:none" />
+          <rect width="48" height="48" style={{ fill: 'none' }} />
         </symbol>
       </defs>
       <path d="M9,9V4L2,12l7,8V14.84c4.88-.57,11,1.42,11,5.16h1a4.38,4.38,0,0,0,1-3C22,11.25,16.49,9.18,9,9Z" />
@@ -135,7 +135,7 @@ const icons = {
 
 type Icons = typeof icons;
 
-export function Icon<T extends keyof Icons>({
+export function Icon<Trans extends keyof Icons>({
   name,
   size = '20px',
   ...props
@@ -150,7 +150,7 @@ export function Icon<T extends keyof Icons>({
 
   return (
     <svg
-      class="icon custom-icon"
+      className="icon custom-icon"
       viewBox="0 0 24 24"
       aria-labelledby={name}
       fill="currentColor"

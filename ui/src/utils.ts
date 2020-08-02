@@ -490,7 +490,7 @@ export function loadCss(id: string, loc: string) {
     link.type = 'text/css';
     link.href = loc;
     link.media = 'all';
-    head.appendChild(link);
+    head.prepend(link);
   }
 }
 
@@ -593,7 +593,7 @@ export function messageToastify(
   router: any
 ) {
   let backgroundColor = `var(--light)`;
-  body = '<div class="notification-text-container">' + body + '</div>';
+  body = '<div className="notification-text-container">' + body + '</div>';
   if (!UserService.Instance.user || !UserService.Instance.user.show_nsfw) {
     body = replaceImageEmbeds(body);
   }
@@ -648,7 +648,7 @@ export function setupTribute(): Tribute {
           {
             key: 'logo',
             val:
-              '<img class="icon icon-navbar" src="/static/assets/logo.png" alt="vaporwave hammer and sickle logo, courtesy of ancestral potato">',
+              '<img className="icon icon-navbar" src="/static/assets/logo.png" alt="vaporwave hammer and sickle logo, courtesy of ancestral potato">',
           },
           ...customEmojis,
         ],
@@ -1074,7 +1074,7 @@ export function imagesDownsize(
   );
   html = html.replace(
     imgTagRegex,
-    '$& class="' + (very_low ? 'notification-image' : 'comment-image') + '"'
+    '$& className="' + (very_low ? 'notification-image' : 'comment-image') + '"'
   );
   return html;
 }
@@ -1137,3 +1137,4 @@ export const getAllUserModeratedCommunities = ({
     return agg;
   }, []);
 };
+

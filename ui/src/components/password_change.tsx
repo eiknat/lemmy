@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -11,6 +11,7 @@ import {
 import { WebSocketService, UserService } from '../services';
 import { wsJsonToRes, capitalizeFirstLetter, toast } from '../utils';
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
 
 interface State {
   passwordChangeForm: PasswordChangeForm;
@@ -50,9 +51,9 @@ export class PasswordChange extends Component<any, State> {
 
   render() {
     return (
-      <div class="container">
-        <div class="row">
-          <div class="col-12 col-lg-6 offset-lg-3 mb-4">
+      <div className="container">
+        <div className="row">
+          <div className="col-12 col-lg-6 offset-lg-3 mb-4">
             <h5>{i18n.t('password_change')}</h5>
             {this.passwordChangeForm()}
           </div>
@@ -64,39 +65,39 @@ export class PasswordChange extends Component<any, State> {
   passwordChangeForm() {
     return (
       <form onSubmit={linkEvent(this, this.handlePasswordChangeSubmit)}>
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label">
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label">
             {i18n.t('new_password')}
           </label>
-          <div class="col-sm-10">
+          <div className="col-sm-10">
             <input
               type="password"
               value={this.state.passwordChangeForm.password}
               onInput={linkEvent(this, this.handlePasswordChange)}
-              class="form-control"
+              className="form-control"
               required
             />
           </div>
         </div>
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label">
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label">
             {i18n.t('verify_password')}
           </label>
-          <div class="col-sm-10">
+          <div className="col-sm-10">
             <input
               type="password"
               value={this.state.passwordChangeForm.password_verify}
               onInput={linkEvent(this, this.handleVerifyPasswordChange)}
-              class="form-control"
+              className="form-control"
               required
             />
           </div>
         </div>
-        <div class="form-group row">
-          <div class="col-sm-10">
-            <button type="submit" class="btn btn-secondary">
+        <div className="form-group row">
+          <div className="col-sm-10">
+            <button type="submit" className="btn btn-secondary">
               {this.state.loading ? (
-                <svg class="icon icon-spinner spin">
+                <svg className="icon icon-spinner spin">
                   <use xlinkHref="#icon-spinner"></use>
                 </svg>
               ) : (

@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Prompt } from 'inferno-router';
+import React, { Component } from 'react';
+import { Prompt } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -25,8 +25,9 @@ import {
 import { UserListing } from './user-listing';
 import { MarkdownTextArea } from './markdown-textarea';
 import { i18n } from '../i18next';
-import { T } from 'inferno-i18next';
+import { Trans } from 'react-i18next';
 import { TextAreaWithCounter } from './post-form';
+import { linkEvent } from '../linkEvent';
 
 interface PrivateMessageFormProps {
   privateMessage?: PrivateMessage; // If a pm is given, that means this is an edit
@@ -119,13 +120,13 @@ export class PrivateMessageForm extends Component<
         />
         <form onSubmit={linkEvent(this, this.handlePrivateMessageSubmit)}>
           {!this.props.privateMessage && (
-            <div class="form-group row">
-              <label class="col-sm-2 col-form-label">
+            <div className="form-group row">
+              <label className="col-sm-2 col-form-label">
                 {capitalizeFirstLetter(i18n.t('to'))}
               </label>
 
               {this.state.recipient && (
-                <div class="col-sm-10 form-control-plaintext">
+                <div className="col-sm-10 form-control-plaintext">
                   <UserListing
                     user={{
                       name: this.state.recipient.name,
@@ -139,20 +140,20 @@ export class PrivateMessageForm extends Component<
               )}
             </div>
           )}
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label">
+          <div className="form-group row">
+            <label className="col-sm-2 col-form-label">
               {i18n.t('message')}
               <span
                 onClick={linkEvent(this, this.handleShowDisclaimer)}
-                class="ml-2 pointer text-danger"
+                className="ml-2 pointer text-danger"
                 data-tippy-content={i18n.t('disclaimer')}
               >
-                <svg class={`icon icon-inline`}>
+                <svg className={`icon icon-inline`}>
                   <use xlinkHref="#icon-alert-triangle"></use>
                 </svg>
               </span>
             </label>
-            <div class="col-sm-10">
+            <div className="col-sm-10">
               <MarkdownTextArea
                 initialContent={this.state.privateMessageForm.content}
                 onContentChange={this.handleContentChange}
@@ -161,33 +162,33 @@ export class PrivateMessageForm extends Component<
           </div>
 
           {this.state.showDisclaimer && (
-            <div class="form-group row">
-              <div class="offset-sm-2 col-sm-10">
-                <div class="alert alert-danger" role="alert">
-                  <T i18nKey="private_message_disclaimer">
+            <div className="form-group row">
+              <div className="offset-sm-2 col-sm-10">
+                <div className="alert alert-danger" role="alert">
+                  <Trans i18nKey="private_message_disclaimer">
                     #
                     <a
-                      class="alert-link"
+                      className="alert-link"
                       target="_blank"
                       rel="noreferrer"
                       href="https://element.io/get-started"
                     >
                       #
                     </a>
-                  </T>
+                  </Trans>
                 </div>
               </div>
             </div>
           )}
-          <div class="form-group row">
-            <div class="offset-sm-2 col-sm-10">
+          <div className="form-group row">
+            <div className="offset-sm-2 col-sm-10">
               <button
                 type="submit"
-                class="btn btn-secondary mr-2"
+                className="btn btn-secondary mr-2"
                 disabled={this.state.loading}
               >
                 {this.state.loading ? (
-                  <svg class="icon icon-spinner spin">
+                  <svg className="icon icon-spinner spin">
                     <use xlinkHref="#icon-spinner"></use>
                   </svg>
                 ) : this.props.privateMessage ? (
@@ -199,14 +200,14 @@ export class PrivateMessageForm extends Component<
               {this.props.privateMessage && (
                 <button
                   type="button"
-                  class="btn btn-secondary"
+                  className="btn btn-secondary"
                   onClick={linkEvent(this, this.handleCancel)}
                 >
                   {i18n.t('cancel')}
                 </button>
               )}
-              <ul class="d-inline-block float-right list-inline mb-1 text-muted font-weight-bold">
-                <li class="list-inline-item"></li>
+              <ul className="d-inline-block float-right list-inline mb-1 text-muted font-weight-bold">
+                <li className="list-inline-item"></li>
               </ul>
             </div>
           </div>

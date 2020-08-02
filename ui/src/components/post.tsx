@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -48,6 +48,7 @@ import { CommentForm } from './comment-form';
 import { CommentNodes } from './comment-nodes';
 import autosize from 'autosize';
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
 
 interface PostState {
   post: PostI;
@@ -199,16 +200,16 @@ export class Post extends Component<any, PostState> {
 
   render() {
     return (
-      <div class="container">
+      <div className="container">
         {this.state.loading ? (
           <h5>
-            <svg class="icon icon-spinner spin">
+            <svg className="icon icon-spinner spin">
               <use xlinkHref="#icon-spinner"></use>
             </svg>
           </h5>
         ) : (
-          <div class="row">
-            <div class="col-12 col-md-8 mb-3 main-content">
+          <div className="row">
+            <div className="col-12 col-md-8 mb-3 main-content">
               <PostListing
                 post={this.state.post}
                 showBody
@@ -229,7 +230,7 @@ export class Post extends Component<any, PostState> {
               {this.state.commentViewType == CommentViewType.Chat &&
                 this.commentsFlat()}
             </div>
-            <div class="flex-1 post-sidebar-container">
+            <div className="flex-1 post-sidebar-container">
               {/* {this.state.comments.length > 0 && this.newComments()} */}
               {this.sidebar()}
             </div>
@@ -242,7 +243,7 @@ export class Post extends Component<any, PostState> {
   sortRadios() {
     return (
       <>
-        <div class="btn-group btn-group-toggle mr-3 mb-2">
+        <div className="btn-group btn-group-toggle mr-3 mb-2">
           <label
             className={`btn btn-sm btn-secondary pointer ${
               this.state.commentSort === CommentSortType.Hot && 'active'
@@ -296,7 +297,7 @@ export class Post extends Component<any, PostState> {
             />
           </label>
         </div>
-        {/* <div class="btn-group btn-group-toggle mb-2">
+        {/* <div className="btn-group btn-group-toggle mb-2">
           <label
             className={`btn btn-sm btn-secondary pointer ${
               this.state.commentViewType === CommentViewType.Chat && 'active'
@@ -317,8 +318,8 @@ export class Post extends Component<any, PostState> {
 
   commentsFlat() {
     return (
-      <div class="d-none d-md-block new-comments mb-3 card border-secondary sidebar-content">
-        <div class="card-body small">
+      <div className="d-none d-md-block new-comments mb-3 card border-secondary sidebar-content">
+        <div className="card-body small">
           <h6>{i18n.t('recent_comments')}</h6>
           <CommentNodes
             nodes={commentsToFlatNodes(this.state.comments)}
@@ -338,7 +339,7 @@ export class Post extends Component<any, PostState> {
 
   sidebar() {
     return (
-      <div class="mb-3">
+      <div className="mb-3">
         <Sidebar
           community={this.state.community}
           moderators={this.state.moderators}

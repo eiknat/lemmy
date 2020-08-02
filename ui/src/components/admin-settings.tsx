@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -15,6 +15,7 @@ import autosize from 'autosize';
 import { SiteForm } from './site-form';
 import { UserListing } from './user-listing';
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
 
 interface AdminSettingsState {
   siteRes: GetSiteResponse;
@@ -83,21 +84,21 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
   render() {
     console.log(this.state.siteRes.site);
     return (
-      <div class="container">
+      <div className="container">
         {this.state.siteLoading || this.state.siteConfigLoading ? (
           <h5>
-            <svg class="icon icon-spinner spin">
+            <svg className="icon icon-spinner spin">
               <use xlinkHref="#icon-spinner"></use>
             </svg>
           </h5>
         ) : (
-          <div class="row">
-            <div class="col-12 col-md-6">
+          <div className="row">
+            <div className="col-12 col-md-6">
               <SiteForm site={this.state.siteRes.site} />
               {this.admins()}
               {this.bannedUsers()}
             </div>
-            <div class="col-12 col-md-6">{this.adminSettings()}</div>
+            <div className="col-12 col-md-6">{this.adminSettings()}</div>
           </div>
         )}
       </div>
@@ -108,9 +109,9 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
     return (
       <>
         <h5>{capitalizeFirstLetter(i18n.t('admins'))}</h5>
-        <ul class="list-unstyled">
+        <ul className="list-unstyled">
           {this.state.siteRes.admins.map(admin => (
-            <li class="list-inline-item">
+            <li className="list-inline-item">
               <UserListing
                 user={{
                   name: admin.name,
@@ -131,9 +132,9 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
     return (
       <>
         <h5>{i18n.t('banned_users')}</h5>
-        <ul class="list-unstyled">
+        <ul className="list-unstyled">
           {this.state.siteRes.banned.map(banned => (
-            <li class="list-inline-item">
+            <li className="list-inline-item">
               <UserListing
                 user={{
                   name: banned.name,
@@ -155,28 +156,28 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
       <div>
         <h5>{i18n.t('admin_settings')}</h5>
         <form onSubmit={linkEvent(this, this.handleSiteConfigSubmit)}>
-          <div class="form-group row">
+          <div className="form-group row">
             <label
-              class="col-12 col-form-label"
+              className="col-12 col-form-label"
               htmlFor={this.siteConfigTextAreaId}
             >
               {i18n.t('site_config')}
             </label>
-            <div class="col-12">
+            <div className="col-12">
               <textarea
                 id={this.siteConfigTextAreaId}
                 value={this.state.siteConfigForm.config_hjson}
                 onInput={linkEvent(this, this.handleSiteConfigHjsonChange)}
-                class="form-control text-monospace"
+                className="form-control text-monospace"
                 rows={3}
               />
             </div>
           </div>
-          <div class="form-group row">
-            <div class="col-12">
-              <button type="submit" class="btn btn-secondary mr-2">
+          <div className="form-group row">
+            <div className="col-12">
+              <button type="submit" className="btn btn-secondary mr-2">
                 {this.state.siteConfigLoading ? (
-                  <svg class="icon icon-spinner spin">
+                  <svg className="icon icon-spinner spin">
                     <use xlinkHref="#icon-spinner"></use>
                   </svg>
                 ) : (

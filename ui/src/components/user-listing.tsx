@@ -1,5 +1,5 @@
-import { Component } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { UserView } from '../interfaces';
 import {
   pictrsAvatarThumbnail,
@@ -68,7 +68,7 @@ export class UserListing extends Component<UserListingProps, any> {
               height="32"
               width="32"
               src={pictrsAvatarThumbnail(user.avatar)}
-              class="rounded-circle mr-2"
+              className="rounded-circle mr-2"
             />
           )}
           <span className={getTextColor({ isMod, isAdmin })}>{name_}</span>

@@ -1,7 +1,8 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { DataType } from '../interfaces';
 
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
 
 interface DataTypeSelectProps {
   type_: DataType;
@@ -33,9 +34,9 @@ export class DataTypeSelect extends Component<
 
   render() {
     return (
-      <div class="btn-group btn-group-toggle">
+      <div className="btn-group btn-group-toggle">
         <label
-          className={`pointer btn btn-sm btn-secondary 
+          className={`pointer btn btn-sm btn-secondary
             ${this.state.type_ == DataType.Post && 'active'}
           `}
         >

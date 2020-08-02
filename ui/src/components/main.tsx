@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -54,9 +54,10 @@ import {
   setupTippy,
 } from '../utils';
 import { i18n } from '../i18next';
-import { T } from 'inferno-i18next';
+import { Trans } from 'react-i18next';
 import { PATREON_URL } from '../constants';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
 
 interface MainState {
   subscribedCommunities: Array<CommunityUser>;
@@ -194,12 +195,12 @@ export class Main extends Component<any, MainState> {
 
   render() {
     return (
-      <div class="container" style={{ 'max-width': '100%' }}>
-        <div class="row">
-          <main role="main" class="col-12 col-md-8">
+      <div className="container" style={{ 'maxWidth': '100%' }}>
+        <div className="row">
+          <main role="main" className="col-12 col-md-8">
             {this.posts()}
           </main>
-          <aside class="col-12 col-md-4 sidebar">{this.my_sidebar()}</aside>
+          <aside className="col-12 col-md-4 sidebar">{this.my_sidebar()}</aside>
         </div>
       </div>
     );
@@ -210,23 +211,23 @@ export class Main extends Component<any, MainState> {
       <div>
         {!this.state.loading && (
           <div>
-            <div class="card border-secondary mb-3">
-              <div class="card-body">
+            <div className="card border-secondary mb-3">
+              <div className="card-body">
                 {this.trendingCommunities()}
                 {UserService.Instance.user &&
                   this.state.subscribedCommunities.length > 0 && (
                     <div>
                       <h5>
-                        <T i18nKey="subscribed_to_communities">
+                        <Trans i18nKey="subscribed_to_communities">
                           #
-                          <Link class="text-body" to="/communities">
+                          <Link className="text-body" to="/communities">
                             #
                           </Link>
-                        </T>
+                        </Trans>
                       </h5>
-                      <ul class="list-inline">
+                      <ul className="list-inline">
                         {this.state.subscribedCommunities.map(community => (
-                          <li class="list-inline-item">
+                          <li id={community.id} className="list-inline-item">
                             <CommunityLink
                               community={{
                                 name: community.community_name,
@@ -242,7 +243,7 @@ export class Main extends Component<any, MainState> {
                   )}
                 {this.showCreateCommunity() && (
                   <Link
-                    class="btn btn-sm btn-secondary btn-block"
+                    className="btn btn-sm btn-secondary btn-block"
                     to="/create_community"
                   >
                     {i18n.t('create_a_community')}
@@ -263,16 +264,16 @@ export class Main extends Component<any, MainState> {
     return (
       <div>
         <h5>
-          <T i18nKey="trending_communities">
+          <Trans i18nKey="trending_communities">
             #
-            <Link class="text-body" to="/communities">
+            <Link className="text-body" to="/communities">
               #
             </Link>
-          </T>
+          </Trans>
         </h5>
-        <ul class="list-inline">
+        <ul className="list-inline">
           {this.state.trendingCommunities.map(community => (
-            <li class="list-inline-item">
+            <li key={community.id} className="list-inline-item">
               <CommunityLink community={community} />
             </li>
           ))}
@@ -313,9 +314,9 @@ export class Main extends Component<any, MainState> {
   siteInfo() {
     return (
       <div>
-        <div class="card border-secondary mb-3">
-          <div class="card-body">
-            <h5 class="mb-4 text-center h3">{`${this.state.siteRes.site.name}`}</h5>
+        <div className="card border-secondary mb-3">
+          <div className="card-body">
+            <h5 className="mb-4 text-center h3">{`${this.state.siteRes.site.name}`}</h5>
             <img
               className="img-fluid mb-2"
               src="/static/assets/hexbear-logo.png"
@@ -327,10 +328,10 @@ export class Main extends Component<any, MainState> {
               style={{ width: '100%' }}
             />
             {this.canAdmin && (
-              <ul class="list-inline mb-1 text-muted font-weight-bold">
+              <ul className="list-inline mb-1 text-muted font-weight-bold">
                 <li className="list-inline-item-action">
                   <span
-                    class="pointer"
+                    className="pointer"
                     onClick={linkEvent(this, this.handleEditClick)}
                     data-tippy-content={i18n.t('edit')}
                   >
@@ -342,7 +343,7 @@ export class Main extends Component<any, MainState> {
             <div className="my-2">
               It is currently {getMoscowTime()} in Moscow
             </div>
-            <ul class="my-2 list-inline">
+            <ul className="my-2 list-inline">
               <li className="list-inline-item badge badge-secondary chapo-bg-secondary">
                 {i18n.t('number_online', { count: this.state.siteRes.online })}
               </li>
@@ -373,10 +374,10 @@ export class Main extends Component<any, MainState> {
                 </Link>
               </li>
             </ul>
-            <ul class="mt-1 list-inline small mb-0">
-              <li class="list-inline-item">{i18n.t('admins')}:</li>
+            <ul className="mt-1 list-inline small mb-0">
+              <li className="list-inline-item">{i18n.t('admins')}:</li>
               {this.state.siteRes.admins.map(admin => (
-                <li class="list-inline-item">
+                <li className="list-inline-item">
                   <UserListing
                     user={{
                       name: admin.name,
@@ -392,8 +393,8 @@ export class Main extends Component<any, MainState> {
           </div>
         </div>
         {this.state.siteRes.site.description && (
-          <div class="card border-secondary mb-3">
-            <div class="card-body">
+          <div className="card border-secondary mb-3">
+            <div className="card-body">
               <div
                 className="md-div"
                 dangerouslySetInnerHTML={mdToHtml(
@@ -409,8 +410,8 @@ export class Main extends Component<any, MainState> {
 
   donations() {
     return (
-      <div class="card border-secondary mb-3">
-        <div class="card-body">
+      <div className="card border-secondary mb-3">
+        <div className="card-body">
           <p>Our Soros stipend only gets us so far.</p>
 
           <a href={PATREON_URL}>
@@ -423,38 +424,38 @@ export class Main extends Component<any, MainState> {
 
   landing() {
     return (
-      <div class="card border-secondary">
-        <div class="card-body">
+      <div className="card border-secondary">
+        <div className="card-body">
           <h5>
             {i18n.t('powered_by')}
-            <svg class="icon mx-2">
+            <svg className="icon mx-2">
               <use xlinkHref="#icon-mouse">#</use>
             </svg>
             <a href={repoUrl}>Lemmy</a>
           </h5>
-          <p class="mb-0">
-            <T i18nKey="landing_0">
+          <p className="mb-0">
+            <Trans i18nKey="landing_0">
               #
               <a href="https://en.wikipedia.org/wiki/Social_network_aggregation">
                 #
               </a>
               <a href="https://en.wikipedia.org/wiki/Fediverse">#</a>
-              <br class="big"></br>
+              <br className="big"></br>
               <code>#</code>
               <br></br>
               <b>#</b>
-              <br class="big"></br>
+              <br className="big"></br>
               <a href={repoUrl}>#</a>
-              <br class="big"></br>
+              <br className="big"></br>
               <a href="https://www.rust-lang.org">#</a>
               <a href="https://actix.rs/">#</a>
               <a href="https://infernojs.org">#</a>
               <a href="https://www.typescriptlang.org/">#</a>
-              <br class="big"></br>
+              <br className="big"></br>
               <a href="https://github.com/LemmyNet/lemmy/graphs/contributors?type=a">
                 #
               </a>
-            </T>
+            </Trans>
           </p>
         </div>
       </div>
@@ -463,11 +464,11 @@ export class Main extends Component<any, MainState> {
 
   posts() {
     return (
-      <div class="main-content-wrapper">
+      <div className="main-content-wrapper">
         {this.selects()}
         {this.state.loading ? (
           <h5>
-            <svg class="icon icon-spinner spin">
+            <svg className="icon icon-spinner spin">
               <use xlinkHref="#icon-spinner"></use>
             </svg>
           </h5>
@@ -508,7 +509,7 @@ export class Main extends Component<any, MainState> {
     return (
       <div className="mb-3 filter-row">
         <span>
-          <span class="mr-2 sort-select">
+          <span className="mr-2 sort-select">
             <SortSelect
               sort={this.state.sort}
               onChange={this.handleSortChange}
@@ -550,13 +551,13 @@ export class Main extends Component<any, MainState> {
         </span>
         {(!isMobile || (isMobile && this.state.filtersOpen)) && (
           <span className="listing-select-group my-3 ml-2">
-            <span class="mr-3">
+            <span className="mr-3">
               <ListingTypeSelect
                 type_={this.state.listingType}
                 onChange={this.handleListingTypeChange}
               />
             </span>
-            <span class="mr-3 data-type-select">
+            <span className="mr-3 data-type-select">
               <DataTypeSelect
                 type_={this.state.dataType}
                 onChange={this.handleDataTypeChange}
@@ -570,10 +571,10 @@ export class Main extends Component<any, MainState> {
 
   paginator() {
     return (
-      <div class="my-2">
+      <div className="my-2">
         {this.state.page > 1 && (
           <button
-            class="btn btn-sm btn-secondary mr-1"
+            className="btn btn-sm btn-secondary mr-1"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
@@ -581,7 +582,7 @@ export class Main extends Component<any, MainState> {
         )}
         {this.state.posts.length > 0 && (
           <button
-            class="btn btn-sm btn-secondary"
+            className="btn btn-sm btn-secondary"
             onClick={linkEvent(this, this.nextPage)}
           >
             {i18n.t('next')}

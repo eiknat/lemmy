@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Prompt } from 'inferno-router';
+import React, { Component } from 'react';
+import { Prompt } from 'react-router-dom';
 import {
   mdToHtml,
   randomStr,
@@ -16,6 +16,7 @@ import Tribute from 'tributejs/src/Tribute.js';
 import { i18n } from '../i18next';
 import emojiShortName from 'emoji-short-name';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
 
 interface MarkdownTextAreaProps {
   initialContent: string;
@@ -116,13 +117,13 @@ export class MarkdownTextArea extends Component<
     return (
       <form id={this.formId} onSubmit={linkEvent(this, this.handleSubmit)}>
         <Prompt when={this.state.content} message={i18n.t('block_leaving')} />
-        <div class="form-group row">
+        <div className="form-group row">
           <div className={`col-sm-12`}>
             <textarea
               id={this.id}
               className={`form-control ${this.state.previewMode && 'd-none'}`}
               value={this.state.content}
-              onInput={linkEvent(this, this.handleContentChange)}
+              onChange={linkEvent(this, this.handleContentChange)}
               onKeyDown={linkEvent(this, this.handleKeydown)}
               // onPaste={linkEvent(this, this.handleImageUploadPaste)}
               required
@@ -138,16 +139,16 @@ export class MarkdownTextArea extends Component<
             )}
           </div>
         </div>
-        <div class="row">
-          <div class="col-sm-12 d-flex flex-wrap">
+        <div className="row">
+          <div className="col-sm-12 d-flex flex-wrap">
             {this.props.buttonTitle && (
               <button
                 type="submit"
-                class="btn btn-sm btn-secondary mr-2"
+                className="btn btn-sm btn-secondary mr-2"
                 disabled={this.props.disabled || this.state.loading}
               >
                 {this.state.loading ? (
-                  <svg class="icon icon-spinner spin">
+                  <svg className="icon icon-spinner spin">
                     <use xlinkHref="#icon-spinner"></use>
                   </svg>
                 ) : (
@@ -158,7 +159,7 @@ export class MarkdownTextArea extends Component<
             {this.props.replyType && (
               <button
                 type="button"
-                class="btn btn-sm btn-secondary mr-2"
+                className="btn btn-sm btn-secondary mr-2"
                 onClick={linkEvent(this, this.handleReplyCancel)}
               >
                 {i18n.t('cancel')}
@@ -175,46 +176,46 @@ export class MarkdownTextArea extends Component<
               </button>
             )}
             {/* A flex expander */}
-            <div class="flex-grow-1"></div>
+            <div className="flex-grow-1"></div>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('bold')}
               onClick={linkEvent(this, this.handleInsertBold)}
             >
-              <svg class="icon icon-inline">
+              <svg className="icon icon-inline">
                 <use xlinkHref="#icon-bold"></use>
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('italic')}
               onClick={linkEvent(this, this.handleInsertItalic)}
             >
-              <svg class="icon icon-inline">
+              <svg className="icon icon-inline">
                 <use xlinkHref="#icon-italic"></use>
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('link')}
               onClick={linkEvent(this, this.handleInsertLink)}
             >
-              <svg class="icon icon-inline">
+              <svg className="icon icon-inline">
                 <use xlinkHref="#icon-link"></use>
               </svg>
             </button>
-            {/* <form class="btn btn-sm text-muted font-weight-bold">
+            {/* <form className="btn btn-sm text-muted font-weight-bold">
               <label
                 htmlFor={`file-upload-${this.id}`}
                 className={`mb-0 ${UserService.Instance.user && 'pointer'}`}
                 data-tippy-content={i18n.t('upload_image')}
               >
                 {this.state.imageLoading ? (
-                  <svg class="icon icon-spinner spin">
+                  <svg className="icon icon-spinner spin">
                     <use xlinkHref="#icon-spinner"></use>
                   </svg>
                 ) : (
-                  <svg class="icon icon-inline">
+                  <svg className="icon icon-inline">
                     <use xlinkHref="#icon-image"></use>
                   </svg>
                 )}
@@ -224,78 +225,78 @@ export class MarkdownTextArea extends Component<
                 type="file"
                 accept="image/*,video/*"
                 name="file"
-                class="d-none"
+                className="d-none"
                 disabled={!UserService.Instance.user}
                 // onChange={linkEvent(this, this.handleImageUpload)}
               />
             </form> */}
             <button
               onClick={linkEvent(this, this.handleEmojiPickerClick)}
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('emoji_picker')}
             >
-              <svg class="icon icon-inline">
+              <svg className="icon icon-inline">
                 <use xlinkHref="#icon-smile"></use>
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('header')}
               onClick={linkEvent(this, this.handleInsertHeader)}
             >
-              <svg class="icon icon-inline">
+              <svg className="icon icon-inline">
                 <use xlinkHref="#icon-header"></use>
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('strikethrough')}
               onClick={linkEvent(this, this.handleInsertStrikethrough)}
             >
-              <svg class="icon icon-inline">
+              <svg className="icon icon-inline">
                 <use xlinkHref="#icon-strikethrough"></use>
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('quote')}
               onClick={linkEvent(this, this.handleInsertQuote)}
             >
-              <svg class="icon icon-inline">
+              <svg className="icon icon-inline">
                 <use xlinkHref="#icon-format_quote"></use>
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('list')}
               onClick={linkEvent(this, this.handleInsertList)}
             >
-              <svg class="icon icon-inline">
+              <svg className="icon icon-inline">
                 <use xlinkHref="#icon-list"></use>
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('code')}
               onClick={linkEvent(this, this.handleInsertCode)}
             >
-              <svg class="icon icon-inline">
+              <svg className="icon icon-inline">
                 <use xlinkHref="#icon-code"></use>
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('spoiler')}
               onClick={linkEvent(this, this.handleInsertSpoiler)}
             >
-              <svg class="icon icon-inline">
+              <svg className="icon icon-inline">
                 <use xlinkHref="#icon-alert-triangle"></use>
               </svg>
             </button>
             <a
               href={markdownHelpUrl}
               target="_blank"
-              class="btn btn-sm text-muted font-weight-bold"
+              className="btn btn-sm text-muted font-weight-bold"
               title={i18n.t('formatting_help')}
               rel="noopener"
             >

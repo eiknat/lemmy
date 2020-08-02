@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -16,6 +16,7 @@ import { WebSocketService } from '../services';
 import { wsJsonToRes, toast, getPageFromProps } from '../utils';
 import { CommunityLink } from './community-link';
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
 
 declare const Sortable: any;
 
@@ -73,28 +74,28 @@ export class Communities extends Component<any, CommunitiesState> {
 
   render() {
     return (
-      <div class="container">
+      <div className="container">
         {this.state.loading ? (
-          <h5 class="">
-            <svg class="icon icon-spinner spin">
+          <h5 className="">
+            <svg className="icon icon-spinner spin">
               <use xlinkHref="#icon-spinner"></use>
             </svg>
           </h5>
         ) : (
           <div>
             <h5>{i18n.t('list_of_communities')}</h5>
-            <div class="table-responsive">
-              <table id="community_table" class="table table-sm table-hover">
-                <thead class="pointer">
+            <div className="table-responsive">
+              <table id="community_table" className="table table-sm table-hover">
+                <thead className="pointer">
                   <tr>
                     <th>{i18n.t('name')}</th>
-                    <th class="d-none d-lg-table-cell">{i18n.t('title')}</th>
+                    <th className="d-none d-lg-table-cell">{i18n.t('title')}</th>
                     <th>{i18n.t('category')}</th>
-                    <th class="text-right">{i18n.t('subscribers')}</th>
-                    <th class="text-right d-none d-lg-table-cell">
+                    <th className="text-right">{i18n.t('subscribers')}</th>
+                    <th className="text-right d-none d-lg-table-cell">
                       {i18n.t('posts')}
                     </th>
-                    <th class="text-right d-none d-lg-table-cell">
+                    <th className="text-right d-none d-lg-table-cell">
                       {i18n.t('comments')}
                     </th>
                     <th></th>
@@ -106,21 +107,21 @@ export class Communities extends Component<any, CommunitiesState> {
                       <td>
                         <CommunityLink community={community} />
                       </td>
-                      <td class="d-none d-lg-table-cell">{community.title}</td>
+                      <td className="d-none d-lg-table-cell">{community.title}</td>
                       <td>{community.category_name}</td>
-                      <td class="text-right">
+                      <td className="text-right">
                         {community.number_of_subscribers}
                       </td>
-                      <td class="text-right d-none d-lg-table-cell">
+                      <td className="text-right d-none d-lg-table-cell">
                         {community.number_of_posts}
                       </td>
-                      <td class="text-right d-none d-lg-table-cell">
+                      <td className="text-right d-none d-lg-table-cell">
                         {community.number_of_comments}
                       </td>
-                      <td class="text-right">
+                      <td className="text-right">
                         {community.subscribed ? (
                           <span
-                            class="pointer btn-link"
+                            className="pointer btn-link"
                             onClick={linkEvent(
                               community.id,
                               this.handleUnsubscribe
@@ -130,7 +131,7 @@ export class Communities extends Component<any, CommunitiesState> {
                           </span>
                         ) : (
                           <span
-                            class="pointer btn-link"
+                            className="pointer btn-link"
                             onClick={linkEvent(
                               community.id,
                               this.handleSubscribe
@@ -154,10 +155,10 @@ export class Communities extends Component<any, CommunitiesState> {
 
   paginator() {
     return (
-      <div class="mt-2">
+      <div className="mt-2">
         {this.state.page > 1 && (
           <button
-            class="btn btn-sm btn-secondary mr-1"
+            className="btn btn-sm btn-secondary mr-1"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
@@ -166,7 +167,7 @@ export class Communities extends Component<any, CommunitiesState> {
 
         {this.state.communities.length > 0 && (
           <button
-            class="btn btn-sm btn-secondary"
+            className="btn btn-sm btn-secondary"
             onClick={linkEvent(this, this.nextPage)}
           >
             {i18n.t('next')}

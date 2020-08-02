@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Prompt } from 'inferno-router';
+import React, { Component } from 'react';
+import { Prompt } from 'react-router-dom';
 import { PostListings } from './post-listings';
 import { MarkdownTextArea } from './markdown-textarea';
 import { Subscription } from 'rxjs';
@@ -39,6 +39,7 @@ import Choices from 'choices.js';
 import { i18n } from '../i18next';
 import { cleanURL } from '../clean-url';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
 
 export const MAX_POST_TITLE_LENGTH = 160;
 export const MAX_POST_BODY_LENGTH = 20000;
@@ -72,7 +73,7 @@ export const TextAreaWithCounter = ({ maxLength, ...props }) => {
     <>
       <textarea {...props} />
       {props.value && (
-        <div class="mt-2">
+        <div className="mt-2">
           <span
             style={{ color: characterLimitExceeded ? 'var(--red)' : 'inherit' }}
           >
@@ -203,17 +204,17 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
           message={i18n.t('block_leaving')}
         />
         <form onSubmit={linkEvent(this, this.handlePostSubmit)}>
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label" htmlFor="post-url">
+          <div className="form-group row">
+            <label className="col-sm-2 col-form-label" htmlFor="post-url">
               {i18n.t('url')}
             </label>
-            <div class="col-sm-10">
+            <div className="col-sm-10">
               {/* don't allow URL field to be edited after publishing */}
               {!this.props.onEdit ? (
                 <input
                   type="url"
                   id="post-url"
-                  class="form-control"
+                  className="form-control"
                   value={this.state.postForm.url}
                   onInput={linkEvent(this, this.handlePostUrlChange)}
                   onPaste={linkEvent(this, this.handleImageUploadPaste)}
@@ -223,7 +224,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               )}
               {this.state.suggestedTitle && (
                 <div
-                  class="mt-1 text-muted small font-weight-bold pointer"
+                  className="mt-1 text-muted small font-weight-bold pointer"
                   onClick={linkEvent(this, this.copySuggestedTitle)}
                 >
                   {i18n.t('copy_suggested_title', {
@@ -247,7 +248,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                     type="file"
                     accept="image/*"
                     name="file"
-                    class="d-none"
+                    className="d-none"
                     disabled={!UserService.Instance.user}
                     onChange={linkEvent(this, this.handleImageUpload)}
                   />
@@ -259,23 +260,23 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                     this.state.postForm.url
                   )}`}
                   target="_blank"
-                  class="mr-2 d-inline-block float-right text-muted small font-weight-bold"
+                  className="mr-2 d-inline-block float-right text-muted small font-weight-bold"
                   rel="noopener"
                 >
                   {i18n.t('archive_link')}
                 </a>
               )}
               {this.state.imageLoading && (
-                <svg class="icon icon-spinner spin">
+                <svg className="icon icon-spinner spin">
                   <use xlinkHref="#icon-spinner"></use>
                 </svg>
               )}
               {isImage(this.state.postForm.url) && (
-                <img src={this.state.postForm.url} class="img-fluid" />
+                <img src={this.state.postForm.url} className="img-fluid" />
               )}
               {this.state.crossPosts.length > 0 && (
                 <>
-                  <div class="my-1 text-muted small font-weight-bold">
+                  <div className="my-1 text-muted small font-weight-bold">
                     {i18n.t('cross_posts')}
                   </div>
                   <PostListings
@@ -288,25 +289,25 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               )}
             </div>
           </div>
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label" htmlFor="post-title">
+          <div className="form-group row">
+            <label className="col-sm-2 col-form-label" htmlFor="post-title">
               {i18n.t('title')}
             </label>
-            <div class="col-sm-10">
+            <div className="col-sm-10">
               {!this.props.onEdit ? (
                 <>
                   <TextAreaWithCounter
                     value={this.state.postForm.name}
                     id="post-title"
                     onInput={linkEvent(this, this.handlePostNameChange)}
-                    class="form-control"
+                    className="form-control"
                     required
                     rows={2}
                     minLength={3}
                     maxLength={MAX_POST_TITLE_LENGTH}
                   />
                   {!validTitle(this.state.postForm.name) && (
-                    <div class="invalid-feedback">
+                    <div className="invalid-feedback">
                       {i18n.t('invalid_post_title')}
                     </div>
                   )}
@@ -316,7 +317,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               )}
               {this.state.suggestedPosts.length > 0 && (
                 <>
-                  <div class="my-1 text-muted small font-weight-bold">
+                  <div className="my-1 text-muted small font-weight-bold">
                     {i18n.t('related_posts')}
                   </div>
                   <PostListings
@@ -329,11 +330,11 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
             </div>
           </div>
 
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label" htmlFor={this.id}>
+          <div className="form-group row">
+            <label className="col-sm-2 col-form-label" htmlFor={this.id}>
               {i18n.t('body')}
             </label>
-            <div class="col-sm-10">
+            <div className="col-sm-10">
               <MarkdownTextArea
                 initialContent={this.state.postForm.body}
                 onContentChange={this.handlePostBodyChange}
@@ -341,13 +342,13 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
             </div>
           </div>
           {!this.props.post && (
-            <div class="form-group row">
-              <label class="col-sm-2 col-form-label" htmlFor="post-community">
+            <div className="form-group row">
+              <label className="col-sm-2 col-form-label" htmlFor="post-community">
                 {i18n.t('community')}
               </label>
-              <div class="col-sm-10">
+              <div className="col-sm-10">
                 <select
-                  class="form-control"
+                  className="form-control"
                   id="post-community"
                   value={this.state.postForm.community_id}
                   onInput={linkEvent(this, this.handlePostCommunityChange)}
@@ -377,25 +378,25 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
             </div>
           )}
           {this.props.enableNsfw && (
-            <div class="form-group row">
-              <div class="col-sm-10">
-                <div class="form-check">
+            <div className="form-group row">
+              <div className="col-sm-10">
+                <div className="form-check">
                   <input
-                    class="form-check-input"
+                    className="form-check-input"
                     id="post-nsfw"
                     type="checkbox"
                     checked={this.state.postForm.nsfw}
                     onChange={linkEvent(this, this.handlePostNsfwChange)}
                   />
-                  <label class="form-check-label" htmlFor="post-nsfw">
+                  <label className="form-check-label" htmlFor="post-nsfw">
                     {i18n.t('nsfw')}
                   </label>
                 </div>
               </div>
             </div>
           )}
-          <div class="form-group row">
-            <div class="col-sm-10">
+          <div className="form-group row">
+            <div className="col-sm-10">
               <button
                 disabled={
                   !this.state.postForm.community_id ||
@@ -403,10 +404,10 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                   postTitleBlank
                 }
                 type="submit"
-                class="btn btn-secondary mr-2"
+                className="btn btn-secondary mr-2"
               >
                 {this.state.loading ? (
-                  <svg class="icon icon-spinner spin">
+                  <svg className="icon icon-spinner spin">
                     <use xlinkHref="#icon-spinner"></use>
                   </svg>
                 ) : this.props.post ? (
@@ -418,7 +419,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               {this.props.post && (
                 <button
                   type="button"
-                  class="btn btn-secondary"
+                  className="btn btn-secondary"
                   onClick={linkEvent(this, this.handleCancel)}
                 >
                   {i18n.t('cancel')}

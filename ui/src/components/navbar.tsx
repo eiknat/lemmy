@@ -1,5 +1,5 @@
-import { Component, linkEvent, createRef, RefObject } from 'inferno';
-import { Link, withRouter } from 'inferno-router';
+import React, { Component, createRef, RefObject } from 'react';
+import { Link, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { WebSocketService, UserService } from '../services';
@@ -36,6 +36,8 @@ import { i18n } from '../i18next';
 import { User } from './user';
 import { Icon } from './icon';
 import { CommunityDropdown } from './community-dropdown';
+import { linkEvent } from '../linkEvent';
+
 
 interface NavbarState {
   isLoggedIn: boolean;
@@ -114,9 +116,9 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     this.setState({ searchParam: '' });
     this.setState({ toggleSearch: false });
     if (searchParam === '') {
-      this.context.router.history.push(`/search/`);
+      this.props.history.push(`/search/`);
     } else {
-      this.context.router.history.push(
+      this.props.history.push(
         `/search/q/${searchParam}/type/all/sort/topall/page/1`
       );
     }
@@ -146,6 +148,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   }
 
   render() {
+    console.log(this.props);
     return this.navbar();
   }
 
@@ -171,47 +174,47 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   navbar() {
     return (
       <>
-        <nav class="container-fluid navbar navbar-expand-md navbar-light main-navbar shadow p-0 px-3">
-          <a class="navbar-brand" href="/">
+        <nav className="container-fluid navbar navbar-expand-md navbar-light main-navbar shadow p-0 px-3">
+          <a className="navbar-brand" href="/">
             <img
               src="/static/assets/hexbear_head.svg"
-              class="icon icon-navbar"
+              className="icon icon-navbar"
               alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
             />
           </a>
-          <Link title={version} class="navbar-brand" to="/">
+          <Link title={version} className="navbar-brand" to="/">
             {this.state.siteName}
           </Link>
           {this.state.isLoggedIn && (
             <Link
-              class="ml-auto p-0 navbar-toggler nav-link"
+              className="ml-auto p-0 navbar-toggler nav-link"
               to="/inbox"
               title={i18n.t('inbox')}
             >
               <Icon name="notification" />
               {this.state.unreadCount > 0 && (
-                <span class="ml-1 badge badge-light badge-pink">
+                <span className="ml-1 badge badge-light badge-pink">
                   {this.state.unreadCount}
                 </span>
               )}
             </Link>
           )}
           <button
-            class="navbar-toggler"
+            className="navbar-toggler"
             type="button"
             aria-label="menu"
             onClick={linkEvent(this, this.expandNavbar)}
             data-tippy-content={i18n.t('expand_here')}
           >
-            <span class="navbar-toggler-icon"></span>
+            <span className="navbar-toggler-icon"></span>
           </button>
           <div
             className={`${!this.state.expanded && 'collapse'} navbar-collapse`}
           >
-            <ul class="navbar-nav my-2 mr-auto">
-              <li class="nav-item">
+            <ul className="navbar-nav my-2 mr-auto">
+              <li className="nav-item">
                 <button
-                  class="nav-link btn btn-inline "
+                  className="nav-link btn btn-inline "
                   //to="/communities"
                   title={i18n.t('communities')}
                   id="community-button"
@@ -220,9 +223,9 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                   {i18n.t('communities')}
                 </button>
               </li>
-              <li class="nav-item">
+              <li className="nav-item">
                 <Link
-                  class="nav-link"
+                  className="nav-link"
                   to={{
                     pathname: '/create_post',
                     state: { prevPath: this.currentLocation },
@@ -233,9 +236,9 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                 </Link>
               </li>
               {this.showCreateCommunityNav() && (
-                <li class="nav-item">
+                <li className="nav-item">
                   <Link
-                    class="nav-link"
+                    className="nav-link"
                     to="/create_community"
                     title={i18n.t('create_community')}
                   >
@@ -245,7 +248,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
               )}
               <li className="nav-item">
                 <Link
-                  class="nav-link"
+                  className="nav-link"
                   to="/contributing"
                   title={i18n.t('donate_to_lemmy')}
                 >
@@ -253,15 +256,15 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                 </Link>
               </li>
             </ul>
-            {!this.context.router.history.location.pathname.match(
+            {!this.props.history.location.pathname.match(
               /^\/search/
             ) && (
               <form
-                class="form-inline"
+                className="form-inline"
                 onSubmit={linkEvent(this, this.handleSearchSubmit)}
               >
                 <input
-                  class={`form-control mr-0 search-input ${
+                  className={`form-control mr-0 search-input ${
                     this.state.toggleSearch ? 'show-input' : 'hide-input'
                   }`}
                   onInput={linkEvent(this, this.handleSearchParam)}
@@ -274,16 +277,15 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                 <button
                   name="search-btn"
                   onClick={linkEvent(this, this.handleSearchBtn)}
-                  class={`btn btn-link ${
-                    this.state.toggleSearch ? 'px-2' : 'px-0'
-                  }`}
-                  style="color: var(--gray)"
+                  className={`btn btn-link ${this.state.toggleSearch ? 'px-2' : 'px-0'
+                    }`}
+                  style={{ color: 'var(--gray)' }}
                 >
                   <Icon name="search" />
                 </button>
               </form>
             )}
-            <ul class="navbar-nav my-2 navbar-right">
+            <ul className="navbar-nav my-2 navbar-right">
               {this.canAdmin && (
                 <li className="nav-item">
                   <Link
@@ -291,7 +293,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                     to={`/admin`}
                     title={i18n.t('admin_settings')}
                   >
-                    <svg class="icon">
+                    <svg className="icon">
                       <use xlinkHref="#icon-settings"></use>
                     </svg>
                   </Link>
@@ -300,26 +302,26 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
             </ul>
             {this.state.isLoggedIn ? (
               <>
-                <ul class="navbar-nav my-2">
+                <ul className="navbar-nav my-2">
                   <li className="nav-item">
                     <Link
-                      class="nav-link p-0 px-2 nav-icon"
+                      className="nav-link p-0 px-2 nav-icon"
                       to="/inbox"
                       title={i18n.t('inbox')}
                     >
                       <Icon name="notification" />
                       {this.state.unreadCount > 0 && (
-                        <span class="ml-1 badge badge-light badge-pink">
+                        <span className="ml-1 badge badge-light badge-pink">
                           {this.state.unreadCount}
                         </span>
                       )}
                     </Link>
                   </li>
                 </ul>
-                <ul class="navbar-nav">
+                <ul className="navbar-nav">
                   <li className="nav-item">
                     <Link
-                      class="nav-link"
+                      className="nav-link"
                       to={`/u/${UserService.Instance.user.username}`}
                       title={i18n.t('settings')}
                     >
@@ -331,7 +333,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                             )}
                             height="32"
                             width="32"
-                            class="rounded-circle mr-2"
+                            className="rounded-circle mr-2"
                           />
                         )}
                         {UserService.Instance.user.username}
@@ -341,10 +343,10 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                 </ul>
               </>
             ) : (
-              <ul class="navbar-nav my-2">
+              <ul className="navbar-nav my-2">
                 <li className="nav-item">
                   <Link
-                    class="nav-link"
+                    className="nav-link"
                     to="/login"
                     title={i18n.t('login_sign_up')}
                   >
@@ -479,7 +481,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   }
 
   get currentLocation() {
-    return this.context.router.history.location.pathname;
+    return this.props.history.location.pathname;
   }
 
   get communityButtonLoc() {
@@ -551,7 +553,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
 
       notification.onclick = () => {
         event.preventDefault();
-        this.context.router.history.push(link);
+        this.props.history.push(link);
       };
     }
   }

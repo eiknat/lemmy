@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -13,6 +13,7 @@ import {
 import { WebSocketService, UserService } from '../services';
 import { wsJsonToRes, validEmail, toast, setupTippy } from '../utils';
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
 
 interface State {
   loginForm: LoginForm;
@@ -68,8 +69,8 @@ export class WelcomePage extends Component<any, State> {
 
   render() {
     return (
-      <div class="container">
-        <div class="row">
+      <div className="container">
+        <div className="row">
           <div className="welcome-container">
             <div className="text-center my-4 p-1">
               <img
@@ -82,7 +83,7 @@ export class WelcomePage extends Component<any, State> {
                 Pre-register your account now before all the good ones are gone.
               </h4>
             </div>
-            <div class="welcome-content">{this.registerForm()}</div>
+            <div className="welcome-content">{this.registerForm()}</div>
           </div>
         </div>
       </div>
@@ -94,17 +95,17 @@ export class WelcomePage extends Component<any, State> {
       <div>
         <form onSubmit={linkEvent(this, this.handleLoginSubmit)}>
           <h5>{i18n.t('login')}</h5>
-          <div class="form-group row">
+          <div className="form-group row">
             <label
-              class="col-sm-2 col-form-label"
+              className="col-sm-2 col-form-label"
               htmlFor="login-email-or-username"
             >
               {i18n.t('email_or_username')}
             </label>
-            <div class="col-sm-10">
+            <div className="col-sm-10">
               <input
                 type="text"
-                class="form-control"
+                className="form-control"
                 id="login-email-or-username"
                 value={this.state.loginForm.username_or_email}
                 onInput={linkEvent(this, this.handleLoginUsernameChange)}
@@ -113,17 +114,17 @@ export class WelcomePage extends Component<any, State> {
               />
             </div>
           </div>
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label" htmlFor="login-password">
+          <div className="form-group row">
+            <label className="col-sm-2 col-form-label" htmlFor="login-password">
               {i18n.t('password')}
             </label>
-            <div class="col-sm-10">
+            <div className="col-sm-10">
               <input
                 type="password"
                 id="login-password"
                 value={this.state.loginForm.password}
                 onInput={linkEvent(this, this.handleLoginPasswordChange)}
-                class="form-control"
+                className="form-control"
                 required
               />
               {!validEmail(this.state.loginForm.username_or_email) ? (
@@ -146,11 +147,11 @@ export class WelcomePage extends Component<any, State> {
               )}
             </div>
           </div>
-          <div class="form-group row">
-            <div class="col-sm-10">
-              <button type="submit" class="btn btn-secondary">
+          <div className="form-group row">
+            <div className="col-sm-10">
+              <button type="submit" className="btn btn-secondary">
                 {this.state.loginLoading ? (
-                  <svg class="icon icon-spinner spin">
+                  <svg className="icon icon-spinner spin">
                     <use xlinkHref="#icon-spinner"></use>
                   </svg>
                 ) : (
@@ -168,16 +169,16 @@ export class WelcomePage extends Component<any, State> {
       <form onSubmit={linkEvent(this, this.handleRegisterSubmit)}>
         <h5>{i18n.t('sign_up')}</h5>
 
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label" htmlFor="register-username">
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label" htmlFor="register-username">
             {i18n.t('username')}
           </label>
 
-          <div class="col-sm-10">
+          <div className="col-sm-10">
             <input
               type="text"
               id="register-username"
-              class="form-control"
+              className="form-control"
               value={this.state.registerForm.username}
               onInput={linkEvent(this, this.handleRegisterUsernameChange)}
               required
@@ -188,15 +189,15 @@ export class WelcomePage extends Component<any, State> {
           </div>
         </div>
 
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label" htmlFor="register-email">
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label" htmlFor="register-email">
             {i18n.t('email')}
           </label>
-          <div class="col-sm-10">
+          <div className="col-sm-10">
             <input
               type="email"
               id="register-email"
-              class="form-control"
+              className="form-control"
               placeholder={i18n.t('optional')}
               value={this.state.registerForm.email}
               onInput={linkEvent(this, this.handleRegisterEmailChange)}
@@ -205,80 +206,80 @@ export class WelcomePage extends Component<any, State> {
           </div>
         </div>
 
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label" htmlFor="register-password">
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label" htmlFor="register-password">
             {i18n.t('password')}
           </label>
-          <div class="col-sm-10">
+          <div className="col-sm-10">
             <input
               type="password"
               id="register-password"
               value={this.state.registerForm.password}
               autoComplete="new-password"
               onInput={linkEvent(this, this.handleRegisterPasswordChange)}
-              class="form-control"
+              className="form-control"
               required
             />
           </div>
         </div>
 
-        <div class="form-group row">
+        <div className="form-group row">
           <label
-            class="col-sm-2 col-form-label"
+            className="col-sm-2 col-form-label"
             htmlFor="register-verify-password"
           >
             {i18n.t('verify_password')}
           </label>
-          <div class="col-sm-10">
+          <div className="col-sm-10">
             <input
               type="password"
               id="register-verify-password"
               value={this.state.registerForm.password_verify}
               autoComplete="new-password"
               onInput={linkEvent(this, this.handleRegisterPasswordVerifyChange)}
-              class="form-control"
+              className="form-control"
               required
             />
           </div>
         </div>
         {this.state.enable_nsfw && (
-          <div class="form-group row">
-            <div class="col-sm-10">
-              <div class="form-check">
+          <div className="form-group row">
+            <div className="col-sm-10">
+              <div className="form-check">
                 <input
-                  class="form-check-input"
+                  className="form-check-input"
                   id="register-show-nsfw"
                   type="checkbox"
                   checked={this.state.registerForm.show_nsfw}
                   onChange={linkEvent(this, this.handleRegisterShowNsfwChange)}
                 />
-                <label class="form-check-label" htmlFor="register-show-nsfw">
+                <label className="form-check-label" htmlFor="register-show-nsfw">
                   {i18n.t('show_nsfw')}
                 </label>
               </div>
             </div>
           </div>
         )}
-        <div class="form-group row">
-          <div class="col-sm-10">
-            <div class="form-check">
+        <div className="form-group row">
+          <div className="col-sm-10">
+            <div className="form-check">
               <input
-                class="form-check-input"
+                className="form-check-input"
                 id="tos"
                 type="checkbox"
                 required
               />
-              <label class="form-check-label" htmlFor="tos">
+              <label className="form-check-label" htmlFor="tos">
                 {i18n.t('TOS')}
               </label>
             </div>
           </div>
         </div>
-        <div class="form-group row">
-          <div class="col-sm-12">
-            <button type="submit" class="btn btn-secondary btn-block">
+        <div className="form-group row">
+          <div className="col-sm-12">
+            <button type="submit" className="btn btn-secondary btn-block">
               {this.state.registerLoading ? (
-                <svg class="icon icon-spinner spin">
+                <svg className="icon icon-spinner spin">
                   <use xlinkHref="#icon-spinner"></use>
                 </svg>
               ) : (

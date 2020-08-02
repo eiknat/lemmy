@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import {
   WebSocketJsonResponse,
   UserOperation,
@@ -21,7 +21,8 @@ import { Subscription } from 'rxjs';
 import { wsJsonToRes, toast } from '../utils';
 import { i18n } from '../i18next';
 import { MomentTime } from './moment-time';
-import { Link } from 'inferno-router';
+import { Link } from 'react-router-dom';
+import { linkEvent } from '../linkEvent';
 
 interface ReportsState {
   moderates: Array<CommunityUser>;
@@ -157,7 +158,7 @@ export class Reports extends Component<{}, ReportsState> {
     } = this.state;
 
     return (
-      <div class="container">
+      <div className="container">
         {moderates.map(communityUser => {
           const { community_id, community_name } = communityUser;
 
@@ -173,13 +174,13 @@ export class Reports extends Component<{}, ReportsState> {
           }
 
           return (
-            <div class="mx-3">
-              <div class="row mb-2">
+            <div className="mx-3">
+              <div className="row mb-2">
                 <h4>
                   <Link to={`/c/${community_name}`}>{community_name}</Link>
                 </h4>
                 <button
-                  class="btn btn-success ml-4"
+                  className="btn btn-success ml-4"
                   onClick={() => {
                     this.fetchReports(community_id);
                     this.handleToggleCommunityDisclosure(community_id);
@@ -201,15 +202,15 @@ export class Reports extends Component<{}, ReportsState> {
                   : 0}
               </p>
               {open.includes(community_id) && (
-                <div class="container">
-                  <div class="row">
-                    <div class="col">
+                <div className="container">
+                  <div className="row">
+                    <div className="col">
                       <h5>Post reports</h5>
                       {postReportsByCommunity[community_id] == null ? (
                         <p>no reports</p>
                       ) : (
                         postReportsByCommunity[community_id].map(report => (
-                          <div class="mb-4">
+                          <div className="mb-4">
                             <div
                               style={{
                                 width: '100%',
@@ -217,7 +218,7 @@ export class Reports extends Component<{}, ReportsState> {
                                 'justify-content': 'space-between',
                               }}
                             >
-                              <p class="small my-0">
+                              <p className="small my-0">
                                 {report.user_name} submitted{' '}
                                 <MomentTime
                                   data={{ published: report.time }}
@@ -228,11 +229,11 @@ export class Reports extends Component<{}, ReportsState> {
                                 View Context
                               </Link>
                             </div>
-                            <p class="my-0">{report.reason}</p>
-                            <div class="card p-1">
-                              <p class="mb-0">Post Title: {report.post_name}</p>
-                              <p class="mb-0">Post Body: {report.post_body}</p>
-                              <p class="mb-0">
+                            <p className="my-0">{report.reason}</p>
+                            <div className="card p-1">
+                              <p className="mb-0">Post Title: {report.post_name}</p>
+                              <p className="mb-0">Post Body: {report.post_body}</p>
+                              <p className="mb-0">
                                 Submitted by:{' '}
                                 <Link to={`/u/${report.creator_name}`}>
                                   {report.creator_name}
@@ -248,13 +249,13 @@ export class Reports extends Component<{}, ReportsState> {
                                   onClick={() =>
                                     this.handleOpenBanDialog(report)
                                   }
-                                  class="btn"
+                                  className="btn"
                                 >
                                   ban
                                 </button>
                               )}
                               <button
-                                class="btn"
+                                className="btn"
                                 onClick={() =>
                                   this.handleOpenRemoveDialog(report)
                                 }
@@ -262,7 +263,7 @@ export class Reports extends Component<{}, ReportsState> {
                                 remove
                               </button>
                               <button
-                                class="btn"
+                                className="btn"
                                 onClick={() =>
                                   this.handleResolvePostReport(
                                     report.id,
@@ -288,13 +289,13 @@ export class Reports extends Component<{}, ReportsState> {
                         ))
                       )}
                     </div>
-                    <div class="col">
+                    <div className="col">
                       <h5>Comment reports</h5>
                       {commentReportsByCommunity[community_id] == null ? (
                         <p>no reports</p>
                       ) : (
                         commentReportsByCommunity[community_id].map(report => (
-                          <div class="mb-4">
+                          <div className="mb-4">
                             <div
                               style={{
                                 width: '100%',
@@ -302,7 +303,7 @@ export class Reports extends Component<{}, ReportsState> {
                                 'justify-content': 'space-between',
                               }}
                             >
-                              <p class="small my-0">
+                              <p className="small my-0">
                                 {report.user_name} submitted{' '}
                                 <MomentTime
                                   data={{ published: report.time }}
@@ -315,12 +316,12 @@ export class Reports extends Component<{}, ReportsState> {
                                 View Context
                               </Link>
                             </div>
-                            <p class="my-0">{report.reason}</p>
-                            <div class="card p-1">
-                              <p class="mb-0">
+                            <p className="my-0">{report.reason}</p>
+                            <div className="card p-1">
+                              <p className="mb-0">
                                 Comment Text: {report.comment_text}
                               </p>
-                              <p class="mb-0">
+                              <p className="mb-0">
                                 Submitted by:{' '}
                                 <Link to={`/u/${report.creator_name}`}>
                                   {report.creator_name}
@@ -333,13 +334,13 @@ export class Reports extends Component<{}, ReportsState> {
                                   onClick={() =>
                                     this.handleOpenBanDialog(report)
                                   }
-                                  class="btn"
+                                  className="btn"
                                 >
                                   ban
                                 </button>
                               )}
                               <button
-                                class="btn"
+                                className="btn"
                                 onClick={() =>
                                   this.handleOpenRemoveDialog(report)
                                 }
@@ -347,7 +348,7 @@ export class Reports extends Component<{}, ReportsState> {
                                 remove
                               </button>
                               <button
-                                class="btn"
+                                className="btn"
                                 onClick={() =>
                                   this.handleResolveCommentReport(
                                     report.id,
@@ -537,12 +538,12 @@ export class Reports extends Component<{}, ReportsState> {
           <form onSubmit={linkEvent(this, this.handleBanSubmit)}>
             <textarea
               placeholder={i18n.t('reason')}
-              class="form-control report-handle-form"
+              className="form-control report-handle-form"
               id="ban-reason"
               onInput={linkEvent(this, this.handleBanReasonChange)}
               value={banReason}
             />
-            <button class="btn btn-danger mt-1" type="submit">
+            <button className="btn btn-danger mt-1" type="submit">
               {i18n.t('ban')} {this.state.currentBanDialog.creator_name}
             </button>
           </form>
@@ -569,12 +570,12 @@ export class Reports extends Component<{}, ReportsState> {
           <form onSubmit={linkEvent(this, cb)}>
             <textarea
               placeholder={i18n.t('reason')}
-              class="form-control report-handle-form"
+              className="form-control report-handle-form"
               id="remove-reason"
               onInput={linkEvent(this, this.handleRemoveReasonChange)}
               value={removeReason}
             />
-            <button class="btn btn-danger mt-1" type="submit">
+            <button className="btn btn-danger mt-1" type="submit">
               {i18n.t('remove')}
             </button>
           </form>

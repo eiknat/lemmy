@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import {
   PrivateMessage as PrivateMessageI,
   EditPrivateMessageForm,
@@ -17,6 +17,7 @@ import { MomentTime } from './moment-time';
 import { PrivateMessageForm } from './private-message-form';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
 
 interface PrivateMessageState {
   showReply: boolean;
@@ -58,9 +59,9 @@ export class PrivateMessage extends Component<
   render() {
     let message = this.props.privateMessage;
     return (
-      <div class="border-top border-light">
+      <div className="border-top border-light">
         <div>
-          <ul class="list-inline mb-0 text-muted small">
+          <ul className="list-inline mb-0 text-muted small">
             {/* TODO refactor this */}
             <li className="list-inline-item">
               {this.mine ? i18n.t('to') : i18n.t('from')}
@@ -86,7 +87,7 @@ export class PrivateMessage extends Component<
                           ? message.recipient_avatar
                           : message.creator_avatar
                       )}
-                      class="rounded-circle mr-1"
+                      className="rounded-circle mr-1"
                     />
                   )}
                 <span>
@@ -105,11 +106,11 @@ export class PrivateMessage extends Component<
                 onClick={linkEvent(this, this.handleMessageCollapse)}
               >
                 {this.state.collapsed ? (
-                  <svg class="icon icon-inline">
+                  <svg className="icon icon-inline">
                     <use xlinkHref="#icon-plus-square"></use>
                   </svg>
                 ) : (
-                  <svg class="icon icon-inline">
+                  <svg className="icon icon-inline">
                     <use xlinkHref="#icon-minus-square"></use>
                   </svg>
                 )}
@@ -135,12 +136,12 @@ export class PrivateMessage extends Component<
                   )}
                 />
               )}
-              <ul class="list-inline mb-0 text-muted font-weight-bold">
+              <ul className="list-inline mb-0 text-muted font-weight-bold">
                 {!this.mine && (
                   <>
                     <li className="list-inline-item">
                       <button
-                        class="btn btn-link btn-sm btn-animate text-muted"
+                        className="btn btn-link btn-sm btn-animate text-muted"
                         onClick={linkEvent(this, this.handleMarkRead)}
                         data-tippy-content={
                           message.read
@@ -149,7 +150,7 @@ export class PrivateMessage extends Component<
                         }
                       >
                         <svg
-                          class={`icon icon-inline ${
+                          className={`icon icon-inline ${
                             message.read && 'text-success'
                           }`}
                         >
@@ -159,7 +160,7 @@ export class PrivateMessage extends Component<
                     </li>
                     <li className="list-inline-item">
                       <button
-                        class="btn btn-link btn-sm btn-animate text-muted"
+                        className="btn btn-link btn-sm btn-animate text-muted"
                         onClick={linkEvent(this, this.handleReplyClick)}
                         data-tippy-content={i18n.t('reply')}
                       >
@@ -172,7 +173,7 @@ export class PrivateMessage extends Component<
                   <>
                     <li className="list-inline-item">
                       <button
-                        class="btn btn-link btn-sm btn-animate text-muted"
+                        className="btn btn-link btn-sm btn-animate text-muted"
                         onClick={linkEvent(this, this.handleEditClick)}
                         data-tippy-content={i18n.t('edit')}
                       >
@@ -181,7 +182,7 @@ export class PrivateMessage extends Component<
                     </li>
                     <li className="list-inline-item">
                       <button
-                        class="btn btn-link btn-sm btn-animate text-muted"
+                        className="btn btn-link btn-sm btn-animate text-muted"
                         onClick={linkEvent(this, this.handleDeleteClick)}
                         data-tippy-content={
                           !message.deleted
@@ -190,7 +191,7 @@ export class PrivateMessage extends Component<
                         }
                       >
                         <svg
-                          class={`icon icon-inline ${
+                          className={`icon icon-inline ${
                             message.deleted && 'text-danger'
                           }`}
                         >
@@ -202,12 +203,12 @@ export class PrivateMessage extends Component<
                 )}
                 <li className="list-inline-item">
                   <button
-                    class="btn btn-link btn-sm btn-animate text-muted"
+                    className="btn btn-link btn-sm btn-animate text-muted"
                     onClick={linkEvent(this, this.handleViewSource)}
                     data-tippy-content={i18n.t('view_source')}
                   >
                     <svg
-                      class={`icon icon-inline ${
+                      className={`icon icon-inline ${
                         this.state.viewSource && 'text-success'
                       }`}
                     >
@@ -228,7 +229,7 @@ export class PrivateMessage extends Component<
           />
         )}
         {/* A collapsed clearfix */}
-        {this.state.collapsed && <div class="row col-12"></div>}
+        {this.state.collapsed && <div className="row col-12"></div>}
       </div>
     );
   }

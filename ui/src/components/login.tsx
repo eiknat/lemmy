@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -14,6 +14,7 @@ import { WebSocketService, UserService } from '../services';
 import { wsJsonToRes, validEmail, toast, setupTippy } from '../utils';
 import { i18n } from '../i18next';
 import { HCAPTCHA_SITE_KEY } from '../env';
+import { linkEvent } from '../linkEvent';
 
 interface State {
   loginForm: LoginForm;
@@ -96,10 +97,10 @@ export class Login extends Component<any, State> {
 
   render() {
     return (
-      <div class="container">
-        <div class="row">
-          <div class="col-12 col-lg-6 mb-4">{this.loginForm()}</div>
-          <div class="col-12 col-lg-6">{this.registerForm()}</div>
+      <div className="container">
+        <div className="row">
+          <div className="col-12 col-lg-6 mb-4">{this.loginForm()}</div>
+          <div className="col-12 col-lg-6">{this.registerForm()}</div>
         </div>
       </div>
     );
@@ -113,17 +114,17 @@ export class Login extends Component<any, State> {
           onSubmit={linkEvent(this, this.handleLoginSubmit)}
         >
           <h5>{i18n.t('login')}</h5>
-          <div class="form-group row">
+          <div className="form-group row">
             <label
-              class="col-sm-2 col-form-label"
+              className="col-sm-2 col-form-label"
               htmlFor="login-email-or-username"
             >
               {i18n.t('email_or_username')}
             </label>
-            <div class="col-sm-10">
+            <div className="col-sm-10">
               <input
                 type="text"
-                class="form-control"
+                className="form-control"
                 id="login-email-or-username"
                 value={this.state.loginForm.username_or_email}
                 onInput={linkEvent(this, this.handleLoginUsernameChange)}
@@ -132,17 +133,17 @@ export class Login extends Component<any, State> {
               />
             </div>
           </div>
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label" htmlFor="login-password">
+          <div className="form-group row">
+            <label className="col-sm-2 col-form-label" htmlFor="login-password">
               {i18n.t('password')}
             </label>
-            <div class="col-sm-10">
+            <div className="col-sm-10">
               <input
                 type="password"
                 id="login-password"
                 value={this.state.loginForm.password}
                 onInput={linkEvent(this, this.handleLoginPasswordChange)}
-                class="form-control"
+                className="form-control"
                 required
               />
               {!validEmail(this.state.loginForm.username_or_email) ? (
@@ -165,21 +166,21 @@ export class Login extends Component<any, State> {
               )}
             </div>
           </div>
-          <div class="form-group row">
+          <div className="form-group row">
             {/*hcaptcha target*/}
             <div
               className="h-captcha"
-              class="col-sm-10"
+              className="col-sm-10"
               id="h-captcha"
               data-sitekey={HCAPTCHA_SITE_KEY}
               data-theme="dark"
             />
           </div>
-          <div class="form-group row">
-            <div class="col-sm-10">
-              <button type="submit" class="btn btn-secondary">
+          <div className="form-group row">
+            <div className="col-sm-10">
+              <button type="submit" className="btn btn-secondary">
                 {this.state.loginLoading ? (
-                  <svg class="icon icon-spinner spin">
+                  <svg className="icon icon-spinner spin">
                     <use xlinkHref="#icon-spinner"></use>
                   </svg>
                 ) : (
@@ -197,16 +198,16 @@ export class Login extends Component<any, State> {
       <form onSubmit={linkEvent(this, this.handleRegisterSubmit)}>
         <h5>{i18n.t('sign_up')}</h5>
 
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label" htmlFor="register-username">
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label" htmlFor="register-username">
             {i18n.t('username')}
           </label>
 
-          <div class="col-sm-10">
+          <div className="col-sm-10">
             <input
               type="text"
               id="register-username"
-              class="form-control"
+              className="form-control"
               value={this.state.registerForm.username}
               onInput={linkEvent(this, this.handleRegisterUsernameChange)}
               required
@@ -217,23 +218,23 @@ export class Login extends Component<any, State> {
           </div>
         </div>
 
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label" htmlFor="register-email">
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label" htmlFor="register-email">
             {i18n.t('email')}
           </label>
-          <div class="col-sm-10">
+          <div className="col-sm-10">
             <input
               type="email"
               id="register-email"
-              class="form-control"
+              className="form-control"
               placeholder={i18n.t('optional')}
               value={this.state.registerForm.email}
               onInput={linkEvent(this, this.handleRegisterEmailChange)}
               minLength={3}
             />
             {!validEmail(this.state.registerForm.email) && (
-              <div class="mt-2 mb-0 alert alert-light" role="alert">
-                <svg class="icon icon-inline mr-2">
+              <div className="mt-2 mb-0 alert alert-light" role="alert">
+                <svg className="icon icon-inline mr-2">
                   <use xlinkHref="#icon-alert-triangle"></use>
                 </svg>
                 {i18n.t('no_password_reset')}
@@ -242,53 +243,53 @@ export class Login extends Component<any, State> {
           </div>
         </div>
 
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label" htmlFor="register-password">
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label" htmlFor="register-password">
             {i18n.t('password')}
           </label>
-          <div class="col-sm-10">
+          <div className="col-sm-10">
             <input
               type="password"
               id="register-password"
               value={this.state.registerForm.password}
               autoComplete="new-password"
               onInput={linkEvent(this, this.handleRegisterPasswordChange)}
-              class="form-control"
+              className="form-control"
               required
             />
           </div>
         </div>
 
-        <div class="form-group row">
+        <div className="form-group row">
           <label
-            class="col-sm-2 col-form-label"
+            className="col-sm-2 col-form-label"
             htmlFor="register-verify-password"
           >
             {i18n.t('verify_password')}
           </label>
-          <div class="col-sm-10">
+          <div className="col-sm-10">
             <input
               type="password"
               id="register-verify-password"
               value={this.state.registerForm.password_verify}
               autoComplete="new-password"
               onInput={linkEvent(this, this.handleRegisterPasswordVerifyChange)}
-              class="form-control"
+              className="form-control"
               required
             />
           </div>
         </div>
-        <div class="form-group row">
-          <label class="col-sm-10 col-form-label" htmlFor="register-math">
+        <div className="form-group row">
+          <label className="col-sm-10 col-form-label" htmlFor="register-math">
             {i18n.t('what_is')}{' '}
             {`${this.state.mathQuestion.a} + ${this.state.mathQuestion.b}?`}
           </label>
 
-          <div class="col-sm-2">
+          <div className="col-sm-2">
             <input
               type="number"
               id="register-math"
-              class="form-control"
+              className="form-control"
               value={this.state.mathQuestion.answer}
               onInput={linkEvent(this, this.handleMathAnswerChange)}
               required
@@ -296,42 +297,42 @@ export class Login extends Component<any, State> {
           </div>
         </div>
         {this.state.enable_nsfw && (
-          <div class="form-group row">
-            <div class="col-sm-10">
-              <div class="form-check">
+          <div className="form-group row">
+            <div className="col-sm-10">
+              <div className="form-check">
                 <input
-                  class="form-check-input"
+                  className="form-check-input"
                   id="register-show-nsfw"
                   type="checkbox"
                   checked={this.state.registerForm.show_nsfw}
                   onChange={linkEvent(this, this.handleRegisterShowNsfwChange)}
                 />
-                <label class="form-check-label" htmlFor="register-show-nsfw">
+                <label className="form-check-label" htmlFor="register-show-nsfw">
                   {i18n.t('show_nsfw')}
                 </label>
               </div>
             </div>
           </div>
         )}
-        <div class="form-group row">
+        <div className="form-group row">
           {/*hcaptcha target*/}
           <div
             className="h-captcha h-captcha-register"
-            class="col-sm-10"
+            className="col-sm-10"
             id="h-captcha-register"
             data-sitekey={HCAPTCHA_SITE_KEY}
             data-theme="dark"
           />
         </div>
-        <div class="form-group row">
-          <div class="col-sm-10">
+        <div className="form-group row">
+          <div className="col-sm-10">
             <button
               type="submit"
-              class="btn btn-secondary"
+              className="btn btn-secondary"
               disabled={this.mathCheck}
             >
               {this.state.registerLoading ? (
-                <svg class="icon icon-spinner spin">
+                <svg className="icon icon-spinner spin">
                   <use xlinkHref="#icon-spinner"></use>
                 </svg>
               ) : (

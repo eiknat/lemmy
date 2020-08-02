@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component,  } from 'react';
 import { WebSocketService, UserService } from '../services';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take, last } from 'rxjs/operators';
@@ -31,6 +31,7 @@ import {
 } from '../utils';
 import { PostListing } from './post-listing';
 import { CommentNodes } from './comment-nodes';
+import { linkEvent } from '../linkEvent';
 
 interface UserDetailsProps {
   username?: string;
@@ -206,10 +207,10 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
 
   paginator() {
     return (
-      <div class="my-2">
+      <div className="my-2">
         {this.props.page > 1 && (
           <button
-            class="btn btn-sm btn-secondary mr-1"
+            className="btn btn-sm btn-secondary mr-1"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
@@ -217,7 +218,7 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
         )}
         {this.state.comments.length + this.state.posts.length > 0 && (
           <button
-            class="btn btn-sm btn-secondary"
+            className="btn btn-sm btn-secondary"
             onClick={linkEvent(this, this.nextPage)}
           >
             {i18n.t('next')}
