@@ -511,6 +511,11 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         {i18n.t('mod')[0]}
                       </RoleBadge>
                     )}
+                    {post.creator_tags.pronouns ? (
+                      <span className="badge mx-1 comment-badge pronouns-badge">
+                        {post.creator_tags.pronouns.split(',').join('/')}
+                      </span>
+                    ) : null}
                     {(post.banned_from_community || post.banned) && (
                       <span className="mx-1 badge badge-danger">
                         {i18n.t('banned')}
