@@ -82,8 +82,8 @@
     "ts-transform-classcat": "^1.0.0",
     "ts-transform-inferno": "^4.0.3",
     "typescript": "^3.9.7",
-    "vite": "^1.0.0-rc.1",
-    "vite-plugin-react": "^3.0.0"
+    "vite": "^1.0.0-rc.4",
+    "vite-plugin-react": "^3.0.2"
   },
   "extends": "@parcel/config-default",
   "engines": {

@@ -12838,7 +12838,7 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vite-plugin-react@^3.0.0:
+vite-plugin-react@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/vite-plugin-react/-/vite-plugin-react-3.0.2.tgz#df47a62d7745a95f728695125eed227147ba37b1"
   integrity sha512-W+OdAWuvSddOJDKbHMeyOihLGnMj8pxo7STH3ATn7FZ/3zvcsZKXSlDWmdRtodeMQJJ8odKlDCheVeTFsQJ/vg==
@@ -12846,7 +12846,7 @@ vite-plugin-react@^3.0.0:
     "@babel/core" "^7.9.6"
     react-refresh "^0.8.2"
 
-vite@^1.0.0-rc.1:
+vite@^1.0.0-rc.4:
   version "1.0.0-rc.4"
   resolved "https://registry.yarnpkg.com/vite/-/vite-1.0.0-rc.4.tgz#210106136861b231704e6381ac9eb1bcd655d4f0"
   integrity sha512-D9gpKKaE2U0YpIxNrSn+nlFPBT0sfg68Y1EReYW8YHMhbNFcxwS7RZIa1W/8Pq6yDfVRAhbOZNijv1mLG5pCEg==

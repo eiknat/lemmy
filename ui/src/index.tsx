@@ -58,6 +58,7 @@ function PPB() {
 class Index extends Component<any, any> {
   render() {
     return (
+      <React.StrictMode>
       <I18nextProvider i18n={i18n}>
         <BrowserRouter>
           <div>
@@ -132,6 +133,7 @@ class Index extends Component<any, any> {
           </div>
         </BrowserRouter>
       </I18nextProvider>
+      </React.StrictMode>
     );
   }
 }
