@@ -6,17 +6,20 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "api-test": "jest src/api_tests/api.spec.ts",
-    "build": "node generate_translations.js && EXTEND_ESLINT=true TSC_COMPILE_ON_ERROR=true react-scripts build",
+    "build": "node generate_translations.js && vite build",
     "build_old": "node fuse prod",
     "lint": "tsc --noEmit && eslint --report-unused-disable-directives --ext .js,.ts,.tsx src",
     "prebuild": "node generate_translations.js",
     "prestart": "node generate_translations.js",
     "start": "node generate_translations.js && EXTEND_ESLINT=true TSC_COMPILE_ON_ERROR=true PORT=4444 react-scripts start",
+    "dev": "vite --port 4444",
     "start_old": "node fuse dev"
   },
   "keywords": [],
   "dependencies": {
     "@joeattardi/emoji-button": "^3.1.1",
+    "@pika/react": "^16.13.1",
+    "@pika/react-dom": "^16.13.1",
     "@types/autosize": "^3.0.6",
     "@types/js-cookie": "^2.2.6",
     "@types/jwt-decode": "^2.2.1",
@@ -30,7 +33,6 @@
     "autosize": "^4.0.2",
     "body-scroll-lock": "^3.0.3",
     "bootswatch": "^4.3.1",
-    "browser-sync": "^2.26.12",
     "choices.js": "^9.0.1",
     "classcat": "^4.0.2",
     "emoji-short-name": "^1.0.0",
@@ -43,7 +45,6 @@
     "markdown-it-emoji": "^1.4.0",
     "markdown-it-for-inline": "^0.1.1",
     "moment": "^2.24.0",
-    "node-fetch": "^2.6.0",
     "parse-domain": "^3.0.2",
     "prettier": "^2.0.4",
     "psl": "^1.8.0",
@@ -72,6 +73,7 @@
     "eslint-plugin-inferno": "^7.14.3",
     "eslint-plugin-jane": "^7.2.1",
     "lint-staged": "^10.1.3",
+    "node-fetch": "^2.6.0",
     "sortpack": "^2.1.4",
     "source-map-loader": "^1.0.1",
     "ts-jest": "^25.4.0",
@@ -79,7 +81,9 @@
     "ts-node": "^8.8.2",
     "ts-transform-classcat": "^1.0.0",
     "ts-transform-inferno": "^4.0.3",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "vite": "^1.0.0-rc.1",
+    "vite-plugin-react": "^3.0.0"
   },
   "extends": "@parcel/config-default",
   "engines": {

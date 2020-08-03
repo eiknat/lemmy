@@ -1,30 +1,30 @@
-import 'moment/locale/es';
-import 'moment/locale/el';
-import 'moment/locale/eu';
-import 'moment/locale/eo';
-import 'moment/locale/de';
-import 'moment/locale/zh-cn';
-import 'moment/locale/fr';
-import 'moment/locale/sv';
-import 'moment/locale/ru';
-import 'moment/locale/nl';
-import 'moment/locale/it';
-import 'moment/locale/fi';
-import 'moment/locale/ca';
-import 'moment/locale/fa';
-import 'moment/locale/pl';
-import 'moment/locale/pt-br';
-import 'moment/locale/ja';
-import 'moment/locale/ka';
-import 'moment/locale/hi';
-import 'moment/locale/gl';
-import 'moment/locale/tr';
-import 'moment/locale/hu';
-import 'moment/locale/uk';
-import 'moment/locale/sq';
-import 'moment/locale/km';
-import 'moment/locale/ga';
-import 'moment/locale/sr';
+// import 'moment/locale/es';
+// import 'moment/locale/el';
+// import 'moment/locale/eu';
+// import 'moment/locale/eo';
+// import 'moment/locale/de';
+// import 'moment/locale/zh-cn';
+// import 'moment/locale/fr';
+// import 'moment/locale/sv';
+// import 'moment/locale/ru';
+// import 'moment/locale/nl';
+// import 'moment/locale/it';
+// import 'moment/locale/fi';
+// import 'moment/locale/ca';
+// import 'moment/locale/fa';
+// import 'moment/locale/pl';
+// import 'moment/locale/pt-br';
+// import 'moment/locale/ja';
+// import 'moment/locale/ka';
+// import 'moment/locale/hi';
+// import 'moment/locale/gl';
+// import 'moment/locale/tr';
+// import 'moment/locale/hu';
+// import 'moment/locale/uk';
+// import 'moment/locale/sq';
+// import 'moment/locale/km';
+// import 'moment/locale/ga';
+// import 'moment/locale/sr';
 
 import {
   UserOperation,
@@ -51,7 +51,7 @@ import { UserService, WebSocketService } from './services';
 
 import Tribute from 'tributejs/src/Tribute.js';
 import markdown_it from 'markdown-it';
-import markdownitEmoji from 'markdown-it-emoji/light';
+// import * as markdownitEmoji from 'markdown-it-emoji/light';
 import markdown_it_container from 'markdown-it-container';
 import iterator from 'markdown-it-for-inline';
 import emojiShortName from 'emoji-short-name';
@@ -180,9 +180,9 @@ export const md = new markdown_it({
       }
     },
   })
-  .use(markdownitEmoji, {
-    defs: objectFlip(emojiShortName),
-  })
+  // .use(markdownitEmoji, {
+  //   defs: objectFlip(emojiShortName),
+  // })
   .use(iterator, 'url_new_win', 'link_open', function (tokens, idx) {
     // make sure all inline links open in a new window and don't include the referrer
     tokens[idx].attrPush(['target', '_blank']);
@@ -464,8 +464,8 @@ export function setTheme(theme: string = 'darkly', loggedIn: boolean = false) {
 
   // if the user is not logged in, we load the default themes and let the browser decide
   if (!loggedIn) {
-    document.getElementById('default-light').removeAttribute('disabled');
-    document.getElementById('default-dark').removeAttribute('disabled');
+    document.getElementById('default-light')?.removeAttribute('disabled');
+    document.getElementById('default-dark')?.removeAttribute('disabled');
   } else {
     document
       .getElementById('default-light')
