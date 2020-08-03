@@ -6,6 +6,7 @@ const config: UserConfig = {
   plugins: [reactPlugin],
   optimizeDeps: {
     include: [
+      'emoji-mart',
       'markdown-it-container',
       'moment',
       'markdown-it-emoji',

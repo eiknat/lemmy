@@ -17,6 +17,9 @@ import { i18n } from '../i18next';
 import emojiShortName from 'emoji-short-name';
 import { Icon } from './icon';
 import { linkEvent } from '../linkEvent';
+import 'emoji-mart/css/emoji-mart.css'
+import { Picker } from 'emoji-mart'
+import { customEmojis } from '../custom-emojis';
 
 interface MarkdownTextAreaProps {
   initialContent: string;
@@ -35,6 +38,7 @@ interface MarkdownTextAreaState {
   previewMode: boolean;
   loading: boolean;
   imageLoading: boolean;
+  showEmojiPicker: boolean;
 }
 
 export class MarkdownTextArea extends Component<
@@ -45,17 +49,18 @@ export class MarkdownTextArea extends Component<
   private formId = `comment-form-${randomStr()}`;
   private tribute: Tribute;
   private emptyState: MarkdownTextAreaState = {
-    content: this.props.initialContent,
+    content: this.props.initialContent || '',
     previewMode: false,
     loading: false,
     imageLoading: false,
+    showEmojiPicker: false,
   };
 
   constructor(props: any, context: any) {
     super(props, context);
 
     this.tribute = setupTribute();
-    this.setupEmojiPicker();
+    // this.setupEmojiPicker();
     this.state = this.emptyState;
   }
 
@@ -230,15 +235,27 @@ export class MarkdownTextArea extends Component<
                 // onChange={linkEvent(this, this.handleImageUpload)}
               />
             </form> */}
-            <button
-              onClick={linkEvent(this, this.handleEmojiPickerClick)}
-              className="btn btn-sm text-muted"
-              data-tippy-content={i18n.t('emoji_picker')}
-            >
-              <svg className="icon icon-inline">
-                <use xlinkHref="#icon-smile" />
-              </svg>
-            </button>
+            <span style={{ position: 'relative' }}>
+              <button
+                onClick={this.toggleEmojiPicker}
+                className="btn btn-sm text-muted"
+                data-tippy-content={i18n.t('emoji_picker')}
+                type="button"
+              >
+                <svg className="icon icon-inline">
+                  <use xlinkHref="#icon-smile" />
+                </svg>
+              </button>
+              {this.state.showEmojiPicker && (
+                <>
+                  <div className="emoji-picker-container">
+                  <Picker custom={customEmojis} onSelect={this.handleInsertEmoji} theme="auto" />
+                  </div>
+                  <div
+                    onClick={this.toggleEmojiPicker} className="click-away-container" />
+                  </>
+              )}
+            </span>
             <button
               className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('header')}
@@ -391,6 +408,10 @@ export class MarkdownTextArea extends Component<
     emojiPicker.togglePicker(event.target);
   }
 
+  toggleEmojiPicker = () => {
+    this.setState({ showEmojiPicker: !this.state.showEmojiPicker });
+  }
+
   handleContentChange(i: MarkdownTextArea, event: any) {
     i.state.content = event.target.value;
     i.setState(i.state);
@@ -427,6 +448,13 @@ export class MarkdownTextArea extends Component<
 
   handleReplyCancel(i: MarkdownTextArea) {
     i.props.onReplyCancel();
+  }
+
+  handleInsertEmoji = ({ colons: shortcode }: { colons: string}) => {
+    const { content } = this.state;
+    // pad the emoji with spaces
+    this.setState({ content: `${content} ${shortcode} ` });
+    this.toggleEmojiPicker();
   }
 
   handleInsertLink(i: MarkdownTextArea, event: any) {

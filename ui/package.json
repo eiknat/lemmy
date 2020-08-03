@@ -30,6 +30,7 @@
     "bootswatch": "^4.3.1",
     "choices.js": "^9.0.1",
     "classcat": "^4.0.2",
+    "emoji-mart": "^3.0.0",
     "emoji-short-name": "^1.0.0",
     "husky": "^4.2.5",
     "i18next": "^19.4.1",
