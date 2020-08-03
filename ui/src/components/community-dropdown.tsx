@@ -79,7 +79,6 @@ export class CommunityDropdown extends Component<
   }
 
   render() {
-    console.log(this.props);
     return (
       <>
         <div className="dropdown-block" id="blocking-element" />
