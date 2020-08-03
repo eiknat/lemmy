@@ -98,7 +98,7 @@ export class Post extends Component<any, PostState> {
         enable_downvotes: undefined,
         open_registration: undefined,
         enable_nsfw: undefined,
-        },
+      },
       online: null,
     },
   };
@@ -328,6 +328,7 @@ export class Post extends Component<any, PostState> {
             locked={this.state.post.locked}
             moderators={this.state.moderators}
             admins={this.state.siteRes.admins}
+            sitemods={this.state.siteRes.sitemods}
             postCreatorId={this.state.post.creator_id}
             showContext
             enableDownvotes={this.state.siteRes.site.enable_downvotes}
@@ -408,6 +409,7 @@ export class Post extends Component<any, PostState> {
           locked={this.state.post.locked}
           moderators={this.state.moderators}
           admins={this.state.siteRes.admins}
+          sitemods={this.state.siteRes.sitemods}
           postCreatorId={this.state.post.creator_id}
           sort={this.state.commentSort}
           maxView={this.state.commentLoadTo}

@@ -701,15 +701,14 @@ export class Main extends Component<any, MainState> {
       this.setState(this.state);
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-      console.log('STALINIST data', data);
       // This means it hasn't been set up yet
       if (!data.site) {
         this.context.router.history.push('/setup');
       } else {
+        console.log('data.site is missing', data.site);
         this.state.siteRes.admins = data.admins;
         this.state.siteRes.sitemods = data.sitemods;
         this.state.siteRes.site = data.site;
-        console.log('data.site', data.site);
         this.state.siteRes.banned = data.banned;
         this.state.siteRes.online = data.online;
         this.setState(this.state);
@@ -764,6 +763,10 @@ export class Main extends Component<any, MainState> {
       this.setState(this.state);
     } else if (res.op == UserOperation.AddAdmin) {
       let data = res.data as AddAdminResponse;
+      this.state.siteRes.admins = data.admins;
+      this.setState(this.state);
+    } else if (res.op == UserOperation.AddSitemod) {
+      let data = res.data as AddSitemodResponse;
       this.state.siteRes.admins = data.admins;
       this.setState(this.state);
     } else if (res.op == UserOperation.BanUser) {

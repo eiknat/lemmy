@@ -475,9 +475,13 @@ export class Login extends Component<any, State> {
         toast(i18n.t('reset_password_mail_sent'));
       } else if (res.op == UserOperation.GetSite) {
         let data = res.data as GetSiteResponse;
-        this.state.enable_nsfw = data.site.enable_nsfw;
-        this.setState(this.state);
-        document.title = `${i18n.t('login')} - ${data.site.name}`;
+        if (data.site) {
+          this.state.enable_nsfw = data.site.enable_nsfw;
+          this.setState(this.state);
+          document.title = `${i18n.t('login')} - ${data.site.name}`;
+        } else {
+          console.log('site is null');
+        }
       }
     }
   }

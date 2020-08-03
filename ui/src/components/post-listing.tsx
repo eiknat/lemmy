@@ -1073,7 +1073,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     return (
       this.props.sitemods &&
       isMod(
-        this.props.sitemods.map(a => a.id),
+        this.props.sitemods.map(s => s.id),
         this.props.post.creator_id
       )
     );

@@ -217,7 +217,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   {i18n.t('sitemod')[0]}
                 </RoleBadge>
               )}
-              {this.isMod && !this.isAdmin && !this.isSitemod (
+              {this.isMod && !this.isAdmin && !this.isSitemod && (
                 <RoleBadge role="mod" tooltipText={i18n.t('mod')}>
                   {i18n.t('mod')[0]}
                 </RoleBadge>
@@ -813,6 +813,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
             locked={this.props.locked}
             moderators={this.props.moderators}
             admins={this.props.admins}
+            sitemods={this.props.sitemods}
             postCreatorId={this.props.postCreatorId}
             sort={this.props.sort}
             sortType={this.props.sortType}
@@ -895,7 +896,6 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
         .map(a => a.id)
         .concat(this.props.sitemods.map(s => s.id))
         .concat(this.props.moderators.map(m => m.user_id));
-      console.log('STALINIST5', adminsThenSitemodsThenMods);
       return canMod(
         UserService.Instance.user,
         adminsThenSitemodsThenMods,
