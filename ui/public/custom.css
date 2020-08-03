@@ -623,3 +623,8 @@ a.text-body {
     width: 100%;
   }
 }
+
+.user-online-badge {
+  display: flex;
+  align-items: center;
+}

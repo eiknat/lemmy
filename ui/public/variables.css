@@ -5,6 +5,7 @@
   --chapo-success: #00bc8c;
   --chapo-mod: #08D673;
   --chapo-admin: #F37171;
+  --chapo-sitemod: #F3f171;
   --chapo-creator: #F471C8;
 }
 
@@ -26,6 +27,10 @@
   color: #F37171 !important;
 }
 
+.sitemod-text {
+  color: #F3f171 !important;
+}
+
 .mod-badge {
   background-color: var(--chapo-mod);
   color: #145234 !important;
@@ -36,9 +41,20 @@
   color: #711919!important;
 }
 
+.sitemod-badge {
+  background-color: #F37171 !important;
+  color: #513719!important;
+}
+
 .creator-badge {
   color: #F471C8 !important;
   background-color: transparent !important;
   /* margin-left: -4px; */
   padding-left: 0;
+}
+
+.pronouns-badge {
+  color: white;
+  background-color: #393939;
+  text-transform: none;
 }
