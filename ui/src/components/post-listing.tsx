@@ -114,12 +114,12 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     this.handleEditCancel = this.handleEditCancel.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     // scroll to top of page when loading post listing
     window.scrollTo(0, 0);
   }
 
-  componentWillReceiveProps(nextProps: PostListingProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: PostListingProps) {
     this.state.my_vote = nextProps.post.my_vote;
     this.state.upvotes = nextProps.post.upvotes;
     this.state.downvotes = nextProps.post.downvotes;

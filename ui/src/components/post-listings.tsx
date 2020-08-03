@@ -35,7 +35,7 @@ export class PostListings extends Component<
   }
 
   //are we getting updated post array? save current scroll pos
-  componentWillReceiveProps() {
+  UNSAFE_componentWillReceiveProps() {
     this.state.scrollPos = window.scrollY;
     this.setState(this.state);
   }

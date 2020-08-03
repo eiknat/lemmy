@@ -142,7 +142,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     this.handleCommentDownvote = this.handleCommentDownvote.bind(this);
   }
 
-  componentWillReceiveProps(nextProps: CommentNodeProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: CommentNodeProps) {
     this.state.my_vote = nextProps.node.comment.my_vote;
     this.state.upvotes = nextProps.node.comment.upvotes;
     this.state.downvotes = nextProps.node.comment.downvotes;

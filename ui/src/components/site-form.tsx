@@ -51,7 +51,7 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
   }
 
   // Necessary to stop the loading
-  componentWillReceiveProps() {
+  UNSAFE_componentWillReceiveProps() {
     this.state.loading = false;
     this.setState(this.state);
   }
@@ -130,7 +130,10 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
                     this.handleSiteEnableDownvotesChange
                   )}
                 />
-                <label className="form-check-label" htmlFor="create-site-downvotes">
+                <label
+                  className="form-check-label"
+                  htmlFor="create-site-downvotes"
+                >
                   {i18n.t('enable_downvotes')}
                 </label>
               </div>

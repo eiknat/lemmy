@@ -91,7 +91,7 @@ export class MarkdownTextArea extends Component<
     }
   }
 
-  componentWillReceiveProps(nextProps: MarkdownTextAreaProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: MarkdownTextAreaProps) {
     if (nextProps.finished) {
       this.state.previewMode = false;
       this.state.loading = false;
