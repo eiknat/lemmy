@@ -8,7 +8,7 @@
     "api-test": "jest src/api_tests/api.spec.ts",
     "build": "node generate_translations.js && vite build",
     "lint": "tsc --noEmit && eslint --report-unused-disable-directives --ext .js,.ts,.tsx src",
-    "start": "node generate_translations.js && vite --port 4444"
+    "start": "node generate_translations.js && vite --port 4444 --open"
   },
   "keywords": [],
   "dependencies": {
