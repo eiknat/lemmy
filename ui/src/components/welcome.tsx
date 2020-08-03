@@ -152,7 +152,7 @@ export class WelcomePage extends Component<any, State> {
               <button type="submit" className="btn btn-secondary">
                 {this.state.loginLoading ? (
                   <svg className="icon icon-spinner spin">
-                    <use xlinkHref="#icon-spinner"></use>
+                    <use xlinkHref="#icon-spinner" />
                   </svg>
                 ) : (
                   i18n.t('login')
@@ -280,7 +280,7 @@ export class WelcomePage extends Component<any, State> {
             <button type="submit" className="btn btn-secondary btn-block">
               {this.state.registerLoading ? (
                 <svg className="icon icon-spinner spin">
-                  <use xlinkHref="#icon-spinner"></use>
+                  <use xlinkHref="#icon-spinner" />
                 </svg>
               ) : (
                 i18n.t('sign_up')

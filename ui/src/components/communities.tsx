@@ -78,7 +78,7 @@ export class Communities extends Component<any, CommunitiesState> {
         {this.state.loading ? (
           <h5 className="">
             <svg className="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+              <use xlinkHref="#icon-spinner" />
             </svg>
           </h5>
         ) : (
@@ -98,7 +98,7 @@ export class Communities extends Component<any, CommunitiesState> {
                     <th className="text-right d-none d-lg-table-cell">
                       {i18n.t('comments')}
                     </th>
-                    <th></th>
+                    <th />
                   </tr>
                 </thead>
                 <tbody>

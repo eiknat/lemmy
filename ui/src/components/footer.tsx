@@ -43,7 +43,7 @@ export class Footer extends Component<any, any> {
               </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href={'/docs/index.html'}>
+              <a className="nav-link" href="/docs/index.html">
                 {i18n.t('docs')}
               </a>
             </li>

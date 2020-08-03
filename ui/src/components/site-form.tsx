@@ -211,7 +211,7 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
               >
                 {this.state.loading ? (
                   <svg className="icon icon-spinner spin">
-                    <use xlinkHref="#icon-spinner"></use>
+                    <use xlinkHref="#icon-spinner" />
                   </svg>
                 ) : this.props.site ? (
                   capitalizeFirstLetter(i18n.t('save'))

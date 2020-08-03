@@ -89,7 +89,7 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
         {this.state.siteLoading || this.state.siteConfigLoading ? (
           <h5>
             <svg className="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+              <use xlinkHref="#icon-spinner" />
             </svg>
           </h5>
         ) : (
@@ -179,7 +179,7 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
               <button type="submit" className="btn btn-secondary mr-2">
                 {this.state.siteConfigLoading ? (
                   <svg className="icon icon-spinner spin">
-                    <use xlinkHref="#icon-spinner"></use>
+                    <use xlinkHref="#icon-spinner" />
                   </svg>
                 ) : (
                   capitalizeFirstLetter(i18n.t('save'))

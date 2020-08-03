@@ -118,7 +118,7 @@ export class MarkdownTextArea extends Component<
       <form id={this.formId} onSubmit={linkEvent(this, this.handleSubmit)}>
         <Prompt when={this.state.content} message={i18n.t('block_leaving')} />
         <div className="form-group row">
-          <div className={`col-sm-12`}>
+          <div className="col-sm-12">
             <textarea
               id={this.id}
               className={`form-control ${this.state.previewMode && 'd-none'}`}
@@ -149,7 +149,7 @@ export class MarkdownTextArea extends Component<
               >
                 {this.state.loading ? (
                   <svg className="icon icon-spinner spin">
-                    <use xlinkHref="#icon-spinner"></use>
+                    <use xlinkHref="#icon-spinner" />
                   </svg>
                 ) : (
                   <span>{this.props.buttonTitle}</span>
@@ -176,14 +176,14 @@ export class MarkdownTextArea extends Component<
               </button>
             )}
             {/* A flex expander */}
-            <div className="flex-grow-1"></div>
+            <div className="flex-grow-1" />
             <button
               className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('bold')}
               onClick={linkEvent(this, this.handleInsertBold)}
             >
               <svg className="icon icon-inline">
-                <use xlinkHref="#icon-bold"></use>
+                <use xlinkHref="#icon-bold" />
               </svg>
             </button>
             <button
@@ -192,7 +192,7 @@ export class MarkdownTextArea extends Component<
               onClick={linkEvent(this, this.handleInsertItalic)}
             >
               <svg className="icon icon-inline">
-                <use xlinkHref="#icon-italic"></use>
+                <use xlinkHref="#icon-italic" />
               </svg>
             </button>
             <button
@@ -201,7 +201,7 @@ export class MarkdownTextArea extends Component<
               onClick={linkEvent(this, this.handleInsertLink)}
             >
               <svg className="icon icon-inline">
-                <use xlinkHref="#icon-link"></use>
+                <use xlinkHref="#icon-link" />
               </svg>
             </button>
             {/* <form className="btn btn-sm text-muted font-weight-bold">
@@ -236,7 +236,7 @@ export class MarkdownTextArea extends Component<
               data-tippy-content={i18n.t('emoji_picker')}
             >
               <svg className="icon icon-inline">
-                <use xlinkHref="#icon-smile"></use>
+                <use xlinkHref="#icon-smile" />
               </svg>
             </button>
             <button
@@ -245,7 +245,7 @@ export class MarkdownTextArea extends Component<
               onClick={linkEvent(this, this.handleInsertHeader)}
             >
               <svg className="icon icon-inline">
-                <use xlinkHref="#icon-header"></use>
+                <use xlinkHref="#icon-header" />
               </svg>
             </button>
             <button
@@ -254,7 +254,7 @@ export class MarkdownTextArea extends Component<
               onClick={linkEvent(this, this.handleInsertStrikethrough)}
             >
               <svg className="icon icon-inline">
-                <use xlinkHref="#icon-strikethrough"></use>
+                <use xlinkHref="#icon-strikethrough" />
               </svg>
             </button>
             <button
@@ -263,7 +263,7 @@ export class MarkdownTextArea extends Component<
               onClick={linkEvent(this, this.handleInsertQuote)}
             >
               <svg className="icon icon-inline">
-                <use xlinkHref="#icon-format_quote"></use>
+                <use xlinkHref="#icon-format_quote" />
               </svg>
             </button>
             <button
@@ -272,7 +272,7 @@ export class MarkdownTextArea extends Component<
               onClick={linkEvent(this, this.handleInsertList)}
             >
               <svg className="icon icon-inline">
-                <use xlinkHref="#icon-list"></use>
+                <use xlinkHref="#icon-list" />
               </svg>
             </button>
             <button
@@ -281,7 +281,7 @@ export class MarkdownTextArea extends Component<
               onClick={linkEvent(this, this.handleInsertCode)}
             >
               <svg className="icon icon-inline">
-                <use xlinkHref="#icon-code"></use>
+                <use xlinkHref="#icon-code" />
               </svg>
             </button>
             <button
@@ -290,7 +290,7 @@ export class MarkdownTextArea extends Component<
               onClick={linkEvent(this, this.handleInsertSpoiler)}
             >
               <svg className="icon icon-inline">
-                <use xlinkHref="#icon-alert-triangle"></use>
+                <use xlinkHref="#icon-alert-triangle" />
               </svg>
             </button>
             <a

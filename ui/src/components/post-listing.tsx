@@ -305,11 +305,11 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
         >
           {post.nsfw ? (
             <svg className="icon thumbnail" style={{ marginTop: '-3px' }}>
-              <use xlinkHref="#icon-warning-post"></use>
+              <use xlinkHref="#icon-warning-post" />
             </svg>
           ) : (
             <svg className="icon thumbnail">
-              <use xlinkHref="#icon-message-square"></use>
+              <use xlinkHref="#icon-message-square" />
             </svg>
           )}
         </button>
@@ -340,7 +340,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
               <Icon name="upvote" className="icon upvote" />
             </button>
             <div
-              className={`unselectable pointer font-weight-bold text-muted px-1 py-1`}
+              className="unselectable pointer font-weight-bold text-muted px-1 py-1"
               data-tippy-content={this.pointsTippy}
             >
               {this.state.score}
@@ -478,8 +478,8 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                       className="unselectable pointer ml-2 text-muted font-italic"
                       data-tippy-content={i18n.t('deleted')}
                     >
-                      <svg className={`icon icon-inline text-danger`}>
-                        <use xlinkHref="#icon-trash"></use>
+                      <svg className="icon icon-inline text-danger">
+                        <use xlinkHref="#icon-trash" />
                       </svg>
                     </small>
                   )}
@@ -556,8 +556,8 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                       className="unselectable pointer ml-1 text-muted font-italic"
                       data-tippy-content={i18n.t('locked')}
                     >
-                      <svg className={`icon custom-icon text-danger`}>
-                        <use xlinkHref="#icon-lock"></use>
+                      <svg className="icon custom-icon text-danger">
+                        <use xlinkHref="#icon-lock" />
                       </svg>
                     </small>
                   )}
@@ -732,7 +732,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                       title={i18n.t('cross_post')}
                     >
                       <svg className="icon icon-inline">
-                        <use xlinkHref="#icon-copy"></use>
+                        <use xlinkHref="#icon-copy" />
                       </svg>
                     </Link>
                   </li>
@@ -771,7 +771,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                           post.deleted && 'text-danger'
                         }`}
                       >
-                        <use xlinkHref="#icon-trash"></use>
+                        <use xlinkHref="#icon-trash" />
                       </svg>
                     </button>
                   </li>
@@ -802,7 +802,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                             this.state.viewSource && 'text-success'
                           }`}
                         >
-                          <use xlinkHref="#icon-file-text"></use>
+                          <use xlinkHref="#icon-file-text" />
                         </svg>
                       </button>
                     </li>
@@ -822,7 +822,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                               post.locked && 'text-danger'
                             }`}
                           >
-                            <use xlinkHref="#icon-lock"></use>
+                            <use xlinkHref="#icon-lock" />
                           </svg>
                         </button>
                       </li>
@@ -841,7 +841,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                               post.stickied && 'text-success'
                             }`}
                           >
-                            <use xlinkHref="#icon-pin"></use>
+                            <use xlinkHref="#icon-pin" />
                           </svg>
                         </button>
                       </li>

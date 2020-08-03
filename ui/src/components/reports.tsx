@@ -222,7 +222,7 @@ export class BaseReports extends Component<{}, ReportsState> {
                                 {report.user_name} submitted{' '}
                                 <MomentTime
                                   data={{ published: report.time }}
-                                  showAgo={true}
+                                  showAgo
                                 />
                               </p>
                               <Link to={`/post/${report.post_id}`}>
@@ -311,7 +311,7 @@ export class BaseReports extends Component<{}, ReportsState> {
                                 {report.user_name} submitted{' '}
                                 <MomentTime
                                   data={{ published: report.time }}
-                                  showAgo={true}
+                                  showAgo
                                 />
                               </p>
                               <Link

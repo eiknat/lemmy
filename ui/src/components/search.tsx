@@ -192,7 +192,7 @@ export class Search extends Component<any, SearchState> {
         <button type="submit" className="btn btn-secondary mr-2">
           {this.state.loading ? (
             <svg className="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+              <use xlinkHref="#icon-spinner" />
             </svg>
           ) : (
             <span>{i18n.t('search')}</span>

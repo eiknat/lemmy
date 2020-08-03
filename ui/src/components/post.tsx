@@ -204,7 +204,7 @@ export class Post extends Component<any, PostState> {
         {this.state.loading ? (
           <h5>
             <svg className="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+              <use xlinkHref="#icon-spinner" />
             </svg>
           </h5>
         ) : (

@@ -186,7 +186,7 @@ export class BaseCommunity extends Component<any, State> {
         {this.state.loading ? (
           <h5>
             <svg className="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+              <use xlinkHref="#icon-spinner" />
             </svg>
           </h5>
         ) : (
@@ -231,7 +231,7 @@ export class BaseCommunity extends Component<any, State> {
                         {i18n.t('subscribe')}
                       </button>
                     )}
-                    <div className="community-button-separator"></div>
+                    <div className="community-button-separator" />
                     <Link
                       className="btn btn-secondary create-post-button"
                       to={`/create_post?community=${this.state.community.name}`}

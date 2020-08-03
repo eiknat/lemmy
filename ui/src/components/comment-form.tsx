@@ -106,7 +106,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
         ) : (
           <div className="alert alert-light" role="alert">
             <svg className="icon icon-inline mr-2">
-              <use xlinkHref="#icon-alert-triangle"></use>
+              <use xlinkHref="#icon-alert-triangle" />
             </svg>
             <Trans i18nKey="must_login" className="d-inline">
               #

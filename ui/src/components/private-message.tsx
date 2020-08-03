@@ -107,11 +107,11 @@ export class PrivateMessage extends Component<
               >
                 {this.state.collapsed ? (
                   <svg className="icon icon-inline">
-                    <use xlinkHref="#icon-plus-square"></use>
+                    <use xlinkHref="#icon-plus-square" />
                   </svg>
                 ) : (
                   <svg className="icon icon-inline">
-                    <use xlinkHref="#icon-minus-square"></use>
+                    <use xlinkHref="#icon-minus-square" />
                   </svg>
                 )}
               </div>
@@ -154,7 +154,7 @@ export class PrivateMessage extends Component<
                             message.read && 'text-success'
                           }`}
                         >
-                          <use xlinkHref="#icon-check"></use>
+                          <use xlinkHref="#icon-check" />
                         </svg>
                       </button>
                     </li>
@@ -195,7 +195,7 @@ export class PrivateMessage extends Component<
                             message.deleted && 'text-danger'
                           }`}
                         >
-                          <use xlinkHref="#icon-trash"></use>
+                          <use xlinkHref="#icon-trash" />
                         </svg>
                       </button>
                     </li>
@@ -212,7 +212,7 @@ export class PrivateMessage extends Component<
                         this.state.viewSource && 'text-success'
                       }`}
                     >
-                      <use xlinkHref="#icon-file-text"></use>
+                      <use xlinkHref="#icon-file-text" />
                     </svg>
                   </button>
                 </li>
@@ -229,7 +229,7 @@ export class PrivateMessage extends Component<
           />
         )}
         {/* A collapsed clearfix */}
-        {this.state.collapsed && <div className="row col-12"></div>}
+        {this.state.collapsed && <div className="row col-12" />}
       </div>
     );
   }

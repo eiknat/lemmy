@@ -148,8 +148,8 @@ export class PrivateMessageForm extends Component<
                 className="ml-2 pointer text-danger"
                 data-tippy-content={i18n.t('disclaimer')}
               >
-                <svg className={`icon icon-inline`}>
-                  <use xlinkHref="#icon-alert-triangle"></use>
+                <svg className="icon icon-inline">
+                  <use xlinkHref="#icon-alert-triangle" />
                 </svg>
               </span>
             </label>
@@ -189,7 +189,7 @@ export class PrivateMessageForm extends Component<
               >
                 {this.state.loading ? (
                   <svg className="icon icon-spinner spin">
-                    <use xlinkHref="#icon-spinner"></use>
+                    <use xlinkHref="#icon-spinner" />
                   </svg>
                 ) : this.props.privateMessage ? (
                   capitalizeFirstLetter(i18n.t('save'))
@@ -207,7 +207,7 @@ export class PrivateMessageForm extends Component<
                 </button>
               )}
               <ul className="d-inline-block float-right list-inline mb-1 text-muted font-weight-bold">
-                <li className="list-inline-item"></li>
+                <li className="list-inline-item" />
               </ul>
             </div>
           </div>

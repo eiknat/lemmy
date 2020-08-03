@@ -181,7 +181,7 @@ export class Login extends Component<any, State> {
               <button type="submit" className="btn btn-secondary">
                 {this.state.loginLoading ? (
                   <svg className="icon icon-spinner spin">
-                    <use xlinkHref="#icon-spinner"></use>
+                    <use xlinkHref="#icon-spinner" />
                   </svg>
                 ) : (
                   i18n.t('login')
@@ -235,7 +235,7 @@ export class Login extends Component<any, State> {
             {!validEmail(this.state.registerForm.email) && (
               <div className="mt-2 mb-0 alert alert-light" role="alert">
                 <svg className="icon icon-inline mr-2">
-                  <use xlinkHref="#icon-alert-triangle"></use>
+                  <use xlinkHref="#icon-alert-triangle" />
                 </svg>
                 {i18n.t('no_password_reset')}
               </div>
@@ -333,7 +333,7 @@ export class Login extends Component<any, State> {
             >
               {this.state.registerLoading ? (
                 <svg className="icon icon-spinner spin">
-                  <use xlinkHref="#icon-spinner"></use>
+                  <use xlinkHref="#icon-spinner" />
                 </svg>
               ) : (
                 i18n.t('sign_up')

@@ -345,7 +345,7 @@ export class Modlog extends Component<any, ModlogState> {
         {this.state.loading ? (
           <h5 className="">
             <svg className="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+              <use xlinkHref="#icon-spinner" />
             </svg>
           </h5>
         ) : (

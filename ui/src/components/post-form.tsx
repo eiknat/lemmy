@@ -268,7 +268,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               )}
               {this.state.imageLoading && (
                 <svg className="icon icon-spinner spin">
-                  <use xlinkHref="#icon-spinner"></use>
+                  <use xlinkHref="#icon-spinner" />
                 </svg>
               )}
               {isImage(this.state.postForm.url) && (
@@ -413,7 +413,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               >
                 {this.state.loading ? (
                   <svg className="icon icon-spinner spin">
-                    <use xlinkHref="#icon-spinner"></use>
+                    <use xlinkHref="#icon-spinner" />
                   </svg>
                 ) : this.props.post ? (
                   capitalizeFirstLetter(i18n.t('save'))

@@ -9,11 +9,11 @@ export class CakeDay extends Component<CakeDayProps, any> {
   render() {
     return (
       <div
-        className={`mx-2 d-inline-block unselectable pointer`}
+        className="mx-2 d-inline-block unselectable pointer"
         data-tippy-content={this.cakeDayTippy()}
       >
         <svg className="icon icon-inline">
-          <use xlinkHref="#icon-cake"></use>
+          <use xlinkHref="#icon-cake" />
         </svg>
       </div>
     );

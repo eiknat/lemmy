@@ -68,6 +68,7 @@ export class UserListing extends Component<UserListingProps, any> {
               height="32"
               width="32"
               src={pictrsAvatarThumbnail(user.avatar)}
+              alt={`Avatar for user ${user.name}`}
               className="rounded-circle mr-2"
             />
           )}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactSVGElement } from 'react';
 
 const icons = {
   report: (
@@ -51,8 +51,8 @@ const icons = {
   ),
   contribute: (
     <>
-      <path d="M17 19h-12c-0.553 0-1-0.447-1-1s0.447-1 1-1h12c0.553 0 1 0.447 1 1s-0.447 1-1 1z"></path>
-      <path d="M17.5 5h-12.5v9c0 1.1 0.9 2 2 2h8c1.1 0 2-0.9 2-2v-2h0.5c1.93 0 3.5-1.57 3.5-3.5s-1.57-3.5-3.5-3.5zM15 14h-8v-7h8v7zM17.5 10h-1.5v-3h1.5c0.827 0 1.5 0.673 1.5 1.5s-0.673 1.5-1.5 1.5z"></path>
+      <path d="M17 19h-12c-0.553 0-1-0.447-1-1s0.447-1 1-1h12c0.553 0 1 0.447 1 1s-0.447 1-1 1z" />
+      <path d="M17.5 5h-12.5v9c0 1.1 0.9 2 2 2h8c1.1 0 2-0.9 2-2v-2h0.5c1.93 0 3.5-1.57 3.5-3.5s-1.57-3.5-3.5-3.5zM15 14h-8v-7h8v7zM17.5 10h-1.5v-3h1.5c0.827 0 1.5 0.673 1.5 1.5s-0.673 1.5-1.5 1.5z" />
     </>
   ),
   rss: (
@@ -133,16 +133,16 @@ const icons = {
   ),
 };
 
-type Icons = typeof icons;
+interface IconProps {
+  name: keyof typeof icons
+  size?: string | number;
+}
 
-export function Icon<Trans extends keyof Icons>({
+export function Icon({
   name,
   size = '20px',
   ...props
-}: {
-  name: T;
-  size?: number | string;
-}): Icons[T] {
+}: IconProps & React.SVGProps<SVGSVGElement>) {
   if (!Object.keys(icons).includes(name)) {
     console.warn(`Icon ${name} not found`);
     return null;
@@ -158,8 +158,6 @@ export function Icon<Trans extends keyof Icons>({
         width: size,
         height: size,
       }}
-      // height={size}
-      // width={size}
       {...props}
     >
       <title id="title">{name}</title>

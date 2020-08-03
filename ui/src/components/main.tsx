@@ -440,18 +440,18 @@ class Main extends Component<any, MainState> {
                 #
               </a>
               <a href="https://en.wikipedia.org/wiki/Fediverse">#</a>
-              <br className="big"></br>
+              <br className="big" />
               <code>#</code>
-              <br></br>
+              <br />
               <b>#</b>
-              <br className="big"></br>
+              <br className="big" />
               <a href={repoUrl}>#</a>
-              <br className="big"></br>
+              <br className="big" />
               <a href="https://www.rust-lang.org">#</a>
               <a href="https://actix.rs/">#</a>
               <a href="https://infernojs.org">#</a>
               <a href="https://www.typescriptlang.org/">#</a>
-              <br className="big"></br>
+              <br className="big" />
               <a href="https://github.com/LemmyNet/lemmy/graphs/contributors?type=a">
                 #
               </a>
@@ -469,7 +469,7 @@ class Main extends Component<any, MainState> {
         {this.state.loading ? (
           <h5>
             <svg className="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+              <use xlinkHref="#icon-spinner" />
             </svg>
           </h5>
         ) : (

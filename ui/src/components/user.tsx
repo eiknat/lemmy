@@ -233,6 +233,7 @@ class BaseUser extends Component<any, UserState> {
               height="80"
               width="80"
               src={this.state.user.avatar}
+              alt={`Avatar for user ${this.state.username}`}
               className="rounded-circle mr-2"
             />
           )}
@@ -241,7 +242,7 @@ class BaseUser extends Component<any, UserState> {
         {this.state.loading && (
           <h5>
             <svg className="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+              <use xlinkHref="#icon-spinner" />
             </svg>
           </h5>
         )}
@@ -379,7 +380,7 @@ class BaseUser extends Component<any, UserState> {
             </h5>
             <div className="d-flex align-items-center mb-2">
               <svg className="icon">
-                <use xlinkHref="#icon-cake"></use>
+                <use xlinkHref="#icon-cake" />
               </svg>
               <span className="ml-2">
                 {i18n.t('cake_day_title')}{' '}
@@ -740,7 +741,7 @@ class BaseUser extends Component<any, UserState> {
                 >
                   {this.state.userSettingsLoading ? (
                     <svg className="icon icon-spinner spin">
-                      <use xlinkHref="#icon-spinner"></use>
+                      <use xlinkHref="#icon-spinner" />
                     </svg>
                   ) : (
                     capitalizeFirstLetter(i18n.t('save'))
@@ -780,7 +781,7 @@ class BaseUser extends Component<any, UserState> {
                     >
                       {this.state.deleteAccountLoading ? (
                         <svg className="icon icon-spinner spin">
-                          <use xlinkHref="#icon-spinner"></use>
+                          <use xlinkHref="#icon-spinner" />
                         </svg>
                       ) : (
                         capitalizeFirstLetter(i18n.t('delete'))
@@ -832,7 +833,7 @@ class BaseUser extends Component<any, UserState> {
                     id="reason"
                     placeholder="reason"
                     onChange={linkEvent(this, this.handleBanReasonChange)}
-                  ></input>
+                   />
                   <button
                     className="btn btn-secondary btn-danger ml-2"
                     type="submit"

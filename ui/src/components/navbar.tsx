@@ -204,7 +204,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
             onClick={linkEvent(this, this.expandNavbar)}
             data-tippy-content={i18n.t('expand_here')}
           >
-            <span className="navbar-toggler-icon"></span>
+            <span className="navbar-toggler-icon" />
           </button>
           <div
             className={`${!this.state.expanded && 'collapse'} navbar-collapse`}
@@ -269,7 +269,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                   type="text"
                   placeholder={i18n.t('search')}
                   onBlur={linkEvent(this, this.handleSearchBlur)}
-                ></input>
+                 />
                 <button
                   name="search-btn"
                   onClick={linkEvent(this, this.handleSearchBtn)}
@@ -287,11 +287,11 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                 <li className="nav-item">
                   <Link
                     className="nav-link p-0 px-2 nav-icon"
-                    to={`/admin`}
+                    to="/admin"
                     title={i18n.t('admin_settings')}
                   >
                     <svg className="icon">
-                      <use xlinkHref="#icon-settings"></use>
+                      <use xlinkHref="#icon-settings" />
                     </svg>
                   </Link>
                 </li>
@@ -357,7 +357,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
             <CommunityDropdown
               posX={this.communityButtonLoc}
               removeDropdown={() => this.showCommunityDropdown(this)}
-            ></CommunityDropdown>
+             />
           )}
         </nav>
         {/* empty space below navbar */}

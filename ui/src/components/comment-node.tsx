@@ -298,7 +298,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                             node.comment.read && 'text-success'
                           }`}
                         >
-                          <use xlinkHref="#icon-check"></use>
+                          <use xlinkHref="#icon-check" />
                         </svg>
                       )}
                     </button>
@@ -358,7 +358,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                 title={i18n.t('message').toLowerCase()}
                               >
                                 <svg className="icon">
-                                  <use xlinkHref="#icon-mail"></use>
+                                  <use xlinkHref="#icon-mail" />
                                 </svg>
                               </Link>
                             </button>
@@ -397,7 +397,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                 this.state.viewSource && 'text-success'
                               }`}
                             >
-                              <use xlinkHref="#icon-file-text"></use>
+                              <use xlinkHref="#icon-file-text" />
                             </svg>
                           </button>
                           {this.myComment ? (
@@ -426,7 +426,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                     node.comment.deleted && 'text-danger'
                                   }`}
                                 >
-                                  <use xlinkHref="#icon-trash"></use>
+                                  <use xlinkHref="#icon-trash" />
                                 </svg>
                               </button>
                             </>
@@ -774,7 +774,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
           />
         )}
         {/* A collapsed clearfix */}
-        {this.state.collapsed && <div className="row col-12"></div>}
+        {this.state.collapsed && <div className="row col-12" />}
       </div>
     );
   }
@@ -788,7 +788,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
         title={this.props.showContext ? i18n.t('show_context') : i18n.t('link')}
       >
         <svg className="icon icon-inline">
-          <use xlinkHref="#icon-link"></use>
+          <use xlinkHref="#icon-link" />
         </svg>
       </Link>
     );
@@ -797,7 +797,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   get loadingIcon() {
     return (
       <svg className="icon icon-spinner spin">
-        <use xlinkHref="#icon-spinner"></use>
+        <use xlinkHref="#icon-spinner" />
       </svg>
     );
   }

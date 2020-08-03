@@ -81,7 +81,7 @@ export class CommunityDropdown extends Component<
   render() {
     return (
       <>
-        <div className="dropdown-block" id="blocking-element"></div>
+        <div className="dropdown-block" id="blocking-element" />
         <div
           className="floating-container"
           style={this.getContainerLoc()}
@@ -95,13 +95,13 @@ export class CommunityDropdown extends Component<
                   className="dropdown-filter form-control"
                   placeholder="Filter"
                   onInput={linkEvent(this, this.handleFilterChange)}
-                ></input>
+                 />
                 <button
                   className="dropdown-exit btn"
                   onClick={linkEvent(this, this.handleDropdownClose)}
                 >
                   <svg className="icon icon-inline">
-                    <use xlinkHref="#icon-cancel"></use>
+                    <use xlinkHref="#icon-cancel" />
                   </svg>
                 </button>
               </div>
@@ -115,11 +115,10 @@ export class CommunityDropdown extends Component<
                           <div className="community-listing">
                             <span
                               className="community-icon"
-                              style={
-                                'background: ' +
-                                this.generateColor(community.community_name)
-                              }
-                            ></span>
+                              style={{
+                                background: this.generateColor(community.community_name)
+                              }}
+                             />
                             <Link
                               className="community-listing-title"
                               to={`/c/${community.community_name}`}
@@ -142,11 +141,10 @@ export class CommunityDropdown extends Component<
                         <div className="community-listing">
                           <span
                             className="community-icon"
-                            style={
-                              'background: ' +
-                              this.generateColor(community.name)
-                            }
-                          ></span>
+                            style={{
+                              background: this.generateColor(community.community_name)
+                            }}
+                           />
                           <Link
                             className="community-listing-title"
                             to={`/c/${community.name}`}

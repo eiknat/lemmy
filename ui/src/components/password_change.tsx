@@ -98,7 +98,7 @@ export class PasswordChange extends Component<any, State> {
             <button type="submit" className="btn btn-secondary">
               {this.state.loading ? (
                 <svg className="icon icon-spinner spin">
-                  <use xlinkHref="#icon-spinner"></use>
+                  <use xlinkHref="#icon-spinner" />
                 </svg>
               ) : (
                 capitalizeFirstLetter(i18n.t('save'))

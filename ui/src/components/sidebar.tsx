@@ -205,7 +205,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
                             community.deleted && 'text-danger'
                           }`}
                         >
-                          <use xlinkHref="#icon-trash"></use>
+                          <use xlinkHref="#icon-trash" />
                         </svg>
                       </span>
                     </li>
@@ -296,7 +296,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
               &nbsp;|&nbsp;
               {this.canMod && (
                 <li className="community-sidebar-item">
-                  <Link to={`/reports`}>{i18n.t('reports')}</Link>
+                  <Link to="/reports">{i18n.t('reports')}</Link>
                 </li>
               )}
             </ul>
