@@ -24,6 +24,3 @@ test/data/result.json
 
 package-lock.json
 *.orig
-
-.cache
-.parcel-cache
