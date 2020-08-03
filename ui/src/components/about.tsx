@@ -21,7 +21,7 @@ export class About extends Component<any, any> {
       <div className="about-container">
         <div className="about-header">
           <img
-            src="/static/assets/banner.png"
+            src="/banner.png"
             className="img-fluid"
             alt="bear with black text reading 'you have nothing to lose but your chains'"
           />
@@ -76,7 +76,7 @@ export class About extends Component<any, any> {
 
             <div className="my-4">
               <img
-                src="/static/assets/last-comment.png"
+                src="/last-comment.png"
                 alt="the last comment before the r/chapotraphouse subreddit was shut down"
                 className="img-fluid"
               />

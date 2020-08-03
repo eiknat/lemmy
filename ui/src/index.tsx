@@ -45,7 +45,7 @@ const container = document.getElementById('app');
 
 function PPB() {
   return (
-    <div style={{ 'max-width': '500px' }}>
+    <div style={{ 'maxWidth': '500px' }}>
       <img
         src="https://i.imgur.com/5pXPI.jpg"
         className="img-fluid"
@@ -56,13 +56,9 @@ function PPB() {
 }
 
 class Index extends Component<any, any> {
-  constructor(props: any, context: any) {
-    super(props, context);
-  }
-
   render() {
     return (
-      <I18nextProvider i18next={i18n}>
+      <I18nextProvider i18n={i18n}>
         <BrowserRouter>
           <div>
             <Navbar />

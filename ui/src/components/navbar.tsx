@@ -176,7 +176,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
       <nav className="container-fluid navbar navbar-expand-md navbar-light main-navbar shadow p-0 px-3">
         <a className="navbar-brand" href="/">
           <img
-            src="/static/assets/hexbear_head.svg"
+            src="/hexbear_head.svg"
             className="icon icon-navbar"
             alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
           />
@@ -527,7 +527,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     let creator_name = reply.creator_name;
     let creator_avatar = reply.creator_avatar
       ? reply.creator_avatar
-      : `${window.location.protocol}//${window.location.host}/static/assets/apple-touch-icon.png`;
+      : `${window.location.protocol}//${window.location.host}/apple-touch-icon.png`;
     let link = isCommentType(reply)
       ? `/post/${reply.post_id}/comment/${reply.id}`
       : `/inbox`;

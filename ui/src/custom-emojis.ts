@@ -129,7 +129,7 @@ export const emojiPaths = [
   'zizek-ok.png',
 ];
 
-const EMOJI_DIR_PATH = '/static/assets/emojis/';
+const EMOJI_DIR_PATH = '/emojis/';
 
 export const customEmojis = emojiPaths.map(path => ({
   key: path.split('.')[0],

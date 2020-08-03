@@ -75,7 +75,7 @@ export class WelcomePage extends Component<any, State> {
             <div className="text-center my-4 p-1">
               <img
                 className="img-fluid mb-2 welcome-logo"
-                src="/static/assets/logo.png"
+                src="/logo.png"
                 alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
               />
               <h3>Chapo Trap House is coming</h3>

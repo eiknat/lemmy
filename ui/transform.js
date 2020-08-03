@@ -3,6 +3,7 @@ module.exports.parser = 'tsx';
 const formatStringToCamelCase = str => {
   const splitted = str.split("-");
   if (splitted.length === 1) return splitted[0];
+  // eslint-ignore-nextline
   return (
     splitted[0] +
     splitted
