@@ -1,7 +1,3 @@
-html, body, * {
-  /* background-color: red !important; */
-}
-
 .img-expanded {
   margin-top: 8px;
 }
@@ -258,6 +254,7 @@ a.text-body {
 
 .comment-node {
   padding: 0.5rem;
+  border-top-color: #303030 !important;
 }
 
 .community-header {
