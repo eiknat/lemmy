@@ -319,11 +319,11 @@ class Main extends Component<any, MainState> {
             <h5 className="mb-4 text-center h3">{`${this.state.siteRes.site.name}`}</h5>
             <img
               className="img-fluid mb-2"
-              src="/hexbear-logo.png"
+              src="/static/hexbear-logo.png"
               alt="hexbear logo"
             />
             <img
-              src="/welcome.gif"
+              src="/static/welcome.gif"
               className="img-fluid"
               style={{ width: '100%' }}
             />
