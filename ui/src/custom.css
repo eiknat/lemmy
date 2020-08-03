@@ -33,7 +33,7 @@ html, body, * {
 
 /* make sure long titles get broken up so they don't break mobile layout */
 a.text-body {
-  word-break: break-word;
+  /* word-break: keep-all; */
 }
 
 @media (min-width: 992px) {
