@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -25,7 +26,7 @@ interface AdminSettingsState {
   siteConfigLoading: boolean;
 }
 
-export class AdminSettings extends Component<any, AdminSettingsState> {
+class BaseAdminSettings extends Component<any, AdminSettingsState> {
   private siteConfigTextAreaId = `site-config-${randomStr()}`;
   private subscription: Subscription;
   private emptyState: AdminSettingsState = {
@@ -208,7 +209,7 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
     let res = wsJsonToRes(msg);
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
-      this.context.router.history.push('/');
+      this.props.history.push('/');
       this.state.siteLoading = false;
       this.state.siteConfigLoading = false;
       this.setState(this.state);
@@ -219,7 +220,7 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
 
       // This means it hasn't been set up yet
       if (!data.site) {
-        this.context.router.history.push('/setup');
+        this.props.history.push('/setup');
       }
       this.state.siteRes = data;
       this.state.siteLoading = false;
@@ -250,3 +251,5 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
     }
   }
 }
+
+export const AdminSettings = withRouter(BaseAdminSettings);

@@ -21,7 +21,7 @@ import { Subscription } from 'rxjs';
 import { wsJsonToRes, toast } from '../utils';
 import { i18n } from '../i18next';
 import { MomentTime } from './moment-time';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { linkEvent } from '../linkEvent';
 
 interface ReportsState {
@@ -48,7 +48,7 @@ interface ReportsState {
   };
 }
 
-export class Reports extends Component<{}, ReportsState> {
+export class BaseReports extends Component<{}, ReportsState> {
   private subscription: Subscription;
   constructor(props: any, context: any) {
     super(props);
@@ -231,8 +231,12 @@ export class Reports extends Component<{}, ReportsState> {
                             </div>
                             <p className="my-0">{report.reason}</p>
                             <div className="card p-1">
-                              <p className="mb-0">Post Title: {report.post_name}</p>
-                              <p className="mb-0">Post Body: {report.post_body}</p>
+                              <p className="mb-0">
+                                Post Title: {report.post_name}
+                              </p>
+                              <p className="mb-0">
+                                Post Body: {report.post_body}
+                              </p>
                               <p className="mb-0">
                                 Submitted by:{' '}
                                 <Link to={`/u/${report.creator_name}`}>
@@ -595,7 +599,7 @@ export class Reports extends Component<{}, ReportsState> {
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
       if (msg.error === 'couldnt_find_that_username_or_email') {
-        this.context.router.history.push('/');
+        this.props.history.push('/');
       }
       return;
     } else if (res.op === UserOperation.GetUserDetails) {
@@ -663,3 +667,5 @@ export class Reports extends Component<{}, ReportsState> {
     }
   }
 }
+
+export const Reports = withRouter(BaseReports);

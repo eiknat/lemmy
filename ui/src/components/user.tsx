@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -97,7 +97,7 @@ function getPageFromProps(page: any): number {
   return page ? Number(page) : 1;
 }
 
-export class User extends Component<any, UserState> {
+class BaseUser extends Component<any, UserState> {
   private subscription: Subscription;
   private emptyState: UserState = {
     user: {
@@ -823,9 +823,11 @@ export class User extends Component<any, UserState> {
             )}
             {this.state.banUserShow && (
               <form onSubmit={linkEvent(this, this.handleBan)}>
-                <div style={{
-                  display: "flex"
-                }}>
+                <div
+                  style={{
+                    display: 'flex',
+                  }}
+                >
                   <input
                     id="reason"
                     placeholder="reason"
@@ -1154,7 +1156,7 @@ export class User extends Component<any, UserState> {
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
       if (msg.error == 'couldnt_find_that_username_or_email') {
-        this.context.router.history.push('/');
+        this.props.history.push('/');
       }
       this.setState({
         deleteAccountLoading: false,
@@ -1204,7 +1206,7 @@ export class User extends Component<any, UserState> {
         deleteAccountLoading: false,
         deleteAccountShowConfirm: false,
       });
-      this.context.router.history.push('/');
+      this.props.history.push('/');
     } else if (res.op == UserOperation.GetSite) {
       const data = res.data as GetSiteResponse;
       this.setState({
@@ -1220,3 +1222,5 @@ export class User extends Component<any, UserState> {
     }
   }
 }
+
+export const User = withRouter(BaseUser);

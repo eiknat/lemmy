@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
+import { withRouter } from 'react-router-dom';
 import { CommunityForm } from './community-form';
 import {
   Community,
@@ -16,7 +17,7 @@ interface CreateCommunityState {
   enableNsfw: boolean;
 }
 
-export class CreateCommunity extends Component<any, CreateCommunityState> {
+export class BaseCreateCommunity extends Component<any, CreateCommunityState> {
   private subscription: Subscription;
   private emptyState: CreateCommunityState = {
     enableNsfw: null,
@@ -28,7 +29,7 @@ export class CreateCommunity extends Component<any, CreateCommunityState> {
 
     if (!UserService.Instance.user) {
       toast(i18n.t('not_logged_in'), 'danger');
-      this.context.router.history.push(`/login`);
+      this.props.history.push(`/login`);
     }
 
     this.subscription = WebSocketService.Instance.subject
@@ -80,3 +81,5 @@ export class CreateCommunity extends Component<any, CreateCommunityState> {
     }
   }
 }
+
+export const CreateCommunity = withRouter(BaseCreateCommunity);

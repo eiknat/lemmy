@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
+import { withRouter } from 'react-router-dom';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { PostForm } from './post-form';
 import { toast, wsJsonToRes } from '../utils';
@@ -17,7 +18,7 @@ interface CreatePostState {
   site: Site;
 }
 
-export class CreatePost extends Component<any, CreatePostState> {
+export class BaseCreatePost extends Component<any, CreatePostState> {
   private subscription: Subscription;
   private emptyState: CreatePostState = {
     site: {
@@ -43,7 +44,7 @@ export class CreatePost extends Component<any, CreatePostState> {
 
     if (!UserService.Instance.user) {
       toast(i18n.t('not_logged_in'), 'danger');
-      this.context.router.history.push(`/login`);
+      this.props.history.push(`/login`);
     }
 
     this.subscription = WebSocketService.Instance.subject
@@ -121,3 +122,5 @@ export class CreatePost extends Component<any, CreatePostState> {
     }
   }
 }
+
+export const CreatePost = withRouter(BaseCreatePost);

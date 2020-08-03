@@ -14,7 +14,6 @@
     "start": "node generate_translations.js && EXTEND_ESLINT=true TSC_COMPILE_ON_ERROR=true  react-scripts start",
     "start_old": "node fuse dev"
   },
-  "extends": "@parcel/config-default",
   "keywords": [],
   "dependencies": {
     "@joeattardi/emoji-button": "^3.1.1",
@@ -27,6 +26,7 @@
     "@types/qs": "^6.9.4",
     "@types/react": "^16.9.44",
     "@types/react-dom": "^16.9.8",
+    "@types/react-router-dom": "^5.1.5",
     "autosize": "^4.0.2",
     "body-scroll-lock": "^3.0.3",
     "bootswatch": "^4.3.1",
@@ -81,6 +81,7 @@
     "ts-transform-inferno": "^4.0.3",
     "typescript": "^3.9.7"
   },
+  "extends": "@parcel/config-default",
   "engines": {
     "node": ">=8.9.0"
   },
@@ -103,15 +104,15 @@
     ]
   },
   "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ],
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
     ]
   }
 }

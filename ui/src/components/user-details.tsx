@@ -1,4 +1,4 @@
-import React, { Component,  } from 'react';
+import React, { Component } from 'react';
 import { WebSocketService, UserService } from '../services';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take, last } from 'rxjs/operators';
@@ -32,6 +32,7 @@ import {
 import { PostListing } from './post-listing';
 import { CommentNodes } from './comment-nodes';
 import { linkEvent } from '../linkEvent';
+import { withRouter } from 'react-router-dom';
 
 interface UserDetailsProps {
   username?: string;
@@ -55,7 +56,7 @@ interface UserDetailsState {
   admins: Array<UserView>;
 }
 
-export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
+class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
   private subscription: Subscription;
   constructor(props: any, context: any) {
     super(props, context);
@@ -229,11 +230,11 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
   }
 
   nextPage(i: UserDetails) {
-    i.props.onPageChange(i.props.page + 1);
+    i.props.onPageChange((i.props.page as number) + 1);
   }
 
   prevPage(i: UserDetails) {
-    i.props.onPageChange(i.props.page - 1);
+    i.props.onPageChange((i.props.page as number) - 1);
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
@@ -243,7 +244,7 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
       if (msg.error == 'couldnt_find_that_username_or_email') {
-        this.context.router.history.push('/');
+        this.props.history.push('/');
       }
       return;
     } else if (msg.reconnect) {
@@ -309,3 +310,5 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
     }
   }
 }
+
+export const UserDetails = withRouter(BaseUserDetails);

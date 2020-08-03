@@ -11,8 +11,9 @@ import {
 } from '../interfaces';
 import { toast, wsJsonToRes } from '../utils';
 import { i18n } from '../i18next';
+import { withRouter } from 'react-router-dom';
 
-export class CreatePrivateMessage extends Component<any, any> {
+export class BaseCreatePrivateMessage extends Component<any, any> {
   private subscription: Subscription;
   constructor(props: any, context: any) {
     super(props, context);
@@ -22,7 +23,7 @@ export class CreatePrivateMessage extends Component<any, any> {
 
     if (!UserService.Instance.user) {
       toast(i18n.t('not_logged_in'), 'danger');
-      this.context.router.history.push(`/login`);
+      this.props.history.push(`/login`);
     }
 
     this.subscription = WebSocketService.Instance.subject
@@ -86,3 +87,5 @@ export class CreatePrivateMessage extends Component<any, any> {
     }
   }
 }
+
+export const CreatePrivateMessage = withRouter(BaseCreatePrivateMessage);

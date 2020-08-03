@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -81,7 +81,7 @@ interface UrlParams {
   page?: number;
 }
 
-export class Community extends Component<any, State> {
+export class BaseCommunity extends Component<any, State> {
   private subscription: Subscription;
   private emptyState: State = {
     community: {
@@ -346,12 +346,12 @@ export class Community extends Component<any, State> {
   }
 
   nextPage(i: Community) {
-    i.updateUrl({ page: i.state.page + 1 });
+    i.updateUrl({ page: (i.state.page as number) + 1 });
     window.scrollTo(0, 0);
   }
 
   prevPage(i: Community) {
-    i.updateUrl({ page: i.state.page - 1 });
+    i.updateUrl({ page: (i.state.page as number) - 1 });
     window.scrollTo(0, 0);
   }
 
@@ -419,7 +419,7 @@ export class Community extends Component<any, State> {
     let res = wsJsonToRes(msg);
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
-      this.context.router.history.push('/');
+      this.props.history.push('/');
       return;
     } else if (msg.reconnect) {
       this.fetchData();
@@ -504,3 +504,5 @@ export class Community extends Component<any, State> {
     }
   }
 }
+
+export const Community = withRouter(BaseCommunity);

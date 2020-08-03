@@ -38,7 +38,6 @@ import { Icon } from './icon';
 import { CommunityDropdown } from './community-dropdown';
 import { linkEvent } from '../linkEvent';
 
-
 interface NavbarState {
   isLoggedIn: boolean;
   expanded: boolean;
@@ -172,199 +171,200 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
 
   // TODO class active corresponding to current page
   navbar() {
-    return <>
-      <nav className="container-fluid navbar navbar-expand-md navbar-light main-navbar shadow p-0 px-3">
-        <a className="navbar-brand" href="/">
-          <img
-            src="/hexbear_head.svg"
-            className="icon icon-navbar"
-            alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
-          />
-        </a>
-        <Link title={version} className="navbar-brand" to="/">
-          {this.state.siteName}
-        </Link>
-        {this.state.isLoggedIn && (
-          <Link
-            className="ml-auto p-0 navbar-toggler nav-link"
-            to="/inbox"
-            title={i18n.t('inbox')}
-          >
-            <Icon name="notification" />
-            {this.state.unreadCount > 0 && (
-              <span className="ml-1 badge badge-light badge-pink">
-                {this.state.unreadCount}
-              </span>
-            )}
+    return (
+      <>
+        <nav className="container-fluid navbar navbar-expand-md navbar-light main-navbar shadow p-0 px-3">
+          <a className="navbar-brand" href="/">
+            <img
+              src="/hexbear_head.svg"
+              className="icon icon-navbar"
+              alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
+            />
+          </a>
+          <Link title={version} className="navbar-brand" to="/">
+            {this.state.siteName}
           </Link>
-        )}
-        <button
-          className="navbar-toggler"
-          type="button"
-          aria-label="menu"
-          onClick={linkEvent(this, this.expandNavbar)}
-          data-tippy-content={i18n.t('expand_here')}
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div
-          className={`${!this.state.expanded && 'collapse'} navbar-collapse`}
-        >
-          <ul className="navbar-nav my-2 mr-auto">
-            <li className="nav-item">
-              <button
-                className="nav-link btn btn-inline "
-                //to="/communities"
-                title={i18n.t('communities')}
-                id="community-button"
-                onClick={linkEvent(this, this.showCommunityDropdown)}
-              >
-                {i18n.t('communities')}
-              </button>
-            </li>
-            <li className="nav-item">
-              <Link
-                className="nav-link"
-                to={{
-                  pathname: '/create_post',
-                  state: { prevPath: this.currentLocation },
-                }}
-                title={i18n.t('create_post')}
-              >
-                {i18n.t('create_post')}
-              </Link>
-            </li>
-            {this.showCreateCommunityNav() && (
+          {this.state.isLoggedIn && (
+            <Link
+              className="ml-auto p-0 navbar-toggler nav-link"
+              to="/inbox"
+              title={i18n.t('inbox')}
+            >
+              <Icon name="notification" />
+              {this.state.unreadCount > 0 && (
+                <span className="ml-1 badge badge-light badge-pink">
+                  {this.state.unreadCount}
+                </span>
+              )}
+            </Link>
+          )}
+          <button
+            className="navbar-toggler"
+            type="button"
+            aria-label="menu"
+            onClick={linkEvent(this, this.expandNavbar)}
+            data-tippy-content={i18n.t('expand_here')}
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div
+            className={`${!this.state.expanded && 'collapse'} navbar-collapse`}
+          >
+            <ul className="navbar-nav my-2 mr-auto">
+              <li className="nav-item">
+                <button
+                  className="nav-link btn btn-inline "
+                  //to="/communities"
+                  title={i18n.t('communities')}
+                  id="community-button"
+                  onClick={linkEvent(this, this.showCommunityDropdown)}
+                >
+                  {i18n.t('communities')}
+                </button>
+              </li>
               <li className="nav-item">
                 <Link
                   className="nav-link"
-                  to="/create_community"
-                  title={i18n.t('create_community')}
+                  to={{
+                    pathname: '/create_post',
+                    state: { prevPath: this.currentLocation },
+                  }}
+                  title={i18n.t('create_post')}
                 >
-                  {i18n.t('create_community')}
+                  {i18n.t('create_post')}
                 </Link>
               </li>
-            )}
-            <li className="nav-item">
-              <Link
-                className="nav-link"
-                to="/contributing"
-                title={i18n.t('donate_to_lemmy')}
-              >
-                <Icon name="contribute" /> {i18n.t('donate')}
-              </Link>
-            </li>
-          </ul>
-          {!this.props.history.location.pathname.match(
-            /^\/search/
-          ) && (
-            <form
-              className="form-inline"
-              onSubmit={linkEvent(this, this.handleSearchSubmit)}
-            >
-              <input
-                className={`form-control mr-0 search-input ${
-                  this.state.toggleSearch ? 'show-input' : 'hide-input'
-                }`}
-                onInput={linkEvent(this, this.handleSearchParam)}
-                value={this.state.searchParam}
-                ref={this.searchTextField}
-                type="text"
-                placeholder={i18n.t('search')}
-                onBlur={linkEvent(this, this.handleSearchBlur)}
-              ></input>
-              <button
-                name="search-btn"
-                onClick={linkEvent(this, this.handleSearchBtn)}
-                className={`btn btn-link ${this.state.toggleSearch ? 'px-2' : 'px-0'
-                  }`}
-                style={{ color: 'var(--gray)' }}
-              >
-                <Icon name="search" />
-              </button>
-            </form>
-          )}
-          <ul className="navbar-nav my-2 navbar-right">
-            {this.canAdmin && (
-              <li className="nav-item">
-                <Link
-                  className="nav-link p-0 px-2 nav-icon"
-                  to={`/admin`}
-                  title={i18n.t('admin_settings')}
-                >
-                  <svg className="icon">
-                    <use xlinkHref="#icon-settings"></use>
-                  </svg>
-                </Link>
-              </li>
-            )}
-          </ul>
-          {this.state.isLoggedIn ? (
-            <>
-              <ul className="navbar-nav my-2">
-                <li className="nav-item">
-                  <Link
-                    className="nav-link p-0 px-2 nav-icon"
-                    to="/inbox"
-                    title={i18n.t('inbox')}
-                  >
-                    <Icon name="notification" />
-                    {this.state.unreadCount > 0 && (
-                      <span className="ml-1 badge badge-light badge-pink">
-                        {this.state.unreadCount}
-                      </span>
-                    )}
-                  </Link>
-                </li>
-              </ul>
-              <ul className="navbar-nav">
+              {this.showCreateCommunityNav() && (
                 <li className="nav-item">
                   <Link
                     className="nav-link"
-                    to={`/u/${UserService.Instance.user.username}`}
-                    title={i18n.t('settings')}
+                    to="/create_community"
+                    title={i18n.t('create_community')}
                   >
-                    <span>
-                      {UserService.Instance.user.avatar && showAvatars() && (
-                        <img
-                          src={pictrsAvatarThumbnail(
-                            UserService.Instance.user.avatar
-                          )}
-                          height="32"
-                          width="32"
-                          className="rounded-circle mr-2"
-                        />
-                      )}
-                      {UserService.Instance.user.username}
-                    </span>
+                    {i18n.t('create_community')}
                   </Link>
                 </li>
-              </ul>
-            </>
-          ) : (
-            <ul className="navbar-nav my-2">
+              )}
               <li className="nav-item">
                 <Link
                   className="nav-link"
-                  to="/login"
-                  title={i18n.t('login_sign_up')}
+                  to="/contributing"
+                  title={i18n.t('donate_to_lemmy')}
                 >
-                  {i18n.t('login_sign_up')}
+                  <Icon name="contribute" /> {i18n.t('donate')}
                 </Link>
               </li>
             </ul>
+            {!this.props.history.location.pathname.match(/^\/search/) && (
+              <form
+                className="form-inline"
+                onSubmit={linkEvent(this, this.handleSearchSubmit)}
+              >
+                <input
+                  className={`form-control mr-0 search-input ${
+                    this.state.toggleSearch ? 'show-input' : 'hide-input'
+                  }`}
+                  onInput={linkEvent(this, this.handleSearchParam)}
+                  value={this.state.searchParam}
+                  ref={this.searchTextField}
+                  type="text"
+                  placeholder={i18n.t('search')}
+                  onBlur={linkEvent(this, this.handleSearchBlur)}
+                ></input>
+                <button
+                  name="search-btn"
+                  onClick={linkEvent(this, this.handleSearchBtn)}
+                  className={`btn btn-link ${
+                    this.state.toggleSearch ? 'px-2' : 'px-0'
+                  }`}
+                  style={{ color: 'var(--gray)' }}
+                >
+                  <Icon name="search" />
+                </button>
+              </form>
+            )}
+            <ul className="navbar-nav my-2 navbar-right">
+              {this.canAdmin && (
+                <li className="nav-item">
+                  <Link
+                    className="nav-link p-0 px-2 nav-icon"
+                    to={`/admin`}
+                    title={i18n.t('admin_settings')}
+                  >
+                    <svg className="icon">
+                      <use xlinkHref="#icon-settings"></use>
+                    </svg>
+                  </Link>
+                </li>
+              )}
+            </ul>
+            {this.state.isLoggedIn ? (
+              <>
+                <ul className="navbar-nav my-2">
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link p-0 px-2 nav-icon"
+                      to="/inbox"
+                      title={i18n.t('inbox')}
+                    >
+                      <Icon name="notification" />
+                      {this.state.unreadCount > 0 && (
+                        <span className="ml-1 badge badge-light badge-pink">
+                          {this.state.unreadCount}
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                </ul>
+                <ul className="navbar-nav">
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link"
+                      to={`/u/${UserService.Instance.user.username}`}
+                      title={i18n.t('settings')}
+                    >
+                      <span>
+                        {UserService.Instance.user.avatar && showAvatars() && (
+                          <img
+                            src={pictrsAvatarThumbnail(
+                              UserService.Instance.user.avatar
+                            )}
+                            height="32"
+                            width="32"
+                            className="rounded-circle mr-2"
+                          />
+                        )}
+                        {UserService.Instance.user.username}
+                      </span>
+                    </Link>
+                  </li>
+                </ul>
+              </>
+            ) : (
+              <ul className="navbar-nav my-2">
+                <li className="nav-item">
+                  <Link
+                    className="nav-link"
+                    to="/login"
+                    title={i18n.t('login_sign_up')}
+                  >
+                    {i18n.t('login_sign_up')}
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </div>
+          {this.state.communityDropdownShown && (
+            <CommunityDropdown
+              posX={this.communityButtonLoc}
+              removeDropdown={() => this.showCommunityDropdown(this)}
+            ></CommunityDropdown>
           )}
-        </div>
-        {this.state.communityDropdownShown && (
-          <CommunityDropdown
-            posX={this.communityButtonLoc}
-            removeDropdown={() => this.showCommunityDropdown(this)}
-          ></CommunityDropdown>
-        )}
-      </nav>
-      {/* empty space below navbar */}
-      <div className="navbar-spacer" />
-    </>;
+        </nav>
+        {/* empty space below navbar */}
+        <div className="navbar-spacer" />
+      </>
+    );
   }
 
   expandNavbar(i: Navbar) {
@@ -534,13 +534,9 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     let htmlBody = imagesDownsize(md.render(reply.content), true, false);
     let body = reply.content; // Unfortunately the notifications API can't do html
 
-    messageToastify(
-      creator_name,
-      creator_avatar,
-      htmlBody,
-      link,
-      this.context.router
-    );
+    messageToastify(creator_name, creator_avatar, htmlBody, link, {
+      history: this.props.history,
+    });
 
     if (Notification.permission !== 'granted') Notification.requestPermission();
     else {

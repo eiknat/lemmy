@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -194,6 +194,7 @@ class Main extends Component<any, MainState> {
   }
 
   render() {
+    console.log(this.props);
     return (
       <div className="container" style={{ maxWidth: '100%' }}>
         <div className="row">
@@ -688,7 +689,7 @@ class Main extends Component<any, MainState> {
 
       // This means it hasn't been set up yet
       if (!data.site) {
-        this.context.router.history.push('/setup');
+        this.props.history.push('/setup');
       }
       this.state.siteRes.admins = data.admins;
       this.state.siteRes.site = data.site;
@@ -805,4 +806,4 @@ class Main extends Component<any, MainState> {
   }
 }
 
-export default withTranslation()(Main);
+export default withTranslation()(withRouter(Main));

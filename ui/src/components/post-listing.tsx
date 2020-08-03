@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { WebSocketService, UserService } from '../services';
 import {
   Post,
@@ -82,7 +82,7 @@ export function PostBody({ body }: { body: string }) {
   );
 }
 
-export class PostListing extends Component<PostListingProps, PostListingState> {
+class BasePostListing extends Component<PostListingProps, PostListingState> {
   private emptyState: PostListingState = {
     showEdit: false,
     showRemoveDialog: false,
@@ -1124,7 +1124,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
 
   handlePostLike(i: PostListing) {
     if (!UserService.Instance.user) {
-      this.context.router.history.push(`/login`);
+      this.props.history.push(`/login`);
     }
 
     let new_vote = i.state.my_vote == 1 ? 0 : 1;
@@ -1155,7 +1155,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
 
   handlePostDisLike(i: PostListing) {
     if (!UserService.Instance.user) {
-      this.context.router.history.push(`/login`);
+      this.props.history.push(`/login`);
     }
 
     let new_vote = i.state.my_vote == -1 ? 0 : -1;
@@ -1468,3 +1468,5 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     return `${points} • ${upvotes} • ${downvotes}`;
   }
 }
+
+export const PostListing = withRouter(BasePostListing);
