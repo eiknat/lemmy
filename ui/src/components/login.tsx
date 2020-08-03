@@ -354,9 +354,9 @@ export class Login extends Component<any, State> {
     i.state.loginForm.password = (document.getElementById(
       'login-password'
     ) as HTMLInputElement).value;
-    i.state.loginForm.captcha_id = document.querySelector(
+    i.state.loginForm.captcha_id = (document.querySelector(
       "textarea[name='h-captcha-response']"
-    ).value;
+    ) as HTMLInputElement).value;
     i.setState(i.state);
     WebSocketService.Instance.login(i.state.loginForm);
   }
