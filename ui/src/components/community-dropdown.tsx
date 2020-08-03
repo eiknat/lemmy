@@ -95,7 +95,7 @@ export class CommunityDropdown extends Component<
                   className="dropdown-filter form-control"
                   placeholder="Filter"
                   onInput={linkEvent(this, this.handleFilterChange)}
-                 />
+                />
                 <button
                   className="dropdown-exit btn"
                   onClick={linkEvent(this, this.handleDropdownClose)}
@@ -111,26 +111,23 @@ export class CommunityDropdown extends Component<
                     <div className="dropdown-category">
                       <h6>Subscribed</h6>
                       {this.sortedSubscriptions.map(community => (
-                        <>
-                          <div className="community-listing">
-                            <span
-                              className="community-icon"
-                              style={{
-                                background: this.generateColor(community.community_name)
-                              }}
-                             />
-                            <Link
-                              className="community-listing-title"
-                              to={`/c/${community.community_name}`}
-                              onClick={linkEvent(
-                                this,
-                                this.handleDropdownClose
-                              )}
-                            >
-                              {community.community_name}
-                            </Link>
-                          </div>
-                        </>
+                        <div key={community.id} className="community-listing">
+                          <span
+                            className="community-icon"
+                            style={{
+                              background: this.generateColor(
+                                community.community_name
+                              ),
+                            }}
+                          />
+                          <Link
+                            className="community-listing-title"
+                            to={`/c/${community.community_name}`}
+                            onClick={linkEvent(this, this.handleDropdownClose)}
+                          >
+                            {community.community_name}
+                          </Link>
+                        </div>
                       ))}
                     </div>
                   )}
@@ -142,9 +139,9 @@ export class CommunityDropdown extends Component<
                           <span
                             className="community-icon"
                             style={{
-                              background: this.generateColor(community.community_name)
+                              background: this.generateColor(community.name),
                             }}
-                           />
+                          />
                           <Link
                             className="community-listing-title"
                             to={`/c/${community.name}`}
@@ -230,6 +227,10 @@ export class CommunityDropdown extends Component<
   }
 
   generateColor(str: string): string {
+    if (!str) {
+      console.warn('No string provided to generateColor');
+      return '';
+    }
     var hash = 0;
     for (var i = 0; i < str.length; i++) {
       hash = str.charCodeAt(i) + ((hash << 5) - hash);
