@@ -11,8 +11,7 @@
     "lint": "tsc --noEmit && eslint --report-unused-disable-directives --ext .js,.ts,.tsx src",
     "prebuild": "node generate_translations.js",
     "prestart": "node generate_translations.js",
-    "start": "node generate_translations.js && EXTEND_ESLINT=true TSC_COMPILE_ON_ERROR=true PORT=4444 react-scripts start",
-    "dev": "vite --port 4444",
+    "start": "node generate_translations.js && vite --port 4444",
     "start_old": "node fuse dev"
   },
   "keywords": [],

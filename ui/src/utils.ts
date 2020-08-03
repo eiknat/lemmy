@@ -1,30 +1,31 @@
-// import 'moment/locale/es';
-// import 'moment/locale/el';
-// import 'moment/locale/eu';
-// import 'moment/locale/eo';
-// import 'moment/locale/de';
-// import 'moment/locale/zh-cn';
-// import 'moment/locale/fr';
-// import 'moment/locale/sv';
-// import 'moment/locale/ru';
-// import 'moment/locale/nl';
-// import 'moment/locale/it';
-// import 'moment/locale/fi';
-// import 'moment/locale/ca';
-// import 'moment/locale/fa';
-// import 'moment/locale/pl';
-// import 'moment/locale/pt-br';
-// import 'moment/locale/ja';
-// import 'moment/locale/ka';
-// import 'moment/locale/hi';
-// import 'moment/locale/gl';
-// import 'moment/locale/tr';
-// import 'moment/locale/hu';
-// import 'moment/locale/uk';
-// import 'moment/locale/sq';
-// import 'moment/locale/km';
-// import 'moment/locale/ga';
-// import 'moment/locale/sr';
+// @TODO: Figure out how to do this properly with esmodules
+import 'moment/locale/es';
+import 'moment/locale/el';
+import 'moment/locale/eu';
+import 'moment/locale/eo';
+import 'moment/locale/de';
+import 'moment/locale/zh-cn';
+import 'moment/locale/fr';
+import 'moment/locale/sv';
+import 'moment/locale/ru';
+import 'moment/locale/nl';
+import 'moment/locale/it';
+import 'moment/locale/fi';
+import 'moment/locale/ca';
+import 'moment/locale/fa';
+import 'moment/locale/pl';
+import 'moment/locale/pt-br';
+import 'moment/locale/ja';
+import 'moment/locale/ka';
+import 'moment/locale/hi';
+import 'moment/locale/gl';
+import 'moment/locale/tr';
+import 'moment/locale/hu';
+import 'moment/locale/uk';
+import 'moment/locale/sq';
+import 'moment/locale/km';
+import 'moment/locale/ga';
+import 'moment/locale/sr';
 
 import {
   UserOperation,
@@ -51,7 +52,7 @@ import { UserService, WebSocketService } from './services';
 
 import Tribute from 'tributejs/src/Tribute.js';
 import markdown_it from 'markdown-it';
-// import * as markdownitEmoji from 'markdown-it-emoji/light';
+import markdownitEmoji from "markdown-it-emoji/light";
 import markdown_it_container from 'markdown-it-container';
 import iterator from 'markdown-it-for-inline';
 import emojiShortName from 'emoji-short-name';
@@ -59,7 +60,6 @@ import Toastify from 'toastify-js';
 import tippy from 'tippy.js';
 import EmojiButton from '@joeattardi/emoji-button';
 import { customEmojis, replaceEmojis } from './custom-emojis';
-import { match } from 'assert';
 import moment from 'moment';
 
 export const repoUrl = 'https://gitlab.com/chapo-sandbox/production';
@@ -180,9 +180,9 @@ export const md = new markdown_it({
       }
     },
   })
-  // .use(markdownitEmoji, {
-  //   defs: objectFlip(emojiShortName),
-  // })
+  .use(markdownitEmoji, {
+    defs: objectFlip(emojiShortName),
+  })
   .use(iterator, 'url_new_win', 'link_open', function (tokens, idx) {
     // make sure all inline links open in a new window and don't include the referrer
     tokens[idx].attrPush(['target', '_blank']);
