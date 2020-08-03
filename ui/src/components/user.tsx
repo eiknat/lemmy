@@ -19,6 +19,7 @@ import {
   GetSiteModeratorsResponse,
   CommunityModsState,
   BanUserForm,
+  UserTagResponse,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import {
@@ -66,6 +67,8 @@ interface UserState {
   admins: Array<UserView>;
   banUserShow: boolean;
   banReason: string;
+  pronouns: string | null;
+  additionalPronouns: string | null;
 }
 
 interface UserProps {
@@ -144,6 +147,8 @@ export class User extends Component<any, UserState> {
     admins: [],
     banUserShow: false,
     banReason: null,
+    pronouns: 'none',
+    additionalPronouns: 'none',
   };
 
   constructor(props: any, context: any) {
@@ -159,6 +164,10 @@ export class User extends Component<any, UserState> {
     );
     this.handlePageChange = this.handlePageChange.bind(this);
     this.isModerator = this.isModerator.bind(this);
+    this.handlePronounsChange = this.handlePronounsChange.bind(this);
+    this.handleAdditionalPronounsChange = this.handleAdditionalPronounsChange.bind(
+      this
+    );
 
     this.state.user_id = Number(this.props.match.params.id) || null;
     this.state.username = this.props.match.params.username;
@@ -224,6 +233,7 @@ export class User extends Component<any, UserState> {
   }
 
   render() {
+    console.log(this.state);
     return (
       <div class="container">
         <h5>
@@ -506,6 +516,52 @@ export class User extends Component<any, UserState> {
                   </button>
                 </div>
               )} */}
+              <div class="form-group row">
+                <label class="col-lg-5 col-form-label" htmlFor="user-pronouns">
+                  {i18n.t('pronouns')}
+                </label>
+                <div class="col-lg-7">
+                  <select
+                    id="user-pronouns"
+                    value={this.state.pronouns}
+                    class="custom-select custom-select-sm"
+                    onChange={this.handlePronounsChange}
+                  >
+                    <option value="none">none</option>
+                    <option value="they/them">they/them</option>
+                    <option value="she/her">she/her</option>
+                    <option value="he/him">he/him</option>
+                    <option value="any pronoun">any</option>
+                  </select>
+                </div>
+              </div>
+
+              {!(
+                this.state.pronouns === '' || this.state.pronouns === 'none'
+              ) && (
+                <div class="form-group row">
+                  <label
+                    class="col-lg-5 col-form-label"
+                    htmlFor="user-secondary-pronouns"
+                  >
+                    {i18n.t('additional_pronouns')}
+                  </label>
+                  <div class="col-lg-7">
+                    <select
+                      id="user-secondary-pronouns"
+                      value={this.state.additionalPronouns}
+                      class="custom-select custom-select-sm"
+                      onChange={this.handleAdditionalPronounsChange}
+                    >
+                      <option value="none">none</option>
+                      <option value="they/them">they/them</option>
+                      <option value="she/her">she/her</option>
+                      <option value="he/him">he/him</option>
+                      <option value="any pronoun">any</option>
+                    </select>
+                  </div>
+                </div>
+              )}
               <div class="form-group">
                 <label>{i18n.t('language')}</label>
                 <select
@@ -534,7 +590,9 @@ export class User extends Component<any, UserState> {
                   ))}
                 </select>
                 <div className="small alert alert-warning my-2">
-                  Stick with Darkly for the best ChapoChat experience. Themes are bugged right now, but we'll be rebuilding themes soon so they're extra fancy.
+                  Stick with Darkly for the best ChapoChat experience. Themes
+                  are bugged right now, but we&apos;ll be rebuilding themes soon
+                  so they&apos;re extra fancy.
                 </div>
               </div>
               <form className="form-group">
@@ -1062,6 +1120,32 @@ export class User extends Component<any, UserState> {
     i.setState(i.state);
 
     WebSocketService.Instance.saveUserSettings(i.state.userSettingsForm);
+
+    let pronounsValue = null;
+
+    if (i.state.pronouns !== 'none' && i.state.pronouns !== '') {
+      pronounsValue = i.state.pronouns;
+
+      if (
+        i.state.additionalPronouns !== 'none' &&
+        i.state.additionalPronouns !== ''
+      ) {
+        pronounsValue += `,${i.state.additionalPronouns}`;
+      }
+    }
+
+    WebSocketService.Instance.setUserTags({
+      tag: 'pronouns',
+      value: pronounsValue,
+    });
+  }
+
+  handlePronounsChange(e: any) {
+    this.setState({ pronouns: e.target.value });
+  }
+
+  handleAdditionalPronounsChange(e: any) {
+    this.setState({ additionalPronouns: e.target.value });
   }
 
   handleDeleteAccountShowConfirmToggle(i: User, event: any) {
@@ -1154,6 +1238,8 @@ export class User extends Component<any, UserState> {
         this.state.follows = data.follows;
         this.state.moderates = data.moderates;
 
+        WebSocketService.Instance.getUserTags({ user: data.user.id });
+
         if (this.isCurrentUser) {
           this.state.userSettingsForm.show_nsfw =
             UserService.Instance.user.show_nsfw;
@@ -1199,6 +1285,15 @@ export class User extends Component<any, UserState> {
 
       this.setState({
         siteModerators: mapSiteModeratorsResponse(data),
+      });
+    } else if (res.op == UserOperation.GetUserTag) {
+      const data = res.data as UserTagResponse;
+      const pronouns = data.tags.pronouns == null ? '' : data.tags.pronouns;
+      const pronounsArray = pronouns.split(',');
+
+      this.setState({
+        pronouns: pronounsArray[0] || 'none',
+        additionalPronouns: pronounsArray[1] || 'none',
       });
     }
   }
