@@ -239,7 +239,9 @@ export class Inbox extends Component<any, InboxState> {
     return (
       <div className="mb-2">
         <span className="mr-3">{this.unreadOrAllRadios()}</span>
-        <div className="mr-3 my-2 user-view-toggle">{this.messageTypeRadios()}</div>
+        <div className="mr-3 my-2 user-view-toggle">
+          {this.messageTypeRadios()}
+        </div>
         <SortSelect
           sort={this.state.sort}
           onChange={this.handleSortChange}
@@ -264,6 +266,7 @@ export class Inbox extends Component<any, InboxState> {
         {combined.map(i =>
           isCommentType(i) ? (
             <CommentNodes
+              key={i.id}
               nodes={[{ comment: i }]}
               noIndent
               markable

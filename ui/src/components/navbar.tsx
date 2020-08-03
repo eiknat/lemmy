@@ -147,7 +147,6 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   }
 
   render() {
-    console.log(this.props);
     return this.navbar();
   }
 
@@ -264,7 +263,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                   className={`form-control mr-0 search-input ${
                     this.state.toggleSearch ? 'show-input' : 'hide-input'
                   }`}
-                  onInput={linkEvent(this, this.handleSearchParam)}
+                  onChange={linkEvent(this, this.handleSearchParam)}
                   value={this.state.searchParam}
                   ref={this.searchTextField}
                   type="text"

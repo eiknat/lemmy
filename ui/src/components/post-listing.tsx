@@ -296,7 +296,10 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
         <button
           className="text-body post-body-expand-button post-listing-box"
           title={i18n.t('expand_here')}
-          onClick={() =>
+          // onClick={() =>
+          //   !this.props.showBody && linkEvent(this, this.handleImageExpandClick)
+          // }
+          onClick={
             !this.props.showBody && linkEvent(this, this.handleImageExpandClick)
           }
         >

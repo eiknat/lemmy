@@ -194,7 +194,6 @@ class Main extends Component<any, MainState> {
   }
 
   render() {
-    console.log(this.props);
     return (
       <div className="container" style={{ maxWidth: '100%' }}>
         <div className="row">

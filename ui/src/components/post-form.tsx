@@ -216,7 +216,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                   id="post-url"
                   className="form-control"
                   value={this.state.postForm.url}
-                  onInput={linkEvent(this, this.handlePostUrlChange)}
+                  onChange={this.handlePostUrlChange}
                   onPaste={linkEvent(this, this.handleImageUploadPaste)}
                 />
               ) : (
@@ -343,7 +343,10 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
           </div>
           {!this.props.post && (
             <div className="form-group row">
-              <label className="col-sm-2 col-form-label" htmlFor="post-community">
+              <label
+                className="col-sm-2 col-form-label"
+                htmlFor="post-community"
+              >
                 {i18n.t('community')}
               </label>
               <div className="col-sm-10">
@@ -369,7 +372,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                       return true;
                     })
                     .map(community => (
-                      <option value={community.id}>
+                      <option key={community.id} value={community.id}>
                         {community.local
                           ? community.name
                           : `${hostname(community.actor_id)}/${community.name}`}
@@ -473,11 +476,13 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     i.setState(i.state);
   }
 
-  handlePostUrlChange(i: PostForm, event: any) {
-    i.state.postForm.url = event.target.value;
-    i.setState(i.state);
-    i.fetchPageTitle();
-  }
+  handlePostUrlChange = (event: any) => {
+    // i.state.postForm.url = event.target.value;
+    this.setState({
+      postForm: { ...this.state.postForm, url: event.target.value },
+    });
+    this.fetchPageTitle();
+  };
 
   async fetchPageTitle() {
     if (validURL(this.state.postForm.url)) {
@@ -554,6 +559,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
   }
 
   handleImageUploadPaste(i: PostForm, event: any) {
+    console.log('PASTING');
     let image = event.clipboardData.files[0];
     if (image) {
       i.handleImageUpload(i, image);
