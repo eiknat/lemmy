@@ -597,7 +597,6 @@ class BaseUser extends Component<any, UserState> {
                   Stick with Darkly for the best ChapoChat experience. Themes
                   are bugged right now, but we&apos;ll be rebuilding themes soon
                   so they&apos;re extra fancy.
-                  Stick with Darkly for the best ChapoChat experience. Themes are bugged right now, but we&aposll be rebuilding themes soon so they&aposre extra fancy.
                 </div>
               </div>
               <form className="form-group">
