@@ -11,7 +11,6 @@ import { WebSocketService, UserService } from '../services';
 import { mdToHtml, getUnixTime, hostname } from '../utils';
 import { CommunityForm } from './community-form';
 import { UserListing } from './user-listing';
-import { CommunityLink } from './community-link';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
 import { linkEvent } from '../linkEvent';
@@ -20,6 +19,7 @@ interface SidebarProps {
   community: Community;
   moderators: Array<CommunityUser>;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
   online: number;
   enableNsfw: boolean;
 }
@@ -212,7 +212,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
                   )}
                 </>
               )}
-              {this.canAdmin && (
+              {this.canAdmin || this.canSitemod && (
                 <li className="list-inline-item">
                   {!this.props.community.removed ? (
                     <span
@@ -368,6 +368,13 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
     return (
       UserService.Instance.user &&
       this.props.admins.map(a => a.id).includes(UserService.Instance.user.id)
+    );
+  }
+
+  get canSitemod(): boolean {
+    return (
+      UserService.Instance.user &&
+      this.props.sitemods.map(s => s.id).includes(UserService.Instance.user.id)
     );
   }
 

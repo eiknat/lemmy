@@ -57,6 +57,7 @@ export class Login extends Component<any, State> {
       password: undefined,
       password_verify: undefined,
       admin: false,
+      sitemod: false,
       show_nsfw: false,
       captcha_id: undefined,
       pronouns: null,
@@ -377,9 +378,9 @@ export class Login extends Component<any, State> {
     i.state.loginForm.password = (document.getElementById(
       'login-password'
     ) as HTMLInputElement).value;
-    i.state.loginForm.captcha_id = document.querySelector(
+    i.state.loginForm.captcha_id = (document.querySelector(
       "textarea[name='h-captcha-response']"
-    ).value;
+    ) as HTMLInputElement).value;
     i.setState(i.state);
     WebSocketService.Instance.login(i.state.loginForm);
   }
@@ -513,9 +514,13 @@ export class Login extends Component<any, State> {
         toast(i18n.t('reset_password_mail_sent'));
       } else if (res.op == UserOperation.GetSite) {
         let data = res.data as GetSiteResponse;
-        this.state.enable_nsfw = data.site.enable_nsfw;
-        this.setState(this.state);
-        document.title = `${i18n.t('login')} - ${data.site.name}`;
+        if (data.site) {
+          this.state.enable_nsfw = data.site.enable_nsfw;
+          this.setState(this.state);
+          document.title = `${i18n.t('login')} - ${data.site.name}`;
+        } else {
+          console.log('site is null');
+        }
       }
     }
   }

@@ -13,6 +13,7 @@ import {
   BanUserForm,
   AddModToCommunityForm,
   AddAdminForm,
+  AddSitemodForm,
   TransferSiteForm,
   TransferCommunityForm,
 } from '../interfaces';
@@ -22,7 +23,6 @@ import { IFramelyCard } from './iframely-card';
 import { UserListing } from './user-listing';
 import { CommunityLink } from './community-link';
 import {
-  md,
   mdToHtml,
   canMod,
   isMod,
@@ -33,11 +33,8 @@ import {
   pictrsImage,
   setupTippy,
   hostname,
-  previewLines,
-  toast,
 } from '../utils';
 import { i18n } from '../i18next';
-import { User } from './user';
 import { Icon } from './icon';
 import { RoleBadge } from './comment-node';
 import { linkEvent } from '../linkEvent';
@@ -69,6 +66,7 @@ interface PostListingProps {
   showBody?: boolean;
   moderators?: Array<CommunityUser>;
   admins?: Array<UserView>;
+  sitemods?: Array<UserView>;
   enableDownvotes: boolean;
   enableNsfw: boolean;
 }
@@ -990,6 +988,18 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                           </span>
                         </li>
                       )}
+                      {!post.banned && (
+                        <li className="list-inline-item">
+                          <span
+                            class="pointer"
+                            onClick={linkEvent(this, this.handleAddSitemod)}
+                          >
+                            {this.isSitemod
+                              ? i18n.t('remove_as_sitemod')
+                              : i18n.t('appoint_as_sitemod')}
+                          </span>
+                        </li>
+                      )}
                     </>
                   )}
                   {/* Site Creator can transfer to another admin */}
@@ -1068,10 +1078,21 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     );
   }
 
+  get isSitemod(): boolean {
+    return (
+      this.props.sitemods &&
+      isMod(
+        this.props.sitemods.map(s => s.id),
+        this.props.post.creator_id
+      )
+    );
+  }
+
   get canMod(): boolean {
-    if (this.props.admins && this.props.moderators) {
+    if (this.props.admins && this.props.sitemods && this.props.moderators) {
       let adminsThenMods = this.props.admins
         .map(a => a.id)
+        .concat(this.props.sitemods.map(s => s.id))
         .concat(this.props.moderators.map(m => m.user_id));
 
       return canMod(
@@ -1085,9 +1106,10 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
   }
 
   get canModOnSelf(): boolean {
-    if (this.props.admins && this.props.moderators) {
+    if (this.props.admins && this.props.sitemods && this.props.moderators) {
       let adminsThenMods = this.props.admins
         .map(a => a.id)
+        .concat(this.props.sitemods.map(s => s.id))
         .concat(this.props.moderators.map(m => m.user_id));
 
       return canMod(
@@ -1378,6 +1400,15 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
       added: !i.isAdmin,
     };
     WebSocketService.Instance.addAdmin(form);
+    i.setState(i.state);
+  }
+
+  handleAddSitemod(i: PostListing) {
+    let form: AddSitemodForm = {
+      user_id: i.props.post.creator_id,
+      added: !i.isSitemod,
+    };
+    WebSocketService.Instance.addSitemod(form);
     i.setState(i.state);
   }
 

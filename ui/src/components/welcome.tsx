@@ -31,13 +31,16 @@ export class WelcomePage extends Component<any, State> {
     loginForm: {
       username_or_email: undefined,
       password: undefined,
+      captcha_id: undefined,
     },
     registerForm: {
       username: undefined,
       password: undefined,
       password_verify: undefined,
       admin: false,
+      sitemod: false,
       show_nsfw: false,
+      captcha_id: undefined,
     },
     loginLoading: false,
     registerLoading: false,
@@ -296,12 +299,12 @@ export class WelcomePage extends Component<any, State> {
   handleLoginSubmit(i: WelcomePage, event: any) {
     event.preventDefault();
     i.state.loginLoading = true;
-    i.state.loginForm.username_or_email = document.getElementById(
+    i.state.loginForm.username_or_email = (document.getElementById(
       'login-email-or-username'
-    ).value;
-    i.state.loginForm.password = document.getElementById(
+    ) as HTMLInputElement).value;
+    i.state.loginForm.password = (document.getElementById(
       'login-password'
-    ).value;
+    ) as HTMLInputElement).value;
     i.setState(i.state);
     WebSocketService.Instance.login(i.state.loginForm);
   }
@@ -395,9 +398,7 @@ export class WelcomePage extends Component<any, State> {
         let data = res.data as GetSiteResponse;
         this.state.enable_nsfw = data.site.enable_nsfw;
         this.setState(this.state);
-        document.title = `${i18n.t('login')} - ${
-          WebSocketService.Instance.site.name
-        }`;
+        document.title = `${i18n.t('login')} - ${data.site.name}`;
       }
     }
   }

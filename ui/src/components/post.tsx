@@ -19,6 +19,7 @@ import {
   BanUserResponse,
   AddModToCommunityResponse,
   AddAdminResponse,
+  AddSitemodResponse,
   SearchType,
   SortType,
   SearchForm,
@@ -38,7 +39,6 @@ import {
   createPostLikeRes,
   commentsToFlatNodes,
   setupTippy,
-  testMessageToast,
   commentFetchLimit,
   debounce,
 } from '../utils';
@@ -83,6 +83,7 @@ export class Post extends Component<any, PostState> {
     crossPosts: [],
     siteRes: {
       admins: [],
+      sitemods: [],
       banned: [],
       site: {
         id: undefined,
@@ -94,6 +95,7 @@ export class Post extends Component<any, PostState> {
         number_of_posts: undefined,
         number_of_comments: undefined,
         number_of_communities: undefined,
+        enable_create_communities: undefined,
         enable_downvotes: undefined,
         open_registration: undefined,
         enable_nsfw: undefined,
@@ -216,6 +218,7 @@ export class Post extends Component<any, PostState> {
                 showCommunity
                 moderators={this.state.moderators}
                 admins={this.state.siteRes.admins}
+                sitemods={this.state.siteRes.sitemods}
                 enableDownvotes={this.state.siteRes.site.enable_downvotes}
                 enableNsfw={this.state.siteRes.site.enable_nsfw}
               />
@@ -327,6 +330,7 @@ export class Post extends Component<any, PostState> {
             locked={this.state.post.locked}
             moderators={this.state.moderators}
             admins={this.state.siteRes.admins}
+            sitemods={this.state.siteRes.sitemods}
             postCreatorId={this.state.post.creator_id}
             showContext
             enableDownvotes={this.state.siteRes.site.enable_downvotes}
@@ -344,6 +348,7 @@ export class Post extends Component<any, PostState> {
           community={this.state.community}
           moderators={this.state.moderators}
           admins={this.state.siteRes.admins}
+          sitemods={this.state.siteRes.sitemods}
           online={this.state.online}
           enableNsfw={this.state.siteRes.site.enable_nsfw}
         />
@@ -406,6 +411,7 @@ export class Post extends Component<any, PostState> {
           locked={this.state.post.locked}
           moderators={this.state.moderators}
           admins={this.state.siteRes.admins}
+          sitemods={this.state.siteRes.sitemods}
           postCreatorId={this.state.post.creator_id}
           sort={this.state.commentSort}
           maxView={this.state.commentLoadTo}
@@ -538,6 +544,10 @@ export class Post extends Component<any, PostState> {
     } else if (res.op == UserOperation.AddAdmin) {
       let data = res.data as AddAdminResponse;
       this.state.siteRes.admins = data.admins;
+      this.setState(this.state);
+    } else if (res.op == UserOperation.AddSitemod) {
+      let data = res.data as AddSitemodResponse;
+      this.state.siteRes.sitemods = data.sitemods;
       this.setState(this.state);
     } else if (res.op == UserOperation.Search) {
       let data = res.data as SearchResponse;

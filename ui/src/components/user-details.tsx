@@ -17,6 +17,7 @@ import {
   BanUserResponse,
   PostResponse,
   AddAdminResponse,
+  AddSitemodResponse,
   CommunityModsState,
 } from '../interfaces';
 import {
@@ -54,6 +55,7 @@ interface UserDetailsState {
   posts: Array<Post>;
   saved?: Array<Post>;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
 }
 
 class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
@@ -68,6 +70,7 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
       posts: [],
       saved: [],
       admins: [],
+      sitemods: [],
     };
 
     this.subscription = WebSocketService.Instance.subject
@@ -157,6 +160,7 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
               <PostListing
                 post={i.data as Post}
                 admins={this.state.admins}
+                sitemods={this.state.sitemods}
                 showCommunity
                 enableDownvotes={this.props.enableDownvotes}
                 enableNsfw={this.props.enableNsfw}
@@ -165,6 +169,7 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
               <CommentNodes
                 nodes={[{ comment: i.data as Comment }]}
                 admins={this.state.admins}
+                sitemods={this.state.sitemods}
                 noIndent
                 showContext
                 enableDownvotes={this.props.enableDownvotes}
@@ -182,6 +187,7 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
         <CommentNodes
           nodes={commentsToFlatNodes(this.state.comments)}
           admins={this.state.admins}
+          sitemods={this.state.sitemods}
           noIndent
           showContext
           enableDownvotes={this.props.enableDownvotes}
@@ -197,6 +203,7 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
           <PostListing
             post={post}
             admins={this.state.admins}
+            sitemods={this.state.sitemods}
             showCommunity
             enableDownvotes={this.props.enableDownvotes}
             enableNsfw={this.props.enableNsfw}
@@ -257,6 +264,7 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
         moderates: data.moderates,
         posts: data.posts,
         admins: data.admins,
+        sitemods: data.sitemods,
       });
     } else if (res.op == UserOperation.CreateCommentLike) {
       const data = res.data as CommentResponse;
@@ -306,6 +314,11 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
       const data = res.data as AddAdminResponse;
       this.setState({
         admins: data.admins,
+      });
+    } else if (res.op == UserOperation.AddSitemod) {
+      const data = res.data as AddSitemodResponse;
+      this.setState({
+        sitemods: data.sitemods,
       });
     }
   }

@@ -66,6 +66,7 @@ interface UserState {
   site: Site;
   siteModerators: CommunityModsState | null;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
   banUserShow: boolean;
   banReason: string;
   pronouns: string | null;
@@ -160,6 +161,7 @@ class BaseUser extends Component<any, UserState> {
     },
     siteModerators: null,
     admins: [],
+    sitemods: [],
     banUserShow: false,
     banReason: null,
     pronouns: 'none',
@@ -274,7 +276,7 @@ class BaseUser extends Component<any, UserState> {
           </main>
           {!this.state.loading && (
             <aside className="col-12 col-md-4 sidebar">
-              {(this.canAdmin || this.isModerator()) &&
+              {(this.canAdmin || this.canSitemod || this.isModerator()) &&
                 !this.isCurrentUser &&
                 this.modActions()}
               {this.userInfo()}
@@ -595,6 +597,7 @@ class BaseUser extends Component<any, UserState> {
                   Stick with Darkly for the best ChapoChat experience. Themes
                   are bugged right now, but we&apos;ll be rebuilding themes soon
                   so they&apos;re extra fancy.
+                  Stick with Darkly for the best ChapoChat experience. Themes are bugged right now, but we&aposll be rebuilding themes soon so they&aposre extra fancy.
                 </div>
               </div>
               <form className="form-group">
@@ -868,7 +871,7 @@ class BaseUser extends Component<any, UserState> {
         <div className="card border-secondary mb-3">
           <div className="card-body">
             <h5>Mod Actions</h5>
-            {(this.canAdmin || this.isModerator()) && (
+            {(this.canAdmin || this.canSitemod || this.isModerator()) && (
               <button
                 className="btn btn-secondary"
                 onClick={linkEvent(this, this.handleBanUserShow)}
@@ -957,6 +960,17 @@ class BaseUser extends Component<any, UserState> {
       canMod(
         UserService.Instance.user,
         this.state.admins.map(a => a.id),
+        this.state.user_id
+      )
+    );
+  }
+
+  get canSitemod(): boolean {
+    return (
+      this.state.sitemods &&
+      canMod(
+        UserService.Instance.user,
+        this.state.sitemods.map(a => a.id),
         this.state.user_id
       )
     );
@@ -1202,7 +1216,7 @@ class BaseUser extends Component<any, UserState> {
 
   handleBan(i: User, event: any) {
     event.preventDefault();
-    if (i.canAdmin) {
+    if (i.canAdmin || i.canSitemod) {
       const form: BanUserForm = {
         user_id: i.state.user.id,
         ban: true,
@@ -1297,6 +1311,7 @@ class BaseUser extends Component<any, UserState> {
       this.setState({
         site: data.site,
         admins: data.admins,
+        sitemods: data.sitemods,
       });
     } else if (res.op == UserOperation.GetSiteModerators) {
       const data = res.data as GetSiteModeratorsResponse;

@@ -140,6 +140,7 @@ interface IconProps {
 
 export function Icon({
   name,
+  style = '',
   size = '20px',
   ...props
 }: IconProps & React.SVGProps<SVGSVGElement>) {
