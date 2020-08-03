@@ -22,6 +22,7 @@ import {
   AddModToCommunityForm,
   TransferCommunityForm,
   AddAdminForm,
+  AddSitemodForm,
   TransferSiteForm,
   BanUserForm,
   SiteForm,
@@ -59,7 +60,6 @@ import { toast } from '../utils';
 import { Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import { User } from '../components/user';
 
 export class WebSocketService {
   private static _instance: WebSocketService;
@@ -67,6 +67,7 @@ export class WebSocketService {
   public subject: Observable<any>;
 
   public admins: Array<UserView>;
+  public sitemods: Array<UserView>;
   public banned: Array<UserView>;
 
   private constructor() {
@@ -244,6 +245,11 @@ export class WebSocketService {
   public addAdmin(form: AddAdminForm) {
     this.setAuth(form);
     this.ws.send(this.wsSendWrapper(UserOperation.AddAdmin, form));
+  }
+
+  public addSitemod(form: AddSitemodForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.AddSitemod, form));
   }
 
   public getUserDetails(form: GetUserDetailsForm) {

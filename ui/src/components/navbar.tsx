@@ -33,7 +33,6 @@ import {
 } from '../utils';
 import { version } from '../version';
 import { i18n } from '../i18next';
-import { User } from './user';
 import { Icon } from './icon';
 import { CommunityDropdown } from './community-dropdown';
 
@@ -46,6 +45,7 @@ interface NavbarState {
   unreadCount: number;
   siteName: string;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
   searchParam: string;
   toggleSearch: boolean;
   creatingCommunitiesEnabled: boolean;
@@ -65,6 +65,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     expanded: false,
     siteName: undefined,
     admins: [],
+    sitemods: [],
     searchParam: '',
     toggleSearch: false,
     creatingCommunitiesEnabled: false,
@@ -104,7 +105,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     this.searchTextField = createRef();
   }
 
-  handleSearchParam(i: Navbar, event: any) {
+  handleSearchParam(i: UnwrappedNavbar, event: any) {
     i.state.searchParam = event.target.value;
     i.setState(i.state);
   }
@@ -122,12 +123,12 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     }
   }
 
-  handleSearchSubmit(i: Navbar, event: any) {
+  handleSearchSubmit(i: UnwrappedNavbar, event: any) {
     event.preventDefault();
     i.updateUrl();
   }
 
-  handleSearchBtn(i: Navbar, event: any) {
+  handleSearchBtn(i: UnwrappedNavbar, event: any) {
     event.preventDefault();
     i.setState({ toggleSearch: true });
 
@@ -138,7 +139,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     }
   }
 
-  handleSearchBlur(i: Navbar, event: any) {
+  handleSearchBlur(i: UnwrappedNavbar, event: any) {
     if (!(event.relatedTarget && event.relatedTarget.name !== 'search-btn')) {
       i.state.toggleSearch = false;
       i.setState(i.state);
@@ -367,12 +368,12 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     );
   }
 
-  expandNavbar(i: Navbar) {
+  expandNavbar(i: UnwrappedNavbar) {
     i.state.expanded = !i.state.expanded;
     i.setState(i.state);
   }
 
-  showCommunityDropdown(i: Navbar) {
+  showCommunityDropdown(i: UnwrappedNavbar) {
     i.state.communityDropdownShown = !i.state.communityDropdownShown;
     i.setState(i.state);
   }

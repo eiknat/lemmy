@@ -12,6 +12,7 @@ import {
   UserView,
   AddModToCommunityForm,
   AddAdminForm,
+  AddSitemodForm,
   TransferCommunityForm,
   TransferSiteForm,
   BanType,
@@ -36,7 +37,6 @@ import { CommentNodes } from './comment-nodes';
 import { UserListing } from './user-listing';
 import { CommunityLink } from './community-link';
 import { i18n } from '../i18next';
-import { replaceEmojis } from '../custom-emojis';
 import { Icon } from './icon';
 
 interface CommentNodeState {
@@ -53,6 +53,7 @@ interface CommentNodeState {
   showConfirmTransferCommunity: boolean;
   showConfirmAppointAsMod: boolean;
   showConfirmAppointAsAdmin: boolean;
+  showConfirmAppointAsSitemod: boolean;
   showReportDialog: boolean;
   collapsed: boolean;
   viewSource: boolean;
@@ -75,6 +76,7 @@ interface CommentNodeProps {
   showContext?: boolean;
   moderators: Array<CommunityUser>;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
   // TODO is this necessary, can't I get it from the node itself?
   postCreatorId?: number;
   showCommunity?: boolean;
@@ -88,7 +90,7 @@ export function RoleBadge({
   tooltipText,
   children,
 }: {
-  role: 'mod' | 'admin' | 'creator';
+  role: 'mod' | 'admin' | 'sitemod' | 'creator';
   children: any;
   tooltipText: string;
 }) {
@@ -120,6 +122,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     showConfirmTransferCommunity: false,
     showConfirmAppointAsMod: false,
     showConfirmAppointAsAdmin: false,
+    showConfirmAppointAsSitemod: false,
     showReportDialog: false,
     my_vote: this.props.node.comment.my_vote,
     score: this.props.node.comment.score,
@@ -201,6 +204,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   }}
                   isMod={this.isMod}
                   isAdmin={this.isAdmin}
+                  isSitemod={this.isSitemod}
                 />
               </span>
               {this.isAdmin && (
@@ -208,7 +212,12 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   {i18n.t('admin')[0]}
                 </RoleBadge>
               )}
-              {this.isMod && !this.isAdmin && (
+              {this.isSitemod && (
+                <RoleBadge role="sitemod" tooltipText={i18n.t('sitemod')}>
+                  {i18n.t('sitemod')[0]}
+                </RoleBadge>
+              )}
+              {this.isMod && !this.isAdmin && !this.isSitemod (
                 <RoleBadge role="mod" tooltipText={i18n.t('mod')}>
                   {i18n.t('mod')[0]}
                 </RoleBadge>
@@ -247,7 +256,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                 onClick={linkEvent(node, this.handleCommentUpvote)}
                 data-tippy-content={this.pointsTippy}
               >
-                <Icon name="hexbear" class="icon mr-1 mb-1" />
+                <Icon name="hexbear" className="icon mr-1 mb-1" />
                 <span class="mr-1">{this.state.score}</span>
               </button>
               <span className="mr-1">•</span>
@@ -379,7 +388,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                               this.loadingIcon
                             ) : (
                               <Icon
-                                class={`icon icon-inline ${
+                                className={`icon icon-inline ${
                                   node.comment.saved && 'text-warning'
                                 }`}
                                 name="star"
@@ -634,6 +643,44 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                     </button>
                                   </>
                                 ))}
+                              {!node.comment.banned &&
+                                (!this.state.showConfirmAppointAsSitemod ? (
+                                  <button
+                                    class="btn btn-link btn-animate text-muted"
+                                    onClick={linkEvent(
+                                      this,
+                                      this.handleShowConfirmAppointAsSitemod
+                                    )}
+                                  >
+                                    {this.isSitemod
+                                      ? i18n.t('remove_as_sitemod')
+                                      : i18n.t('appoint_as_sitemod')}
+                                  </button>
+                                ) : (
+                                  <>
+                                    <button class="btn btn-link btn-animate text-muted">
+                                      {i18n.t('are_you_sure')}
+                                    </button>
+                                    <button
+                                      class="btn btn-link btn-animate text-muted"
+                                      onClick={linkEvent(
+                                        this,
+                                        this.handleAddSitemod
+                                      )}
+                                    >
+                                      {i18n.t('yes')}
+                                    </button>
+                                    <button
+                                      class="btn btn-link btn-animate text-muted"
+                                      onClick={linkEvent(
+                                        this,
+                                        this.handleCancelConfirmAppointAsSitemod
+                                      )}
+                                    >
+                                      {i18n.t('no')}
+                                    </button>
+                                  </>
+                                ))}
                             </>
                           )}
                           {/* Site Creator can transfer to another admin */}
@@ -828,19 +875,30 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     );
   }
 
+  get isSitemod(): boolean {
+    return (
+      this.props.sitemods &&
+      isMod(
+        this.props.sitemods.map(s => s.id),
+        this.props.node.comment.creator_id
+      )
+    );
+  }
+
   get isPostCreator(): boolean {
     return this.props.node.comment.creator_id == this.props.postCreatorId;
   }
 
   get canMod(): boolean {
-    if (this.props.admins && this.props.moderators) {
-      let adminsThenMods = this.props.admins
+    if (this.props.admins && this.props.sitemods && this.props.moderators) {
+      let adminsThenSitemodsThenMods = this.props.admins
         .map(a => a.id)
+        .concat(this.props.sitemods.map(s => s.id))
         .concat(this.props.moderators.map(m => m.user_id));
-
+      console.log('STALINIST5', adminsThenSitemodsThenMods);
       return canMod(
         UserService.Instance.user,
-        adminsThenMods,
+        adminsThenSitemodsThenMods,
         this.props.node.comment.creator_id
       );
     } else {
@@ -1146,6 +1204,26 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     };
     WebSocketService.Instance.addAdmin(form);
     i.state.showConfirmAppointAsAdmin = false;
+    i.setState(i.state);
+  }
+
+  handleShowConfirmAppointAsSitemod(i: CommentNode) {
+    i.state.showConfirmAppointAsSitemod = true;
+    i.setState(i.state);
+  }
+
+  handleCancelConfirmAppointAsSitemod(i: CommentNode) {
+    i.state.showConfirmAppointAsSitemod = false;
+    i.setState(i.state);
+  }
+
+  handleAddSitemod(i: CommentNode) {
+    let form: AddSitemodForm = {
+      user_id: i.props.node.comment.creator_id,
+      added: !i.isSitemod,
+    };
+    WebSocketService.Instance.addSitemod(form);
+    i.state.showConfirmAppointAsSitemod = false;
     i.setState(i.state);
   }
 

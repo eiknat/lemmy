@@ -58,6 +58,7 @@ interface State {
   communityName: string;
   moderators: Array<CommunityUser>;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
   online: number;
   loading: boolean;
   posts: Array<Post>;
@@ -106,6 +107,7 @@ export class Community extends Component<any, State> {
     },
     moderators: [],
     admins: [],
+    sitemods: [],
     communityId: Number(this.props.match.params.id),
     communityName: this.props.match.params.name,
     online: null,
@@ -264,6 +266,7 @@ export class Community extends Component<any, State> {
                   community={this.state.community}
                   moderators={this.state.moderators}
                   admins={this.state.admins}
+                  sitemods={this.state.sitemods}
                   online={this.state.online}
                   enableNsfw={this.state.site.enable_nsfw}
                 />
@@ -427,6 +430,7 @@ export class Community extends Component<any, State> {
       this.state.community = data.community;
       this.state.moderators = data.moderators;
       this.state.admins = data.admins;
+      this.state.sitemods = data.sitemods;
       this.state.online = data.online;
       document.title = `/c/${this.state.community.name} - ${this.state.site.name}`;
       this.setState(this.state);

@@ -59,7 +59,6 @@ import Toastify from 'toastify-js';
 import tippy from 'tippy.js';
 import EmojiButton from '@joeattardi/emoji-button';
 import { customEmojis, replaceEmojis } from './custom-emojis';
-import { match } from 'assert';
 import moment from 'moment';
 
 export const repoUrl = 'https://gitlab.com/chapo-sandbox/production';

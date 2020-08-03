@@ -137,10 +137,12 @@ type Icons = typeof icons;
 
 export function Icon<T extends keyof Icons>({
   name,
+  style = '',
   size = '20px',
   ...props
 }: {
   name: T;
+  style?: string;
   size?: number | string;
 }): Icons[T] {
   if (!Object.keys(icons).includes(name)) {

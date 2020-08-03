@@ -4,9 +4,7 @@ import {
   mdToHtml,
   randomStr,
   markdownHelpUrl,
-  toast,
   setupTribute,
-  pictrsDeleteToast,
   setupTippy,
   emojiPicker,
 } from '../utils';
@@ -408,7 +406,7 @@ export class MarkdownTextArea extends Component<
     event.preventDefault();
     i.state.loading = true;
     i.setState(i.state);
-    i.props.onSubmit(i.state.content);
+    i.props.onSubmit(i.state.content, event);
   }
 
   handleKeydown(i: MarkdownTextArea, event: any) {
@@ -419,7 +417,7 @@ export class MarkdownTextArea extends Component<
         // submit comment
         i.state.loading = true;
         i.setState(i.state);
-        i.props.onSubmit(i.state.content);
+        i.props.onSubmit(i.state.content, event);
       }
     }
   }

@@ -108,18 +108,19 @@ export class Main extends Component<any, MainState> {
         id: null,
         name: null,
         creator_id: null,
-        creator_name: null,
         published: null,
+        creator_name: null,
         number_of_users: null,
         number_of_posts: null,
         number_of_comments: null,
         number_of_communities: null,
-        enable_create_communities: null,
         enable_downvotes: null,
+        enable_create_communities: null,
         open_registration: null,
         enable_nsfw: null,
       },
       admins: [],
+      sitemods: [],
       banned: [],
       online: null,
     },
@@ -384,6 +385,22 @@ export class Main extends Component<any, MainState> {
                       local: admin.local,
                       actor_id: admin.actor_id,
                       id: admin.id,
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+            <ul class="mt-1 list-inline small mb-0">
+              <li class="list-inline-item">{i18n.t('sitemods')}:</li>
+              {this.state.siteRes.sitemods.map(sitemod => (
+                <li class="list-inline-item">
+                  <UserListing
+                    user={{
+                      name: sitemod.name,
+                      avatar: sitemod.avatar,
+                      local: sitemod.local,
+                      actor_id: sitemod.actor_id,
+                      id: sitemod.id,
                     }}
                   />
                 </li>
@@ -684,17 +701,20 @@ export class Main extends Component<any, MainState> {
       this.setState(this.state);
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-
+      console.log('STALINIST data', data);
       // This means it hasn't been set up yet
       if (!data.site) {
         this.context.router.history.push('/setup');
+      } else {
+        this.state.siteRes.admins = data.admins;
+        this.state.siteRes.sitemods = data.sitemods;
+        this.state.siteRes.site = data.site;
+        console.log('data.site', data.site);
+        this.state.siteRes.banned = data.banned;
+        this.state.siteRes.online = data.online;
+        this.setState(this.state);
+        document.title = `${this.state.siteRes.site.name}`;
       }
-      this.state.siteRes.admins = data.admins;
-      this.state.siteRes.site = data.site;
-      this.state.siteRes.banned = data.banned;
-      this.state.siteRes.online = data.online;
-      this.setState(this.state);
-      document.title = `${this.state.siteRes.site.name}`;
     } else if (res.op == UserOperation.EditSite) {
       let data = res.data as SiteResponse;
       this.state.siteRes.site = data.site;

@@ -1,8 +1,6 @@
 import { Component } from 'inferno';
 import { WebSocketService } from '../services';
 import { i18n } from '../i18next';
-import { T } from 'inferno-i18next';
-import { repoUrl } from '../utils';
 
 export class About extends Component<any, any> {
   constructor(props: any, context: any) {
