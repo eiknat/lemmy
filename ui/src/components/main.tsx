@@ -51,8 +51,8 @@ import {
   createPostLikeFindRes,
   editPostFindRes,
   commentsToFlatNodes,
-  setupTippy,
-} from '../utils';
+  setupTippy} from '../utils';
+import { BASE_PATH } from "../isProduction";
 import { i18n } from '../i18next';
 import { Trans, withTranslation } from 'react-i18next';
 import { PATREON_URL } from '../constants';
@@ -319,11 +319,11 @@ class Main extends Component<any, MainState> {
             <h5 className="mb-4 text-center h3">{`${this.state.siteRes.site.name}`}</h5>
             <img
               className="img-fluid mb-2"
-              src="/static/hexbear-logo.png"
+              src={`${BASE_PATH}hexbear-logo.png`}
               alt="hexbear logo"
             />
             <img
-              src="/static/welcome.gif"
+              src={`${BASE_PATH}welcome.gif`}
               className="img-fluid"
               style={{ width: '100%' }}
             />

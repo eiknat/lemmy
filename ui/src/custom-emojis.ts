@@ -1,3 +1,5 @@
+import { BASE_PATH } from "./isProduction";
+
 export const emojiPaths = [
   '100-com.png',
   '10000-com.png',
@@ -129,7 +131,7 @@ export const emojiPaths = [
   'zizek-ok.png',
 ];
 
-const EMOJI_DIR_PATH = '/static/emojis/';
+const EMOJI_DIR_PATH = `emojis/`;
 
 export const customEmojis = emojiPaths.map(path => ({
   key: path.split('.')[0],

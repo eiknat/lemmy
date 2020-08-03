@@ -59,8 +59,10 @@ import emojiShortName from 'emoji-short-name';
 import Toastify from 'toastify-js';
 import tippy from 'tippy.js';
 import EmojiButton from '@joeattardi/emoji-button';
+
 import { customEmojis, replaceEmojis } from './custom-emojis';
 import moment from 'moment';
+import { BASE_PATH } from './isProduction';
 
 export const repoUrl = 'https://gitlab.com/chapo-sandbox/production';
 export const helpGuideUrl = '/docs/about_guide.html';
@@ -475,7 +477,7 @@ export function setTheme(theme: string = 'darkly', loggedIn: boolean = false) {
       .setAttribute('disabled', 'disabled');
 
     // Load the theme dynamically
-    let cssLoc = `/static/css/themes/${theme}.min.css`;
+    let cssLoc = `${BASE_PATH}css/themes/${theme}.min.css`;
     loadCss(theme, cssLoc);
     document.getElementById(theme).removeAttribute('disabled');
   }
@@ -648,7 +650,7 @@ export function setupTribute(): Tribute {
           {
             key: 'logo',
             val:
-              '<img className="icon icon-navbar" src="/static/logo.png" alt="vaporwave hammer and sickle logo, courtesy of ancestral potato">',
+              `<img className="icon icon-navbar" src="${BASE_PATH}logo.png" alt="vaporwave hammer and sickle logo, courtesy of ancestral potato">`,
           },
           ...customEmojis,
         ],

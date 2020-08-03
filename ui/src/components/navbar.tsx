@@ -29,8 +29,8 @@ import {
   toast,
   messageToastify,
   md,
-  imagesDownsize,
-} from '../utils';
+  imagesDownsize} from '../utils';
+import { BASE_PATH } from "../isProduction";
 import { version } from '../version';
 import { i18n } from '../i18next';
 import { User } from './user';
@@ -175,7 +175,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
         <nav className="container-fluid navbar navbar-expand-md navbar-light main-navbar shadow p-0 px-3">
           <a className="navbar-brand" href="/">
             <img
-              src="/static/hexbear_head.svg"
+              src={`${BASE_PATH}hexbear_head.svg`}
               className="icon icon-navbar"
               alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
             />

@@ -3,6 +3,7 @@ import { WebSocketService } from '../services';
 import { i18n } from '../i18next';
 import { Trans } from 'react-i18next';
 import { repoUrl } from '../utils';
+import { BASE_PATH } from "../isProduction";
 
 export class About extends Component<any, any> {
   constructor(props: any, context: any) {
@@ -21,7 +22,7 @@ export class About extends Component<any, any> {
       <div className="about-container">
         <div className="about-header">
           <img
-            src="/static/banner.png"
+            src={`${BASE_PATH}banner.png`}
             className="img-fluid"
             alt="bear with black text reading 'you have nothing to lose but your chains'"
           />
@@ -76,7 +77,7 @@ export class About extends Component<any, any> {
 
             <div className="my-4">
               <img
-                src="/static/last-comment.png"
+                src={`${BASE_PATH}last-comment.png`}
                 alt="the last comment before the r/chapotraphouse subreddit was shut down"
                 className="img-fluid"
               />

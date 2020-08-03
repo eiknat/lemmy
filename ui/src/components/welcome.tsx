@@ -12,6 +12,7 @@ import {
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import { wsJsonToRes, validEmail, toast, setupTippy } from '../utils';
+import { BASE_PATH } from "../isProduction";
 import { i18n } from '../i18next';
 import { linkEvent } from '../linkEvent';
 
@@ -75,7 +76,7 @@ export class WelcomePage extends Component<any, State> {
             <div className="text-center my-4 p-1">
               <img
                 className="img-fluid mb-2 welcome-logo"
-                src="/static/logo.png"
+                src={`${BASE_PATH}logo.png`}
                 alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
               />
               <h3>Chapo Trap House is coming</h3>
