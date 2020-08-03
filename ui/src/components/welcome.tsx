@@ -297,12 +297,12 @@ export class WelcomePage extends Component<any, State> {
   handleLoginSubmit(i: WelcomePage, event: any) {
     event.preventDefault();
     i.state.loginLoading = true;
-    i.state.loginForm.username_or_email = document.getElementById(
+    i.state.loginForm.username_or_email = (document.getElementById(
       'login-email-or-username'
-    ).value;
-    i.state.loginForm.password = document.getElementById(
+    ) as HTMLInputElement).value;
+    i.state.loginForm.password = (document.getElementById(
       'login-password'
-    ).value;
+    ) as HTMLInputElement).value;
     i.setState(i.state);
     WebSocketService.Instance.login(i.state.loginForm);
   }
