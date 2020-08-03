@@ -217,6 +217,7 @@ export class Post extends Component<any, PostState> {
                 showCommunity
                 moderators={this.state.moderators}
                 admins={this.state.siteRes.admins}
+                sitemods={this.state.siteRes.sitemods}
                 enableDownvotes={this.state.siteRes.site.enable_downvotes}
                 enableNsfw={this.state.siteRes.site.enable_nsfw}
               />

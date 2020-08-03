@@ -985,7 +985,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                             class="pointer"
                             onClick={linkEvent(this, this.handleAddSitemod)}
                           >
-                            {this.isAdmin
+                            {this.isSitemod
                               ? i18n.t('remove_as_sitemod')
                               : i18n.t('appoint_as_sitemod')}
                           </span>
@@ -1097,9 +1097,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
   }
 
   get canModOnSelf(): boolean {
-    if (this.props.admins && this.props.moderators) {
+    if (this.props.admins && this.props.sitemods && this.props.moderators) {
       let adminsThenMods = this.props.admins
         .map(a => a.id)
+        .concat(this.props.sitemods.map(s => s.id))
         .concat(this.props.moderators.map(m => m.user_id));
 
       return canMod(

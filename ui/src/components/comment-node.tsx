@@ -450,7 +450,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                               <Icon name="report" />
                             </button>
                           )}
-                          {/* Admins and mods can remove comments */}
+                          {/* Admins, sitemods, and mods can remove comments */}
                           {(this.canMod || this.canAdmin) && (
                             <>
                               {!node.comment.removed ? (
