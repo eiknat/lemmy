@@ -6,7 +6,7 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "api-test": "jest src/api_tests/api.spec.ts",
-    "build": "node generate_translations.js && vite build",
+    "build": "node generate_translations.js && vite build --base=/static/",
     "lint": "tsc --noEmit && eslint --report-unused-disable-directives --ext .js,.ts,.tsx src",
     "start": "node generate_translations.js && vite --port 4444 --open"
   },
