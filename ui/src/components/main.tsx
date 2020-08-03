@@ -23,6 +23,7 @@ import {
   GetCommentsResponse,
   CommentResponse,
   AddAdminResponse,
+  AddSitemodResponse,
   BanUserResponse,
   WebSocketJsonResponse,
 } from '../interfaces';
@@ -767,7 +768,7 @@ export class Main extends Component<any, MainState> {
       this.setState(this.state);
     } else if (res.op == UserOperation.AddSitemod) {
       let data = res.data as AddSitemodResponse;
-      this.state.siteRes.admins = data.admins;
+      this.state.siteRes.sitemods = data.sitemods;
       this.setState(this.state);
     } else if (res.op == UserOperation.BanUser) {
       let data = res.data as BanUserResponse;
