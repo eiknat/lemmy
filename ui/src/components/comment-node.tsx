@@ -213,7 +213,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   {i18n.t('mod')[0]}
                 </RoleBadge>
               )}
-              {node.comment.creator_tags.pronouns ? (
+              {node.comment.creator_tags?.pronouns ? (
                 <span className="badge mr-1 comment-badge pronouns-badge">
                   {node.comment.creator_tags.pronouns.split(',').join('/')}
                 </span>

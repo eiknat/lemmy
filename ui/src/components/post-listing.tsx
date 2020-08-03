@@ -511,7 +511,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         {i18n.t('mod')[0]}
                       </RoleBadge>
                     )}
-                    {post.creator_tags.pronouns ? (
+                    {post.creator_tags?.pronouns ? (
                       <span className="badge mx-1 comment-badge pronouns-badge">
                         {post.creator_tags.pronouns.split(',').join('/')}
                       </span>

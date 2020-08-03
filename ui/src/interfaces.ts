@@ -203,7 +203,7 @@ export interface Post {
   creator_name: string;
   creator_published: string;
   creator_avatar?: string;
-  creator_tags: {
+  creator_tags?: {
     [tag: string]: string;
   };
   community_actor_id: string;
@@ -251,7 +251,7 @@ export interface Comment {
   creator_name: string;
   creator_avatar?: string;
   creator_published: string;
-  creator_tags: {
+  creator_tags?: {
     [tag: string]: string;
   };
   score: number;
