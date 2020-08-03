@@ -58,7 +58,7 @@ import iterator from 'markdown-it-for-inline';
 import emojiShortName from 'emoji-short-name';
 import Toastify from 'toastify-js';
 import tippy from 'tippy.js';
-import EmojiButton from '@joeattardi/emoji-button';
+import { EmojiButton } from '@joeattardi/emoji-button';
 
 import { customEmojis, replaceEmojis } from './custom-emojis';
 import moment from 'moment';

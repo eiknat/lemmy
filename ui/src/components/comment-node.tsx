@@ -143,13 +143,14 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps: CommentNodeProps) {
-    this.state.my_vote = nextProps.node.comment.my_vote;
-    this.state.upvotes = nextProps.node.comment.upvotes;
-    this.state.downvotes = nextProps.node.comment.downvotes;
-    this.state.score = nextProps.node.comment.score;
-    this.state.readLoading = false;
-    this.state.saveLoading = false;
-    this.setState(this.state);
+    this.setState({
+      my_vote: nextProps.node.comment.my_vote,
+      upvotes: nextProps.node.comment.upvotes,
+      downvotes: nextProps.node.comment.downvotes,
+      score: nextProps.node.comment.score,
+      readLoading: false,
+      saveLoading: false,
+    });
   }
 
   render() {
