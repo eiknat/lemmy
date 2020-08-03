@@ -59,6 +59,7 @@ export class Login extends Component<any, State> {
       admin: false,
       show_nsfw: false,
       captcha_id: undefined,
+      pronouns: null,
     },
     loginLoading: false,
     registerLoading: false,
@@ -74,6 +75,8 @@ export class Login extends Component<any, State> {
     super(props, context);
 
     this.state = this.emptyState;
+
+    this.handlePronounsChange = this.handlePronounsChange.bind(this);
 
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
@@ -244,6 +247,26 @@ export class Login extends Component<any, State> {
         </div>
 
         <div className="form-group row">
+          <label className="col-sm-2 col-form-label" htmlFor="register-pronouns">
+            {i18n.t('pronouns')}
+          </label>
+          <div className="col-sm-10">
+            <select
+              id="register-pronouns"
+              value={this.state.registerForm.pronouns}
+              className="custom-select custom-select-sm"
+              onChange={this.handlePronounsChange}
+            >
+              <option value="none">none</option>
+              <option value="they/them">they/them</option>
+              <option value="she/her">she/her</option>
+              <option value="he/him">he/him</option>
+              <option value="any pronoun">any</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="form-group row">
           <label className="col-sm-2 col-form-label" htmlFor="register-password">
             {i18n.t('password')}
           </label>
@@ -371,6 +394,15 @@ export class Login extends Component<any, State> {
     i.setState(i.state);
   }
 
+  handlePronounsChange(e: any) {
+    this.setState({
+      registerForm: {
+        ...this.state.registerForm,
+        pronouns: e.target.value,
+      },
+    });
+  }
+
   handleRegisterSubmit(i: Login, event: any) {
     event.preventDefault();
     i.state.registerLoading = true;
@@ -380,7 +412,13 @@ export class Login extends Component<any, State> {
     i.setState(i.state);
 
     if (!i.mathCheck) {
-      WebSocketService.Instance.register(i.state.registerForm);
+      WebSocketService.Instance.register({
+        ...i.state.registerForm,
+        pronouns:
+          i.state.registerForm.pronouns === 'none'
+            ? null
+            : i.state.registerForm.pronouns,
+      });
     }
   }
 

@@ -52,6 +52,8 @@ import {
   ListPostReportsForm,
   GetCommunitySettingsForm,
   EditCommunitySettingsForm,
+  GetUserTagForm,
+  SetUserTagForm,
 } from '../interfaces';
 import { UserService } from './';
 import { i18n } from '../i18next';
@@ -389,6 +391,15 @@ export class WebSocketService {
 
   public getSiteModerators() {
     this.ws.send(this.wsSendWrapper(UserOperation.GetSiteModerators, {}));
+  }
+
+  public getUserTags(form: GetUserTagForm) {
+    this.ws.send(this.wsSendWrapper(UserOperation.GetUserTag, form));
+  }
+
+  public setUserTags(form: SetUserTagForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.SetUserTag, form));
   }
 
   private wsSendWrapper(op: UserOperation, data: MessageType) {

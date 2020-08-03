@@ -56,6 +56,8 @@ export enum UserOperation {
   GetCommunitySettings,
   EditCommunitySettings,
   GetSiteModerators,
+  GetUserTag,
+  SetUserTag,
 }
 
 export enum CommentSortType {
@@ -201,6 +203,9 @@ export interface Post {
   creator_name: string;
   creator_published: string;
   creator_avatar?: string;
+  creator_tags?: {
+    [tag: string]: string;
+  };
   community_actor_id: string;
   community_local: boolean;
   community_name: string;
@@ -246,6 +251,9 @@ export interface Comment {
   creator_name: string;
   creator_avatar?: string;
   creator_published: string;
+  creator_tags?: {
+    [tag: string]: string;
+  };
   score: number;
   upvotes: number;
   downvotes: number;
@@ -593,6 +601,7 @@ export interface RegisterForm {
   admin: boolean;
   show_nsfw: boolean;
   captcha_id: string;
+  pronouns?: string;
 }
 
 export interface LoginResponse {
@@ -1030,7 +1039,9 @@ export type MessageType =
   | ResolveCommentReportForm
   | ResolvePostReportForm
   | CreateCommentReportForm
-  | CreatePostReportForm;
+  | CreatePostReportForm
+  | GetUserTagForm
+  | SetUserTagForm;
 
 type ResponseType =
   | SiteResponse
@@ -1063,7 +1074,8 @@ type ResponseType =
   | CreateCommentReportResponse
   | CreatePostReportResponse
   | CommunitySettingsResponse
-  | GetSiteModeratorsResponse;
+  | GetSiteModeratorsResponse
+  | UserTagResponse;
 
 export interface WebSocketResponse {
   op: UserOperation;
@@ -1108,6 +1120,24 @@ export interface CommunityModsState {
 
 export interface GetSiteModeratorsResponse {
   communities: CommunityMods[];
+}
+
+export interface GetUserTagForm {
+  user: number;
+  community?: number;
+}
+
+export interface SetUserTagForm {
+  tag: string;
+  value?: string | null; //null removes tag
+  community?: number;
+}
+
+export interface UserTagResponse {
+  user: number;
+  tags: {
+    [tag: string]: string;
+  };
 }
 
 export enum UserDetailsView {
