@@ -52,8 +52,9 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
 
   // Necessary to stop the loading
   UNSAFE_componentWillReceiveProps() {
-    this.state.loading = false;
-    this.setState(this.state);
+    this.setState({
+      loading: false
+    });
   }
 
   componentDidUpdate() {

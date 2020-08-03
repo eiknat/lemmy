@@ -990,36 +990,36 @@ class BaseUser extends Component<any, UserState> {
     this.updateUrl({ sort: SortType[val].toLowerCase(), page: 1 });
   }
 
-  handleViewChange(i: User, event: any) {
+  handleViewChange(i: BaseUser, event: any) {
     i.updateUrl({
       view: UserDetailsView[Number(event.target.value)].toLowerCase(),
       page: 1,
     });
   }
 
-  handleUserSettingsShowNsfwChange(i: User, event: any) {
+  handleUserSettingsShowNsfwChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.show_nsfw = event.target.checked;
     i.setState(i.state);
   }
 
-  handleUserSettingsShowAvatarsChange(i: User, event: any) {
+  handleUserSettingsShowAvatarsChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.show_avatars = event.target.checked;
     UserService.Instance.user.show_avatars = event.target.checked; // Just for instant updates
     i.setState(i.state);
   }
 
-  handleUserSettingsSendNotificationsToEmailChange(i: User, event: any) {
+  handleUserSettingsSendNotificationsToEmailChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.send_notifications_to_email = event.target.checked;
     i.setState(i.state);
   }
 
-  handleUserSettingsThemeChange(i: User, event: any) {
+  handleUserSettingsThemeChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.theme = event.target.value;
     setTheme(event.target.value, true);
     i.setState(i.state);
   }
 
-  handleUserSettingsLangChange(i: User, event: any) {
+  handleUserSettingsLangChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.lang = event.target.value;
     i18n.changeLanguage(i.state.userSettingsForm.lang);
     i.setState(i.state);
@@ -1036,7 +1036,7 @@ class BaseUser extends Component<any, UserState> {
     this.setState(this.state);
   }
 
-  handleUserSettingsEmailChange(i: User, event: any) {
+  handleUserSettingsEmailChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.email = event.target.value;
     if (i.state.userSettingsForm.email == '' && !i.state.user.email) {
       i.state.userSettingsForm.email = undefined;
@@ -1044,7 +1044,7 @@ class BaseUser extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleUserSettingsMatrixUserIdChange(i: User, event: any) {
+  handleUserSettingsMatrixUserIdChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.matrix_user_id = event.target.value;
     if (
       i.state.userSettingsForm.matrix_user_id == '' &&
@@ -1055,7 +1055,7 @@ class BaseUser extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleUserSettingsNewPasswordChange(i: User, event: any) {
+  handleUserSettingsNewPasswordChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.new_password = event.target.value;
     if (i.state.userSettingsForm.new_password == '') {
       i.state.userSettingsForm.new_password = undefined;
@@ -1063,7 +1063,7 @@ class BaseUser extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleUserSettingsNewPasswordVerifyChange(i: User, event: any) {
+  handleUserSettingsNewPasswordVerifyChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.new_password_verify = event.target.value;
     if (i.state.userSettingsForm.new_password_verify == '') {
       i.state.userSettingsForm.new_password_verify = undefined;
@@ -1071,7 +1071,7 @@ class BaseUser extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleUserSettingsOldPasswordChange(i: User, event: any) {
+  handleUserSettingsOldPasswordChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.old_password = event.target.value;
     if (i.state.userSettingsForm.old_password == '') {
       i.state.userSettingsForm.old_password = undefined;
@@ -1079,7 +1079,7 @@ class BaseUser extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleImageUpload(i: User, event: any) {
+  handleImageUpload(i: BaseUser, event: any) {
     event.preventDefault();
     let file = event.target.files[0];
     const imageUploadUrl = `/pictrs/image`;
@@ -1116,7 +1116,7 @@ class BaseUser extends Component<any, UserState> {
       });
   }
 
-  removeAvatar(i: User, event: any) {
+  removeAvatar(i: BaseUser, event: any) {
     event.preventDefault();
     i.state.userSettingsLoading = true;
     i.state.userSettingsForm.avatar = '';
@@ -1132,7 +1132,7 @@ class BaseUser extends Component<any, UserState> {
     );
   }
 
-  handleUserSettingsSubmit(i: User, event: any) {
+  handleUserSettingsSubmit(i: BaseUser, event: any) {
     event.preventDefault();
     i.state.userSettingsLoading = true;
     i.setState(i.state);
@@ -1166,23 +1166,23 @@ class BaseUser extends Component<any, UserState> {
     this.setState({ additionalPronouns: e.target.value });
   }
 
-  handleDeleteAccountShowConfirmToggle(i: User, event: any) {
+  handleDeleteAccountShowConfirmToggle(i: BaseUser, event: any) {
     event.preventDefault();
     i.state.deleteAccountShowConfirm = !i.state.deleteAccountShowConfirm;
     i.setState(i.state);
   }
 
-  handleDeleteAccountPasswordChange(i: User, event: any) {
+  handleDeleteAccountPasswordChange(i: BaseUser, event: any) {
     i.state.deleteAccountForm.password = event.target.value;
     i.setState(i.state);
   }
 
-  handleLogoutClick(i: User) {
+  handleLogoutClick(i: BaseUser) {
     UserService.Instance.logout();
     i.context.router.history.push('/');
   }
 
-  handleDeleteAccount(i: User, event: any) {
+  handleDeleteAccount(i: BaseUser, event: any) {
     event.preventDefault();
     i.state.deleteAccountLoading = true;
     i.setState(i.state);
@@ -1190,17 +1190,17 @@ class BaseUser extends Component<any, UserState> {
     WebSocketService.Instance.deleteAccount(i.state.deleteAccountForm);
   }
 
-  handleBanUserShow(i: User) {
+  handleBanUserShow(i: BaseUser) {
     i.state.banUserShow = !i.state.banUserShow;
     i.setState(i.state);
   }
 
-  handleBanReasonChange(i: User, event: any) {
+  handleBanReasonChange(i: BaseUser, event: any) {
     i.state.banReason = event.target.value;
     i.setState(i.state);
   }
 
-  handleBan(i: User, event: any) {
+  handleBan(i: BaseUser, event: any) {
     event.preventDefault();
     if (i.canAdmin) {
       const form: BanUserForm = {

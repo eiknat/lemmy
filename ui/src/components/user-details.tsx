@@ -229,11 +229,11 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
     );
   }
 
-  nextPage(i: UserDetails) {
+  nextPage(i: BaseUserDetails) {
     i.props.onPageChange((i.props.page as number) + 1);
   }
 
-  prevPage(i: UserDetails) {
+  prevPage(i: BaseUserDetails) {
     i.props.onPageChange((i.props.page as number) - 1);
   }
 

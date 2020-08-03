@@ -404,7 +404,7 @@ export class BaseReports extends Component<{}, ReportsState> {
     this.setState({ currentBanDialog: report, banReason: '' });
   }
 
-  handleBanSubmit(i: Reports, event: any) {
+  handleBanSubmit(i: BaseReports, event: any) {
     event.preventDefault();
 
     const form: BanFromCommunityForm = {
@@ -423,7 +423,7 @@ export class BaseReports extends Component<{}, ReportsState> {
     });
   }
 
-  handleBanReasonChange(i: Reports, event: any) {
+  handleBanReasonChange(i: BaseReports, event: any) {
     i.state.banReason = event.target.value;
     i.setState(i.state);
   }
@@ -432,7 +432,7 @@ export class BaseReports extends Component<{}, ReportsState> {
     this.setState({ currentRemoveDialog: report, removeReason: '' });
   }
 
-  handleRemoveCommentSubmit(i: Reports, event: any) {
+  handleRemoveCommentSubmit(i: BaseReports, event: any) {
     event.preventDefault();
 
     const {
@@ -460,7 +460,7 @@ export class BaseReports extends Component<{}, ReportsState> {
     });
   }
 
-  handleRemovePostSubmit(i: Reports, event: any) {
+  handleRemovePostSubmit(i: BaseReports, event: any) {
     event.preventDefault();
 
     const {
@@ -487,7 +487,7 @@ export class BaseReports extends Component<{}, ReportsState> {
     i.setState(i.state);
   }
 
-  handleRemoveReasonChange(i: Reports, event: any) {
+  handleRemoveReasonChange(i: BaseReports, event: any) {
     i.state.removeReason = event.target.value;
     i.setState(i.state);
   }
@@ -565,7 +565,7 @@ export class BaseReports extends Component<{}, ReportsState> {
     currentRemoveDialog: PostReport | CommentReport | null;
     report: PostReport | CommentReport;
     removeReason: string;
-    cb: (i: Reports, event: any) => void;
+    cb: (i: BaseReports, event: any) => void;
   }) {
     return (
       currentRemoveDialog &&

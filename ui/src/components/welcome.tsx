@@ -31,6 +31,7 @@ export class WelcomePage extends Component<any, State> {
     loginForm: {
       username_or_email: undefined,
       password: undefined,
+      captcha_id: undefined,
     },
     registerForm: {
       username: undefined,
@@ -38,6 +39,7 @@ export class WelcomePage extends Component<any, State> {
       password_verify: undefined,
       admin: false,
       show_nsfw: false,
+      captcha_id: undefined,
     },
     loginLoading: false,
     registerLoading: false,

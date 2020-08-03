@@ -172,8 +172,7 @@ export class Login extends Component<any, State> {
           <div className="form-group row">
             {/*hcaptcha target*/}
             <div
-              className="h-captcha"
-              className="col-sm-10"
+              className="col-sm-10 h-captcha"
               id="h-captcha"
               data-sitekey={HCAPTCHA_SITE_KEY}
               data-theme="dark"
@@ -340,8 +339,7 @@ export class Login extends Component<any, State> {
         <div className="form-group row">
           {/*hcaptcha target*/}
           <div
-            className="h-captcha h-captcha-register"
-            className="col-sm-10"
+            className="col-sm-10 h-captcha h-captcha-register"
             id="h-captcha-register"
             data-sitekey={HCAPTCHA_SITE_KEY}
             data-theme="dark"
@@ -513,9 +511,14 @@ export class Login extends Component<any, State> {
         toast(i18n.t('reset_password_mail_sent'));
       } else if (res.op == UserOperation.GetSite) {
         let data = res.data as GetSiteResponse;
-        this.state.enable_nsfw = data.site.enable_nsfw;
-        this.setState(this.state);
-        document.title = `${i18n.t('login')} - ${data.site.name}`;
+        if (data.site) {
+          this.setState({
+            enable_nsfw: data.site.enable_nsfw
+          });
+          document.title = `${i18n.t('login')} - ${data.site.name}`;
+        } else {
+          console.log('site is null');
+        }
       }
     }
   }

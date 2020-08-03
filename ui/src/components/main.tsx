@@ -606,13 +606,15 @@ class Main extends Component<any, MainState> {
   }
 
   handleEditClick(i: Main) {
-    i.state.showEditSite = true;
-    i.setState(i.state);
+    this.setState({
+      showEditSite: true
+    });
   }
 
   handleEditCancel() {
-    this.state.showEditSite = false;
-    this.setState(this.state);
+    this.setState({
+      showEditSite: false
+    });
   }
 
   nextPage(i: Main) {

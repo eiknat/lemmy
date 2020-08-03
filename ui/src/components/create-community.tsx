@@ -68,15 +68,15 @@ export class BaseCreateCommunity extends Component<any, CreateCommunityState> {
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
-    console.log(msg);
     let res = wsJsonToRes(msg);
     if (msg.error) {
       // Toast errors are already handled by community-form
       return;
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-      this.state.enableNsfw = data.site.enable_nsfw;
-      this.setState(this.state);
+      this.setState({
+        enableNsfw: data.site.enable_nsfw
+      });
       document.title = `${i18n.t('create_community')} - ${data.site.name}`;
     }
   }

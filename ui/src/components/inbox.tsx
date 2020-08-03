@@ -348,29 +348,37 @@ export class Inbox extends Component<any, InboxState> {
   }
 
   nextPage(i: Inbox) {
-    i.state.page++;
-    i.setState(i.state);
-    i.refetch();
+    this.setState((prevState) => ({
+      page: prevState.page + 1
+    }), () => {
+      i.refetch();
+    });
   }
 
   prevPage(i: Inbox) {
-    i.state.page--;
-    i.setState(i.state);
-    i.refetch();
+    this.setState((prevState) => ({
+      page: prevState.page - 1
+    }), () => {
+      i.refetch();
+    });
   }
 
   handleUnreadOrAllChange(i: Inbox, event: any) {
-    i.state.unreadOrAll = Number(event.target.value);
-    i.state.page = 1;
-    i.setState(i.state);
-    i.refetch();
+    this.setState({
+      unreadOrAll: Number(event.target.value),
+      page: 1
+    }, () => {
+      i.refetch();
+    });
   }
 
   handleMessageTypeChange(i: Inbox, event: any) {
-    i.state.messageType = Number(event.target.value);
-    i.state.page = 1;
-    i.setState(i.state);
-    i.refetch();
+    this.setState({
+      messageType: Number(event.target.value),
+      page: 1
+    }, () => {
+      i.refetch();
+    });
   }
 
   refetch() {
@@ -399,20 +407,24 @@ export class Inbox extends Component<any, InboxState> {
   }
 
   handleSortChange(val: SortType) {
-    this.state.sort = val;
-    this.state.page = 1;
-    this.setState(this.state);
-    this.refetch();
+    this.setState({
+      sort: val,
+      page: 1
+    }, () => {
+      this.refetch();
+    });
   }
 
   markAllAsRead(i: Inbox) {
     WebSocketService.Instance.markAllAsRead();
-    i.state.replies = [];
-    i.state.mentions = [];
-    i.state.messages = [];
-    i.sendUnreadCount();
-    window.scrollTo(0, 0);
-    i.setState(i.state);
+    this.setState({
+      replies: [],
+      mentions: [],
+      messages: [],
+    }, () => {
+      i.sendUnreadCount();
+      window.scrollTo(0, 0);
+    });
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
