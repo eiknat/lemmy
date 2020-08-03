@@ -183,8 +183,8 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
   }
 
   componentWillUnmount() {
+    // this.choices && this.choices.destroy();
     this.subscription.unsubscribe();
-    this.choices && this.choices.destroy();
     window.onbeforeunload = null;
   }
 
@@ -272,7 +272,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                 </svg>
               )}
               {isImage(this.state.postForm.url) && (
-                <img src={this.state.postForm.url} className="img-fluid" />
+                <img src={this.state.postForm.url} alt="post form thumbnail" className="img-fluid" />
               )}
               {this.state.crossPosts.length > 0 && (
                 <>
@@ -358,19 +358,19 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                 >
                   <option>{i18n.t('select_a_community')}</option>
                   {this.state.communities
-                    .filter(community => {
-                      // don't allow crossposting to same community as original
-                      if (this.state.crosspostCommunityId) {
-                        // remove main community
-                        const MAIN_COMMUNITY_ID = 2;
-                        return (
-                          community.id !== this.state.crosspostCommunityId &&
-                          community.id != MAIN_COMMUNITY_ID
-                        );
-                      }
+                    // .filter(community => {
+                    //   // don't allow crossposting to same community as original
+                    //   if (this.state.crosspostCommunityId) {
+                    //     // remove main community
+                    //     const MAIN_COMMUNITY_ID = 2;
+                    //     return (
+                    //       community.id !== this.state.crosspostCommunityId &&
+                    //       community.id != MAIN_COMMUNITY_ID
+                    //     );
+                    //   }
 
-                      return true;
-                    })
+                    //   return true;
+                    // })
                     .map(community => (
                       <option key={community.id} value={community.id}>
                         {community.local
@@ -615,32 +615,9 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       });
   }
 
-  parseMessage(msg: WebSocketJsonResponse) {
-    let res = wsJsonToRes(msg);
-    if (msg.error) {
-      toast(i18n.t(msg.error), 'danger');
-      this.state.loading = false;
-      this.setState(this.state);
-      return;
-    } else if (res.op == UserOperation.ListCommunities) {
-      let data = res.data as ListCommunitiesResponse;
-      this.state.communities = data.communities;
-      if (this.props.post) {
-        this.state.postForm.community_id = this.props.post.community_id;
-      } else if (this.props.params && this.props.params.community) {
-        let foundCommunityId = data.communities.find(
-          r => r.name == this.props.params.community
-        ).id;
-        this.state.postForm.community_id = foundCommunityId;
-      } else {
-        // By default, the null valued 'Select a Community'
-      }
-      this.setState(this.state);
-
-      // Set up select searching
-      let selectId: any = document.getElementById('post-community');
-      if (selectId) {
-        this.choices = new Choices(selectId, {
+  initChoices = (selectId: any) => {
+    setTimeout(() => {
+      this.choices = new Choices(selectId, {
           shouldSort: false,
           classNames: {
             containerOuter: 'choices',
@@ -674,11 +651,40 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
         this.choices.passedElement.element.addEventListener(
           'choice',
           (e: any) => {
-            this.state.postForm.community_id = Number(e.detail.choice.value);
-            this.setState(this.state);
+            this.setState({ postForm: { ...this.state.postForm, community_id: Number(e.detail.choice.value) } });
           },
           false
         );
+    }, 10)
+  }
+
+  parseMessage(msg: WebSocketJsonResponse) {
+    let res = wsJsonToRes(msg);
+    if (msg.error) {
+      toast(i18n.t(msg.error), 'danger');
+      this.state.loading = false;
+      this.setState(this.state);
+      return;
+    } else if (res.op == UserOperation.ListCommunities) {
+      let data = res.data as ListCommunitiesResponse;
+      // this.state.communities = data.communities;
+      this.setState({ communities: data.communities })
+      if (this.props.post) {
+        this.setState({ postForm: { ...this.state.postForm, community_id: this.props.post.community_id } });
+      } else if (this.props.params && this.props.params.community) {
+        let foundCommunityId = data.communities.find(
+          r => r.name == this.props.params.community
+        ).id;
+        this.setState({ postForm: { ...this.state.postForm, community_id: foundCommunityId } });
+      } else {
+        // By default, the null valued 'Select a Community'
+      }
+      // this.setState(this.state);
+
+      // Set up select searching
+      let selectId = document.getElementById('post-community');
+      if (selectId) {
+        this.initChoices(selectId);
       }
     } else if (res.op == UserOperation.CreatePost) {
       let data = res.data as PostResponse;
