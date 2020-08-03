@@ -79,6 +79,7 @@ export class CommunityDropdown extends Component<
   }
 
   render() {
+    console.log(this.props);
     return (
       <>
         <div className="dropdown-block" id="blocking-element" />
@@ -107,30 +108,34 @@ export class CommunityDropdown extends Component<
               </div>
               {this.sortedCommunities.length > 0 ? (
                 <div className="dropdown-categories">
-                  {this.sortedSubscriptions.length > 0 && (
-                    <div className="dropdown-category">
-                      <h6>Subscribed</h6>
-                      {this.sortedSubscriptions.map(community => (
-                        <div key={community.id} className="community-listing">
-                          <span
-                            className="community-icon"
-                            style={{
-                              background: this.generateColor(
-                                community.community_name
-                              ),
-                            }}
-                          />
-                          <Link
-                            className="community-listing-title"
-                            to={`/c/${community.community_name}`}
-                            onClick={linkEvent(this, this.handleDropdownClose)}
-                          >
-                            {community.community_name}
-                          </Link>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  {this.state.subscriptions !== null &&
+                    this.sortedSubscriptions.length > 0 && (
+                      <div className="dropdown-category">
+                        <h6>Subscribed</h6>
+                        {this.sortedSubscriptions.map(community => (
+                          <div key={community.id} className="community-listing">
+                            <span
+                              className="community-icon"
+                              style={{
+                                background: this.generateColor(
+                                  community.community_name
+                                ),
+                              }}
+                            />
+                            <Link
+                              className="community-listing-title"
+                              to={`/c/${community.community_name}`}
+                              onClick={linkEvent(
+                                this,
+                                this.handleDropdownClose
+                              )}
+                            >
+                              {community.community_name}
+                            </Link>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   <div className="dropdown-category">
                     <h6>Communities</h6>
                     {this.sortedCommunities.map(community => (
@@ -191,15 +196,18 @@ export class CommunityDropdown extends Component<
       limit: this.maxLoad,
       page: this.state.page,
     };
-    let getUserDetailsForm: GetUserDetailsForm = {
-      user_id: UserService.Instance.user.id,
-      sort: SortType[0],
-      saved_only: false,
-      page: 1,
-      limit: 1,
-    };
     WebSocketService.Instance.listCommunities(listCommunitiesForm);
-    WebSocketService.Instance.getUserDetails(getUserDetailsForm);
+
+    if (UserService.Instance.user) {
+      let getUserDetailsForm: GetUserDetailsForm = {
+        user_id: UserService.Instance.user.id,
+        sort: SortType[0],
+        saved_only: false,
+        page: 1,
+        limit: 1,
+      };
+      WebSocketService.Instance.getUserDetails(getUserDetailsForm);
+    }
   }
 
   get sortedSubscriptions(): Array<CommunityUser> {
@@ -289,11 +297,11 @@ export class CommunityDropdown extends Component<
     } else if (res.op == UserOperation.ListCommunities) {
       let data = res.data as ListCommunitiesResponse;
       this.state.communities = data.communities;
+      this.state.loading = false;
       this.setState(this.state);
     } else if (res.op == UserOperation.GetUserDetails) {
       let data = res.data as UserDetailsResponse;
       this.state.subscriptions = data.follows;
-      this.state.loading = false;
       this.setState(this.state);
       this.onLoadingComplete();
     }
