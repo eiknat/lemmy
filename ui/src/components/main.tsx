@@ -389,7 +389,7 @@ class Main extends Component<any, MainState> {
             <ul className="mt-1 list-inline small mb-0">
               <li className="list-inline-item">{i18n.t('sitemods')}:</li>
               {this.state.siteRes.sitemods.map(sitemod => (
-                <li className="list-inline-item">
+                <li key={sitemod.id} className="list-inline-item">
                   <UserListing
                     user={{
                       name: sitemod.name,
