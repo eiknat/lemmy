@@ -704,7 +704,7 @@ class Main extends Component<any, MainState> {
       let data = res.data as GetSiteResponse;
       // This means it hasn't been set up yet
       if (!data.site) {
-        this.context.router.history.push('/setup');
+        this.props.history.push('/setup');
       } else {
         console.log('data.site is missing', data.site);
         this.setState({
