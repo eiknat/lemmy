@@ -204,7 +204,7 @@ class BaseUser extends Component<any, UserState> {
   get isCurrentUser() {
     return (
       UserService.Instance.user &&
-      UserService.Instance.user.id == this.state.user.id
+      UserService.Instance.user.id === this.state.user.id
     );
   }
 
@@ -979,7 +979,7 @@ class BaseUser extends Component<any, UserState> {
     return (
       getAllUserModeratedCommunities({
         siteModerators: this.state.siteModerators || {},
-        moderatorId: UserService.Instance.user.id,
+        moderatorId: UserService.Instance.user?.id,
       }).length > 0
     );
   }
