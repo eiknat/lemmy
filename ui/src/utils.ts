@@ -869,6 +869,7 @@ export function createPostLikeRes(data: PostResponse, post: Post) {
     post.score = data.post.score;
     post.upvotes = data.post.upvotes;
     post.downvotes = data.post.downvotes;
+    post.saved = data.post.saved;
     if (data.post.my_vote !== null) {
       post.my_vote = data.post.my_vote;
     }

@@ -58,6 +58,7 @@ interface PostListingState {
   score: number;
   upvotes: number;
   downvotes: number;
+  localPostSaved: boolean;
 }
 
 interface PostListingProps {
@@ -80,6 +81,19 @@ export function PostBody({ body }: { body: string }) {
   );
 }
 
+export function PostListingButton({ as: Element = 'button', onClick, children, ...props }: { as?: any, onClick?: () => void, children: React.ReactNode }) {
+  return (
+    <Element
+      className="btn btn-sm btn-link btn-animate text-muted post-listing-button"
+      onClick={onClick}
+      type="button"
+      {...props}
+    >
+      {children}
+    </Element>
+  )
+}
+
 class BasePostListing extends Component<PostListingProps, PostListingState> {
   private emptyState: PostListingState = {
     showEdit: false,
@@ -100,6 +114,8 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     score: this.props.post.score,
     upvotes: this.props.post.upvotes,
     downvotes: this.props.post.downvotes,
+    // @TODO: Debug why this isn't being passed down on update
+    localPostSaved: this.props.post.saved,
   };
 
   constructor(props: any, context: any) {
@@ -646,6 +662,11 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                         {i18n.t('submit_report')}
                       </button>
                     </div>
+                    <div className="row mt-1">
+                      <button type="button" className="btn btn-secondary" onClick={linkEvent(this, this.handleReportPost)}>
+                        {i18n.t('cancel')}
+                      </button>
+                    </div>
                   </form>
                 )}
                 <div className="post-listing-details">
@@ -656,24 +677,12 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                     })}
                     to={`/post/${post.id}`}
                   >
-                    {/* <svg className="mr-1 icon icon-inline">
-                        <use xlinkHref="#icon-message-square"></use>
-                      </svg> */}
                     <Icon name="comment" className="icon mr-1" />
-                    {i18n.t('number_of_comments', {
+                    {isMobile ? post.number_of_comments : i18n.t('number_of_comments', {
                       count: post.number_of_comments,
                     })}
                   </Link>
-                  {UserService.Instance.user && !this.props.showBody && (
-                    <button
-                      className="btn btn-sm btn-link btn-animate text-muted p-0 px-2"
-                      onClick={linkEvent(this, this.handleReportPost)}
-                      data-tippy-content={i18n.t('snitch')}
-                    >
-                      <Icon name="report" />
-                    </button>
-                  )}
-                  {this.state.upvotes !== this.state.score && (
+                  {/* {this.state.upvotes !== this.state.score && (
                     <>
                       <span
                         className="unselectable pointer mx-1 inline-vote-details"
@@ -689,7 +698,48 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                         </div>
                       </span>
                     </>
-                  )}
+                  )} */}
+                  {/* {UserService.Instance.user && (
+                    <>
+                      {!this.props.showBody && (
+                        <>
+                          <li className="list-inline-item">
+                            <PostListingButton
+                              onClick={this.handleSavePostClick}
+                              data-tippy-content={
+                                post.saved ? i18n.t('unsave') : i18n.t('save')
+                              }
+                            >
+                              <Icon
+                                name={this.state.localPostSaved ? 'star' : 'starOutline'}
+                                className={`icon icon-inline ${this.state.localPostSaved && 'text-warning'}`}
+                              />
+                            </PostListingButton>
+                          </li>
+                          <li className="list-inline-item">
+                            <Link
+                              to={`/create_post${this.crossPostParams}`}
+                              title={i18n.t('cross_post')}
+                            >
+                              <PostListingButton>
+                                <svg className="icon icon-inline">
+                                  <use xlinkHref="#icon-copy" />
+                                </svg>
+                              </PostListingButton>
+                            </Link>
+                          </li>
+                          <li className="list-inline-item">
+                            <PostListingButton
+                              onClick={this.handleReportPost}
+                              data-tippy-content={i18n.t('snitch')}
+                            >
+                              <Icon name="report" />
+                            </PostListingButton>
+                          </li>
+                        </>
+                      )}
+                    </>
+                  )} */}
                 </div>
               </div>
             </div>
@@ -698,46 +748,41 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
         <ul className="list-inline mb-1 text-muted font-weight-bold">
           {UserService.Instance.user && (
             <>
-              {this.props.showBody && (
                 <>
                   <li className="list-inline-item">
-                    <button
-                      className="btn btn-sm btn-link btn-animate text-muted"
-                      onClick={linkEvent(this, this.handleSavePostClick)}
+                    <PostListingButton
+                      onClick={this.handleSavePostClick}
                       data-tippy-content={
                         post.saved ? i18n.t('unsave') : i18n.t('save')
                       }
                     >
                       <Icon
-                        name="star"
-                        className={`icon icon-inline ${
-                          post.saved && 'text-warning'
-                        }`}
+                        name={this.state.localPostSaved ? 'star' : 'starOutline'}
+                        className={`icon icon-inline ${this.state.localPostSaved && 'text-warning'}`}
                       />
-                    </button>
+                    </PostListingButton>
                   </li>
                   <li className="list-inline-item">
                     <Link
-                      className="btn btn-sm btn-link btn-animate text-muted"
                       to={`/create_post${this.crossPostParams}`}
                       title={i18n.t('cross_post')}
                     >
-                      <svg className="icon icon-inline">
-                        <use xlinkHref="#icon-copy" />
-                      </svg>
+                      <PostListingButton>
+                        <svg className="icon icon-inline">
+                          <use xlinkHref="#icon-copy" />
+                        </svg>
+                      </PostListingButton>
                     </Link>
                   </li>
                   <li className="list-inline-item">
-                    <button
-                      className="btn btn-sm btn-link btn-animate text-muted"
-                      onClick={linkEvent(this, this.handleReportPost)}
+                    <PostListingButton
+                      onClick={this.handleReportPost}
                       data-tippy-content={i18n.t('snitch')}
                     >
                       <Icon name="report" />
-                    </button>
+                    </PostListingButton>
                   </li>
                 </>
-              )}
               {this.myPost && this.props.showBody && (
                 <>
                   <li className="list-inline-item">
@@ -1233,14 +1278,15 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     WebSocketService.Instance.editPost(deleteForm);
   }
 
-  handleSavePostClick(i: BasePostListing) {
-    let saved = i.props.post.saved === undefined ? true : !i.props.post.saved;
+  handleSavePostClick = () => {
+    let saved = this.props.post.saved === undefined ? true : !this.props.post.saved;
     let form: SavePostForm = {
-      post_id: i.props.post.id,
+      post_id: this.props.post.id,
       save: saved,
     };
 
     WebSocketService.Instance.savePost(form);
+    this.setState({ localPostSaved: !this.state.localPostSaved });
   }
 
   get crossPostParams(): string {
@@ -1455,8 +1501,8 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     }));
   }
 
-  handleReportPost(i: BasePostListing) {
-    i.setState((prevState) => ({
+  handleReportPost = () => {
+    this.setState((prevState) => ({
       showReportDialog: !prevState.showReportDialog
     }));
   }
