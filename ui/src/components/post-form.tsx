@@ -63,10 +63,15 @@ function CommunityInput({ communities, onSelect }) {
     keys: [(item) => `${item.name}`]
   });
 
-  console.log({ results })
-
   function handleChange(e) {
     setValue(e.target.value);
+  }
+
+  function validateInput() {
+    // if the current value does not equal a valid community, clear it
+    if (!communities.some(community => community.name === value)) {
+      setValue('');
+    }
   }
 
   return (
@@ -75,9 +80,10 @@ function CommunityInput({ communities, onSelect }) {
       openOnFocus
       onSelect={(name) => {
         const community = communities.find(comm => comm.name === name)
-        console.log({ community });
-        onSelect(community.id)
+        setValue(community.name);
+        onSelect(community.id);
       }}
+      onBlur={validateInput}
     >
       <ComboboxInput
         className="community-search-input form-control"
@@ -87,7 +93,7 @@ function CommunityInput({ communities, onSelect }) {
       />
       <ComboboxPopover className="shadow-popup">
           {results.length > 0 ? (
-            <ComboboxList>
+            <ComboboxList persistSelection>
               {results.slice(0, 10).map((result, index) => (
                 <ComboboxOption
                   key={index}
