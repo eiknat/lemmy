@@ -159,6 +159,16 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   render() {
     let node = this.props.node;
 
+    const borderStyle = !this.props.noIndent && this.props.node.comment.parent_id
+      ? {
+        borderLeftColor: this.state.borderColor,
+        borderLeftWidth: `2px`,
+        // borderLeftStyle: `solid`,
+        }
+      : {}
+
+    console.log({ borderStyle })
+
     return (
       <div
         className={`comment ${
@@ -167,14 +177,10 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
       >
         <div
           id={`comment-${node.comment.id}`}
-          className={`details comment-node border-top border-light py-2 ${
+          className={`details comment-node border-top py-2 ${
             this.isCommentNew ? 'mark' : ''
           }`}
-          style={
-            !this.props.noIndent && this.props.node.comment.parent_id
-              ? { borderLeft: `2px ${this.state.borderColor} solid !important` }
-              : {}
-          }
+          style={borderStyle}
         >
           <div
             className={`${
