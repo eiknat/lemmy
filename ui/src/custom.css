@@ -696,3 +696,7 @@ a.text-body {
 /* the string portions are suggested */
 [data-suggested-value] {
 }
+
+.post-listing-button {
+  padding: 0.25rem 0.5rem;
+}
