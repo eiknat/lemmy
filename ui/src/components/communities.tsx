@@ -18,8 +18,6 @@ import { CommunityLink } from './community-link';
 import { i18n } from '../i18next';
 import { linkEvent } from '../linkEvent';
 
-declare const Sortable: any;
-
 const communityLimit = 100;
 
 interface CommunitiesState {
@@ -103,7 +101,7 @@ export class Communities extends Component<any, CommunitiesState> {
                 </thead>
                 <tbody>
                   {this.state.communities.map(community => (
-                    <tr>
+                    <tr key={`community-${community.name}`}>
                       <td>
                         <CommunityLink community={community} />
                       </td>
@@ -230,8 +228,9 @@ export class Communities extends Component<any, CommunitiesState> {
         loading: false,
       }, () => {
         window.scrollTo(0, 0);
+        // XXX: Sort this table?
         let table = document.querySelector('#community_table');
-        Sortable.initTable(table);
+        return table;
       });
     } else if (res.op == UserOperation.FollowCommunity) {
       let data = res.data as CommunityResponse;
