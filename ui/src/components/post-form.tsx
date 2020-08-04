@@ -278,9 +278,9 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
         <Prompt
           when={
             !this.state.loading &&
-            (this.state.postForm.name ||
-              this.state.postForm.url ||
-              this.state.postForm.body)
+            (!!this.state.postForm.name ||
+              !!this.state.postForm.url ||
+              !!this.state.postForm.body)
           }
           message={i18n.t('block_leaving')}
         />

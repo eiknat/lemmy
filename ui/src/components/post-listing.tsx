@@ -13,6 +13,7 @@ import {
   BanUserForm,
   AddModToCommunityForm,
   AddAdminForm,
+  AddSitemodForm,
   TransferSiteForm,
   TransferCommunityForm,
 } from '../interfaces';
@@ -22,7 +23,6 @@ import { IFramelyCard } from './iframely-card';
 import { UserListing } from './user-listing';
 import { CommunityLink } from './community-link';
 import {
-  md,
   mdToHtml,
   canMod,
   isMod,
@@ -33,11 +33,8 @@ import {
   pictrsImage,
   setupTippy,
   hostname,
-  previewLines,
-  toast,
 } from '../utils';
 import { i18n } from '../i18next';
-import { User } from './user';
 import { Icon } from './icon';
 import { RoleBadge } from './comment-node';
 import { linkEvent } from '../linkEvent';
@@ -69,6 +66,7 @@ interface PostListingProps {
   showBody?: boolean;
   moderators?: Array<CommunityUser>;
   admins?: Array<UserView>;
+  sitemods?: Array<UserView>;
   enableDownvotes: boolean;
   enableNsfw: boolean;
 }
@@ -120,19 +118,18 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps: PostListingProps) {
-    this.state.my_vote = nextProps.post.my_vote;
-    this.state.upvotes = nextProps.post.upvotes;
-    this.state.downvotes = nextProps.post.downvotes;
-    this.state.score = nextProps.post.score;
-    if (this.props.post.id !== nextProps.post.id) {
-      this.state.imageExpanded = false;
-    }
-    this.setState(this.state);
+    this.setState({
+      my_vote: nextProps.post.my_vote,
+      upvotes: nextProps.post.upvotes,
+      downvotes: nextProps.post.downvotes,
+      score: nextProps.post.score,
+      imageExpanded: this.props.post.id === nextProps.post.id
+    });
   }
 
   render() {
     return (
-      <div className="">
+      <div>
         {!this.state.showEdit ? (
           <>
             {this.listing()}
@@ -574,7 +571,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                         {i18n.t('cross_posted_to')}
                       </li>
                       {this.props.post.duplicates.map(post => (
-                        <li className="list-inline-item mr-2">
+                        <li className="list-inline-item mr-2" key={`post-id-${post.id}`}>
                           <Link to={`/post/${post.id}`}>
                             {post.community_name}
                           </Link>
@@ -990,6 +987,18 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                           </span>
                         </li>
                       )}
+                      {!post.banned && (
+                        <li className="list-inline-item">
+                          <span
+                            className="pointer"
+                            onClick={linkEvent(this, this.handleAddSitemod)}
+                          >
+                            {this.isSitemod
+                              ? i18n.t('remove_as_sitemod')
+                              : i18n.t('appoint_as_sitemod')}
+                          </span>
+                        </li>
+                      )}
                     </>
                   )}
                   {/* Site Creator can transfer to another admin */}
@@ -1068,10 +1077,21 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     );
   }
 
+  get isSitemod(): boolean {
+    return (
+      this.props.sitemods &&
+      isMod(
+        this.props.sitemods.map(s => s.id),
+        this.props.post.creator_id
+      )
+    );
+  }
+
   get canMod(): boolean {
-    if (this.props.admins && this.props.moderators) {
+    if (this.props.admins && this.props.sitemods && this.props.moderators) {
       let adminsThenMods = this.props.admins
         .map(a => a.id)
+        .concat(this.props.sitemods.map(s => s.id))
         .concat(this.props.moderators.map(m => m.user_id));
 
       return canMod(
@@ -1085,9 +1105,10 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
   }
 
   get canModOnSelf(): boolean {
-    if (this.props.admins && this.props.moderators) {
+    if (this.props.admins && this.props.sitemods && this.props.moderators) {
       let adminsThenMods = this.props.admins
         .map(a => a.id)
+        .concat(this.props.sitemods.map(s => s.id))
         .concat(this.props.moderators.map(m => m.user_id));
 
       return canMod(
@@ -1130,7 +1151,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     );
   }
 
-  handlePostLike(i: PostListing) {
+  handlePostLike(i: BasePostListing) {
     if (!UserService.Instance.user) {
       this.props.history.push(`/login`);
     }
@@ -1161,7 +1182,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     setupTippy();
   }
 
-  handlePostDisLike(i: PostListing) {
+  handlePostDisLike(i: BasePostListing) {
     if (!UserService.Instance.user) {
       this.props.history.push(`/login`);
     }
@@ -1192,7 +1213,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     setupTippy();
   }
 
-  handleEditClick(i: PostListing) {
+  handleEditClick(i: BasePostListing) {
     i.state.showEdit = true;
     i.setState(i.state);
   }
@@ -1208,7 +1229,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     this.setState(this.state);
   }
 
-  handleDeleteClick(i: PostListing) {
+  handleDeleteClick(i: BasePostListing) {
     let deleteForm: PostFormI = {
       body: i.props.post.body,
       community_id: i.props.post.community_id,
@@ -1223,7 +1244,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     WebSocketService.Instance.editPost(deleteForm);
   }
 
-  handleSavePostClick(i: PostListing) {
+  handleSavePostClick(i: BasePostListing) {
     let saved = i.props.post.saved == undefined ? true : !i.props.post.saved;
     let form: SavePostForm = {
       post_id: i.props.post.id,
@@ -1254,12 +1275,12 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     i.setState(i.state);
   }
 
-  handleModRemoveReasonChange(i: PostListing, event: any) {
+  handleModRemoveReasonChange(i: BasePostListing, event: any) {
     i.state.removeReason = event.target.value;
     i.setState(i.state);
   }
 
-  handleModRemoveSubmit(i: PostListing) {
+  handleModRemoveSubmit(i: BasePostListing) {
     event.preventDefault();
     let form: PostFormI = {
       name: i.props.post.name,
@@ -1276,7 +1297,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     i.setState(i.state);
   }
 
-  handleModLock(i: PostListing) {
+  handleModLock(i: BasePostListing) {
     let form: PostFormI = {
       name: i.props.post.name,
       community_id: i.props.post.community_id,
@@ -1289,7 +1310,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     WebSocketService.Instance.editPost(form);
   }
 
-  handleModSticky(i: PostListing) {
+  handleModSticky(i: BasePostListing) {
     let form: PostFormI = {
       name: i.props.post.name,
       community_id: i.props.post.community_id,
@@ -1302,41 +1323,41 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     WebSocketService.Instance.editPost(form);
   }
 
-  handleModBanFromCommunityShow(i: PostListing) {
+  handleModBanFromCommunityShow(i: BasePostListing) {
     i.state.showBanDialog = true;
     i.state.banType = BanType.Community;
     i.setState(i.state);
   }
 
-  handleModBanShow(i: PostListing) {
+  handleModBanShow(i: BasePostListing) {
     i.state.showBanDialog = true;
     i.state.banType = BanType.Site;
     i.setState(i.state);
   }
 
-  handleModBanReasonChange(i: PostListing, event: any) {
+  handleModBanReasonChange(i: BasePostListing, event: any) {
     i.state.banReason = event.target.value;
     i.setState(i.state);
   }
 
-  handleModBanExpiresChange(i: PostListing, event: any) {
+  handleModBanExpiresChange(i: BasePostListing, event: any) {
     i.state.banExpires = event.target.value;
     i.setState(i.state);
   }
 
-  handleModBanFromCommunitySubmit(i: PostListing) {
+  handleModBanFromCommunitySubmit(i: BasePostListing) {
     i.state.banType = BanType.Community;
     i.setState(i.state);
     i.handleModBanBothSubmit(i);
   }
 
-  handleModBanSubmit(i: PostListing) {
+  handleModBanSubmit(i: BasePostListing) {
     i.state.banType = BanType.Site;
     i.setState(i.state);
     i.handleModBanBothSubmit(i);
   }
 
-  handleModBanBothSubmit(i: PostListing) {
+  handleModBanBothSubmit(i: BasePostListing) {
     event.preventDefault();
 
     if (i.state.banType == BanType.Community) {
@@ -1362,7 +1383,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     i.setState(i.state);
   }
 
-  handleAddModToCommunity(i: PostListing) {
+  handleAddModToCommunity(i: BasePostListing) {
     let form: AddModToCommunityForm = {
       user_id: i.props.post.creator_id,
       community_id: i.props.post.community_id,
@@ -1372,7 +1393,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     i.setState(i.state);
   }
 
-  handleAddAdmin(i: PostListing) {
+  handleAddAdmin(i: BasePostListing) {
     let form: AddAdminForm = {
       user_id: i.props.post.creator_id,
       added: !i.isAdmin,
@@ -1381,66 +1402,73 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     i.setState(i.state);
   }
 
-  handleShowConfirmTransferCommunity(i: PostListing) {
-    i.state.showConfirmTransferCommunity = true;
+  handleAddSitemod(i: BasePostListing) {
+    let form: AddSitemodForm = {
+      user_id: i.props.post.creator_id,
+      added: !i.isSitemod,
+    };
+    WebSocketService.Instance.addSitemod(form);
     i.setState(i.state);
   }
 
-  handleCancelShowConfirmTransferCommunity(i: PostListing) {
-    i.state.showConfirmTransferCommunity = false;
-    i.setState(i.state);
+  handleShowConfirmTransferCommunity(i: BasePostListing) {
+    i.setState({showConfirmTransferCommunity: true});
   }
 
-  handleTransferCommunity(i: PostListing) {
+  handleCancelShowConfirmTransferCommunity(i: BasePostListing) {
+    i.setState({showConfirmTransferCommunity: false});
+  }
+
+  handleTransferCommunity(i: BasePostListing) {
     let form: TransferCommunityForm = {
       community_id: i.props.post.community_id,
       user_id: i.props.post.creator_id,
     };
     WebSocketService.Instance.transferCommunity(form);
-    i.state.showConfirmTransferCommunity = false;
-    i.setState(i.state);
+    i.setState({showConfirmTransferCommunity: false});
   }
 
-  handleShowConfirmTransferSite(i: PostListing) {
-    i.state.showConfirmTransferSite = true;
-    i.setState(i.state);
+  handleShowConfirmTransferSite(i: BasePostListing) {
+    i.setState({showConfirmTransferCommunity: true});
   }
 
-  handleCancelShowConfirmTransferSite(i: PostListing) {
-    i.state.showConfirmTransferSite = false;
-    i.setState(i.state);
+  handleCancelShowConfirmTransferSite(i: BasePostListing) {
+    i.setState({showConfirmTransferSite: false});
   }
 
-  handleTransferSite(i: PostListing) {
+  handleTransferSite(i: BasePostListing) {
     let form: TransferSiteForm = {
       user_id: i.props.post.creator_id,
     };
     WebSocketService.Instance.transferSite(form);
-    i.state.showConfirmTransferSite = false;
-    i.setState(i.state);
+    i.setState({showConfirmTransferSite: false});
   }
 
-  handleImageExpandClick(i: PostListing) {
-    i.state.imageExpanded = !i.state.imageExpanded;
-    i.setState(i.state);
+  handleImageExpandClick(i: BasePostListing) {
+    i.setState((prevState) => ({
+      imageExpanded: !prevState.imageExpanded
+    }));
   }
 
-  handleViewSource(i: PostListing) {
-    i.state.viewSource = !i.state.viewSource;
-    i.setState(i.state);
+  handleViewSource(i: BasePostListing) {
+    i.setState((prevState) => ({
+      viewSource: !prevState.viewSource
+    }));
   }
 
-  handleReportPost(i: PostListing) {
-    i.state.showReportDialog = !i.state.showReportDialog;
-    i.setState(i.state);
+  handleReportPost(i: BasePostListing) {
+    i.setState((prevState) => ({
+      showReportDialog: !prevState.showReportDialog
+    }));
   }
 
-  handleReportReasonChange(i: PostListing, event: any) {
-    i.state.reportReason = event.target.value;
-    i.setState(i.state);
+  handleReportReasonChange(i: BasePostListing, event: any) {
+    i.setState({
+      reportReason: event.target.value
+    });
   }
 
-  handleReportSubmit(i: PostListing, e: any) {
+  handleReportSubmit(i: BasePostListing, e: any) {
     e.preventDefault();
 
     WebSocketService.Instance.createPostReport({
@@ -1448,16 +1476,18 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
       reason: i.state.reportReason,
     });
 
-    i.state.reportReason = null;
-    i.state.showReportDialog = false;
-
-    i.setState(i.state);
+    i.setState({
+      reportReason: null,
+      showReportDialog: false,
+    });
   }
 
-  handleShowAdvanced(i: PostListing) {
-    i.state.showAdvanced = !i.state.showAdvanced;
-    i.setState(i.state);
-    setupTippy();
+  handleShowAdvanced(i: BasePostListing) {
+    i.setState((prevState) => ({
+      showAdvanced: !prevState.showAdvanced
+    }), () => {
+      setupTippy()
+    });
   }
 
   get pointsTippy(): string {

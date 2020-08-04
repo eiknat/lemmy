@@ -125,9 +125,9 @@ export class CommunityForm extends Component<
         <Prompt
           when={
             !this.state.loading &&
-            (this.state.communityForm.name ||
-              this.state.communityForm.title ||
-              this.state.communityForm.description)
+            (!!this.state.communityForm.name ||
+              !!this.state.communityForm.title ||
+              !!this.state.communityForm.description)
           }
           message={i18n.t('block_leaving')}
         />
@@ -402,8 +402,8 @@ export class CommunityForm extends Component<
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
-    let res = wsJsonToRes(msg);
     console.log(msg);
+    let res = wsJsonToRes(msg);
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
       this.state.loading = false;

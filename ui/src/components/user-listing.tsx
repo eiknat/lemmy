@@ -23,18 +23,23 @@ interface UserListingProps {
   realLink?: boolean;
   isMod?: boolean;
   isAdmin?: boolean;
+  isSitemod?: boolean;
 }
 
 function getTextColor({
   isMod,
   isAdmin,
+  isSitemod,
 }: {
   isMod?: boolean;
   isAdmin?: boolean;
+  isSitemod?: boolean;
 }): string {
   if (isMod) return 'mod-text';
 
   if (isAdmin) return 'admin-text';
+
+  if (isSitemod) return 'sitemod-text';
 
   return '';
 }
@@ -45,7 +50,7 @@ export class UserListing extends Component<UserListingProps, any> {
   }
 
   render() {
-    const { isMod, isAdmin } = this.props;
+    const { isMod, isAdmin, isSitemod } = this.props;
     let user = this.props.user;
     let local = user.local == null ? true : user.local;
     let name_: string, link: string;
@@ -57,8 +62,6 @@ export class UserListing extends Component<UserListingProps, any> {
       name_ = `${user.name}@${hostname(user.actor_id)}`;
       link = !this.props.realLink ? `/user/${user.id}` : user.actor_id;
     }
-
-    const textStyle = isMod ? '' : isAdmin ? 'red' : '';
 
     return (
       <>
@@ -72,7 +75,7 @@ export class UserListing extends Component<UserListingProps, any> {
               className="rounded-circle mr-2"
             />
           )}
-          <span className={getTextColor({ isMod, isAdmin })}>{name_}</span>
+          <span className={getTextColor({ isMod, isAdmin, isSitemod })}>{name_}</span>
         </Link>
 
         {isCakeDay(user.published) && <CakeDay creatorName={name_} />}

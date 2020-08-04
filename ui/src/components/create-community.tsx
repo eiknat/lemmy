@@ -75,8 +75,9 @@ export class BaseCreateCommunity extends Component<any, CreateCommunityState> {
       return;
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-      this.state.enableNsfw = data.site.enable_nsfw;
-      this.setState(this.state);
+      this.setState({
+        enableNsfw: data.site.enable_nsfw
+      });
       document.title = `${i18n.t('create_community')} - ${data.site.name}`;
     }
   }

@@ -47,6 +47,7 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
         enable_nsfw: null,
       },
       admins: [],
+      sitemods: [],
       banned: [],
       online: null,
     },
@@ -97,6 +98,7 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
             <div className="col-12 col-md-6">
               <SiteForm site={this.state.siteRes.site} />
               {this.admins()}
+              {this.sitemods()}
               {this.bannedUsers()}
             </div>
             <div className="col-12 col-md-6">{this.adminSettings()}</div>
@@ -120,6 +122,29 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
                   id: admin.id,
                   local: admin.local,
                   actor_id: admin.actor_id,
+                }}
+              />
+            </li>
+          ))}
+        </ul>
+      </>
+    );
+  }
+
+  sitemods() {
+    return (
+      <>
+        <h5>{capitalizeFirstLetter(i18n.t('sitemods'))}</h5>
+        <ul className="list-unstyled">
+          {this.state.siteRes.sitemods.map(sitemod => (
+            <li className="list-inline-item">
+              <UserListing
+                user={{
+                  name: sitemod.name,
+                  avatar: sitemod.avatar,
+                  id: sitemod.id,
+                  local: sitemod.local,
+                  actor_id: sitemod.actor_id,
                 }}
               />
             </li>
@@ -156,7 +181,7 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
     return (
       <div>
         <h5>{i18n.t('admin_settings')}</h5>
-        <form onSubmit={linkEvent(this, this.handleSiteConfigSubmit)}>
+        <form onSubmit={linkEvent(this, this.handleSiteAdminConfigSubmit)}>
           <div className="form-group row">
             <label
               className="col-12 col-form-label"
@@ -192,7 +217,7 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
     );
   }
 
-  handleSiteConfigSubmit(i: AdminSettings, event: any) {
+  handleSiteAdminConfigSubmit(i: AdminSettings, event: any) {
     event.preventDefault();
     i.state.siteConfigLoading = true;
     WebSocketService.Instance.saveSiteConfig(i.state.siteConfigForm);
@@ -225,13 +250,13 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
       this.state.siteRes = data;
       this.state.siteLoading = false;
       this.setState(this.state);
-      document.title = `${i18n.t('admin_settings')} - ${
-        this.state.siteRes.site.name
-      }`;
     } else if (res.op == UserOperation.EditSite) {
       let data = res.data as SiteResponse;
       this.state.siteRes.site = data.site;
       this.setState(this.state);
+      document.title = `${i18n.t('admin_settings')} - ${
+        this.state.siteRes.site.name
+      }`;
       toast(i18n.t('site_saved'));
     } else if (res.op == UserOperation.GetSiteConfig) {
       let data = res.data as GetSiteConfigResponse;

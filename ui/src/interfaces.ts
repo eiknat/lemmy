@@ -29,6 +29,7 @@ export enum UserOperation {
   EditSite,
   GetSite,
   AddAdmin,
+  AddSitemod,
   BanUser,
   Search,
   MarkAllAsRead,
@@ -382,6 +383,7 @@ export interface UserDetailsResponse {
   comments: Array<Comment>;
   posts: Array<Post>;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
 }
 
 export interface GetRepliesForm {
@@ -599,6 +601,7 @@ export interface RegisterForm {
   password: string;
   password_verify: string;
   admin: boolean;
+  sitemod: boolean;
   show_nsfw: boolean;
   captcha_id: string;
   pronouns?: string;
@@ -649,6 +652,7 @@ export interface GetCommunityResponse {
   community: Community;
   moderators: Array<CommunityUser>;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
   online: number;
 }
 
@@ -706,6 +710,7 @@ export interface GetPostResponse {
   community: Community;
   moderators: Array<CommunityUser>;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
   online: number;
 }
 
@@ -813,6 +818,7 @@ export interface SiteConfigForm {
 export interface GetSiteResponse {
   site: Site;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
   banned: Array<UserView>;
   online: number;
 }
@@ -842,6 +848,16 @@ export interface AddAdminForm {
 
 export interface AddAdminResponse {
   admins: Array<UserView>;
+}
+
+export interface AddSitemodForm {
+  user_id: number;
+  added: boolean;
+  auth?: string;
+}
+
+export interface AddSitemodResponse {
+  sitemods: Array<UserView>;
 }
 
 export interface SearchForm {
@@ -1011,12 +1027,12 @@ export type MessageType =
   | CreatePostLikeForm
   | BanFromCommunityForm
   | AddAdminForm
+  | AddSitemodForm
   | AddModToCommunityForm
   | TransferCommunityForm
   | TransferSiteForm
   | SaveCommentForm
   | BanUserForm
-  | AddAdminForm
   | GetUserDetailsForm
   | GetRepliesForm
   | GetUserMentionsForm
@@ -1062,6 +1078,7 @@ type ResponseType =
   | AddModToCommunityResponse
   | BanUserResponse
   | AddAdminResponse
+  | AddSitemodResponse
   | PrivateMessageResponse
   | PrivateMessagesResponse
   | GetSiteConfigResponse

@@ -28,6 +28,7 @@ export class Setup extends Component<any, State> {
       password: undefined,
       password_verify: undefined,
       admin: true,
+      sitemod: true,
       show_nsfw: true,
       captcha_id: '',
     },
@@ -192,15 +193,17 @@ export class Setup extends Component<any, State> {
     let res = wsJsonToRes(msg);
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
-      this.state.userLoading = false;
-      this.setState(this.state);
-      return;
+      this.setState({
+        userLoading: false
+      });
     } else if (res.op == UserOperation.Register) {
       let data = res.data as LoginResponse;
-      this.state.userLoading = false;
-      this.state.doneRegisteringUser = true;
-      UserService.Instance.login(data);
-      this.setState(this.state);
+      this.setState({
+        userLoading: false,
+        doneRegisteringUser: true
+      }, () => {
+        UserService.Instance.login(data)
+      });
     } else if (res.op == UserOperation.CreateSite) {
       this.props.history.push('/');
     }
