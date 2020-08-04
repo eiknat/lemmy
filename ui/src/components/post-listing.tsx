@@ -699,7 +699,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                       </span>
                     </>
                   )} */}
-                  {/* {UserService.Instance.user && (
+                  {UserService.Instance.user && (
                     <>
                       {!this.props.showBody && (
                         <>
@@ -739,7 +739,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                         </>
                       )}
                     </>
-                  )} */}
+                  )}
                 </div>
               </div>
             </div>
@@ -748,6 +748,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
         <ul className="list-inline mb-1 text-muted font-weight-bold">
           {UserService.Instance.user && (
             <>
+                {this.props.showBody && (
                 <>
                   <li className="list-inline-item">
                     <PostListingButton
@@ -783,6 +784,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                     </PostListingButton>
                   </li>
                 </>
+                  )}
               {this.myPost && this.props.showBody && (
                 <>
                   <li className="list-inline-item">
