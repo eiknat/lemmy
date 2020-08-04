@@ -131,7 +131,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
 
   render() {
     return (
-      <div className="">
+      <div>
         {!this.state.showEdit ? (
           <>
             {this.listing()}
@@ -573,7 +573,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                         {i18n.t('cross_posted_to')}
                       </li>
                       {this.props.post.duplicates.map(post => (
-                        <li className="list-inline-item mr-2">
+                        <li className="list-inline-item mr-2" key={`post-id-${post.id}`}>
                           <Link to={`/post/${post.id}`}>
                             {post.community_name}
                           </Link>

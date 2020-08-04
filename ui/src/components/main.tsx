@@ -151,20 +151,15 @@ class Main extends Component<any, MainState> {
         err => console.error(err),
         () => console.log('complete')
       );
-
     WebSocketService.Instance.getSite();
-
     if (UserService.Instance.user) {
       WebSocketService.Instance.getFollowedCommunities();
     }
-
     let listCommunitiesForm: ListCommunitiesForm = {
       sort: SortType[SortType.Hot],
       limit: 6,
     };
-
     WebSocketService.Instance.listCommunities(listCommunitiesForm);
-
     this.fetchData();
   }
 
@@ -601,8 +596,9 @@ class Main extends Component<any, MainState> {
   }
 
   toggleMobileFilters(i: Main) {
-    i.state.filtersOpen = !i.state.filtersOpen;
-    i.setState(i.state);
+    i.setState((prevState) => ({
+      filtersOpen: !prevState.filtersOpen
+    }));
   }
 
   handleEditClick(i: Main) {
@@ -676,15 +672,17 @@ class Main extends Component<any, MainState> {
       return;
     } else if (msg.reconnect) {
       this.fetchData();
-    } else if (res.op == UserOperation.GetFollowedCommunities) {
+    } else if (res.op === UserOperation.GetFollowedCommunities) {
       let data = res.data as GetFollowedCommunitiesResponse;
-      this.state.subscribedCommunities = data.communities;
-      this.setState(this.state);
-    } else if (res.op == UserOperation.ListCommunities) {
+      this.setState({
+        subscribedCommunities: data.communities
+      });
+    } else if (res.op === UserOperation.ListCommunities) {
       let data = res.data as ListCommunitiesResponse;
-      this.state.trendingCommunities = data.communities;
-      this.setState(this.state);
-    } else if (res.op == UserOperation.GetSite) {
+      this.setState({
+        trendingCommunities: data.communities
+      });
+    } else if (res.op === UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
 
       // This means it hasn't been set up yet
@@ -697,23 +695,30 @@ class Main extends Component<any, MainState> {
       this.state.siteRes.online = data.online;
       this.setState(this.state);
       document.title = `${this.state.siteRes.site.name}`;
-    } else if (res.op == UserOperation.EditSite) {
+    } else if (res.op === UserOperation.EditSite) {
       let data = res.data as SiteResponse;
-      this.state.siteRes.site = data.site;
-      this.state.showEditSite = false;
-      this.setState(this.state);
-      toast(i18n.t('site_saved'));
-    } else if (res.op == UserOperation.GetPosts) {
+      this.setState((prevState) => ({
+        siteRes: {
+          ...prevState.siteRes,
+          site: data.site,
+        },
+        showEditSite: false,
+      }), () => {
+        toast(i18n.t('site_saved'));
+      });
+    } else if (res.op === UserOperation.GetPosts) {
       let data = res.data as GetPostsResponse;
-      this.state.posts = data.posts;
-      this.state.loading = false;
-      this.setState(this.state);
-      setupTippy();
-    } else if (res.op == UserOperation.CreatePost) {
+      this.setState({
+        posts: data.posts,
+        loading: false,
+      }, () => {
+        setupTippy();
+      });
+    } else if (res.op === UserOperation.CreatePost) {
       let data = res.data as PostResponse;
 
       // If you're on subscribed, only push it if you're subscribed.
-      if (this.state.listingType == ListingType.Subscribed) {
+      if (this.state.listingType === ListingType.Subscribed) {
         if (
           this.state.subscribedCommunities
             .map(c => c.community_id)
@@ -736,19 +741,19 @@ class Main extends Component<any, MainState> {
         }
       }
       this.setState(this.state);
-    } else if (res.op == UserOperation.EditPost) {
+    } else if (res.op === UserOperation.EditPost) {
       let data = res.data as PostResponse;
       editPostFindRes(data, this.state.posts);
       this.setState(this.state);
-    } else if (res.op == UserOperation.CreatePostLike) {
+    } else if (res.op === UserOperation.CreatePostLike) {
       let data = res.data as PostResponse;
       createPostLikeFindRes(data, this.state.posts);
       this.setState(this.state);
-    } else if (res.op == UserOperation.AddAdmin) {
+    } else if (res.op === UserOperation.AddAdmin) {
       let data = res.data as AddAdminResponse;
       this.state.siteRes.admins = data.admins;
       this.setState(this.state);
-    } else if (res.op == UserOperation.BanUser) {
+    } else if (res.op === UserOperation.BanUser) {
       let data = res.data as BanUserResponse;
       let found = this.state.siteRes.banned.find(u => (u.id = data.user.id));
 
@@ -766,11 +771,12 @@ class Main extends Component<any, MainState> {
         .forEach(p => (p.banned = data.banned));
 
       this.setState(this.state);
-    } else if (res.op == UserOperation.GetComments) {
+    } else if (res.op === UserOperation.GetComments) {
       let data = res.data as GetCommentsResponse;
-      this.state.comments = data.comments;
-      this.state.loading = false;
-      this.setState(this.state);
+      this.setState({
+        comments: data.comments,
+        loading: false
+      });
     } else if (res.op == UserOperation.EditComment) {
       let data = res.data as CommentResponse;
       editCommentRes(data, this.state.comments);
