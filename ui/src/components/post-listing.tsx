@@ -990,7 +990,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                       {!post.banned && (
                         <li className="list-inline-item">
                           <span
-                            class="pointer"
+                            className="pointer"
                             onClick={linkEvent(this, this.handleAddSitemod)}
                           >
                             {this.isSitemod

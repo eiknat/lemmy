@@ -135,9 +135,9 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
     return (
       <>
         <h5>{capitalizeFirstLetter(i18n.t('sitemods'))}</h5>
-        <ul class="list-unstyled">
+        <ul className="list-unstyled">
           {this.state.siteRes.sitemods.map(sitemod => (
-            <li class="list-inline-item">
+            <li className="list-inline-item">
               <UserListing
                 user={{
                   name: sitemod.name,

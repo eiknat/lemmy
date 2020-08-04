@@ -659,7 +659,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                               {!node.comment.banned &&
                                 (!this.state.showConfirmAppointAsSitemod ? (
                                   <button
-                                    class="btn btn-link btn-animate text-muted"
+                                  className="btn btn-link btn-animate text-muted"
                                     onClick={linkEvent(
                                       this,
                                       this.handleShowConfirmAppointAsSitemod
@@ -671,11 +671,11 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                   </button>
                                 ) : (
                                   <>
-                                    <button class="btn btn-link btn-animate text-muted">
+                                    <button className="btn btn-link btn-animate text-muted">
                                       {i18n.t('are_you_sure')}
                                     </button>
                                     <button
-                                      class="btn btn-link btn-animate text-muted"
+                                      className="btn btn-link btn-animate text-muted"
                                       onClick={linkEvent(
                                         this,
                                         this.handleAddSitemod
@@ -684,7 +684,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                       {i18n.t('yes')}
                                     </button>
                                     <button
-                                      class="btn btn-link btn-animate text-muted"
+                                      className="btn btn-link btn-animate text-muted"
                                       onClick={linkEvent(
                                         this,
                                         this.handleCancelConfirmAppointAsSitemod
