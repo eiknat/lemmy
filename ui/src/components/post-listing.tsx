@@ -121,7 +121,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
       upvotes: nextProps.post.upvotes,
       downvotes: nextProps.post.downvotes,
       score: nextProps.post.score,
-      imageExpanded: this.props.post.id === nextProps.post.id
+      // imageExpanded: this.props.post.id === nextProps.post.id
     });
   }
 
@@ -206,7 +206,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
         <span
           className="text-body pointer"
           data-tippy-content={i18n.t('expand_here')}
-          onClick={linkEvent(this, this.handleImageExpandClick)}
+          onClick={this.handleImageExpandClick}
         >
           {this.imgThumb(this.getImage(true))}
           <Icon name="image" className="icon mini-overlay" />
@@ -219,7 +219,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
             <span
               className="text-body pointer"
               data-tippy-content={i18n.t('expand_here')}
-              onClick={linkEvent(this, this.handleImageExpandClick)}
+              onClick={this.handleImageExpandClick}
             >
               {this.imgThumb(this.getImage(true))}
               <Icon className="icon mini-overlay" name="link" />
@@ -243,7 +243,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
         <span
           className="text-body pointer"
           data-tippy-content={i18n.t('expand_here')}
-          onClick={linkEvent(this, this.handleImageExpandClick)}
+          onClick={this.handleImageExpandClick}
         >
           <Icon
             className="icon thumbnail mini-overlay"
@@ -295,7 +295,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
           //   !this.props.showBody && linkEvent(this, this.handleImageExpandClick)
           // }
           onClick={
-            !this.props.showBody && linkEvent(this, this.handleImageExpandClick)
+            !this.props.showBody && this.handleImageExpandClick
           }
         >
           {post.nsfw ? (
@@ -421,7 +421,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                         <span
                           className="text-monospace unselectable pointer ml-2 text-muted small"
                           data-tippy-content={i18n.t('expand_here')}
-                          onClick={linkEvent(this, this.handleImageExpandClick)}
+                          onClick={this.handleImageExpandClick}
                         >
                           {/* keeping this for accessibility reasons */}
                         </span>
@@ -429,20 +429,14 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                         <span>
                           <span
                             className="text-monospace unselectable pointer ml-2 text-muted small"
-                            onClick={linkEvent(
-                              this,
-                              this.handleImageExpandClick
-                            )}
+                            onClick={this.handleImageExpandClick}
                           >
                             {/* keeping this for accessibility reasons */}
                           </span>
                           <div>
                             <span
                               className="pointer"
-                              onClick={linkEvent(
-                                this,
-                                this.handleImageExpandClick
-                              )}
+                              onClick={this.handleImageExpandClick}
                             >
                               {post.embed_html !== null &&
                               isValidEmbed(post.url) ? (
@@ -1449,10 +1443,10 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     i.setState({showConfirmTransferSite: false});
   }
 
-  handleImageExpandClick(i: BasePostListing) {
-    i.setState((prevState) => ({
-      imageExpanded: !prevState.imageExpanded
-    }));
+  handleImageExpandClick = () => {
+    this.setState({
+      imageExpanded: !this.state.imageExpanded
+    });
   }
 
   handleViewSource(i: BasePostListing) {

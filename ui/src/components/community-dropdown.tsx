@@ -20,6 +20,8 @@ import { i18n } from '../i18next';
 import { Link } from 'react-router-dom';
 import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import { linkEvent } from '../linkEvent';
+import matchSorter from 'match-sorter'
+
 
 interface CommunityDropdownState {
   favorites: Array<Community> /*not used right now */;
@@ -211,25 +213,22 @@ export class CommunityDropdown extends Component<
 
   get sortedSubscriptions(): Array<CommunityUser> {
     if (this.state.subscriptions) {
-      return this.state.subscriptions
-        .filter(community =>
-          community.community_name.startsWith(this.state.filter)
-        )
-        .sort();
+      return matchSorter(this.state.subscriptions, this.state.filter, {
+        keys: ['name']
+      })
     }
-    return this.state.subscriptions;
   }
 
   get sortedCommunities(): Array<Community> {
-    return this.state.communities.filter(community => {
-      // don't show subscribed communities twice
-      let isSubscribed: boolean;
-      if (this.state.subscriptions) {
-        isSubscribed = this.state.subscriptions.some(
+    // don't show subscribed communities twice
+    const communities = !this.state.subscriptions ? this.state.communities : this.state.communities.filter(community => {
+      const isSubscribed = this.state.subscriptions.some(
           subscription => subscription.community_id === community.id
-        );
-      }
-      return community.name.startsWith(this.state.filter) && !isSubscribed;
+      );
+      return !isSubscribed
+    })
+    return matchSorter(communities, this.state.filter, {
+      keys: ['name']
     });
   }
 
