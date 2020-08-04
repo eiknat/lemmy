@@ -140,7 +140,7 @@ export class CommunityDropdown extends Component<
                   <div className="dropdown-category">
                     <h6>Communities</h6>
                     {this.sortedCommunities.map(community => (
-                      <>
+                      <div key={`{community-${community.name}`}>
                         <div className="community-listing">
                           <span
                             className="community-icon"
@@ -156,7 +156,7 @@ export class CommunityDropdown extends Component<
                             {community.name}
                           </Link>
                         </div>
-                      </>
+                      </div>
                     ))}
                   </div>
                 </div>
