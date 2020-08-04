@@ -81,7 +81,16 @@ export function PostBody({ body }: { body: string }) {
   );
 }
 
-export function PostListingButton({ as: Element = 'button', onClick, children, ...props }: { as?: any, onClick?: () => void, children: React.ReactNode }) {
+export function PostListingButton({
+  as: Element = 'button',
+  onClick,
+  children,
+  ...props
+}: {
+  as?: any;
+  onClick?: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <Element
       className="btn btn-sm btn-link btn-animate text-muted post-listing-button"
@@ -91,7 +100,7 @@ export function PostListingButton({ as: Element = 'button', onClick, children, .
     >
       {children}
     </Element>
-  )
+  );
 }
 
 class BasePostListing extends Component<PostListingProps, PostListingState> {
@@ -310,9 +319,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
           // onClick={() =>
           //   !this.props.showBody && linkEvent(this, this.handleImageExpandClick)
           // }
-          onClick={
-            !this.props.showBody && this.handleImageExpandClick
-          }
+          onClick={!this.props.showBody && this.handleImageExpandClick}
         >
           {post.nsfw ? (
             <svg className="icon thumbnail" style={{ marginTop: '-3px' }}>
@@ -579,7 +586,10 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                         {i18n.t('cross_posted_to')}
                       </li>
                       {this.props.post.duplicates.map(post => (
-                        <li className="list-inline-item mr-2" key={`post-id-${post.id}`}>
+                        <li
+                          className="list-inline-item mr-2"
+                          key={`post-id-${post.id}`}
+                        >
                           <Link to={`/post/${post.id}`}>
                             {post.community_name}
                           </Link>
@@ -653,7 +663,10 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                         className="form-control mr-2"
                         placeholder={i18n.t('reason')}
                         value={this.state.reportReason}
-                        onChange={linkEvent(this, this.handleReportReasonChange)}
+                        onChange={linkEvent(
+                          this,
+                          this.handleReportReasonChange
+                        )}
                         maxLength={600}
                       />
                     </div>
@@ -663,7 +676,11 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                       </button>
                     </div>
                     <div className="row mt-1">
-                      <button type="button" className="btn btn-secondary" onClick={linkEvent(this, this.handleReportPost)}>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={linkEvent(this, this.handleReportPost)}
+                      >
                         {i18n.t('cancel')}
                       </button>
                     </div>
@@ -678,9 +695,11 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                     to={`/post/${post.id}`}
                   >
                     <Icon name="comment" className="icon mr-1" />
-                    {isMobile ? post.number_of_comments : i18n.t('number_of_comments', {
-                      count: post.number_of_comments,
-                    })}
+                    {isMobile
+                      ? post.number_of_comments
+                      : i18n.t('number_of_comments', {
+                          count: post.number_of_comments,
+                        })}
                   </Link>
                   {/* {this.state.upvotes !== this.state.score && (
                     <>
@@ -711,8 +730,14 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                               }
                             >
                               <Icon
-                                name={this.state.localPostSaved ? 'star' : 'starOutline'}
-                                className={`icon icon-inline ${this.state.localPostSaved && 'text-warning'}`}
+                                name={
+                                  this.state.localPostSaved
+                                    ? 'star'
+                                    : 'starOutline'
+                                }
+                                className={`icon icon-inline ${
+                                  this.state.localPostSaved && 'text-warning'
+                                }`}
                               />
                             </PostListingButton>
                           </li>
@@ -748,7 +773,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
         <ul className="list-inline mb-1 text-muted font-weight-bold">
           {UserService.Instance.user && (
             <>
-                {this.props.showBody && (
+              {this.props.showBody && (
                 <>
                   <li className="list-inline-item">
                     <PostListingButton
@@ -758,8 +783,12 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                       }
                     >
                       <Icon
-                        name={this.state.localPostSaved ? 'star' : 'starOutline'}
-                        className={`icon icon-inline ${this.state.localPostSaved && 'text-warning'}`}
+                        name={
+                          this.state.localPostSaved ? 'star' : 'starOutline'
+                        }
+                        className={`icon icon-inline ${
+                          this.state.localPostSaved && 'text-warning'
+                        }`}
                       />
                     </PostListingButton>
                   </li>
@@ -784,7 +813,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                     </PostListingButton>
                   </li>
                 </>
-                  )}
+              )}
               {this.myPost && this.props.showBody && (
                 <>
                   <li className="list-inline-item">
@@ -1248,22 +1277,22 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
 
   handleEditClick = () => {
     this.setState({
-      showEdit: true
+      showEdit: true,
     });
-  }
+  };
 
-  handleEditCancel = () =>  {
+  handleEditCancel = () => {
     this.setState({
-      showEdit: false
+      showEdit: false,
     });
-  }
+  };
 
   // The actual editing is done in the recieve for post
   handleEditPost = () => {
     this.setState({
-      showEdit: false
+      showEdit: false,
     });
-  }
+  };
 
   handleDeleteClick(i: BasePostListing) {
     let deleteForm: PostFormI = {
@@ -1281,7 +1310,8 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
   }
 
   handleSavePostClick = () => {
-    let saved = this.props.post.saved === undefined ? true : !this.props.post.saved;
+    let saved =
+      this.props.post.saved === undefined ? true : !this.props.post.saved;
     let form: SavePostForm = {
       post_id: this.props.post.id,
       save: saved,
@@ -1289,7 +1319,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
 
     WebSocketService.Instance.savePost(form);
     this.setState({ localPostSaved: !this.state.localPostSaved });
-  }
+  };
 
   get crossPostParams(): string {
     let params = `?title=${this.props.post.name}`;
@@ -1309,15 +1339,15 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
 
   handleModRemoveShow = () => {
     this.setState({
-      showRemoveDialog: true
+      showRemoveDialog: true,
     });
-  }
+  };
 
   handleModRemoveReasonChange = (event: any) => {
     this.setState({
-      removeReason: event.target.value
+      removeReason: event.target.value,
     });
-  }
+  };
 
   handleModRemoveSubmit(i: BasePostListing) {
     event.preventDefault();
@@ -1333,7 +1363,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     };
     WebSocketService.Instance.editPost(form);
     i.setState({
-      showRemoveDialog: false
+      showRemoveDialog: false,
     });
   }
 
@@ -1366,44 +1396,50 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
   handleModBanFromCommunityShow = () => {
     this.setState({
       showBanDialog: true,
-      banType: BanType.Community
+      banType: BanType.Community,
     });
-  }
+  };
 
   handleModBanShow = () => {
     this.setState({
       showBanDialog: true,
-      banType: BanType.Site
+      banType: BanType.Site,
     });
-  }
+  };
 
   handleModBanReasonChange = (event: any) => {
     this.setState({
-      banReason: event.target.value
+      banReason: event.target.value,
     });
-  }
+  };
 
   handleModBanExpiresChange = (event: any) => {
     this.setState({
-      banReason: event.target.value
+      banReason: event.target.value,
     });
-  }
+  };
 
   handleModBanFromCommunitySubmit = () => {
-    this.setState({
-      banType: BanType.Community
-    }, () => {
-      this.handleModBanBothSubmit();
-    });
-  }
+    this.setState(
+      {
+        banType: BanType.Community,
+      },
+      () => {
+        this.handleModBanBothSubmit();
+      }
+    );
+  };
 
   handleModBanSubmit = () => {
-    this.setState({
-      banType: BanType.Site
-    }, () => {
-      this.handleModBanBothSubmit();
-    });
-  }
+    this.setState(
+      {
+        banType: BanType.Site,
+      },
+      () => {
+        this.handleModBanBothSubmit();
+      }
+    );
+  };
 
   handleModBanBothSubmit = () => {
     if (this.state.banType === BanType.Community) {
@@ -1426,9 +1462,9 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     }
 
     this.setState({
-      showBanDialog: false
+      showBanDialog: false,
     });
-  }
+  };
 
   handleAddModToCommunity(i: BasePostListing) {
     let form: AddModToCommunityForm = {
@@ -1459,11 +1495,11 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
   }
 
   handleShowConfirmTransferCommunity(i: BasePostListing) {
-    i.setState({showConfirmTransferCommunity: true});
+    i.setState({ showConfirmTransferCommunity: true });
   }
 
   handleCancelShowConfirmTransferCommunity(i: BasePostListing) {
-    i.setState({showConfirmTransferCommunity: false});
+    i.setState({ showConfirmTransferCommunity: false });
   }
 
   handleTransferCommunity(i: BasePostListing) {
@@ -1472,15 +1508,15 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
       user_id: i.props.post.creator_id,
     };
     WebSocketService.Instance.transferCommunity(form);
-    i.setState({showConfirmTransferCommunity: false});
+    i.setState({ showConfirmTransferCommunity: false });
   }
 
   handleShowConfirmTransferSite(i: BasePostListing) {
-    i.setState({showConfirmTransferCommunity: true});
+    i.setState({ showConfirmTransferCommunity: true });
   }
 
   handleCancelShowConfirmTransferSite(i: BasePostListing) {
-    i.setState({showConfirmTransferSite: false});
+    i.setState({ showConfirmTransferSite: false });
   }
 
   handleTransferSite(i: BasePostListing) {
@@ -1488,30 +1524,30 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
       user_id: i.props.post.creator_id,
     };
     WebSocketService.Instance.transferSite(form);
-    i.setState({showConfirmTransferSite: false});
+    i.setState({ showConfirmTransferSite: false });
   }
 
   handleImageExpandClick = () => {
     this.setState({
-      imageExpanded: !this.state.imageExpanded
+      imageExpanded: !this.state.imageExpanded,
     });
-  }
+  };
 
   handleViewSource(i: BasePostListing) {
-    i.setState((prevState) => ({
-      viewSource: !prevState.viewSource
+    i.setState(prevState => ({
+      viewSource: !prevState.viewSource,
     }));
   }
 
   handleReportPost = () => {
-    this.setState((prevState) => ({
-      showReportDialog: !prevState.showReportDialog
+    this.setState(prevState => ({
+      showReportDialog: !prevState.showReportDialog,
     }));
-  }
+  };
 
   handleReportReasonChange(i: BasePostListing, event: any) {
     i.setState({
-      reportReason: event.target.value
+      reportReason: event.target.value,
     });
   }
 
@@ -1530,11 +1566,14 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
   }
 
   handleShowAdvanced(i: BasePostListing) {
-    i.setState((prevState) => ({
-      showAdvanced: !prevState.showAdvanced
-    }), () => {
-      setupTippy()
-    });
+    i.setState(
+      prevState => ({
+        showAdvanced: !prevState.showAdvanced,
+      }),
+      () => {
+        setupTippy();
+      }
+    );
   }
 
   get pointsTippy(): string {

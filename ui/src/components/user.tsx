@@ -185,9 +185,7 @@ class BaseUser extends Component<any, UserState> {
     this.handleAdditionalPronounsChange = this.handleAdditionalPronounsChange.bind(
       this
     );
-
-    this.state.user_id = Number(this.props.match.params.id) || null;
-    this.state.username = this.props.match.params.username;
+    this.handleLogoutClick = this.handleLogoutClick.bind(this);
 
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
@@ -384,7 +382,10 @@ class BaseUser extends Component<any, UserState> {
                   <UserListing user={user} realLink />
                 </li>
                 {user.banned && (
-                  <li className="list-inline-item badge badge-danger" key={`user-banned-${user.id}`}>
+                  <li
+                    className="list-inline-item badge badge-danger"
+                    key={`user-banned-${user.id}`}
+                  >
                     {i18n.t('banned')}
                   </li>
                 )}
@@ -440,7 +441,7 @@ class BaseUser extends Component<any, UserState> {
             {this.isCurrentUser ? (
               <button
                 className="btn btn-block btn-secondary mt-3"
-                onClick={linkEvent(this, this.handleLogoutClick)}
+                onClick={this.handleLogoutClick}
               >
                 {i18n.t('logout')}
               </button>
@@ -521,7 +522,10 @@ class BaseUser extends Component<any, UserState> {
                 </div>
               )} */}
               <div className="form-group row">
-                <label className="col-lg-5 col-form-label" htmlFor="user-pronouns">
+                <label
+                  className="col-lg-5 col-form-label"
+                  htmlFor="user-pronouns"
+                >
                   {i18n.t('pronouns')}
                 </label>
                 <div className="col-lg-7">
@@ -577,7 +581,9 @@ class BaseUser extends Component<any, UserState> {
                   <option value="browser">{i18n.t('browser_default')}</option>
                   <option disabled>──</option>
                   {languages.map(lang => (
-                    <option key={`language-${lang.code}`} value={lang.code}>{lang.name}</option>
+                    <option key={`language-${lang.code}`} value={lang.code}>
+                      {lang.name}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -590,7 +596,9 @@ class BaseUser extends Component<any, UserState> {
                 >
                   <option disabled>{i18n.t('theme')}</option>
                   {themes.map(theme => (
-                    <option key={`theme-${theme}`} value={theme}>{theme}</option>
+                    <option key={`theme-${theme}`} value={theme}>
+                      {theme}
+                    </option>
                   ))}
                 </select>
                 <div className="small alert alert-warning my-2">
@@ -891,7 +899,7 @@ class BaseUser extends Component<any, UserState> {
                     id="reason"
                     placeholder="reason"
                     onChange={linkEvent(this, this.handleBanReasonChange)}
-                   />
+                  />
                   <button
                     className="btn btn-secondary btn-danger ml-2"
                     type="submit"
@@ -1190,9 +1198,9 @@ class BaseUser extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleLogoutClick(i: BaseUser) {
+  handleLogoutClick() {
     UserService.Instance.logout();
-    i.context.router.history.push('/');
+    this.props.history.push('/');
   }
 
   handleDeleteAccount(i: BaseUser, event: any) {
