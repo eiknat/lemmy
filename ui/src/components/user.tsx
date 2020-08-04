@@ -382,7 +382,7 @@ class BaseUser extends Component<any, UserState> {
                   <UserListing user={user} realLink />
                 </li>
                 {user.banned && (
-                  <li className="list-inline-item badge badge-danger">
+                  <li className="list-inline-item badge badge-danger" key={`user-banned-${user.id}`}>
                     {i18n.t('banned')}
                   </li>
                 )}
@@ -575,7 +575,7 @@ class BaseUser extends Component<any, UserState> {
                   <option value="browser">{i18n.t('browser_default')}</option>
                   <option disabled>──</option>
                   {languages.map(lang => (
-                    <option value={lang.code}>{lang.name}</option>
+                    <option key={`language-${lang.code}`} value={lang.code}>{lang.name}</option>
                   ))}
                 </select>
               </div>
@@ -588,7 +588,7 @@ class BaseUser extends Component<any, UserState> {
                 >
                   <option disabled>{i18n.t('theme')}</option>
                   {themes.map(theme => (
-                    <option value={theme}>{theme}</option>
+                    <option key={`theme-${theme}`} value={theme}>{theme}</option>
                   ))}
                 </select>
                 <div className="small alert alert-warning my-2">
@@ -914,7 +914,7 @@ class BaseUser extends Component<any, UserState> {
               <h5>{i18n.t('moderates')}</h5>
               <ul className="list-unstyled mb-0">
                 {this.state.moderates.map(community => (
-                  <li>
+                  <li key={`moderates-${community.community_name}`}>
                     <Link to={`/c/${community.community_name}`}>
                       {community.community_name}
                     </Link>
@@ -937,7 +937,7 @@ class BaseUser extends Component<any, UserState> {
               <h5>{i18n.t('subscribed')}</h5>
               <ul className="list-unstyled mb-0">
                 {this.state.follows.map(community => (
-                  <li>
+                  <li key={`follows-${community.community_name}`}>
                     <Link to={`/c/${community.community_name}`}>
                       {community.community_name}
                     </Link>

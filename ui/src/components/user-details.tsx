@@ -152,7 +152,7 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
     return (
       <div>
         {combined.map(i => (
-          <div>
+          <div key={`post-${(i.data as Post).id}`}>
             {i.type === 'posts' ? (
               <PostListing
                 post={i.data as Post}
