@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { Prompt } from 'react-router-dom';
 import { PostListings } from './post-listings';
 import { MarkdownTextArea } from './markdown-textarea';
@@ -35,15 +35,75 @@ import {
   pictrsDeleteToast,
   validTitle,
 } from '../utils';
-import Choices from 'choices.js';
+// import Choices from 'choices.js';
 import { i18n } from '../i18next';
 import { cleanURL } from '../clean-url';
 import { Icon } from './icon';
 import { linkEvent } from '../linkEvent';
+import matchSorter from 'match-sorter'
+
+
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxPopover,
+  ComboboxList,
+  ComboboxOption,
+  ComboboxOptionText,
+} from "@reach/combobox";
+import "@reach/combobox/styles.css";
 
 export const MAX_POST_TITLE_LENGTH = 160;
 export const MAX_POST_BODY_LENGTH = 20000;
 export const MAX_COMMENT_LENGTH = 10000;
+
+function CommunityInput({ communities, onSelect }) {
+  const [value, setValue] = useState('')
+  const results = matchSorter(communities, value, {
+    keys: [(item) => `${item.name}`]
+  });
+
+  console.log({ results })
+
+  function handleChange(e) {
+    setValue(e.target.value);
+  }
+
+  return (
+    <Combobox
+      aria-label="Communities"
+      openOnFocus
+      onSelect={(name) => {
+        const community = communities.find(comm => comm.name === name)
+        console.log({ community });
+        onSelect(community.id)
+      }}
+    >
+      <ComboboxInput
+        className="community-search-input form-control"
+        onChange={handleChange}
+        value={value}
+        placeholder={i18n.t('select_a_community')}
+      />
+      <ComboboxPopover className="shadow-popup">
+          {results.length > 0 ? (
+            <ComboboxList>
+              {results.slice(0, 10).map((result, index) => (
+                <ComboboxOption
+                  key={index}
+                  value={result.name}
+                />
+              ))}
+            </ComboboxList>
+          ) : (
+            <div data-reach-combobox-popover style={{ fontSize: '16px', padding: 8, paddingTop: 0 }}>
+              No results found
+            </div>
+          )}
+        </ComboboxPopover>
+    </Combobox>
+  )
+}
 
 interface PostFormProps {
   post?: Post; // If a post is given, that means this is an edit
@@ -89,7 +149,7 @@ export const TextAreaWithCounter = ({ maxLength, ...props }) => {
 export class PostForm extends Component<PostFormProps, PostFormState> {
   private id = `post-form-${randomStr()}`;
   private subscription: Subscription;
-  private choices: Choices;
+  // private choices: Choices;
   private emptyState: PostFormState = {
     postForm: {
       name: null,
@@ -192,6 +252,21 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     const postTitleBlank =
       this.state.postForm.name === null ||
       this.state.postForm.name.trim() === '';
+
+    const communities = this.state.communities
+                    .filter(community => {
+                      // don't allow crossposting to same community as original
+                      if (this.state.crosspostCommunityId) {
+                        // remove main community
+                        const MAIN_COMMUNITY_ID = 2;
+                        return (
+                          community.id !== this.state.crosspostCommunityId &&
+                          community.id != MAIN_COMMUNITY_ID
+                        );
+                      }
+
+                      return true;
+                    })
     return (
       <div>
         <Prompt
@@ -350,7 +425,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                 {i18n.t('community')}
               </label>
               <div className="col-sm-10">
-                <select
+                {/* <select
                   className="form-control"
                   id="post-community"
                   value={this.state.postForm.community_id}
@@ -358,19 +433,19 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                 >
                   <option>{i18n.t('select_a_community')}</option>
                   {this.state.communities
-                    // .filter(community => {
-                    //   // don't allow crossposting to same community as original
-                    //   if (this.state.crosspostCommunityId) {
-                    //     // remove main community
-                    //     const MAIN_COMMUNITY_ID = 2;
-                    //     return (
-                    //       community.id !== this.state.crosspostCommunityId &&
-                    //       community.id != MAIN_COMMUNITY_ID
-                    //     );
-                    //   }
+                    .filter(community => {
+                      // don't allow crossposting to same community as original
+                      if (this.state.crosspostCommunityId) {
+                        // remove main community
+                        const MAIN_COMMUNITY_ID = 2;
+                        return (
+                          community.id !== this.state.crosspostCommunityId &&
+                          community.id != MAIN_COMMUNITY_ID
+                        );
+                      }
 
-                    //   return true;
-                    // })
+                      return true;
+                    })
                     .map(community => (
                       <option key={community.id} value={community.id}>
                         {community.local
@@ -378,7 +453,11 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                           : `${hostname(community.actor_id)}/${community.name}`}
                       </option>
                     ))}
-                </select>
+                </select> */}
+                <CommunityInput
+                  onSelect={this.handlePostCommunityChange}
+                  communities={communities}
+                />
               </div>
             </div>
           )}
@@ -538,9 +617,8 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     this.setState(this.state);
   }
 
-  handlePostCommunityChange(i: PostForm, event: any) {
-    i.state.postForm.community_id = Number(event.target.value);
-    i.setState(i.state);
+  handlePostCommunityChange = (community_id) => {
+    this.setState({ postForm: { ...this.state.postForm, community_id, }});
   }
 
   handlePostNsfwChange(i: PostForm, event: any) {
@@ -615,48 +693,48 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       });
   }
 
-  initChoices = (selectId: any) => {
-    setTimeout(() => {
-      this.choices = new Choices(selectId, {
-          shouldSort: false,
-          classNames: {
-            containerOuter: 'choices',
-            containerInner: 'choices__inner bg-secondary border-0',
-            input: 'form-control',
-            inputCloned: 'choices__input--cloned',
-            list: 'choices__list',
-            listItems: 'choices__list--multiple',
-            listSingle: 'choices__list--single',
-            listDropdown: 'choices__list--dropdown',
-            item: 'choices__item bg-secondary',
-            itemSelectable: 'choices__item--selectable',
-            itemDisabled: 'choices__item--disabled',
-            itemChoice: 'choices__item--choice',
-            placeholder: 'choices__placeholder',
-            group: 'choices__group',
-            groupHeading: 'choices__heading',
-            button: 'choices__button',
-            activeState: 'is-active',
-            focusState: 'is-focused',
-            openState: 'is-open',
-            disabledState: 'is-disabled',
-            highlightedState: 'text-info',
-            selectedState: 'text-info',
-            flippedState: 'is-flipped',
-            loadingState: 'is-loading',
-            noResults: 'has-no-results',
-            noChoices: 'has-no-choices',
-          },
-        });
-        this.choices.passedElement.element.addEventListener(
-          'choice',
-          (e: any) => {
-            this.setState({ postForm: { ...this.state.postForm, community_id: Number(e.detail.choice.value) } });
-          },
-          false
-        );
-    }, 10)
-  }
+  // initChoices = (selectId: any) => {
+  //   setTimeout(() => {
+  //     this.choices = new Choices(selectId, {
+  //         shouldSort: false,
+  //         classNames: {
+  //           containerOuter: 'choices',
+  //           containerInner: 'choices__inner bg-secondary border-0',
+  //           input: 'form-control',
+  //           inputCloned: 'choices__input--cloned',
+  //           list: 'choices__list',
+  //           listItems: 'choices__list--multiple',
+  //           listSingle: 'choices__list--single',
+  //           listDropdown: 'choices__list--dropdown',
+  //           item: 'choices__item bg-secondary',
+  //           itemSelectable: 'choices__item--selectable',
+  //           itemDisabled: 'choices__item--disabled',
+  //           itemChoice: 'choices__item--choice',
+  //           placeholder: 'choices__placeholder',
+  //           group: 'choices__group',
+  //           groupHeading: 'choices__heading',
+  //           button: 'choices__button',
+  //           activeState: 'is-active',
+  //           focusState: 'is-focused',
+  //           openState: 'is-open',
+  //           disabledState: 'is-disabled',
+  //           highlightedState: 'text-info',
+  //           selectedState: 'text-info',
+  //           flippedState: 'is-flipped',
+  //           loadingState: 'is-loading',
+  //           noResults: 'has-no-results',
+  //           noChoices: 'has-no-choices',
+  //         },
+  //       });
+  //       this.choices.passedElement.element.addEventListener(
+  //         'choice',
+  //         (e: any) => {
+  //           this.setState({ postForm: { ...this.state.postForm, community_id: Number(e.detail.choice.value) } });
+  //         },
+  //         false
+  //       );
+  //   }, 10)
+  // }
 
   parseMessage(msg: WebSocketJsonResponse) {
     let res = wsJsonToRes(msg);
@@ -684,7 +762,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       // Set up select searching
       let selectId = document.getElementById('post-community');
       if (selectId) {
-        this.initChoices(selectId);
+        // this.initChoices(selectId);
       }
     } else if (res.op == UserOperation.CreatePost) {
       let data = res.data as PostResponse;

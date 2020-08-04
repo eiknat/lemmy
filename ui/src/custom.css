@@ -656,3 +656,43 @@ a.text-body {
   background-color: rgba(0, 0, 0, .3);
   z-index: 999;
 }
+
+[data-reach-combobox] {
+}
+[data-reach-combobox-input] {
+}
+[data-reach-combobox-popover] {
+  border-color: #444;
+  margin-top: 5px;
+  border-radius: 2px;
+  background-color: #444;
+}
+[data-reach-combobox-list] {
+
+}
+[data-reach-combobox-option] {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  /* color: #fff; */
+}
+
+[data-reach-combobox-option]:hover {
+  background-color: var(--chapo-accent) !important;
+  color: #fff;
+}
+
+[data-reach-combobox-option][data-highlighted] {
+  background-color: var(--chapo-accent);
+  color: #333;
+}
+
+[data-reach-combobox-button] {
+}
+
+/* the string portions that match what the user has typed */
+[data-user-value] {
+  color: #fff;
+}
+/* the string portions are suggested */
+[data-suggested-value] {
+}
