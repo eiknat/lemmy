@@ -84,12 +84,12 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
   private emptyState: PostListingState = {
     showEdit: false,
     showRemoveDialog: false,
-    removeReason: null,
+    removeReason: '',
     showBanDialog: false,
-    banReason: null,
-    banExpires: null,
+    banReason: '',
+    banExpires: '',
     banType: BanType.Community,
-    reportReason: null,
+    reportReason: '',
     showReportDialog: false,
     showConfirmTransferSite: false,
     showConfirmTransferCommunity: false,
@@ -108,8 +108,6 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     this.state = this.emptyState;
     this.handlePostLike = this.handlePostLike.bind(this);
     this.handlePostDisLike = this.handlePostDisLike.bind(this);
-    this.handleEditPost = this.handleEditPost.bind(this);
-    this.handleEditCancel = this.handleEditCancel.bind(this);
   }
 
   componentDidMount() {
@@ -329,7 +327,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
           >
             <button
               className={`btn-animate btn btn-link p-0 ${
-                this.state.my_vote == 1 ? 'text-info' : 'text-muted'
+                this.state.my_vote === 1 ? 'text-info' : 'text-muted'
               }`}
               onClick={linkEvent(this, this.handlePostLike)}
               data-tippy-content={i18n.t('upvote')}
@@ -345,7 +343,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
             {this.props.enableDownvotes && (
               <button
                 className={`btn-animate btn btn-link p-0 ${
-                  this.state.my_vote == -1 ? 'text-danger' : 'text-muted'
+                  this.state.my_vote === -1 ? 'text-danger' : 'text-muted'
                 }`}
                 onClick={linkEvent(this, this.handlePostDisLike)}
                 data-tippy-content={i18n.t('downvote')}
@@ -397,7 +395,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                     )}
                   </h5>
                   {post.url &&
-                    !(hostname(post.url) == window.location.hostname) && (
+                    !(hostname(post.url) === window.location.hostname) && (
                       <small className="d-inline-block">
                         <a
                           className="ml-2 text-muted font-italic"
@@ -590,10 +588,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                       className="form-control mr-2"
                       placeholder={i18n.t('reason')}
                       value={this.state.removeReason}
-                      onInput={linkEvent(
-                        this,
-                        this.handleModRemoveReasonChange
-                      )}
+                      onChange={this.handleModRemoveReasonChange}
                     />
                     <button type="submit" className="btn btn-secondary">
                       {i18n.t('remove_post')}
@@ -601,7 +596,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                   </form>
                 )}
                 {this.state.showBanDialog && (
-                  <form onSubmit={linkEvent(this, this.handleModBanBothSubmit)}>
+                  <form onSubmit={this.handleModBanBothSubmit}>
                     <div className="form-group row">
                       <label
                         className="col-form-label"
@@ -615,13 +610,13 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                         className="form-control mr-2"
                         placeholder={i18n.t('reason')}
                         value={this.state.banReason}
-                        onInput={linkEvent(this, this.handleModBanReasonChange)}
+                        onChange={this.handleModBanReasonChange}
                       />
                     </div>
                     {/* TODO hold off on expires until later */}
                     {/* <div className="form-group row"> */}
                     {/*   <label className="col-form-label">Expires</label> */}
-                    {/*   <input type="date" className="form-control mr-2" placeholder={i18n.t('expires')} value={this.state.banExpires} onInput={linkEvent(this, this.handleModBanExpiresChange)} /> */}
+                    {/*   <input type="date" className="form-control mr-2" placeholder={i18n.t('expires')} value={this.state.banExpires} onChange={linkEvent(this, this.handleModBanExpiresChange)} /> */}
                     {/* </div> */}
                     <div className="form-group row">
                       <button type="submit" className="btn btn-secondary">
@@ -648,7 +643,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                         className="form-control mr-2"
                         placeholder={i18n.t('reason')}
                         value={this.state.reportReason}
-                        onInput={linkEvent(this, this.handleReportReasonChange)}
+                        onChange={linkEvent(this, this.handleReportReasonChange)}
                         maxLength={600}
                       />
                     </div>
@@ -754,7 +749,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                   <li className="list-inline-item">
                     <button
                       className="btn btn-sm btn-link btn-animate text-muted"
-                      onClick={linkEvent(this, this.handleEditClick)}
+                      onClick={this.handleEditClick}
                       data-tippy-content={i18n.t('edit')}
                     >
                       <Icon name="edit" />
@@ -855,7 +850,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                       {!post.removed ? (
                         <span
                           className="pointer"
-                          onClick={linkEvent(this, this.handleModRemoveShow)}
+                          onClick={this.handleModRemoveShow}
                         >
                           {i18n.t('remove')}
                         </span>
@@ -876,10 +871,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                           {!post.banned_from_community ? (
                             <span
                               className="pointer"
-                              onClick={linkEvent(
-                                this,
-                                this.handleModBanFromCommunityShow
-                              )}
+                              onClick={this.handleModBanFromCommunityShow}
                             >
                               {i18n.t('ban')}
                             </span>
@@ -961,14 +953,14 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                           {!post.banned ? (
                             <span
                               className="pointer"
-                              onClick={linkEvent(this, this.handleModBanShow)}
+                              onClick={this.handleModBanShow}
                             >
                               {i18n.t('ban_from_site')}
                             </span>
                           ) : (
                             <span
                               className="pointer"
-                              onClick={linkEvent(this, this.handleModBanSubmit)}
+                              onClick={this.handleModBanSubmit}
                             >
                               {i18n.t('unban_from_site')}
                             </span>
@@ -1053,7 +1045,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
   private get myPost(): boolean {
     return (
       UserService.Instance.user &&
-      this.props.post.creator_id == UserService.Instance.user.id
+      this.props.post.creator_id === UserService.Instance.user.id
     );
   }
 
@@ -1137,8 +1129,8 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     return (
       this.props.moderators &&
       UserService.Instance.user &&
-      this.props.post.creator_id != UserService.Instance.user.id &&
-      UserService.Instance.user.id == this.props.moderators[0].user_id
+      this.props.post.creator_id !== UserService.Instance.user.id &&
+      UserService.Instance.user.id === this.props.moderators[0].user_id
     );
   }
 
@@ -1146,8 +1138,8 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     return (
       this.props.admins &&
       UserService.Instance.user &&
-      this.props.post.creator_id != UserService.Instance.user.id &&
-      UserService.Instance.user.id == this.props.admins[0].id
+      this.props.post.creator_id !== UserService.Instance.user.id &&
+      UserService.Instance.user.id === this.props.admins[0].id
     );
   }
 
@@ -1156,12 +1148,12 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
       this.props.history.push(`/login`);
     }
 
-    let new_vote = i.state.my_vote == 1 ? 0 : 1;
+    let new_vote = i.state.my_vote === 1 ? 0 : 1;
 
-    if (i.state.my_vote == 1) {
+    if (i.state.my_vote === 1) {
       i.state.score--;
       i.state.upvotes--;
-    } else if (i.state.my_vote == -1) {
+    } else if (i.state.my_vote === -1) {
       i.state.downvotes--;
       i.state.upvotes++;
       i.state.score += 2;
@@ -1187,13 +1179,13 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
       this.props.history.push(`/login`);
     }
 
-    let new_vote = i.state.my_vote == -1 ? 0 : -1;
+    let new_vote = i.state.my_vote === -1 ? 0 : -1;
 
-    if (i.state.my_vote == 1) {
+    if (i.state.my_vote === 1) {
       i.state.score -= 2;
       i.state.upvotes--;
       i.state.downvotes++;
-    } else if (i.state.my_vote == -1) {
+    } else if (i.state.my_vote === -1) {
       i.state.downvotes--;
       i.state.score++;
     } else {
@@ -1213,20 +1205,23 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     setupTippy();
   }
 
-  handleEditClick(i: BasePostListing) {
-    i.state.showEdit = true;
-    i.setState(i.state);
+  handleEditClick = () => {
+    this.setState({
+      showEdit: true
+    });
   }
 
-  handleEditCancel() {
-    this.state.showEdit = false;
-    this.setState(this.state);
+  handleEditCancel = () =>  {
+    this.setState({
+      showEdit: false
+    });
   }
 
   // The actual editing is done in the recieve for post
-  handleEditPost() {
-    this.state.showEdit = false;
-    this.setState(this.state);
+  handleEditPost = () => {
+    this.setState({
+      showEdit: false
+    });
   }
 
   handleDeleteClick(i: BasePostListing) {
@@ -1245,7 +1240,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
   }
 
   handleSavePostClick(i: BasePostListing) {
-    let saved = i.props.post.saved == undefined ? true : !i.props.post.saved;
+    let saved = i.props.post.saved === undefined ? true : !i.props.post.saved;
     let form: SavePostForm = {
       post_id: i.props.post.id,
       save: saved,
@@ -1270,14 +1265,16 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     return params;
   }
 
-  handleModRemoveShow(i: PostListing) {
-    i.state.showRemoveDialog = true;
-    i.setState(i.state);
+  handleModRemoveShow = () => {
+    this.setState({
+      showRemoveDialog: true
+    });
   }
 
-  handleModRemoveReasonChange(i: BasePostListing, event: any) {
-    i.state.removeReason = event.target.value;
-    i.setState(i.state);
+  handleModRemoveReasonChange = (event: any) => {
+    this.setState({
+      removeReason: event.target.value
+    });
   }
 
   handleModRemoveSubmit(i: BasePostListing) {
@@ -1293,8 +1290,9 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
       auth: null,
     };
     WebSocketService.Instance.editPost(form);
-    i.state.showRemoveDialog = false;
-    i.setState(i.state);
+    i.setState({
+      showRemoveDialog: false
+    });
   }
 
   handleModLock(i: BasePostListing) {
@@ -1323,64 +1321,71 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     WebSocketService.Instance.editPost(form);
   }
 
-  handleModBanFromCommunityShow(i: BasePostListing) {
-    i.state.showBanDialog = true;
-    i.state.banType = BanType.Community;
-    i.setState(i.state);
+  handleModBanFromCommunityShow = () => {
+    this.setState({
+      showBanDialog: true,
+      banType: BanType.Community
+    });
   }
 
-  handleModBanShow(i: BasePostListing) {
-    i.state.showBanDialog = true;
-    i.state.banType = BanType.Site;
-    i.setState(i.state);
+  handleModBanShow = () => {
+    this.setState({
+      showBanDialog: true,
+      banType: BanType.Site
+    });
   }
 
-  handleModBanReasonChange(i: BasePostListing, event: any) {
-    i.state.banReason = event.target.value;
-    i.setState(i.state);
+  handleModBanReasonChange = (event: any) => {
+    this.setState({
+      banReason: event.target.value
+    });
   }
 
-  handleModBanExpiresChange(i: BasePostListing, event: any) {
-    i.state.banExpires = event.target.value;
-    i.setState(i.state);
+  handleModBanExpiresChange = (event: any) => {
+    this.setState({
+      banReason: event.target.value
+    });
   }
 
-  handleModBanFromCommunitySubmit(i: BasePostListing) {
-    i.state.banType = BanType.Community;
-    i.setState(i.state);
-    i.handleModBanBothSubmit(i);
+  handleModBanFromCommunitySubmit = () => {
+    this.setState({
+      banType: BanType.Community
+    }, () => {
+      this.handleModBanBothSubmit();
+    });
   }
 
-  handleModBanSubmit(i: BasePostListing) {
-    i.state.banType = BanType.Site;
-    i.setState(i.state);
-    i.handleModBanBothSubmit(i);
+  handleModBanSubmit = () => {
+    this.setState({
+      banType: BanType.Site
+    }, () => {
+      this.handleModBanBothSubmit();
+    });
   }
 
-  handleModBanBothSubmit(i: BasePostListing) {
-    event.preventDefault();
-
-    if (i.state.banType == BanType.Community) {
+  handleModBanBothSubmit = () => {
+    if (this.state.banType === BanType.Community) {
       let form: BanFromCommunityForm = {
-        user_id: i.props.post.creator_id,
-        community_id: i.props.post.community_id,
-        ban: !i.props.post.banned_from_community,
-        reason: i.state.banReason,
-        expires: getUnixTime(i.state.banExpires),
+        user_id: this.props.post.creator_id,
+        community_id: this.props.post.community_id,
+        ban: !this.props.post.banned_from_community,
+        reason: this.state.banReason,
+        expires: getUnixTime(this.state.banExpires),
       };
       WebSocketService.Instance.banFromCommunity(form);
     } else {
       let form: BanUserForm = {
-        user_id: i.props.post.creator_id,
-        ban: !i.props.post.banned,
-        reason: i.state.banReason,
-        expires: getUnixTime(i.state.banExpires),
+        user_id: this.props.post.creator_id,
+        ban: !this.props.post.banned,
+        reason: this.state.banReason,
+        expires: getUnixTime(this.state.banExpires),
       };
       WebSocketService.Instance.banUser(form);
     }
 
-    i.state.showBanDialog = false;
-    i.setState(i.state);
+    this.setState({
+      showBanDialog: false
+    });
   }
 
   handleAddModToCommunity(i: BasePostListing) {
