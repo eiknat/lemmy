@@ -133,16 +133,30 @@ export const emojiPaths = [
 
 const EMOJI_DIR_PATH = `${BASE_PATH}emojis/`;
 
-export const customEmojis = emojiPaths.map(path => ({
+export const customEmojis = emojiPaths.map(path => {
+  const name = path.split('.')[0];
+
+  return {
+    name: name,
+    short_names: [name],
+    text: '',
+    emoticons: [],
+    keywords: [name],
+    imageUrl: EMOJI_DIR_PATH + path,
+    customCategory: 'Custom'
+  }
+})
+
+export const emojiReplacements = emojiPaths.map(path => ({
   key: path.split('.')[0],
-  val: `<img className="icon icon-navbar" src="${EMOJI_DIR_PATH + path}" alt="${
+  val: `<img class="icon icon-navbar" src="${EMOJI_DIR_PATH + path}" alt="${
     path.split('.')[0]
   }" />`,
 }));
 
 export function replaceEmojis(html) {
   let newHtml = html;
-  customEmojis.forEach(emoji => {
+  emojiReplacements.forEach(emoji => {
     if (html.includes(`:${emoji.key}:`)) {
       const regex = new RegExp(`:${emoji.key}:`, 'g');
       newHtml = newHtml.replace(regex, emoji.val);

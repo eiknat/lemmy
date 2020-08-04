@@ -36,8 +36,9 @@ export class PostListings extends Component<
 
   //are we getting updated post array? save current scroll pos
   UNSAFE_componentWillReceiveProps() {
-    this.state.scrollPos = window.scrollY;
-    this.setState(this.state);
+    this.setState({
+      scrollPos: window.scrollY
+    });
   }
 
   //have we updated? revert scroll to top (bug on inferno side?) - scroll back to previous pos

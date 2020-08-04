@@ -378,6 +378,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
+    // console.log(msg);
     let res = wsJsonToRes(msg);
     if (msg.error) {
       if (msg.error == 'not_logged_in') {

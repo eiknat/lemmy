@@ -105,7 +105,8 @@ export class IFramelyCard extends Component<
   }
 
   handleIframeExpand(i: IFramelyCard) {
-    i.state.expanded = !i.state.expanded;
-    i.setState(i.state);
+    this.setState((prevState) => ({
+      expanded: !prevState.expanded
+    }));
   }
 }

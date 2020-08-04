@@ -348,12 +348,12 @@ export class BaseCommunity extends Component<any, State> {
     );
   }
 
-  nextPage(i: Community) {
+  nextPage(i: BaseCommunity) {
     i.updateUrl({ page: (i.state.page as number) + 1 });
     window.scrollTo(0, 0);
   }
 
-  prevPage(i: Community) {
+  prevPage(i: BaseCommunity) {
     i.updateUrl({ page: (i.state.page as number) - 1 });
     window.scrollTo(0, 0);
   }
@@ -428,18 +428,21 @@ export class BaseCommunity extends Component<any, State> {
       this.fetchData();
     } else if (res.op == UserOperation.GetCommunity) {
       let data = res.data as GetCommunityResponse;
-      this.state.community = data.community;
-      this.state.moderators = data.moderators;
-      this.state.admins = data.admins;
-      this.state.sitemods = data.sitemods;
-      this.state.online = data.online;
+      this.setState({
+        community: data.community,
+        moderators: data.moderators,
+        admins: data.admins,
+        sitemods: data.sitemods,
+        online: data.online,
+      }, () => {
+        this.fetchData();
+      });
       document.title = `/c/${this.state.community.name} - ${this.state.site.name}`;
-      this.setState(this.state);
-      this.fetchData();
     } else if (res.op == UserOperation.EditCommunity) {
       let data = res.data as CommunityResponse;
-      this.state.community = data.community;
-      this.setState(this.state);
+      this.setState({
+        community: data.community
+      });
     } else if (res.op == UserOperation.FollowCommunity) {
       let data = res.data as CommunityResponse;
       this.state.community.subscribed = data.community.subscribed;
@@ -448,10 +451,12 @@ export class BaseCommunity extends Component<any, State> {
       this.setState(this.state);
     } else if (res.op == UserOperation.GetPosts) {
       let data = res.data as GetPostsResponse;
-      this.state.posts = data.posts;
-      this.state.loading = false;
-      this.setState(this.state);
-      setupTippy();
+      this.setState({
+        posts: data.posts,
+        loading: false
+      }, () => {
+        setupTippy()
+      });
     } else if (res.op == UserOperation.EditPost) {
       let data = res.data as PostResponse;
       editPostFindRes(data, this.state.posts);
@@ -466,21 +471,21 @@ export class BaseCommunity extends Component<any, State> {
       this.setState(this.state);
     } else if (res.op == UserOperation.AddModToCommunity) {
       let data = res.data as AddModToCommunityResponse;
-      this.state.moderators = data.moderators;
-      this.setState(this.state);
+      this.setState({
+        moderators: data.moderators
+      });
     } else if (res.op == UserOperation.BanFromCommunity) {
       let data = res.data as BanFromCommunityResponse;
 
       this.state.posts
         .filter(p => p.creator_id == data.user.id)
         .forEach(p => (p.banned = data.banned));
-
-      this.setState(this.state);
     } else if (res.op == UserOperation.GetComments) {
       let data = res.data as GetCommentsResponse;
-      this.state.comments = data.comments;
-      this.state.loading = false;
-      this.setState(this.state);
+      this.setState({
+        comments: data.comments,
+        loading: false
+      });
     } else if (res.op == UserOperation.EditComment) {
       let data = res.data as CommentResponse;
       editCommentRes(data, this.state.comments);
@@ -496,15 +501,14 @@ export class BaseCommunity extends Component<any, State> {
     } else if (res.op == UserOperation.SaveComment) {
       let data = res.data as CommentResponse;
       saveCommentRes(data, this.state.comments);
-      this.setState(this.state);
     } else if (res.op == UserOperation.CreateCommentLike) {
       let data = res.data as CommentResponse;
       createCommentLikeRes(data, this.state.comments);
-      this.setState(this.state);
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-      this.state.site = data.site;
-      this.setState(this.state);
+      this.setState({
+        site: data.site
+      });
     }
   }
 }

@@ -156,6 +156,7 @@ a.text-body {
   background-color: transparent;
   border: 0;
   box-shadow: 0;
+  width: 100%;
 }
 
 .welcome-container {
@@ -627,4 +628,34 @@ a.text-body {
 .user-online-badge {
   display: flex;
   align-items: center;
+}
+
+.emoji-picker-container {
+  position: absolute;
+  top: 30px;
+  z-index: 1000;
+  transform: translateX(-50%);
+}
+
+@media only screen and (max-width: 992px) {
+  .emoji-picker-container {
+    width: 100vw;
+    transform: translateX(0%);
+    position: fixed;
+    left: 0;
+  }
+
+  .emoji-picker-container > section {
+    width: 100% !important;
+  }
+}
+
+.click-away-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, .3);
+  z-index: 999;
 }

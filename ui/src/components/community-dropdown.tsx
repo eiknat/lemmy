@@ -295,14 +295,17 @@ export class CommunityDropdown extends Component<
       return;
     } else if (res.op == UserOperation.ListCommunities) {
       let data = res.data as ListCommunitiesResponse;
-      this.state.communities = data.communities;
-      this.state.loading = false;
-      this.setState(this.state);
+      this.setState({
+        communities: data.communities,
+        loading: false
+      });
     } else if (res.op == UserOperation.GetUserDetails) {
       let data = res.data as UserDetailsResponse;
-      this.state.subscriptions = data.follows;
-      this.setState(this.state);
-      this.onLoadingComplete();
+      this.setState({
+        subscriptions: data.follows,
+      }, () => {
+        this.onLoadingComplete();
+      });
     }
   }
 }

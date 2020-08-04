@@ -155,7 +155,7 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
     return (
       <div>
         {combined.map(i => (
-          <div>
+          <div key={`post-${(i.data as Post).id}`}>
             {i.type === 'posts' ? (
               <PostListing
                 post={i.data as Post}
@@ -236,11 +236,11 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
     );
   }
 
-  nextPage(i: UserDetails) {
+  nextPage(i: BaseUserDetails) {
     i.props.onPageChange((i.props.page as number) + 1);
   }
 
-  prevPage(i: UserDetails) {
+  prevPage(i: BaseUserDetails) {
     i.props.onPageChange((i.props.page as number) - 1);
   }
 

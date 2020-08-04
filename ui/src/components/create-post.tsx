@@ -117,8 +117,9 @@ export class BaseCreatePost extends Component<any, CreatePostState> {
       return;
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-      this.state.site = data.site;
-      this.setState(this.state);
+      this.setState({
+        site: data.site
+      });
       document.title = `${i18n.t('create_post')} - ${data.site.name}`;
     }
   }

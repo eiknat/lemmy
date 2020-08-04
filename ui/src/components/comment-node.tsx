@@ -146,13 +146,14 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps: CommentNodeProps) {
-    this.state.my_vote = nextProps.node.comment.my_vote;
-    this.state.upvotes = nextProps.node.comment.upvotes;
-    this.state.downvotes = nextProps.node.comment.downvotes;
-    this.state.score = nextProps.node.comment.score;
-    this.state.readLoading = false;
-    this.state.saveLoading = false;
-    this.setState(this.state);
+    this.setState({
+      my_vote: nextProps.node.comment.my_vote,
+      upvotes: nextProps.node.comment.upvotes,
+      downvotes: nextProps.node.comment.downvotes,
+      score: nextProps.node.comment.score,
+      readLoading: false,
+      saveLoading: false,
+    });
   }
 
   render() {
@@ -959,13 +960,15 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   }
 
   handleReplyClick(i: CommentNode) {
-    i.state.showReply = true;
-    i.setState(i.state);
+    i.setState({
+      showReply: true
+    });
   }
 
   handleEditClick(i: CommentNode) {
-    i.state.showEdit = true;
-    i.setState(i.state);
+    i.setState({
+      showEdit: true
+    });
   }
 
   handleDeleteClick(i: CommentNode) {
@@ -998,9 +1001,10 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   }
 
   handleReplyCancel() {
-    this.state.showReply = false;
-    this.state.showEdit = false;
-    this.setState(this.state);
+    this.setState({
+      showReply: false,
+      showEdit: false,
+    });
   }
 
   handleCommentUpvote(i: CommentNodeI) {

@@ -266,9 +266,10 @@ export class PrivateMessage extends Component<
   }
 
   handleReplyCancel() {
-    this.state.showReply = false;
-    this.state.showEdit = false;
-    this.setState(this.state);
+    this.setState({
+      showReply: false,
+      showEdit: false
+    });
   }
 
   handleMarkRead(i: PrivateMessage) {
@@ -290,13 +291,15 @@ export class PrivateMessage extends Component<
   }
 
   handlePrivateMessageEdit() {
-    this.state.showEdit = false;
-    this.setState(this.state);
+    this.setState({
+      showEdit: false
+    });
   }
 
   handlePrivateMessageCreate() {
-    this.state.showReply = false;
-    this.setState(this.state);
+    this.setState({
+      showReply: false
+    });
     toast(i18n.t('message_sent'));
   }
 }

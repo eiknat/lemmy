@@ -500,13 +500,15 @@ export class Search extends Component<any, SearchState> {
       return;
     } else if (res.op == UserOperation.Search) {
       let data = res.data as SearchResponse;
-      this.state.searchResponse = data;
-      this.state.loading = false;
-      document.title = `${i18n.t('search')} - ${this.state.q} - ${
-        this.state.site.name
-      }`;
-      window.scrollTo(0, 0);
-      this.setState(this.state);
+      this.setState({
+        searchResponse: data,
+        loading: false,
+      }, () => {
+        document.title = `${i18n.t('search')} - ${this.state.q} - ${
+          this.state.site.name
+        }`;
+        window.scrollTo(0, 0);
+      });
     } else if (res.op == UserOperation.CreateCommentLike) {
       let data = res.data as CommentResponse;
       createCommentLikeRes(data, this.state.searchResponse.comments);
@@ -517,9 +519,11 @@ export class Search extends Component<any, SearchState> {
       this.setState(this.state);
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-      this.state.site = data.site;
-      this.setState(this.state);
-      document.title = `${i18n.t('search')} - ${data.site.name}`;
+      this.setState({
+        site: data.site
+      }, () => {
+        document.title = `${i18n.t('search')} - ${data.site.name}`;
+      });
     }
   }
 }
