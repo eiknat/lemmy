@@ -476,6 +476,7 @@ export class Login extends Component<any, State> {
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
+    console.log(msg);
     let res = wsJsonToRes(msg);
     if (msg.error) {
       if (msg.error.includes('invalid_captcha')) {

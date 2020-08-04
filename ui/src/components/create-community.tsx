@@ -68,6 +68,7 @@ export class BaseCreateCommunity extends Component<any, CreateCommunityState> {
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
+    console.log(msg);
     let res = wsJsonToRes(msg);
     if (msg.error) {
       // Toast errors are already handled by community-form

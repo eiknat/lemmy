@@ -141,8 +141,9 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
         op == UserOperation.EditComment &&
         data.comment.content)
     ) {
-      this.state.finished = true;
-      this.setState(this.state);
+      this.setState({
+        finished: true
+      });
     }
   }
 
@@ -170,8 +171,9 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
     let res = wsJsonToRes(msg);
 
     if (msg.error) {
-      this.state.finished = true;
-      this.setState(this.state);
+      this.setState({
+        finished: true
+      });
       return;
     }
     // Only do the showing and hiding if logged in

@@ -80,7 +80,7 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
           when={
             !this.state.loading &&
             !this.props.site &&
-            (this.state.siteForm.name || this.state.siteForm.description)
+            (!!this.state.siteForm.name || !!this.state.siteForm.description)
           }
           message={i18n.t('block_leaving')}
         />

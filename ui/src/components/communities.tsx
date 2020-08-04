@@ -224,15 +224,15 @@ export class Communities extends Component<any, CommunitiesState> {
       return;
     } else if (res.op == UserOperation.ListCommunities) {
       let data = res.data as ListCommunitiesResponse;
-      this.state.communities = data.communities;
-      this.state.communities.sort(
-        (a, b) => b.number_of_subscribers - a.number_of_subscribers
-      );
-      this.state.loading = false;
-      window.scrollTo(0, 0);
-      this.setState(this.state);
-      let table = document.querySelector('#community_table');
-      Sortable.initTable(table);
+      this.setState({
+        communities: data.communities.sort(
+          (a, b) => b.number_of_subscribers - a.number_of_subscribers),
+        loading: false,
+      }, () => {
+        window.scrollTo(0, 0);
+        let table = document.querySelector('#community_table');
+        Sortable.initTable(table);
+      });
     } else if (res.op == UserOperation.FollowCommunity) {
       let data = res.data as CommunityResponse;
       let found = this.state.communities.find(c => c.id == data.community.id);

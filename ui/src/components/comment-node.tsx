@@ -902,13 +902,15 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   }
 
   handleReplyClick(i: CommentNode) {
-    i.state.showReply = true;
-    i.setState(i.state);
+    i.setState({
+      showReply: true
+    });
   }
 
   handleEditClick(i: CommentNode) {
-    i.state.showEdit = true;
-    i.setState(i.state);
+    i.setState({
+      showEdit: true
+    });
   }
 
   handleDeleteClick(i: CommentNode) {
@@ -941,9 +943,10 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   }
 
   handleReplyCancel() {
-    this.state.showReply = false;
-    this.state.showEdit = false;
-    this.setState(this.state);
+    this.setState({
+      showReply: false,
+      showEdit: false,
+    });
   }
 
   handleCommentUpvote(i: CommentNodeI) {

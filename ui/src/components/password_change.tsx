@@ -129,6 +129,7 @@ export class PasswordChange extends Component<any, State> {
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
+    console.log(msg);
     let res = wsJsonToRes(msg);
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');

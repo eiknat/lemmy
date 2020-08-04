@@ -121,7 +121,7 @@ export class MarkdownTextArea extends Component<
   render() {
     return (
       <form id={this.formId} onSubmit={linkEvent(this, this.handleSubmit)}>
-        <Prompt when={this.state.content} message={i18n.t('block_leaving')} />
+        <Prompt when={!!this.state.content} message={i18n.t('block_leaving')} />
         <div className="form-group row">
           <div className="col-sm-12">
             <textarea

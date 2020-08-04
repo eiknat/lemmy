@@ -348,7 +348,7 @@ export class Inbox extends Component<any, InboxState> {
   }
 
   nextPage(i: Inbox) {
-    this.setState((prevState) => ({
+    i.setState((prevState) => ({
       page: prevState.page + 1
     }), () => {
       i.refetch();
@@ -356,7 +356,7 @@ export class Inbox extends Component<any, InboxState> {
   }
 
   prevPage(i: Inbox) {
-    this.setState((prevState) => ({
+    i.setState((prevState) => ({
       page: prevState.page - 1
     }), () => {
       i.refetch();
@@ -364,7 +364,7 @@ export class Inbox extends Component<any, InboxState> {
   }
 
   handleUnreadOrAllChange(i: Inbox, event: any) {
-    this.setState({
+    i.setState({
       unreadOrAll: Number(event.target.value),
       page: 1
     }, () => {
@@ -373,7 +373,7 @@ export class Inbox extends Component<any, InboxState> {
   }
 
   handleMessageTypeChange(i: Inbox, event: any) {
-    this.setState({
+    i.setState({
       messageType: Number(event.target.value),
       page: 1
     }, () => {
@@ -417,7 +417,7 @@ export class Inbox extends Component<any, InboxState> {
 
   markAllAsRead(i: Inbox) {
     WebSocketService.Instance.markAllAsRead();
-    this.setState({
+    i.setState({
       replies: [],
       mentions: [],
       messages: [],
@@ -437,25 +437,31 @@ export class Inbox extends Component<any, InboxState> {
       this.refetch();
     } else if (res.op == UserOperation.GetReplies) {
       let data = res.data as GetRepliesResponse;
-      this.state.replies = data.replies;
-      this.sendUnreadCount();
-      window.scrollTo(0, 0);
-      this.setState(this.state);
-      setupTippy();
+      this.setState({
+        replies: data.replies,
+      }, () => {
+        this.sendUnreadCount();
+        window.scrollTo(0, 0);
+        setupTippy();
+      });
     } else if (res.op == UserOperation.GetUserMentions) {
       let data = res.data as GetUserMentionsResponse;
-      this.state.mentions = data.mentions;
-      this.sendUnreadCount();
-      window.scrollTo(0, 0);
-      this.setState(this.state);
-      setupTippy();
+      this.setState({
+        mentions: data.mentions,
+      }, () => {
+        this.sendUnreadCount();
+        window.scrollTo(0, 0);
+        setupTippy();
+      });
     } else if (res.op == UserOperation.GetPrivateMessages) {
       let data = res.data as PrivateMessagesResponse;
-      this.state.messages = data.messages;
-      this.sendUnreadCount();
-      window.scrollTo(0, 0);
-      this.setState(this.state);
-      setupTippy();
+      this.setState({
+        messages: data.messages,
+      }, () => {
+        this.sendUnreadCount();
+        window.scrollTo(0, 0);
+        setupTippy();
+      });
     } else if (res.op == UserOperation.EditPrivateMessage) {
       let data = res.data as PrivateMessageResponse;
       let found: PrivateMessageI = this.state.messages.find(
@@ -545,8 +551,9 @@ export class Inbox extends Component<any, InboxState> {
       this.setState(this.state);
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-      this.state.enableDownvotes = data.site.enable_downvotes;
-      this.setState(this.state);
+      this.setState({
+        enableDownvotes: data.site.enable_downvotes,
+      });
       document.title = `/u/${UserService.Instance.user.username} ${i18n.t(
         'inbox'
       )} - ${data.site.name}`;
