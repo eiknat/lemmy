@@ -588,7 +588,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                       {this.props.post.duplicates.map(post => (
                         <li
                           className="list-inline-item mr-2"
-                          key={`post-id-${post.id}`}
+                          key={post.id}
                         >
                           <Link to={`/post/${post.id}`}>
                             {post.community_name}

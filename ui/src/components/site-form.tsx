@@ -5,7 +5,6 @@ import { Site, SiteForm as SiteFormI } from '../interfaces';
 import { WebSocketService } from '../services';
 import { capitalizeFirstLetter, randomStr } from '../utils';
 import { i18n } from '../i18next';
-import { linkEvent } from '../linkEvent';
 
 interface SiteFormProps {
   site?: Site; // If a site is given, that means this is an edit
@@ -21,11 +20,11 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
   private id = `site-form-${randomStr()}`;
   private emptyState: SiteFormState = {
     siteForm: {
+      name: null,
       enable_downvotes: true,
       enable_create_communities: true,
       open_registration: true,
       enable_nsfw: true,
-      name: null,
     },
     loading: false,
   };
@@ -34,18 +33,18 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
     super(props, context);
 
     this.state = this.emptyState;
-    this.handleSiteDescriptionChange = this.handleSiteDescriptionChange.bind(
-      this
-    );
-    console.log(this.props.site);
+
     if (this.props.site) {
-      this.state.siteForm = {
-        name: this.props.site.name,
-        description: this.props.site.description,
-        enable_downvotes: this.props.site.enable_downvotes,
-        enable_create_communities: this.props.site.enable_create_communities,
-        open_registration: this.props.site.open_registration,
-        enable_nsfw: this.props.site.enable_nsfw,
+      this.state = {
+        siteForm: {
+          name: this.props.site.name,
+          description: this.props.site.description,
+          enable_downvotes: this.props.site.enable_downvotes,
+          enable_create_communities: this.props.site.enable_create_communities,
+          open_registration: this.props.site.open_registration,
+          enable_nsfw: this.props.site.enable_nsfw,
+        },
+        loading: false
       };
     }
   }
@@ -84,7 +83,7 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
           }
           message={i18n.t('block_leaving')}
         />
-        <form onSubmit={linkEvent(this, this.handleCreateSiteSubmit)}>
+        <form onSubmit={this.handleCreateSiteSubmit}>
           <h5>{`${
             this.props.site
               ? capitalizeFirstLetter(i18n.t('save'))
@@ -100,7 +99,7 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
                 id="create-site-name"
                 className="form-control"
                 value={this.state.siteForm.name}
-                onInput={linkEvent(this, this.handleSiteNameChange)}
+                onChange={this.handleSiteNameChange}
                 required
                 minLength={3}
                 maxLength={20}
@@ -126,10 +125,7 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
                   id="create-site-downvotes"
                   type="checkbox"
                   checked={this.state.siteForm.enable_downvotes}
-                  onChange={linkEvent(
-                    this,
-                    this.handleSiteEnableDownvotesChange
-                  )}
+                  onChange={this.handleSiteEnableDownvotesChange}
                 />
                 <label
                   className="form-check-label"
@@ -148,7 +144,7 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
                   id="create-site-enable-nsfw"
                   type="checkbox"
                   checked={this.state.siteForm.enable_nsfw}
-                  onChange={linkEvent(this, this.handleSiteEnableNsfwChange)}
+                  onChange={this.handleSiteEnableNsfwChange}
                 />
                 <label
                   className="form-check-label"
@@ -167,10 +163,7 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
                   id="create-site-open-registration"
                   type="checkbox"
                   checked={this.state.siteForm.open_registration}
-                  onChange={linkEvent(
-                    this,
-                    this.handleSiteOpenRegistrationChange
-                  )}
+                  onChange={this.handleSiteOpenRegistrationChange}
                 />
                 <label
                   className="form-check-label"
@@ -189,10 +182,7 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
                   id="create-site-create-communities"
                   type="checkbox"
                   checked={this.state.siteForm.enable_create_communities}
-                  onChange={linkEvent(
-                    this,
-                    this.handleSiteEnableCreateCommunitiesChange
-                  )}
+                  onChange={this.handleSiteEnableCreateCommunitiesChange}
                 />
                 <label
                   className="form-check-label"
@@ -224,7 +214,7 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
                 <button
                   type="button"
                   className="btn btn-secondary"
-                  onClick={linkEvent(this, this.handleCancel)}
+                  onClick={this.handleCancel}
                 >
                   {i18n.t('cancel')}
                 </button>
@@ -236,48 +226,73 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
     );
   }
 
-  handleCreateSiteSubmit(i: SiteForm, event: any) {
-    event.preventDefault();
-    i.state.loading = true;
-    if (i.props.site) {
-      WebSocketService.Instance.editSite(i.state.siteForm);
+  handleCreateSiteSubmit = (event: any) => {
+    this.setState({
+      loading: true
+    });
+    if (this.props.site) {
+      WebSocketService.Instance.editSite(this.state.siteForm);
     } else {
-      WebSocketService.Instance.createSite(i.state.siteForm);
+      WebSocketService.Instance.createSite(this.state.siteForm);
     }
-    i.setState(i.state);
   }
 
-  handleSiteNameChange(i: SiteForm, event: any) {
-    i.state.siteForm.name = event.target.value;
-    i.setState(i.state);
+  handleSiteNameChange = (event: any) => {
+    this.setState({
+      siteForm: {
+        ...this.state.siteForm,
+        name: event.target.value
+      }
+    });
   }
 
-  handleSiteDescriptionChange(val: string) {
-    this.state.siteForm.description = val;
-    this.setState(this.state);
+  handleSiteDescriptionChange = (key: any) => {
+    console.log('event', event);
+    this.setState({
+      siteForm: {
+        ...this.state.siteForm,
+        description: key
+      }
+    });
   }
 
-  handleSiteEnableNsfwChange(i: SiteForm, event: any) {
-    i.state.siteForm.enable_nsfw = event.target.checked;
-    i.setState(i.state);
+  handleSiteEnableNsfwChange = (event: any) => {
+    this.setState({
+      siteForm: {
+        ...this.state.siteForm,
+        enable_nsfw: event.target.checked
+      }
+    });
   }
 
-  handleSiteOpenRegistrationChange(i: SiteForm, event: any) {
-    i.state.siteForm.open_registration = event.target.checked;
-    i.setState(i.state);
+  handleSiteOpenRegistrationChange = (event: any) => {
+    this.setState({
+      siteForm: {
+        ...this.state.siteForm,
+        open_registration: event.target.checked
+      }
+    });
   }
 
-  handleSiteEnableDownvotesChange(i: SiteForm, event: any) {
-    i.state.siteForm.enable_downvotes = event.target.checked;
-    i.setState(i.state);
+  handleSiteEnableDownvotesChange = (event: any) => {
+    this.setState({
+      siteForm: {
+        ...this.state.siteForm,
+        enable_downvotes: event.target.checked
+      }
+    });
   }
 
-  handleSiteEnableCreateCommunitiesChange(i: SiteForm, event: any) {
-    i.state.siteForm.enable_create_communities = event.target.checked;
-    i.setState(i.state);
+  handleSiteEnableCreateCommunitiesChange = (event: any) => {
+    this.setState({
+      siteForm: {
+        ...this.state.siteForm,
+        enable_create_communities: event.target.checked
+      }
+    });
   }
 
-  handleCancel(i: SiteForm) {
-    i.props.onCancel();
+  handleCancel = () => {
+    this.props.onCancel();
   }
 }

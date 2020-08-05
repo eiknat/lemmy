@@ -101,7 +101,7 @@ export class Communities extends Component<any, CommunitiesState> {
                 </thead>
                 <tbody>
                   {this.state.communities.map(community => (
-                    <tr key={`community-${community.name}`}>
+                    <tr key={community.id}>
                       <td>
                         <CommunityLink community={community} />
                       </td>

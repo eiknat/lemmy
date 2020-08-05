@@ -384,7 +384,7 @@ class BaseUser extends Component<any, UserState> {
                 {user.banned && (
                   <li
                     className="list-inline-item badge badge-danger"
-                    key={`user-banned-${user.id}`}
+                    key={user.id}
                   >
                     {i18n.t('banned')}
                   </li>
@@ -581,7 +581,7 @@ class BaseUser extends Component<any, UserState> {
                   <option value="browser">{i18n.t('browser_default')}</option>
                   <option disabled>──</option>
                   {languages.map(lang => (
-                    <option key={`language-${lang.code}`} value={lang.code}>
+                    <option key={lang.code} value={lang.code}>
                       {lang.name}
                     </option>
                   ))}
@@ -596,7 +596,7 @@ class BaseUser extends Component<any, UserState> {
                 >
                   <option disabled>{i18n.t('theme')}</option>
                   {themes.map(theme => (
-                    <option key={`theme-${theme}`} value={theme}>
+                    <option key={theme} value={theme}>
                       {theme}
                     </option>
                   ))}
@@ -924,7 +924,7 @@ class BaseUser extends Component<any, UserState> {
               <h5>{i18n.t('moderates')}</h5>
               <ul className="list-unstyled mb-0">
                 {this.state.moderates.map(community => (
-                  <li key={`moderates-${community.community_name}`}>
+                  <li key={community.id}>
                     <Link to={`/c/${community.community_name}`}>
                       {community.community_name}
                     </Link>
@@ -947,7 +947,7 @@ class BaseUser extends Component<any, UserState> {
               <h5>{i18n.t('subscribed')}</h5>
               <ul className="list-unstyled mb-0">
                 {this.state.follows.map(community => (
-                  <li key={`follows-${community.community_name}`}>
+                  <li key={community.id}>
                     <Link to={`/c/${community.community_name}`}>
                       {community.community_name}
                     </Link>
