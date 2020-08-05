@@ -455,6 +455,7 @@ export class Post extends Component<any, PostState> {
       this.state.community = data.community;
       this.state.moderators = data.moderators;
       this.state.siteRes.admins = data.admins;
+      this.state.siteRes.sitemods = data.sitemods;
       this.state.online = data.online;
       this.state.loading = false;
       document.title = `${this.state.post.name} - ${this.state.siteRes.site.name}`;
@@ -571,6 +572,7 @@ export class Post extends Component<any, PostState> {
       this.state.community = data.community;
       this.state.moderators = data.moderators;
       this.state.siteRes.admins = data.admins;
+      this.state.siteRes.sitemods = data.sitemods;
       this.setState(this.state);
     }
   }

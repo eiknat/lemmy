@@ -780,7 +780,7 @@ class Main extends Component<any, MainState> {
           admins: data.admins
         }
       });
-    } else if (res.op == UserOperation.AddSitemod) {
+    } else if (res.op === UserOperation.AddSitemod) {
       let data = res.data as AddSitemodResponse;
       this.setState({
         siteRes: {
