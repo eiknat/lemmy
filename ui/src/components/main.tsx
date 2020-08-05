@@ -721,12 +721,12 @@ class Main extends Component<any, MainState> {
       }
     } else if (res.op === UserOperation.EditSite) {
       let data = res.data as SiteResponse;
-      this.setState((prevState) => ({
+      this.setState({
         siteRes: {
-          ...prevState.siteRes,
+          ...this.state.siteRes,
           site: data.site,
         }
-      }), () => {
+      }, () => {
         toast(i18n.t('site_saved'));
       });
     } else if (res.op === UserOperation.GetPosts) {
@@ -774,20 +774,20 @@ class Main extends Component<any, MainState> {
       this.setState(this.state);
     } else if (res.op === UserOperation.AddAdmin) {
       let data = res.data as AddAdminResponse;
-      this.setState((prevState) => ({
+      this.setState({
         siteRes: {
-          ...prevState.siteRes,
+          ...this.state.siteRes,
           admins: data.admins
         }
-      }));
+      });
     } else if (res.op == UserOperation.AddSitemod) {
       let data = res.data as AddSitemodResponse;
-      this.setState((prevState) => ({
+      this.setState({
         siteRes: {
-          ...prevState.siteRes,
+          ...this.state.siteRes,
           sitemods: data.sitemods
         }
-      }));
+      });
     } else if (res.op === UserOperation.BanUser) {
       let data = res.data as BanUserResponse;
       let found = this.state.siteRes.banned.find(u => (u.id = data.user.id));

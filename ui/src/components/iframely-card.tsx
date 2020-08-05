@@ -3,8 +3,6 @@ import { Post } from '../interfaces';
 import { mdToHtml } from '../utils';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
-import { linkEvent } from '../linkEvent';
-
 
 interface FramelyCardProps {
   post: Post;
@@ -40,7 +38,7 @@ export class IFramelyCard extends Component<
                     {post.embed_html ? (
                       <span
                         className="unselectable pointer"
-                        onClick={linkEvent(this, this.handleIframeExpand)}
+                        onClick={this.handleIframeExpand}
                         data-tippy-content={i18n.t('expand_here')}
                       >
                         {post.embed_title}
@@ -104,9 +102,9 @@ export class IFramelyCard extends Component<
     );
   }
 
-  handleIframeExpand(i: IFramelyCard) {
-    this.setState((prevState) => ({
-      expanded: !prevState.expanded
-    }));
+  handleIframeExpand = () => {
+    this.setState({
+      expanded: !this.state.expanded
+    });
   }
 }
