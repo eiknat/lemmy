@@ -59,6 +59,7 @@ import { Trans, withTranslation } from 'react-i18next';
 import { PATREON_URL } from '../constants';
 import { Icon } from './icon';
 import { linkEvent } from '../linkEvent';
+import { Box, Button, Flex } from 'theme-ui';
 
 interface MainState {
   subscribedCommunities: Array<CommunityUser>;
@@ -239,12 +240,11 @@ class Main extends Component<any, MainState> {
                     </div>
                   )}
                 {this.showCreateCommunity() && (
-                  <Link
-                    className="btn btn-sm btn-secondary btn-block"
-                    to="/create_community"
-                  >
-                    {i18n.t('create_a_community')}
-                  </Link>
+                  <Flex>
+                    <Button css={{ width: '100%' }} as={Link} to="/create_community">
+                      {i18n.t('create_a_community')}
+                    </Button>
+                  </Flex>
                 )}
               </div>
             </div>

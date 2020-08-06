@@ -52,6 +52,7 @@ import {
   ComboboxOptionText,
 } from "@reach/combobox";
 import "@reach/combobox/styles.css";
+import { Button } from 'theme-ui';
 
 export const MAX_POST_TITLE_LENGTH = 160;
 export const MAX_POST_BODY_LENGTH = 20000;
@@ -487,14 +488,14 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
           )}
           <div className="form-group row">
             <div className="col-sm-10">
-              <button
+              <Button
+                mr={2}
                 disabled={
                   !this.state.postForm.community_id ||
                   this.state.loading ||
                   postTitleBlank
                 }
                 type="submit"
-                className="btn btn-secondary mr-2"
               >
                 {this.state.loading ? (
                   <svg className="icon icon-spinner spin">
@@ -505,15 +506,14 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                 ) : (
                   capitalizeFirstLetter(i18n.t('create'))
                 )}
-              </button>
+              </Button>
               {this.props.post && (
-                <button
+                <Button
                   type="button"
-                  className="btn btn-secondary"
                   onClick={linkEvent(this, this.handleCancel)}
                 >
                   {i18n.t('cancel')}
-                </button>
+                </Button>
               )}
             </div>
           </div>

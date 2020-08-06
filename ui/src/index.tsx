@@ -40,6 +40,7 @@ import PrivacyPolicy from './components/privacy-policy';
 
 import './custom.css';
 import './variables.css';
+import { ThemeSystemProvider } from './components/ThemeSystemProvider';
 
 const container = document.getElementById('app');
 
@@ -59,80 +60,82 @@ class Index extends Component<any, any> {
   render() {
     return (
       <React.StrictMode>
-      <I18nextProvider i18n={i18n}>
-        <BrowserRouter>
-          <div>
-            <Navbar />
-            <div className="mt-4 p-0 fl-1">
-              <Switch>
-                <Route exact path="/" component={Main} />
-                {/* <Route exact path={`/`} component={WelcomePage} /> */}
-                <Route path="/ppb" component={PPB} />
-                <Route
-                  path="/home/data_type/:data_type/listing_type/:listing_type/sort/:sort/page/:page"
-                  component={Main}
-                />
-                <Route path="/login" component={Login} />
-                <Route path="/create_post" component={CreatePost} />
-                <Route path="/create_community" component={CreateCommunity} />
-                <Route
-                  path="/create_private_message"
-                  component={CreatePrivateMessage}
-                />
-                <Route
-                  path="/communities/page/:page"
-                  component={Communities}
-                />
-                <Route path="/communities" component={Communities} />
-                <Route
-                  path="/post/:id/comment/:comment_id"
-                  component={Post}
-                />
-                <Route path="/post/:id" component={Post} />
-                <Route
-                  path="/c/:name/data_type/:data_type/sort/:sort/page/:page"
-                  component={Community}
-                />
-                <Route path="/community/:id" component={Community} />
-                <Route path="/c/:name" component={Community} />
-                <Route
-                  path="/u/:username/view/:view/sort/:sort/page/:page"
-                  component={User}
-                />
-                <Route path="/user/:id" component={User} />
-                <Route path="/u/:username" component={User} />
-                <Route path="/inbox" component={Inbox} />
-                <Route
-                  path="/modlog/community/:community_id"
-                  component={Modlog}
-                />
-                <Route path="/modlog" component={Modlog} />
-                <Route path="/about" component={About} />
-                <Route path="/setup" component={Setup} />
-                <Route path="/admin" component={AdminSettings} />
-                <Route
-                  path="/search/q/:q/type/:type/sort/:sort/page/:page"
-                  component={Search}
-                />
-                <Route path="/search" component={Search} />
-                <Route path="/sponsors" component={Sponsors} />
-                <Route path="/contributing" component={Sponsors} />
-                <Route
-                  path="/password_change/:token"
-                  component={PasswordChange}
-                />
-                <Route path="/pbb" component={PPB} />
-                <Route path="/welcome" component={WelcomePage} />
-                <Route path="/reports" component={Reports} />
-                <Route path="/tos" component={Tos} />
-                <Route path="/privacy_policy" component={PrivacyPolicy} />
-              </Switch>
-              <Symbols />
-            </div>
-            <Footer />
-          </div>
-        </BrowserRouter>
-      </I18nextProvider>
+        <ThemeSystemProvider>
+          <I18nextProvider i18n={i18n}>
+            <BrowserRouter>
+              <div>
+                <Navbar />
+                <div className="mt-4 p-0 fl-1">
+                  <Switch>
+                    <Route exact path="/" component={Main} />
+                    {/* <Route exact path={`/`} component={WelcomePage} /> */}
+                    <Route path="/ppb" component={PPB} />
+                    <Route
+                      path="/home/data_type/:data_type/listing_type/:listing_type/sort/:sort/page/:page"
+                      component={Main}
+                    />
+                    <Route path="/login" component={Login} />
+                    <Route path="/create_post" component={CreatePost} />
+                    <Route path="/create_community" component={CreateCommunity} />
+                    <Route
+                      path="/create_private_message"
+                      component={CreatePrivateMessage}
+                    />
+                    <Route
+                      path="/communities/page/:page"
+                      component={Communities}
+                    />
+                    <Route path="/communities" component={Communities} />
+                    <Route
+                      path="/post/:id/comment/:comment_id"
+                      component={Post}
+                    />
+                    <Route path="/post/:id" component={Post} />
+                    <Route
+                      path="/c/:name/data_type/:data_type/sort/:sort/page/:page"
+                      component={Community}
+                    />
+                    <Route path="/community/:id" component={Community} />
+                    <Route path="/c/:name" component={Community} />
+                    <Route
+                      path="/u/:username/view/:view/sort/:sort/page/:page"
+                      component={User}
+                    />
+                    <Route path="/user/:id" component={User} />
+                    <Route path="/u/:username" component={User} />
+                    <Route path="/inbox" component={Inbox} />
+                    <Route
+                      path="/modlog/community/:community_id"
+                      component={Modlog}
+                    />
+                    <Route path="/modlog" component={Modlog} />
+                    <Route path="/about" component={About} />
+                    <Route path="/setup" component={Setup} />
+                    <Route path="/admin" component={AdminSettings} />
+                    <Route
+                      path="/search/q/:q/type/:type/sort/:sort/page/:page"
+                      component={Search}
+                    />
+                    <Route path="/search" component={Search} />
+                    <Route path="/sponsors" component={Sponsors} />
+                    <Route path="/contributing" component={Sponsors} />
+                    <Route
+                      path="/password_change/:token"
+                      component={PasswordChange}
+                    />
+                    <Route path="/pbb" component={PPB} />
+                    <Route path="/welcome" component={WelcomePage} />
+                    <Route path="/reports" component={Reports} />
+                    <Route path="/tos" component={Tos} />
+                    <Route path="/privacy_policy" component={PrivacyPolicy} />
+                  </Switch>
+                  <Symbols />
+                </div>
+                <Footer />
+              </div>
+            </BrowserRouter>
+          </I18nextProvider>
+        </ThemeSystemProvider>
       </React.StrictMode>
     );
   }

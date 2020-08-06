@@ -27,8 +27,8 @@ import {
   fetchLimit,
   routeSortTypeToEnum,
   capitalizeFirstLetter,
-  themes,
-  setTheme,
+  // themes,
+  // setTheme,
   languages,
   showAvatars,
   toast,
@@ -46,6 +46,8 @@ import moment from 'moment';
 import { UserDetails } from './user-details';
 import { Icon } from './icon';
 import { linkEvent } from '../linkEvent';
+import { changeTheme, themes, ThemeSelector } from '../theme';
+// import { changeTheme } from './ThemeSystemProvider';
 
 interface UserState {
   user: UserView;
@@ -591,16 +593,20 @@ class BaseUser extends Component<any, UserState> {
                 <label>{i18n.t('theme')}</label>
                 <select
                   value={this.state.userSettingsForm.theme}
-                  onChange={linkEvent(this, this.handleUserSettingsThemeChange)}
+                  onChange={this.handleUserSettingsThemeChange}
                   className="ml-2 custom-select custom-select-sm w-auto"
                 >
                   <option disabled>{i18n.t('theme')}</option>
-                  {themes.map(theme => (
+                  {Object.keys(themes).map(theme => (
                     <option key={theme} value={theme}>
                       {theme}
                     </option>
                   ))}
                 </select>
+                <ThemeSelector
+                  value={this.state.userSettingsForm.theme}
+                  onChange={this.handleUserSettingsThemeChange}
+                />
                 <div className="small alert alert-warning my-2">
                   Stick with Darkly for the best ChapoChat experience. Themes
                   are bugged right now, but we&apos;ll be rebuilding themes soon
@@ -1034,10 +1040,9 @@ class BaseUser extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleUserSettingsThemeChange(i: BaseUser, event: any) {
-    i.state.userSettingsForm.theme = event.target.value;
-    setTheme(event.target.value, true);
-    i.setState(i.state);
+  handleUserSettingsThemeChange = (event: any) => {
+    changeTheme(event.target.value);
+    this.setState({ userSettingsForm: { ...this.state.userSettingsForm, theme: event.target.value } });
   }
 
   handleUserSettingsLangChange(i: BaseUser, event: any) {

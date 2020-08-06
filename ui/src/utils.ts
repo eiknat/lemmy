@@ -379,7 +379,7 @@ export function debounce(
 }
 
 export function getLanguage(): string {
-  let user = UserService.Instance.user;
+  let user = UserService?.Instance?.user;
   let lang = user && user.lang ? user.lang : 'browser';
 
   if (lang == 'browser') {
@@ -456,31 +456,10 @@ export function getMomentLanguage(): string {
 }
 
 export function setTheme(theme: string = 'darkly', loggedIn: boolean = false) {
-  // unload all the other themes
-  for (var i = 0; i < themes.length; i++) {
-    let styleSheet = document.getElementById(themes[i]);
-    if (styleSheet) {
-      styleSheet.setAttribute('disabled', 'disabled');
-    }
-  }
-
-  // if the user is not logged in, we load the default themes and let the browser decide
-  if (!loggedIn) {
-    document.getElementById('default-light')?.removeAttribute('disabled');
-    document.getElementById('default-dark')?.removeAttribute('disabled');
-  } else {
-    document
-      .getElementById('default-light')
-      .setAttribute('disabled', 'disabled');
-    document
-      .getElementById('default-dark')
-      .setAttribute('disabled', 'disabled');
-
-    // Load the theme dynamically
-    let cssLoc = `${BASE_PATH}css/themes/${theme}.min.css`;
-    loadCss(theme, cssLoc);
-    document.getElementById(theme).removeAttribute('disabled');
-  }
+  console.log('CHANGING THEME:');
+  console.log({ theme });
+  const event = new CustomEvent("change-theme", { detail: theme });
+  document.dispatchEvent(event);
 }
 
 export function loadCss(id: string, loc: string) {
