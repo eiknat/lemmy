@@ -73,10 +73,23 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     communityDropdownShown: false,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
-    this.state = this.emptyState;
+  state = {
+    isLoggedIn: UserService.Instance.user !== undefined,
+    unreadCount: 0,
+    replies: [],
+    mentions: [],
+    messages: [],
+    expanded: false,
+    siteName: undefined,
+    admins: [],
+    sitemods: [],
+    searchParam: '',
+    toggleSearch: false,
+    creatingCommunitiesEnabled: false,
+    communityDropdownShown: false,
+  };
 
+  componentDidMount() {
     // Subscribe to user changes
     this.userSub = UserService.Instance.sub.subscribe(user => {
       this.state.isLoggedIn = user.user !== undefined;

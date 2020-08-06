@@ -59,7 +59,8 @@ import { Trans, withTranslation } from 'react-i18next';
 import { PATREON_URL } from '../constants';
 import { Icon } from './icon';
 import { linkEvent } from '../linkEvent';
-import { Box, Button, Flex } from 'theme-ui';
+import { Box, Flex } from 'theme-ui';
+import Button from './elements/Button';
 
 interface MainState {
   subscribedCommunities: Array<CommunityUser>;
@@ -146,7 +147,9 @@ class Main extends Component<any, MainState> {
     this.handleSortChange = this.handleSortChange.bind(this);
     this.handleListingTypeChange = this.handleListingTypeChange.bind(this);
     this.handleDataTypeChange = this.handleDataTypeChange.bind(this);
+  }
 
+  componentDidMount() {
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
       .subscribe(
@@ -585,20 +588,19 @@ class Main extends Component<any, MainState> {
     return (
       <div className="my-2">
         {this.state.page > 1 && (
-          <button
-            className="btn btn-sm btn-secondary mr-1"
+          <Button
+            mr={1}
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
-          </button>
+          </Button>
         )}
         {this.state.posts.length > 0 && (
-          <button
-            className="btn btn-sm btn-secondary"
+          <Button
             onClick={linkEvent(this, this.nextPage)}
           >
             {i18n.t('next')}
-          </button>
+          </Button>
         )}
       </div>
     );

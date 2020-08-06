@@ -4,6 +4,7 @@ import { UserService } from '../services';
 
 import { i18n } from '../i18next';
 import { linkEvent } from '../linkEvent';
+import Button from './elements/Button';
 
 interface ListingTypeSelectProps {
   type_: ListingType;
@@ -36,34 +37,44 @@ export class ListingTypeSelect extends Component<
   render() {
     return (
       <div className="btn-group btn-group-toggle">
-        <label
-          className={`btn btn-sm btn-secondary
+        <Button as="label"
+          className={`
             ${this.state.type_ == ListingType.Subscribed && 'active'}
-            ${UserService.Instance.user == undefined ? 'disabled' : 'pointer'}
           `}
+          disabled={UserService.Instance.user == undefined}
+          css={{
+            borderTopRightRadius: 0,
+            borderBottomRightRadius: 0,
+            backgroundColor: this.state.type_ == ListingType.Subscribed ? 'inherit' : '#2b2a2a'
+          }}
         >
           <input
             type="radio"
+            className="visually-hidden"
             value={ListingType.Subscribed}
             checked={this.state.type_ == ListingType.Subscribed}
             onChange={linkEvent(this, this.handleTypeChange)}
             disabled={UserService.Instance.user == undefined}
           />
           {i18n.t('subscribed')}
-        </label>
-        <label
-          className={`pointer btn btn-sm btn-secondary ${
-            this.state.type_ == ListingType.All && 'active'
-          }`}
+        </Button>
+        <Button
+          as="label"
+          css={{
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+            backgroundColor: this.state.type_ == ListingType.All ? 'inherit' : '#2b2a2a'
+          }}
         >
           <input
             type="radio"
+            className="visually-hidden"
             value={ListingType.All}
             checked={this.state.type_ == ListingType.All}
             onChange={linkEvent(this, this.handleTypeChange)}
           />
           {i18n.t('all')}
-        </label>
+        </Button>
       </div>
     );
   }

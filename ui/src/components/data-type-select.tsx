@@ -3,6 +3,7 @@ import { DataType } from '../interfaces';
 
 import { i18n } from '../i18next';
 import { linkEvent } from '../linkEvent';
+import Button from './elements/Button';
 
 interface DataTypeSelectProps {
   type_: DataType;
@@ -35,32 +36,40 @@ export class DataTypeSelect extends Component<
   render() {
     return (
       <div className="btn-group btn-group-toggle">
-        <label
-          className={`pointer btn btn-sm btn-secondary
-            ${this.state.type_ == DataType.Post && 'active'}
-          `}
+        <Button
+          as="label"
+          css={{
+            borderTopRightRadius: 0,
+            borderBottomRightRadius: 0,
+            backgroundColor: this.state.type_ == DataType.Post ? 'inherit' : '#2b2a2a'
+          }}
         >
           <input
             type="radio"
+            className="visually-hidden"
             value={DataType.Post}
             checked={this.state.type_ == DataType.Post}
             onChange={linkEvent(this, this.handleTypeChange)}
           />
           {i18n.t('posts')}
-        </label>
-        <label
-          className={`pointer btn btn-sm btn-secondary ${
-            this.state.type_ == DataType.Comment && 'active'
-          }`}
+        </Button>
+        <Button
+          as="label"
+          css={{
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+            backgroundColor:  this.state.type_ == DataType.Comment ? 'inherit' : '#2b2a2a'
+          }}
         >
           <input
             type="radio"
+            className="visually-hidden"
             value={DataType.Comment}
             checked={this.state.type_ == DataType.Comment}
             onChange={linkEvent(this, this.handleTypeChange)}
           />
           {i18n.t('comments')}
-        </label>
+        </Button>
       </div>
     );
   }

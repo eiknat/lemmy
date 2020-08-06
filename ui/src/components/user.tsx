@@ -47,6 +47,8 @@ import { UserDetails } from './user-details';
 import { Icon } from './icon';
 import { linkEvent } from '../linkEvent';
 import { changeTheme, themes, ThemeSelector } from '../theme';
+import Button from './elements/Button';
+// import { Button } from 'theme-ui';
 // import { changeTheme } from './ThemeSystemProvider';
 
 interface UserState {
@@ -441,12 +443,9 @@ class BaseUser extends Component<any, UserState> {
               </table>
             </div>
             {this.isCurrentUser ? (
-              <button
-                className="btn btn-block btn-secondary mt-3"
-                onClick={this.handleLogoutClick}
-              >
+              <Button css={{ width: '100%' }} mt={3} onClick={this.handleLogoutClick}>
                 {i18n.t('logout')}
-              </button>
+              </Button>
             ) : (
               <>
                 <a
@@ -591,27 +590,10 @@ class BaseUser extends Component<any, UserState> {
               </div>
               <div className="form-group">
                 <label>{i18n.t('theme')}</label>
-                <select
-                  value={this.state.userSettingsForm.theme}
-                  onChange={this.handleUserSettingsThemeChange}
-                  className="ml-2 custom-select custom-select-sm w-auto"
-                >
-                  <option disabled>{i18n.t('theme')}</option>
-                  {Object.keys(themes).map(theme => (
-                    <option key={theme} value={theme}>
-                      {theme}
-                    </option>
-                  ))}
-                </select>
                 <ThemeSelector
                   value={this.state.userSettingsForm.theme}
                   onChange={this.handleUserSettingsThemeChange}
                 />
-                <div className="small alert alert-warning my-2">
-                  Stick with Darkly for the best ChapoChat experience. Themes
-                  are bugged right now, but we&apos;ll be rebuilding themes soon
-                  so they&apos;re extra fancy.
-                </div>
               </div>
               <form className="form-group">
                 <label>
@@ -807,31 +789,28 @@ class BaseUser extends Component<any, UserState> {
                 </div>
               </div>
               <div className="form-group">
-                <button
+                <Button
                   type="submit"
-                  className="btn btn-block btn-secondary mr-4"
+                  mr={4}
+                  loading={this.state.userSettingsLoading}
+                  block
                 >
-                  {this.state.userSettingsLoading ? (
-                    <svg className="icon icon-spinner spin">
-                      <use xlinkHref="#icon-spinner" />
-                    </svg>
-                  ) : (
-                    capitalizeFirstLetter(i18n.t('save'))
-                  )}
-                </button>
+                  {capitalizeFirstLetter(i18n.t('save'))}
+                </Button>
               </div>
               <hr />
               <div className="form-group mb-0">
-                <button
-                  className="btn btn-block btn-danger"
+                <Button
+                  variant="danger"
+                  block
                   onClick={linkEvent(
                     this,
                     this.handleDeleteAccountShowConfirmToggle
                   )}
                 >
                   {i18n.t('delete_account')}
-                </button>
-                {this.state.deleteAccountShowConfirm && (
+                </Button>
+                  {this.state.deleteAccountShowConfirm && (
                   <>
                     <div className="my-2 alert alert-danger" role="alert">
                       {i18n.t('delete_account_confirm')}
@@ -846,8 +825,9 @@ class BaseUser extends Component<any, UserState> {
                       )}
                       className="form-control my-2"
                     />
-                    <button
-                      className="btn btn-danger mr-4"
+                    <Button
+                      variant="danger"
+                      mr={4}
                       disabled={!this.state.deleteAccountForm.password}
                       onClick={linkEvent(this, this.handleDeleteAccount)}
                     >
@@ -858,7 +838,7 @@ class BaseUser extends Component<any, UserState> {
                       ) : (
                         capitalizeFirstLetter(i18n.t('delete'))
                       )}
-                    </button>
+                    </Button>
                     <button
                       className="btn btn-secondary"
                       onClick={linkEvent(
@@ -869,7 +849,13 @@ class BaseUser extends Component<any, UserState> {
                       {i18n.t('cancel')}
                     </button>
                   </>
-                )}
+                  )}
+                {/* <button
+                  className="btn btn-block btn-danger"
+
+                >
+
+                </button> */}
               </div>
             </form>
           </div>

@@ -140,15 +140,16 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     window.scrollTo(0, 0);
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: PostListingProps) {
-    this.setState({
-      my_vote: nextProps.post.my_vote,
-      upvotes: nextProps.post.upvotes,
-      downvotes: nextProps.post.downvotes,
-      score: nextProps.post.score,
-      // imageExpanded: this.props.post.id === nextProps.post.id
-    });
-  }
+  // @TODO: Check if this problem still persists
+  // UNSAFE_componentWillReceiveProps(nextProps: PostListingProps) {
+  //   this.setState({
+  //     my_vote: nextProps.post.my_vote,
+  //     upvotes: nextProps.post.upvotes,
+  //     downvotes: nextProps.post.downvotes,
+  //     score: nextProps.post.score,
+  //     // imageExpanded: this.props.post.id === nextProps.post.id
+  //   });
+  // }
 
   render() {
     return (
@@ -319,7 +320,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
           // onClick={() =>
           //   !this.props.showBody && linkEvent(this, this.handleImageExpandClick)
           // }
-          onClick={!this.props.showBody && this.handleImageExpandClick}
+          onClick={() => !this.props.showBody && this.handleImageExpandClick()}
         >
           {post.nsfw ? (
             <svg className="icon thumbnail" style={{ marginTop: '-3px' }}>

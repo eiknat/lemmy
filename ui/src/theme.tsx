@@ -15,6 +15,7 @@ const defaultTheme: ThemeProviderProps<Theme> = {
     primary: '#DA1B9A',
     secondary: '#2030DF',
     accent: '#2030DF',
+    danger: '#E74C3C',
   },
   buttons: {
     primary: {
@@ -32,6 +33,9 @@ const defaultTheme: ThemeProviderProps<Theme> = {
         cursor: 'not-allowed',
         backgroundColor: '#444',
       }
+    },
+    danger: {
+      backgroundColor: 'danger',
     }
   }
 }

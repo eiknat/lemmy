@@ -28,23 +28,20 @@ export class PostListings extends Component<
     scrollPos: window.scrollY,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
-
-    this.state = this.emptyState;
-  }
+  state = this.emptyState
 
   //are we getting updated post array? save current scroll pos
-  UNSAFE_componentWillReceiveProps() {
-    this.setState({
-      scrollPos: window.scrollY
-    });
-  }
+  // UNSAFE_componentWillReceiveProps() {
+  //   this.setState({
+  //     scrollPos: window.scrollY
+  //   });
+  // }
 
+  // @TODO: Check if this bug is in React
   //have we updated? revert scroll to top (bug on inferno side?) - scroll back to previous pos
-  componentDidUpdate() {
-    window.scrollTo(0, this.state.scrollPos);
-  }
+  // componentDidUpdate() {
+  //   window.scrollTo(0, this.state.scrollPos);
+  // }
 
   render() {
     return this.props.posts.length > 0 ? (
