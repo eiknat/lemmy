@@ -22,7 +22,11 @@ function ThemeSystemProvider({ children }) {
 
   useEffect(() => {
     function handleThemeChange(e) {
-      setCurrentTheme(e.detail);
+      if (Object.keys(themes).includes(e.detail)) {
+        setCurrentTheme(e.detail);
+      } else {
+        setCurrentTheme('chapo');
+      }
     }
 
     document.addEventListener('change-theme', handleThemeChange);

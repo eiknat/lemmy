@@ -28,7 +28,6 @@ import {
   routeSortTypeToEnum,
   capitalizeFirstLetter,
   // themes,
-  // setTheme,
   languages,
   showAvatars,
   toast,
@@ -46,7 +45,7 @@ import moment from 'moment';
 import { UserDetails } from './user-details';
 import { Icon } from './icon';
 import { linkEvent } from '../linkEvent';
-import { changeTheme, themes, ThemeSelector } from '../theme';
+import { changeTheme, ThemeSelector } from '../theme';
 import Button from './elements/Button';
 // import { Button } from 'theme-ui';
 // import { changeTheme } from './ThemeSystemProvider';
