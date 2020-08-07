@@ -591,8 +591,8 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                 </button>
                               </>
                             ))}
-                          {/* Admins can ban from all, and appoint other admins */}
-                          {this.canAdmin && (
+                          {/* Admins and sitmods can ban from all */}
+                          {(this.canAdmin || this.canSitemod) && (
                             <>
                               {!this.isAdmin &&
                                 (!node.comment.banned ? (
@@ -615,7 +615,13 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                   >
                                     {i18n.t('unban_from_site')}
                                   </button>
-                                ))}
+                                )
+                              )}
+                            </>
+                            )}
+                            {/* Admins can appoint admins and sitemods */}
+                            {this.canAdmin && (
+                              <>
                               {!node.comment.banned &&
                                 (!this.state.showConfirmAppointAsAdmin ? (
                                   <button
@@ -923,6 +929,17 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
       canMod(
         UserService.Instance.user,
         this.props.admins.map(a => a.id),
+        this.props.node.comment.creator_id
+      )
+    );
+  }
+
+  get canSitemod(): boolean {
+    return (
+      this.props.sitemods &&
+      canMod(
+        UserService.Instance.user,
+        this.props.sitemods.map(s => s.id),
         this.props.node.comment.creator_id
       )
     );
