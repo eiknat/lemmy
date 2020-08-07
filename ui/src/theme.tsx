@@ -12,6 +12,7 @@ const defaultTheme: ThemeProviderProps<Theme> = {
   ...dark,
   colors: {
     ...dark.colors,
+    background: '#222',
     primary: '#DA1B9A',
     secondary: '#2030DF',
     accent: '#2030DF',
@@ -51,13 +52,13 @@ export function ThemeSelector({ value, onChange }) {
 
   function handleThemeChange(e) {
     setCurrentTheme(e.target.value)
-    onChange(e);
+    onChange(e.target.value);
   }
 
   return (
     <select
       value={value}
-      onBlur={handleThemeChange}
+      onChange={handleThemeChange}
       className="ml-2 custom-select custom-select-sm w-auto"
     >
       <option disabled>{i18n.t('theme')}</option>

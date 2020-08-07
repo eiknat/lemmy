@@ -455,9 +455,7 @@ export function getMomentLanguage(): string {
   return lang;
 }
 
-export function setTheme(theme: string = 'darkly', loggedIn: boolean = false) {
-  console.log('CHANGING THEME:');
-  console.log({ theme });
+export function setTheme(theme: string = 'chapo', loggedIn: boolean = false) {
   const event = new CustomEvent("change-theme", { detail: theme });
   document.dispatchEvent(event);
 }

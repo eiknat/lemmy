@@ -167,8 +167,6 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
         }
       : {}
 
-    console.log({ borderStyle })
-
     return (
       <div
         className={`comment ${

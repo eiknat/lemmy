@@ -238,7 +238,6 @@ class BaseUser extends Component<any, UserState> {
   }
 
   render() {
-    console.log(this.state);
     return (
       <div className="container">
         <h5>
@@ -1026,9 +1025,9 @@ class BaseUser extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleUserSettingsThemeChange = (event: any) => {
-    changeTheme(event.target.value);
-    this.setState({ userSettingsForm: { ...this.state.userSettingsForm, theme: event.target.value } });
+  handleUserSettingsThemeChange = (value) => {
+    changeTheme(value);
+    this.setState({ userSettingsForm: { ...this.state.userSettingsForm, theme: value } });
   }
 
   handleUserSettingsLangChange(i: BaseUser, event: any) {

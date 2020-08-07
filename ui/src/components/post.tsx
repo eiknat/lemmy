@@ -105,11 +105,22 @@ export class Post extends Component<any, PostState> {
     },
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
+  state = this.emptyState
 
-    this.state = this.emptyState;
+  // constructor(props: any, context: any) {
+  //   super(props, context);
 
+  //   this.state = this.emptyState;
+
+
+  // }
+
+  componentWillUnmount() {
+    this.subscription.unsubscribe();
+    window.removeEventListener('scroll', this.debouncedScroll);
+  }
+
+  componentDidMount() {
     let postId = Number(this.props.match.params.id);
     if (this.props.match.params.comment_id) {
       this.state.scrolled_comment_id = this.props.match.params.comment_id;
@@ -130,14 +141,7 @@ export class Post extends Component<any, PostState> {
 
     this.debouncedScroll = debounce(this.updateScroll(this), 500);
     WebSocketService.Instance.getSite();
-  }
 
-  componentWillUnmount() {
-    this.subscription.unsubscribe();
-    window.removeEventListener('scroll', this.debouncedScroll);
-  }
-
-  componentDidMount() {
     autosize(document.querySelectorAll('textarea'));
     //testMessageToast();
     window.addEventListener('scroll', this.debouncedScroll, false);
