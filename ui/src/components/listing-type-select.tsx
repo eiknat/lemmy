@@ -37,7 +37,8 @@ export class ListingTypeSelect extends Component<
   render() {
     return (
       <div className="btn-group btn-group-toggle">
-        <Button as="label"
+        <Button
+          as="label"
           className={`
             ${this.state.type_ == ListingType.Subscribed && 'active'}
           `}
@@ -45,8 +46,10 @@ export class ListingTypeSelect extends Component<
           css={{
             borderTopRightRadius: 0,
             borderBottomRightRadius: 0,
-            backgroundColor: this.state.type_ == ListingType.Subscribed ? 'inherit' : '#2b2a2a'
           }}
+          variant={
+            this.state.type_ == ListingType.Subscribed ? 'highlight' : 'primary'
+          }
         >
           <input
             type="radio"
@@ -63,8 +66,11 @@ export class ListingTypeSelect extends Component<
           css={{
             borderTopLeftRadius: 0,
             borderBottomLeftRadius: 0,
-            backgroundColor: this.state.type_ == ListingType.All ? 'inherit' : '#2b2a2a'
+            // backgroundColor: this.state.type_ == ListingType.All ? 'inherit' : '#2b2a2a'
           }}
+          variant={
+            this.state.type_ == ListingType.All ? 'highlight' : 'primary'
+          }
         >
           <input
             type="radio"

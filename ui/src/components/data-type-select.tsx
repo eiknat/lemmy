@@ -41,8 +41,9 @@ export class DataTypeSelect extends Component<
           css={{
             borderTopRightRadius: 0,
             borderBottomRightRadius: 0,
-            backgroundColor: this.state.type_ == DataType.Post ? 'inherit' : '#2b2a2a'
+            // backgroundColor: this.state.type_ == DataType.Post ? 'inherit' : '#2b2a2a'
           }}
+          variant={this.state.type_ == DataType.Post ? 'highlight' : 'primary'}
         >
           <input
             type="radio"
@@ -58,8 +59,11 @@ export class DataTypeSelect extends Component<
           css={{
             borderTopLeftRadius: 0,
             borderBottomLeftRadius: 0,
-            backgroundColor:  this.state.type_ == DataType.Comment ? 'inherit' : '#2b2a2a'
+            // backgroundColor:  this.state.type_ == DataType.Comment ? 'inherit' : '#2b2a2a'
           }}
+          variant={
+            this.state.type_ == DataType.Comment ? 'highlight' : 'primary'
+          }
         >
           <input
             type="radio"

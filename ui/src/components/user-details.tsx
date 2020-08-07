@@ -152,10 +152,12 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
       combined.sort((a, b) => b.data.score - a.data.score);
     }
 
+    console.log({ combined });
+
     return (
       <div>
         {combined.map(i => (
-          <div key={i.data.id}>
+          <div key={`${i.type}-${i.data.id}`}>
             {i.type === 'posts' ? (
               <PostListing
                 post={i.data as Post}
@@ -237,11 +239,11 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
   }
 
   nextPage(i: BaseUserDetails) {
-    i.props.onPageChange((i.props.page as number) + 1);
+    i.props.onPageChange((i.props.page) + 1);
   }
 
   prevPage(i: BaseUserDetails) {
-    i.props.onPageChange((i.props.page as number) - 1);
+    i.props.onPageChange((i.props.page) - 1);
   }
 
   parseMessage(msg: WebSocketJsonResponse) {

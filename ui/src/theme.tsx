@@ -1,12 +1,43 @@
 import React from 'react';
 
-import * as allThemes from "@theme-ui/presets";
-import { Theme, ThemeProviderProps } from "theme-ui";
-import { darken } from "@theme-ui/color";
+import * as allThemes from '@theme-ui/presets';
+import { Theme, ThemeProviderProps } from 'theme-ui';
+import { darken, lighten } from '@theme-ui/color';
 import { i18n } from './i18next';
 import { useThemeSystem } from './components/ThemeSystemProvider';
 
 const { dark } = allThemes;
+
+export const variants = {
+  buttons: {
+    primary: {
+      color: 'text',
+      backgroundColor: 'muted',
+      cursor: 'pointer',
+      // backgroundColor: 'primary',
+      '&:hover': {
+        color: 'text',
+        textDecoration: 'none',
+        // backgroundColor: darken('primary', 0.05),
+        backgroundColor: darken('muted', 0.1),
+      },
+      '&:disabled': {
+        opacity: 0.65,
+        cursor: 'not-allowed',
+        backgroundColor: '#444',
+      },
+    },
+    highlight: {
+      backgroundColor: lighten('muted', 0.1),
+      '&:hover': {
+        backgroundColor: 'muted',
+      },
+    },
+    danger: {
+      backgroundColor: 'danger',
+    },
+  },
+};
 
 const defaultTheme: ThemeProviderProps<Theme> = {
   ...dark,
@@ -15,43 +46,25 @@ const defaultTheme: ThemeProviderProps<Theme> = {
     background: '#222',
     primary: '#DA1B9A',
     secondary: '#2030DF',
-    accent: '#2030DF',
+    accent: '#F3B90C',
     danger: '#E74C3C',
+    muted: '#303030',
   },
-  buttons: {
-    primary: {
-      color: '#dedede',
-      backgroundColor: '#444',
-      // backgroundColor: 'primary',
-      '&:hover': {
-        color: '#dedede',
-        textDecoration: 'none',
-        // backgroundColor: darken('primary', 0.05),
-        backgroundColor: darken('#444', 0.1)
-      },
-      '&:disabled': {
-        opacity: 0.65,
-        cursor: 'not-allowed',
-        backgroundColor: '#444',
-      }
-    },
-    danger: {
-      backgroundColor: 'danger',
-    }
-  }
-}
+};
+
+console.log({ defaultTheme });
 
 export const themes = {
   chapo: defaultTheme,
   ...allThemes,
-}
+};
 
 export function ThemeSelector({ value, onChange }) {
   const { setCurrentTheme } = useThemeSystem();
   // console.log({ context });
 
   function handleThemeChange(e) {
-    setCurrentTheme(e.target.value)
+    setCurrentTheme(e.target.value);
     onChange(e.target.value);
   }
 
@@ -68,7 +81,7 @@ export function ThemeSelector({ value, onChange }) {
         </option>
       ))}
     </select>
-  )
+  );
 }
 
 // create custom event to allow theme to be changed from anywhere

@@ -54,6 +54,7 @@
     "quote-props": 0,
     "unicorn/filename-case": 0,
     "react/no-direct-mutation-state": 1,
-    "react/no-access-state-in-setstate": 1
+    "react/no-access-state-in-setstate": 1,
+    "jsx-a11y/no-onchange": 0
   }
 }
