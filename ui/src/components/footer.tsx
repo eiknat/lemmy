@@ -2,6 +2,7 @@ import { Component } from 'inferno';
 import { Link } from 'inferno-router';
 import { repoUrl } from '../utils';
 import { version } from '../version';
+import { VERSION as git_version } from '../git-version';
 import { i18n } from '../i18next';
 
 export class Footer extends Component<any, any> {
@@ -15,7 +16,7 @@ export class Footer extends Component<any, any> {
         <div className="navbar-collapse">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-              <span class="navbar-text">{version}</span>
+              <span class="navbar-text">{git_version.raw}</span>
             </li>
             <li class="nav-item">
               <Link class="nav-link" to="/about">

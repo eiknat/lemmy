@@ -32,6 +32,7 @@ import {
   imagesDownsize,
 } from '../utils';
 import { version } from '../version';
+import { VERSION as git_version } from '../git-version';
 import { i18n } from '../i18next';
 import { User } from './user';
 import { Icon } from './icon';
@@ -179,7 +180,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
               alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
             />
           </a>
-          <Link title={version} class="navbar-brand" to="/">
+          <Link title={git_version.raw} class="navbar-brand" to="/">
             {this.state.siteName}
           </Link>
           {this.state.isLoggedIn && (

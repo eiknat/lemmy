@@ -9,8 +9,8 @@
     "api-test": "jest src/api_tests/api.spec.ts",
     "build": "node fuse prod",
     "lint": "tsc --noEmit && eslint --report-unused-disable-directives --ext .js,.ts,.tsx src",
-    "prebuild": "node generate_translations.js",
-    "prestart": "node generate_translations.js",
+    "prebuild": "node generate_translations.js && node generate_git_verison.js",
+    "prestart": "node generate_translations.js && node generate_git_verison.js",
     "start": "node fuse dev"
   },
   "keywords": [],
@@ -29,6 +29,7 @@
     "choices.js": "^9.0.1",
     "classcat": "^4.0.2",
     "emoji-short-name": "^1.0.0",
+    "git-describe": "^4.0.4",
     "husky": "^4.2.5",
     "i18next": "^19.4.1",
     "inferno": "^7.4.2",
