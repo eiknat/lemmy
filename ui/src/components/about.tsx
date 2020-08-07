@@ -6,13 +6,9 @@ import { repoUrl } from '../utils';
 import { BASE_PATH } from "../isProduction";
 
 export class About extends Component<any, any> {
-  constructor(props: any, context: any) {
-    super(props, context);
-  }
-
   componentDidMount() {
     document.title = `${i18n.t('about')} - ${
-      WebSocketService.Instance.site.name
+      WebSocketService.Instance?.site?.name || 'ChapoChat'
     }`;
     window.scrollTo(0, 0);
   }

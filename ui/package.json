@@ -40,6 +40,7 @@
     "i18next": "^19.6.3",
     "js-cookie": "^2.2.1",
     "jwt-decode": "^2.2.0",
+    "lodash.isequal": "^4.5.0",
     "markdown-it": "^11.0.0",
     "markdown-it-container": "^3.0.0",
     "markdown-it-emoji": "^1.4.0",

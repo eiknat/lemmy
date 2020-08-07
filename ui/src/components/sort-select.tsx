@@ -39,13 +39,6 @@ export class SortSelect extends Component<SortSelectProps, SortSelectState> {
           <Select
             value={this.props.sort}
             onChange={linkEvent(this, this.handleSortChange)}
-            css={{
-              display: 'inline-block',
-            }}
-            style={{
-              display: 'inline-block',
-            }}
-            // className="custom-select custom-select-sm w-auto mr-2"
           >
             <option disabled>{i18n.t('sort_type')}</option>
             {!this.props.hideHot && (

@@ -38,11 +38,14 @@ export class BaseCreatePost extends Component<any, CreatePostState> {
     },
   };
 
+  state = this.emptyState
+
   constructor(props: any, context: any) {
     super(props, context);
     this.handlePostCreate = this.handlePostCreate.bind(this);
-    this.state = this.emptyState;
+  }
 
+  componentDidMount() {
     if (!UserService.Instance.user) {
       toast(i18n.t('not_logged_in'), 'danger');
       this.props.history.push(`/login`);

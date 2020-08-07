@@ -37,6 +37,7 @@ import { SortSelect } from './sort-select';
 import { CommentNodes } from './comment-nodes';
 import { i18n } from '../i18next';
 import { linkEvent } from '../linkEvent';
+import { Box, Select } from 'theme-ui';
 
 interface SearchState {
   q: string;
@@ -206,21 +207,28 @@ export class Search extends Component<any, SearchState> {
   selects() {
     return (
       <div className="mb-2">
-        <select
-          value={this.state.type_}
-          onChange={linkEvent(this, this.handleTypeChange)}
-          className="custom-select custom-select-sm w-auto"
-        >
-          <option disabled>{i18n.t('type')}</option>
-          <option value={SearchType.All}>{i18n.t('all')}</option>
-          <option value={SearchType.Comments}>{i18n.t('comments')}</option>
-          <option value={SearchType.Posts}>{i18n.t('posts')}</option>
-          <option value={SearchType.Communities}>
-            {i18n.t('communities')}
-          </option>
-          <option value={SearchType.Users}>{i18n.t('users')}</option>
-        </select>
-        <span className="ml-2">
+        <Box css={{ display: 'inline-block' }} mr={2}>
+          <Select
+            value={this.state.type_}
+            onChange={linkEvent(this, this.handleTypeChange)}
+            css={{
+              display: 'inline-block',
+            }}
+            style={{
+              display: 'inline-block',
+            }}
+          >
+            <option disabled>{i18n.t('type')}</option>
+            <option value={SearchType.All}>{i18n.t('all')}</option>
+            <option value={SearchType.Comments}>{i18n.t('comments')}</option>
+            <option value={SearchType.Posts}>{i18n.t('posts')}</option>
+            <option value={SearchType.Communities}>
+              {i18n.t('communities')}
+            </option>
+            <option value={SearchType.Users}>{i18n.t('users')}</option>
+            </Select>
+        </Box>
+        <span>
           <SortSelect
             sort={this.state.sort}
             onChange={this.handleSortChange}

@@ -62,11 +62,9 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
     siteConfigLoading: true,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
+  state = this.emptyState
 
-    this.state = this.emptyState;
-
+  componentDidMount() {
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
       .subscribe(
@@ -114,7 +112,7 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
         <h5>{capitalizeFirstLetter(i18n.t('admins'))}</h5>
         <ul className="list-unstyled">
           {this.state.siteRes.admins.map(admin => (
-            <li className="list-inline-item">
+            <li key={admin.id} className="list-inline-item">
               <UserListing
                 user={{
                   name: admin.name,
@@ -137,7 +135,7 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
         <h5>{capitalizeFirstLetter(i18n.t('sitemods'))}</h5>
         <ul className="list-unstyled">
           {this.state.siteRes.sitemods.map(sitemod => (
-            <li className="list-inline-item">
+            <li key={sitemod.id} className="list-inline-item">
               <UserListing
                 user={{
                   name: sitemod.name,
@@ -160,7 +158,7 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
         <h5>{i18n.t('banned_users')}</h5>
         <ul className="list-unstyled">
           {this.state.siteRes.banned.map(banned => (
-            <li className="list-inline-item">
+            <li key={banned.id} className="list-inline-item">
               <UserListing
                 user={{
                   name: banned.name,
@@ -193,7 +191,7 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
               <textarea
                 id={this.siteConfigTextAreaId}
                 value={this.state.siteConfigForm.config_hjson}
-                onInput={linkEvent(this, this.handleSiteConfigHjsonChange)}
+                onChange={linkEvent(this, this.handleSiteConfigHjsonChange)}
                 className="form-control text-monospace"
                 rows={3}
               />

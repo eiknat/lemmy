@@ -212,7 +212,7 @@ class Main extends Component<any, MainState> {
       <div>
         {!this.state.loading && (
           <div>
-            <div className="card border-secondary mb-3">
+            <Box mb={3}>
               <div className="card-body">
                 {this.trendingCommunities()}
                 {UserService.Instance.user &&
@@ -250,7 +250,7 @@ class Main extends Component<any, MainState> {
                   </Flex>
                 )}
               </div>
-            </div>
+            </Box>
             {this.sidebar()}
             {this.donations()}
             {this.landing()}

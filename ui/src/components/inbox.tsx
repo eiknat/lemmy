@@ -75,10 +75,9 @@ export class Inbox extends Component<any, InboxState> {
     enableDownvotes: undefined,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
+  state = this.emptyState
 
-    this.state = this.emptyState;
+  componentDidMount() {
     this.handleSortChange = this.handleSortChange.bind(this);
 
     this.subscription = WebSocketService.Instance.subject

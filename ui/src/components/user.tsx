@@ -172,10 +172,11 @@ class BaseUser extends Component<any, UserState> {
     additionalPronouns: 'none',
   };
 
+  state = this.emptyState
+
   constructor(props: any, context: any) {
     super(props, context);
 
-    this.state = this.emptyState;
     this.handleSortChange = this.handleSortChange.bind(this);
     this.handleUserSettingsSortTypeChange = this.handleUserSettingsSortTypeChange.bind(
       this
@@ -190,7 +191,9 @@ class BaseUser extends Component<any, UserState> {
       this
     );
     this.handleLogoutClick = this.handleLogoutClick.bind(this);
+  }
 
+  componentDidMount() {
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
       .subscribe(

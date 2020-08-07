@@ -134,11 +134,11 @@ interface PostFormState {
   crosspostCommunityId?: number;
 }
 
-export const TextAreaWithCounter = ({ maxLength, ...props }) => {
-  const characterLimitExceeded = props.value && props.value.length > maxLength;
+export const TextAreaWithCounter = ({ maxLength, value, ...props }) => {
+  const characterLimitExceeded = value && value.length > maxLength;
   return (
     <>
-      <textarea {...props} />
+      <textarea value={value || ''} {...props} />
       {props.value && (
         <div className="mt-2">
           <span
@@ -176,14 +176,16 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     crossPosts: [],
   };
 
+  state = this.emptyState;
+
   constructor(props: any, context: any) {
     super(props, context);
     this.fetchSimilarPosts = debounce(this.fetchSimilarPosts).bind(this);
     this.fetchPageTitle = debounce(this.fetchPageTitle).bind(this);
     this.handlePostBodyChange = this.handlePostBodyChange.bind(this);
+  }
 
-    this.state = this.emptyState;
-
+  componentDidMount() {
     if (this.props.post) {
       this.state.postForm = {
         body: this.props.post.body,
@@ -230,9 +232,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     };
 
     WebSocketService.Instance.listCommunities(listCommunitiesForm);
-  }
 
-  componentDidMount() {
     setupTippy();
   }
 

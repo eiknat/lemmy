@@ -28,6 +28,7 @@ export const variants = {
       },
     },
     highlight: {
+      color: 'text',
       backgroundColor: lighten('muted', 0.1),
       '&:hover': {
         backgroundColor: 'muted',
@@ -36,7 +37,18 @@ export const variants = {
     danger: {
       backgroundColor: 'danger',
     },
+    outline: {
+      borderColor: 'muted',
+      borderWidth: '1px',
+      borderStyle: 'solid',
+      backgroundColor: 'transparent',
+    }
   },
+  forms: {
+     select: {
+      borderColor: lighten('muted', 0.4),
+    }
+  }
 };
 
 const defaultTheme: ThemeProviderProps<Theme> = {
@@ -51,8 +63,6 @@ const defaultTheme: ThemeProviderProps<Theme> = {
     muted: '#303030',
   },
 };
-
-console.log({ defaultTheme });
 
 export const themes = {
   chapo: defaultTheme,

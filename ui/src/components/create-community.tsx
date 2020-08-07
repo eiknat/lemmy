@@ -22,11 +22,14 @@ export class BaseCreateCommunity extends Component<any, CreateCommunityState> {
   private emptyState: CreateCommunityState = {
     enableNsfw: null,
   };
+
+  state = this.emptyState
   constructor(props: any, context: any) {
     super(props, context);
     this.handleCommunityCreate = this.handleCommunityCreate.bind(this);
-    this.state = this.emptyState;
+  }
 
+  componentDidMount() {
     if (!UserService.Instance.user) {
       toast(i18n.t('not_logged_in'), 'danger');
       this.props.history.push(`/login`);

@@ -61,15 +61,17 @@ export class CommunityForm extends Component<
     community_settings: null,
   };
 
+  state = this.emptyState
+
   constructor(props: any, context: any) {
     super(props, context);
-
-    this.state = this.emptyState;
 
     this.handleCommunityDescriptionChange = this.handleCommunityDescriptionChange.bind(
       this
     );
+  }
 
+  componentDidMount() {
     if (this.props.community) {
       this.state.communityForm = {
         name: this.props.community.name,
@@ -193,7 +195,7 @@ export class CommunityForm extends Component<
                 onInput={linkEvent(this, this.handleCommunityCategoryChange)}
               >
                 {this.state.categories.map(category => (
-                  <option value={category.id}>{category.name}</option>
+                  <option key={category.id} value={category.id}>{category.name}</option>
                 ))}
               </select>
             </div>

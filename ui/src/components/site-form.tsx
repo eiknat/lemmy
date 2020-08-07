@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Prompt } from 'react-router-dom';
+import isEqual from 'lodash.isequal'
 import { MarkdownTextArea } from './markdown-textarea';
 import { Site, SiteForm as SiteFormI } from '../interfaces';
 import { WebSocketService } from '../services';
@@ -29,13 +30,11 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
     loading: false,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
+  state = this.emptyState;
 
-    this.state = this.emptyState;
-
+  componentDidMount() {
     if (this.props.site) {
-      this.state = {
+      this.setState({
         siteForm: {
           name: this.props.site.name,
           description: this.props.site.description,
@@ -45,18 +44,20 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
           enable_nsfw: this.props.site.enable_nsfw,
         },
         loading: false
-      };
+      });
     }
   }
 
   // Necessary to stop the loading
-  UNSAFE_componentWillReceiveProps() {
-    this.setState({
-      loading: false
-    });
-  }
+  // UNSAFE_componentWillReceiveProps() {
+  //   this.setState({
+  //     loading: false
+  //   });
+  // }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
+    // console.log({ prevProps, props: this.props });
+    // console.log(JSON.stringify(prevProps) === JSON.stringify(this.props));
     if (
       !this.state.loading &&
       !this.props.site &&
@@ -65,6 +66,11 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
       window.onbeforeunload = () => true;
     } else {
       window.onbeforeunload = undefined;
+    }
+
+    if (!isEqual(prevProps, this.props)) {
+      console.log('NOT EQUAL')
+      this.setState({ loading: false })
     }
   }
 

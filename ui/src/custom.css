@@ -307,6 +307,7 @@ a.text-body {
 .community-button-separator {
   border-right: 3px solid #323232;
   margin: 0 15px;
+  height: 40px;
 }
 
 @media only screen and (max-width: 992px) {
@@ -321,7 +322,7 @@ a.text-body {
   }
 
   .community-stat-section {
-    width: 100%;
+    width: 50%;
   }
 
   .header-names {
@@ -336,6 +337,7 @@ a.text-body {
 
 .header-right-section {
   display: flex;
+  align-items: center;
   padding: 15px 25px;
 }
 

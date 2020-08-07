@@ -11,6 +11,7 @@ const config: UserConfig = {
       'moment',
       'markdown-it-emoji',
       "markdown-it-emoji/light",
+      "lodash.isequal",
       "moment/locale/es",
       "moment/locale/el",
       "moment/locale/eu",

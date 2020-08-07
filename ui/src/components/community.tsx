@@ -52,6 +52,7 @@ import {
 import { i18n } from '../i18next';
 import { Icon } from './icon';
 import { linkEvent } from '../linkEvent';
+import Button from './elements/Button';
 
 interface State {
   community: CommunityI;
@@ -213,33 +214,32 @@ export class BaseCommunity extends Component<any, State> {
                       </div>
                     </div>
                     {this.state.community.subscribed ? (
-                      <button
-                        className="btn btn-secondary unsubscribe-button"
+                      <Button
                         onClick={linkEvent(
                           this.state.community.id,
                           this.handleUnsubscribe
                         )}
                       >
                         {i18n.t('unsubscribe')}
-                      </button>
+                      </Button>
                     ) : (
-                      <button
-                        className="btn btn-secondary subscribe-button"
+                      <Button
                         onClick={linkEvent(
                           this.state.community.id,
-                          this.handleSubscribe
-                        )}
+                            this.handleSubscribe
+                            )
+                            }
                       >
                         {i18n.t('subscribe')}
-                      </button>
+                      </Button>
                     )}
-                    <div className="community-button-separator" />
-                    <Link
-                      className="btn btn-secondary create-post-button"
-                      to={`/create_post?community=${this.state.community.name}`}
-                    >
-                      {isMobile ? '+' : 'Create Post'}
-                    </Link>
+                      <div className="community-button-separator" />
+                      <Link to={`/create_post?community=${this.state.community.name}`} style={{ display: 'block' }}>
+                        <Button variant="secondary">
+
+                          {isMobile ? '+' : 'Create Post'}
+                        </Button>
+                      </Link>
                   </div>
                 </div>
               </div>
