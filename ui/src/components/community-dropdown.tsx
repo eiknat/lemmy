@@ -55,9 +55,9 @@ export class CommunityDropdown extends Component<
     loading: true,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
-    this.state = this.emptyState;
+  state = this.emptyState;
+
+  componentDidMount() {
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
       .subscribe(
@@ -69,9 +69,7 @@ export class CommunityDropdown extends Component<
 
     this.thisRef = createRef();
     this.handleClickOutside = this.handleClickOutside.bind(this);
-  }
 
-  componentDidMount() {
     document.addEventListener('mousedown', this.handleClickOutside);
   }
 

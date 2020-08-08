@@ -302,10 +302,11 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
               target="_blank"
               title={post.url}
               rel="noreferrer"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}
             >
               <Icon
-                className="icon thumbnail mini-overlay"
-                style={{ marginTop: '4px' }}
+                className="icon thumbnail"
+                size="40px"
                 name="link"
               />
             </a>
