@@ -220,7 +220,7 @@ export class Main extends Component<any, MainState> {
           <main role="main" class="col-12 col-md-8">
             {this.posts()}
           </main>
-          <aside class="col-12 col-md-4 sidebar">{this.my_sidebar()}</aside>
+          <aside class="col-12 col-md-4 sidebar">{this.mySidebar()}</aside>
         </div>
       </div>
     );
@@ -502,12 +502,10 @@ export class Main extends Component<any, MainState> {
             <a href={repoUrl}>Lemmy</a>
           </h5>
           <p class="mb-0">
-            <T i18nKey="landing_0">
-              #
-            </a>
-          </T>
-        </p>
-      </>
+            <T i18nKey="landing_0">#</T>
+          </p>
+        </div>
+      </div>
     );
   }
 
