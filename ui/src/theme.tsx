@@ -42,13 +42,15 @@ export const variants = {
       borderWidth: '1px',
       borderStyle: 'solid',
       backgroundColor: 'transparent',
-    }
+    },
   },
   forms: {
-     select: {
+    select: {
       borderColor: lighten('muted', 0.4),
-    }
-  }
+      backgroundColor: 'background',
+      color: 'text',
+    },
+  },
 };
 
 const defaultTheme: ThemeProviderProps<Theme> = {
