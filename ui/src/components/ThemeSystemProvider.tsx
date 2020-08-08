@@ -6,7 +6,7 @@ import { themes, variants } from '../theme';
 const ThemeSystem = createContext({});
 
 function ThemeSystemProvider({ children }) {
-  const [currentTheme, setCurrentTheme] = useState('dark');
+  const [currentTheme, setCurrentTheme] = useState('chapo');
 
   const theme = Object.keys(themes).includes(currentTheme)
     ? themes[currentTheme]
