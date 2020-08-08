@@ -263,5 +263,6 @@
     "silver_sponsors": "Srebrni Sponsorzy to ci, którzy wpłacili co najmniej $40 na Lemmiego.",
     "select_a_community": "Wybierz społeczność",
     "invalid_username": "Nieprawidłowa nazwa użytkownika.",
-    "invalid_login_credentials": "Nieprawidłowe dane logowania."
+    "invalid_login_credentials": "Nieprawidłowe dane logowania.",
+    "invalid_community_name": "Niepoprawna nazwa."
 }

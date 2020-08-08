@@ -16,7 +16,6 @@ import {
   Comment,
   CommentResponse,
   PrivateMessage,
-  UserView,
   PrivateMessageResponse,
   WebSocketJsonResponse,
 } from '../interfaces';
@@ -31,7 +30,6 @@ import {
   md,
   imagesDownsize,
 } from '../utils';
-import { version } from '../version';
 import { i18n } from '../i18next';
 import { User } from './user';
 import { Icon } from './icon';
@@ -44,8 +42,6 @@ interface NavbarState {
   mentions: Array<Comment>;
   messages: Array<PrivateMessage>;
   unreadCount: number;
-  siteName: string;
-  admins: Array<UserView>;
   searchParam: string;
   toggleSearch: boolean;
   creatingCommunitiesEnabled: boolean;
@@ -55,16 +51,39 @@ interface NavbarState {
 class UnwrappedNavbar extends Component<any, NavbarState> {
   private wsSub: Subscription;
   private userSub: Subscription;
+  private unreadCountSub: Subscription;
   private searchTextField: RefObject<HTMLInputElement>;
   emptyState: NavbarState = {
-    isLoggedIn: UserService.Instance.user !== undefined,
+    isLoggedIn: false,
     unreadCount: 0,
     replies: [],
     mentions: [],
     messages: [],
     expanded: false,
-    siteName: undefined,
-    admins: [],
+    siteRes: {
+      site: {
+        id: null,
+        name: null,
+        creator_id: null,
+        creator_name: null,
+        published: null,
+        number_of_users: null,
+        number_of_posts: null,
+        number_of_comments: null,
+        number_of_communities: null,
+        enable_downvotes: null,
+        open_registration: null,
+        enable_nsfw: null,
+        icon: null,
+        banner: null,
+        creator_preferred_username: null,
+      },
+      my_user: null,
+      admins: [],
+      banned: [],
+      online: null,
+      version: null,
+    },
     searchParam: '',
     toggleSearch: false,
     creatingCommunitiesEnabled: false,
@@ -75,16 +94,6 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     super(props, context);
     this.state = this.emptyState;
 
-    // Subscribe to user changes
-    this.userSub = UserService.Instance.sub.subscribe(user => {
-      this.state.isLoggedIn = user.user !== undefined;
-      if (this.state.isLoggedIn) {
-        this.state.unreadCount = user.user.unreadCount;
-        this.requestNotificationPermission();
-      }
-      this.setState(this.state);
-    });
-
     this.wsSub = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
       .subscribe(
@@ -93,15 +102,28 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
         () => console.log('complete')
       );
 
-    if (this.state.isLoggedIn) {
-      this.requestNotificationPermission();
-      // TODO couldn't get re-logging in to re-fetch unreads
-      this.fetchUnreads();
-    }
-
     WebSocketService.Instance.getSite();
 
     this.searchTextField = createRef();
+  }
+
+  componentDidMount() {
+    // Subscribe to jwt changes
+    this.userSub = UserService.Instance.jwtSub.subscribe(res => {
+      // A login
+      if (res !== undefined) {
+        this.requestNotificationPermission();
+      } else {
+        this.state.isLoggedIn = false;
+      }
+      WebSocketService.Instance.getSite();
+      this.setState(this.state);
+    });
+
+    // Subscribe to unread count changes
+    this.unreadCountSub = UserService.Instance.unreadCountSub.subscribe(res => {
+      this.setState({ unreadCount: res });
+    });
   }
 
   handleSearchParam(i: Navbar, event: any) {
@@ -159,6 +181,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   componentWillUnmount() {
     this.wsSub.unsubscribe();
     this.userSub.unsubscribe();
+    this.unreadCountSub.unsubscribe();
   }
 
   showCreateCommunityNav() {
@@ -169,6 +192,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
 
   // TODO class active corresponding to current page
   navbar() {
+    let user = UserService.Instance.user;
     return (
       <>
         <nav class="container-fluid navbar navbar-expand-md navbar-light main-navbar shadow p-0 px-3">
@@ -445,36 +469,38 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
           data.site.enable_create_communities;
         this.setState(this.state);
       }
+
+      this.state.siteLoading = false;
+      this.setState(this.state);
     }
   }
 
   fetchUnreads() {
-    if (this.state.isLoggedIn) {
-      let repliesForm: GetRepliesForm = {
-        sort: SortType[SortType.New],
-        unread_only: true,
-        page: 1,
-        limit: fetchLimit,
-      };
+    console.log('Fetching unreads...');
+    let repliesForm: GetRepliesForm = {
+      sort: SortType[SortType.New],
+      unread_only: true,
+      page: 1,
+      limit: fetchLimit,
+    };
 
-      let userMentionsForm: GetUserMentionsForm = {
-        sort: SortType[SortType.New],
-        unread_only: true,
-        page: 1,
-        limit: fetchLimit,
-      };
+    let userMentionsForm: GetUserMentionsForm = {
+      sort: SortType[SortType.New],
+      unread_only: true,
+      page: 1,
+      limit: fetchLimit,
+    };
 
-      let privateMessagesForm: GetPrivateMessagesForm = {
-        unread_only: true,
-        page: 1,
-        limit: fetchLimit,
-      };
+    let privateMessagesForm: GetPrivateMessagesForm = {
+      unread_only: true,
+      page: 1,
+      limit: fetchLimit,
+    };
 
-      if (this.currentLocation !== '/inbox') {
-        WebSocketService.Instance.getReplies(repliesForm);
-        WebSocketService.Instance.getUserMentions(userMentionsForm);
-        WebSocketService.Instance.getPrivateMessages(privateMessagesForm);
-      }
+    if (this.currentLocation !== '/inbox') {
+      WebSocketService.Instance.getReplies(repliesForm);
+      WebSocketService.Instance.getUserMentions(userMentionsForm);
+      WebSocketService.Instance.getPrivateMessages(privateMessagesForm);
     }
   }
 
@@ -488,10 +514,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   }
 
   sendUnreadCount() {
-    UserService.Instance.user.unreadCount = this.state.unreadCount;
-    UserService.Instance.sub.next({
-      user: UserService.Instance.user,
-    });
+    UserService.Instance.unreadCountSub.next(this.state.unreadCount);
   }
 
   calculateUnreadCount(): number {
@@ -505,7 +528,9 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   get canAdmin(): boolean {
     return (
       UserService.Instance.user &&
-      this.state.admins.map(a => a.id).includes(UserService.Instance.user.id)
+      this.state.siteRes.admins
+        .map(a => a.id)
+        .includes(UserService.Instance.user.id)
     );
   }
 

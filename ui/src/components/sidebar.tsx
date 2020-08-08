@@ -4,14 +4,16 @@ import {
   Community,
   CommunityUser,
   FollowCommunityForm,
-  CommunityForm as CommunityFormI,
+  DeleteCommunityForm,
+  RemoveCommunityForm,
   UserView,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
-import { mdToHtml, getUnixTime, hostname } from '../utils';
+import { mdToHtml, getUnixTime, pictrsAvatarThumbnail } from '../utils';
 import { CommunityForm } from './community-form';
 import { UserListing } from './user-listing';
 import { CommunityLink } from './community-link';
+import { BannerIconHeader } from './banner-icon-header';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
 
@@ -21,6 +23,7 @@ interface SidebarProps {
   admins: Array<UserView>;
   online: number;
   enableNsfw: boolean;
+  showIcon?: boolean;
 }
 
 interface SidebarState {
@@ -63,16 +66,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
   }
 
   sidebar() {
-    let community = this.props.community;
-    let name_: string, link: string;
-
-    if (community.local) {
-      name_ = community.name;
-      link = `/c/${community.name}`;
-    } else {
-      name_ = `${community.name}@${hostname(community.actor_id)}`;
-      link = community.actor_id;
-    }
+    const { community } = this.props;
     return (
       <div className="sidebar-content">
         <div class="card border-secondary mb-3">
@@ -322,19 +316,15 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
 
   handleDeleteClick(i: Sidebar) {
     event.preventDefault();
-    let deleteForm: CommunityFormI = {
-      name: i.props.community.name,
-      title: i.props.community.title,
-      category_id: i.props.community.category_id,
+    let deleteForm: DeleteCommunityForm = {
       edit_id: i.props.community.id,
       deleted: !i.props.community.deleted,
-      nsfw: i.props.community.nsfw,
-      auth: null,
     };
-    WebSocketService.Instance.editCommunity(deleteForm);
+    WebSocketService.Instance.deleteCommunity(deleteForm);
   }
 
   handleUnsubscribe(communityId: number) {
+    event.preventDefault();
     let form: FollowCommunityForm = {
       community_id: communityId,
       follow: false,
@@ -343,6 +333,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
   }
 
   handleSubscribe(communityId: number) {
+    event.preventDefault();
     let form: FollowCommunityForm = {
       community_id: communityId,
       follow: true,
@@ -387,18 +378,13 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
 
   handleModRemoveSubmit(i: Sidebar) {
     event.preventDefault();
-    let deleteForm: CommunityFormI = {
-      name: i.props.community.name,
-      title: i.props.community.title,
-      category_id: i.props.community.category_id,
+    let removeForm: RemoveCommunityForm = {
       edit_id: i.props.community.id,
       removed: !i.props.community.removed,
       reason: i.state.removeReason,
       expires: getUnixTime(i.state.removeExpires),
-      nsfw: i.props.community.nsfw,
-      auth: null,
     };
-    WebSocketService.Instance.editCommunity(deleteForm);
+    WebSocketService.Instance.removeCommunity(removeForm);
 
     i.state.showRemoveDialog = false;
     i.setState(i.state);

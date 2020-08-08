@@ -36,11 +36,14 @@ export class SortSelect extends Component<SortSelectProps, SortSelectState> {
         <select
           value={this.props.sort}
           onChange={linkEvent(this, this.handleSortChange)}
-          class="custom-select custom-select-sm w-auto mr-2"
+          class="custom-select w-auto mr-2 mb-2"
         >
           <option disabled>{i18n.t('sort_type')}</option>
           {!this.props.hideHot && (
-            <option value={SortType.Hot}>{i18n.t('hot')}</option>
+            <>
+              <option value={SortType.Active}>{i18n.t('active')}</option>
+              <option value={SortType.Hot}>{i18n.t('hot')}</option>
+            </>
           )}
           <option value={SortType.New}>{i18n.t('new')}</option>
           <option disabled>─────</option>
@@ -64,6 +67,6 @@ export class SortSelect extends Component<SortSelectProps, SortSelectState> {
   }
 
   handleSortChange(i: SortSelect, event: any) {
-    i.props.onChange(event.target.value);
+    i.props.onChange(Number(event.target.value));
   }
 }

@@ -51,6 +51,8 @@ import { UserService, WebSocketService } from './services';
 
 import Tribute from 'tributejs/src/Tribute.js';
 import markdown_it from 'markdown-it';
+import markdown_it_sub from 'markdown-it-sub';
+import markdown_it_sup from 'markdown-it-sup';
 import markdownitEmoji from 'markdown-it-emoji/light';
 import markdown_it_container from 'markdown-it-container';
 import iterator from 'markdown-it-for-inline';
@@ -63,10 +65,12 @@ import { match } from 'assert';
 import moment from 'moment';
 
 export const repoUrl = 'https://gitlab.com/chapo-sandbox/production';
+export const favIconUrl = '/static/assets/favicon.svg';
 export const helpGuideUrl = '/docs/about_guide.html';
 export const markdownHelpUrl = `${helpGuideUrl}#markdown-guide`;
 export const sortingHelpUrl = `${helpGuideUrl}#sorting`;
 export const archiveUrl = 'https://archive.is';
+export const elementUrl = 'https://element.io/';
 
 export const postRefetchSeconds: number = 60 * 1000;
 export const fetchLimit: number = 20;
@@ -163,6 +167,8 @@ export const md = new markdown_it({
   linkify: true,
   typographer: true,
 })
+  .use(markdown_it_sub)
+  .use(markdown_it_sup)
   .use(markdown_it_container, 'spoiler', {
     validate: function (params: any) {
       return params.trim().match(/^spoiler\s+(.*)$/);
@@ -296,6 +302,8 @@ export function routeSortTypeToEnum(sort: string): SortType {
     return SortType.New;
   } else if (sort == 'hot') {
     return SortType.Hot;
+  } else if (sort == 'active') {
+    return SortType.Active;
   } else if (sort == 'topday') {
     return SortType.TopDay;
   } else if (sort == 'topweek') {
@@ -376,9 +384,9 @@ export function debounce(
   };
 }
 
-export function getLanguage(): string {
+export function getLanguage(override?: string): string {
   let user = UserService.Instance.user;
-  let lang = user && user.lang ? user.lang : 'browser';
+  let lang = override || (user && user.lang ? user.lang : 'browser');
 
   if (lang == 'browser') {
     return getBrowserLanguage();
@@ -628,7 +636,7 @@ export function testMessageToast() {
 export function setupTribute(): Tribute {
   return new Tribute({
     noMatchTemplate: function () {
-      return '<span style:"visibility: hidden;"></span>';
+      return '';
     },
     collection: [
       // Emojis
@@ -719,7 +727,7 @@ function userSearch(text: string, cb: any) {
 
     WebSocketService.Instance.search(form);
 
-    this.userSub = WebSocketService.Instance.subject.subscribe(
+    let userSub = WebSocketService.Instance.subject.subscribe(
       msg => {
         let res = wsJsonToRes(msg);
         if (res.op == UserOperation.Search) {
@@ -739,7 +747,7 @@ function userSearch(text: string, cb: any) {
             };
           });
           cb(users);
-          this.userSub.unsubscribe();
+          userSub.unsubscribe();
         }
       },
       err => console.error(err),
@@ -762,7 +770,7 @@ function communitySearch(text: string, cb: any) {
 
     WebSocketService.Instance.search(form);
 
-    this.communitySub = WebSocketService.Instance.subject.subscribe(
+    let communitySub = WebSocketService.Instance.subject.subscribe(
       msg => {
         let res = wsJsonToRes(msg);
         if (res.op == UserOperation.Search) {
@@ -776,7 +784,7 @@ function communitySearch(text: string, cb: any) {
             };
           });
           cb(communities);
-          this.communitySub.unsubscribe();
+          communitySub.unsubscribe();
         }
       },
       err => console.error(err),
@@ -807,7 +815,7 @@ export function getSortTypeFromProps(props: any): SortType {
     ? routeSortTypeToEnum(props.match.params.sort)
     : UserService.Instance.user
     ? UserService.Instance.user.default_sort_type
-    : SortType.Hot;
+    : SortType.Active;
 }
 
 export function getPageFromProps(props: any): number {
@@ -958,7 +966,7 @@ function convertCommentSortType(sort: SortType): CommentSortType {
     return CommentSortType.Top;
   } else if (sort == SortType.New) {
     return CommentSortType.New;
-  } else if (sort == SortType.Hot) {
+  } else if (sort == SortType.Hot || sort == SortType.Active) {
     return CommentSortType.Hot;
   } else {
     return CommentSortType.Hot;
@@ -1000,6 +1008,14 @@ export function postSort(
         +a.deleted - +b.deleted ||
         (communityType && +b.stickied - +a.stickied) ||
         b.hot_rank - a.hot_rank
+    );
+  } else if (sort == SortType.Active) {
+    posts.sort(
+      (a, b) =>
+        +a.removed - +b.removed ||
+        +a.deleted - +b.deleted ||
+        (communityType && +b.stickied - +a.stickied) ||
+        b.hot_rank_active - a.hot_rank_active
     );
   }
 }
@@ -1137,3 +1153,15 @@ export const getAllUserModeratedCommunities = ({
     return agg;
   }, []);
 };
+export function siteBannerCss(banner: string): string {
+  return ` \
+    background-image: linear-gradient( rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8) ) ,url("${banner}"); \
+    background-attachment: fixed; \
+    background-position: top; \
+    background-repeat: no-repeat; \
+    background-size: 100% cover; \
+
+    width: 100%; \
+    max-height: 100vh; \
+    `;
+}

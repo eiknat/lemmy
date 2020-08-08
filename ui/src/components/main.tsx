@@ -1,4 +1,5 @@
 import { Component, linkEvent } from 'inferno';
+import { Helmet } from 'inferno-helmet';
 import { Link } from 'inferno-router';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
@@ -35,6 +36,7 @@ import { DataTypeSelect } from './data-type-select';
 import { SiteForm } from './site-form';
 import { UserListing } from './user-listing';
 import { CommunityLink } from './community-link';
+import { BannerIconHeader } from './banner-icon-header';
 import {
   wsJsonToRes,
   repoUrl,
@@ -52,6 +54,7 @@ import {
   editPostFindRes,
   commentsToFlatNodes,
   setupTippy,
+  favIconUrl,
 } from '../utils';
 import { i18n } from '../i18next';
 import { T } from 'inferno-i18next';
@@ -118,10 +121,14 @@ export class Main extends Component<any, MainState> {
         enable_downvotes: null,
         open_registration: null,
         enable_nsfw: null,
+        icon: null,
+        banner: null,
+        creator_preferred_username: null,
       },
       admins: [],
       banned: [],
       online: null,
+      version: null,
     },
     showEditSite: false,
     loading: true,
@@ -192,6 +199,20 @@ export class Main extends Component<any, MainState> {
     }
   }
 
+  get documentTitle(): string {
+    if (this.state.siteRes.site.name) {
+      return `${this.state.siteRes.site.name}`;
+    } else {
+      return 'Lemmy';
+    }
+  }
+
+  get favIcon(): string {
+    return this.state.siteRes.site.icon
+      ? this.state.siteRes.site.icon
+      : favIconUrl;
+  }
+
   render() {
     return (
       <div class="container" style={{ 'max-width': '100%' }}>
@@ -205,12 +226,19 @@ export class Main extends Component<any, MainState> {
     );
   }
 
-  my_sidebar() {
+  mySidebar() {
     return (
       <div>
         {!this.state.loading && (
           <div>
-            <div class="card border-secondary mb-3">
+            <div class="card bg-transparent border-secondary mb-3">
+              <div class="card-header bg-transparent border-secondary">
+                <div class="mb-2">
+                  {this.siteName()}
+                  {this.adminButtons()}
+                </div>
+                <BannerIconHeader banner={this.state.siteRes.site.banner} />
+              </div>
               <div class="card-body">
                 {this.trendingCommunities()}
                 {UserService.Instance.user &&
@@ -259,6 +287,14 @@ export class Main extends Component<any, MainState> {
     );
   }
 
+  createCommunityButton() {
+    return (
+      <Link class="btn btn-secondary btn-block" to="/create_community">
+        {i18n.t('create_a_community')}
+      </Link>
+    );
+  }
+
   trendingCommunities() {
     return (
       <div>
@@ -278,6 +314,39 @@ export class Main extends Component<any, MainState> {
           ))}
         </ul>
       </div>
+    );
+  }
+
+  subscribedCommunities() {
+    return (
+      UserService.Instance.user &&
+      this.state.subscribedCommunities.length > 0 && (
+        <div>
+          <h5>
+            <T i18nKey="subscribed_to_communities">
+              #
+              <Link class="text-body" to="/communities">
+                #
+              </Link>
+            </T>
+          </h5>
+          <ul class="list-inline">
+            {this.state.subscribedCommunities.map(community => (
+              <li class="list-inline-item">
+                <CommunityLink
+                  community={{
+                    name: community.community_name,
+                    id: community.community_id,
+                    local: community.community_local,
+                    actor_id: community.community_actor_id,
+                    icon: community.community_icon,
+                  }}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
     );
   }
 
@@ -435,36 +504,16 @@ export class Main extends Component<any, MainState> {
           <p class="mb-0">
             <T i18nKey="landing_0">
               #
-              <a href="https://en.wikipedia.org/wiki/Social_network_aggregation">
-                #
-              </a>
-              <a href="https://en.wikipedia.org/wiki/Fediverse">#</a>
-              <br class="big"></br>
-              <code>#</code>
-              <br></br>
-              <b>#</b>
-              <br class="big"></br>
-              <a href={repoUrl}>#</a>
-              <br class="big"></br>
-              <a href="https://www.rust-lang.org">#</a>
-              <a href="https://actix.rs/">#</a>
-              <a href="https://infernojs.org">#</a>
-              <a href="https://www.typescriptlang.org/">#</a>
-              <br class="big"></br>
-              <a href="https://github.com/LemmyNet/lemmy/graphs/contributors?type=a">
-                #
-              </a>
-            </T>
-          </p>
-        </div>
-      </div>
+            </a>
+          </T>
+        </p>
+      </>
     );
   }
 
   posts() {
     return (
       <div class="main-content-wrapper">
-        {this.selects()}
         {this.state.loading ? (
           <h5>
             <svg class="icon icon-spinner spin">
@@ -473,6 +522,7 @@ export class Main extends Component<any, MainState> {
           </h5>
         ) : (
           <div>
+            {this.selects()}
             {this.listings()}
             {this.paginator()}
           </div>
@@ -573,7 +623,7 @@ export class Main extends Component<any, MainState> {
       <div class="my-2">
         {this.state.page > 1 && (
           <button
-            class="btn btn-sm btn-secondary mr-1"
+            class="btn btn-secondary mr-1"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
@@ -581,7 +631,7 @@ export class Main extends Component<any, MainState> {
         )}
         {this.state.posts.length > 0 && (
           <button
-            class="btn btn-sm btn-secondary"
+            class="btn btn-secondary"
             onClick={linkEvent(this, this.nextPage)}
           >
             {i18n.t('next')}
@@ -694,7 +744,6 @@ export class Main extends Component<any, MainState> {
       this.state.siteRes.banned = data.banned;
       this.state.siteRes.online = data.online;
       this.setState(this.state);
-      document.title = `${this.state.siteRes.site.name}`;
     } else if (res.op == UserOperation.EditSite) {
       let data = res.data as SiteResponse;
       this.state.siteRes.site = data.site;
@@ -769,7 +818,11 @@ export class Main extends Component<any, MainState> {
       this.state.comments = data.comments;
       this.state.loading = false;
       this.setState(this.state);
-    } else if (res.op == UserOperation.EditComment) {
+    } else if (
+      res.op == UserOperation.EditComment ||
+      res.op == UserOperation.DeleteComment ||
+      res.op == UserOperation.RemoveComment
+    ) {
       let data = res.data as CommentResponse;
       editCommentRes(data, this.state.comments);
       this.setState(this.state);

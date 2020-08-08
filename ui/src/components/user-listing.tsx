@@ -9,8 +9,9 @@ import {
 } from '../utils';
 import { CakeDay } from './cake-day';
 
-interface UserOther {
+export interface UserOther {
   name: string;
+  preferred_username?: string;
   id?: number; // Necessary if its federated
   avatar?: string;
   local?: boolean;
@@ -23,6 +24,9 @@ interface UserListingProps {
   realLink?: boolean;
   isMod?: boolean;
   isAdmin?: boolean;
+  useApubName?: boolean;
+  muted?: boolean;
+  hideAvatar?: boolean;
 }
 
 function getTextColor({
@@ -48,33 +52,40 @@ export class UserListing extends Component<UserListingProps, any> {
     const { isMod, isAdmin } = this.props;
     let user = this.props.user;
     let local = user.local == null ? true : user.local;
-    let name_: string, link: string;
+    let apubName: string, link: string;
 
     if (local) {
-      name_ = user.name;
+      apubName = `@${user.name}`;
       link = `/u/${user.name}`;
     } else {
-      name_ = `${user.name}@${hostname(user.actor_id)}`;
+      apubName = `@${user.name}@${hostname(user.actor_id)}`;
       link = !this.props.realLink ? `/user/${user.id}` : user.actor_id;
     }
 
     const textStyle = isMod ? '' : isAdmin ? 'red' : '';
+    let displayName = this.props.useApubName
+      ? apubName
+      : user.preferred_username
+      ? user.preferred_username
+      : apubName;
 
     return (
       <>
-        <Link className="text-body font-weight-bold" to={link}>
-          {user.avatar && showAvatars() && (
+        <Link
+          title={apubName}
+          className={this.props.muted ? 'text-muted' : 'text-info'}
+          to={link}
+        >
+          {!this.props.hideAvatar && user.avatar && showAvatars() && (
             <img
-              height="32"
-              width="32"
+              style="width: 2rem; height: 2rem;"
               src={pictrsAvatarThumbnail(user.avatar)}
               class="rounded-circle mr-2"
             />
           )}
-          <span className={getTextColor({ isMod, isAdmin })}>{name_}</span>
+          <span className={getTextColor({ isMod, isAdmin })}>{displayName}</span>
         </Link>
-
-        {isCakeDay(user.published) && <CakeDay creatorName={name_} />}
+        {/* {isCakeDay(user.published) && <CakeDay creatorName={displayName} />} */}
       </>
     );
   }

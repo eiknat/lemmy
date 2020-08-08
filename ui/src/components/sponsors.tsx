@@ -1,9 +1,11 @@
 import { Component } from 'inferno';
+import { Helmet } from 'inferno-helmet';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { WebSocketService } from '../services';
 import {
   GetSiteResponse,
+  Site,
   WebSocketJsonResponse,
   UserOperation,
 } from '../interfaces';
@@ -12,10 +14,18 @@ import { T } from 'inferno-i18next';
 import { repoUrl, wsJsonToRes, toast } from '../utils';
 import { PATREON_URL } from '../constants';
 
-export class Sponsors extends Component<any, any> {
+interface SponsorsState {
+  site: Site;
+}
+
+export class Sponsors extends Component<any, SponsorsState> {
   private subscription: Subscription;
+  private emptyState: SponsorsState = {
+    site: undefined,
+  };
   constructor(props: any, context: any) {
     super(props, context);
+    this.state = this.emptyState;
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
       .subscribe(
@@ -33,6 +43,14 @@ export class Sponsors extends Component<any, any> {
 
   componentWillUnmount() {
     this.subscription.unsubscribe();
+  }
+
+  get documentTitle(): string {
+    if (this.state.site) {
+      return `${i18n.t('sponsors')} - ${this.state.site.name}`;
+    } else {
+      return 'Lemmy';
+    }
   }
 
   render() {
@@ -91,7 +109,8 @@ export class Sponsors extends Component<any, any> {
       return;
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-      document.title = `${i18n.t('sponsors')} - ${data.site.name}`;
+      this.state.site = data.site;
+      this.setState(this.state);
     }
   }
 }

@@ -1,4 +1,5 @@
 import { Component, linkEvent } from 'inferno';
+import { Helmet } from 'inferno-helmet';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -8,7 +9,7 @@ import {
   GetPostResponse,
   PostResponse,
   Comment,
-  CommentForm as CommentFormI,
+  MarkCommentAsReadForm,
   CommentResponse,
   CommentSortType,
   CommentViewType,
@@ -40,7 +41,7 @@ import {
   setupTippy,
   testMessageToast,
   commentFetchLimit,
-  debounce,
+  debounce,, favIconUrl
 } from '../utils';
 import { PostListing } from './post-listing';
 import { Sidebar } from './sidebar';
@@ -98,6 +99,7 @@ export class Post extends Component<any, PostState> {
         enable_nsfw: undefined,
       },
       online: null,
+      version: null,
     },
   };
 
@@ -180,26 +182,41 @@ export class Post extends Component<any, PostState> {
       UserService.Instance.user &&
       UserService.Instance.user.id == parent_user_id
     ) {
-      let form: CommentFormI = {
-        content: found.content,
+      let form: MarkCommentAsReadForm = {
         edit_id: found.id,
-        creator_id: found.creator_id,
-        post_id: found.post_id,
-        parent_id: found.parent_id,
         read: true,
         auth: null,
       };
-      WebSocketService.Instance.editComment(form);
-      UserService.Instance.user.unreadCount--;
-      UserService.Instance.sub.next({
-        user: UserService.Instance.user,
-      });
+      WebSocketService.Instance.markCommentAsRead(form);
+      UserService.Instance.unreadCountSub.next(
+        UserService.Instance.unreadCountSub.value - 1
+      );
     }
+  }
+
+  get documentTitle(): string {
+    if (this.state.post) {
+      return `${this.state.post.name} - ${this.state.siteRes.site.name}`;
+    } else {
+      return 'Lemmy';
+    }
+  }
+
+  get favIcon(): string {
+    return this.state.post ? this.state.post.community_icon : favIconUrl;
   }
 
   render() {
     return (
       <div class="container">
+        <Helmet title={this.documentTitle}>
+          <link
+            id="favicon"
+            rel="icon"
+            type="image/x-icon"
+            href={this.favIcon}
+          />
+        </Helmet>
         {this.state.loading ? (
           <h5>
             <svg class="icon icon-spinner spin">
@@ -242,9 +259,9 @@ export class Post extends Component<any, PostState> {
   sortRadios() {
     return (
       <>
-        <div class="btn-group btn-group-toggle mr-3 mb-2">
+        <div class="btn-group btn-group-toggle flex-wrap mr-3 mb-2">
           <label
-            className={`btn btn-sm btn-secondary pointer ${
+            className={`btn btn-outline-secondary pointer ${
               this.state.commentSort === CommentSortType.Hot && 'active'
             }`}
           >
@@ -257,7 +274,7 @@ export class Post extends Component<any, PostState> {
             />
           </label>
           <label
-            className={`btn btn-sm btn-secondary pointer ${
+            className={`btn btn-outline-secondary pointer ${
               this.state.commentSort === CommentSortType.Top && 'active'
             }`}
           >
@@ -270,7 +287,7 @@ export class Post extends Component<any, PostState> {
             />
           </label>
           <label
-            className={`btn btn-sm btn-secondary pointer ${
+            className={`btn btn-outline-secondary pointer ${
               this.state.commentSort === CommentSortType.New && 'active'
             }`}
           >
@@ -283,7 +300,7 @@ export class Post extends Component<any, PostState> {
             />
           </label>
           <label
-            className={`btn btn-sm btn-secondary pointer ${
+            className={`btn btn-outline-secondary pointer ${
               this.state.commentSort === CommentSortType.Old && 'active'
             }`}
           >
@@ -298,7 +315,7 @@ export class Post extends Component<any, PostState> {
         </div>
         {/* <div class="btn-group btn-group-toggle mb-2">
           <label
-            className={`btn btn-sm btn-secondary pointer ${
+            className={`btn btn-outline-secondary pointer ${
               this.state.commentViewType === CommentViewType.Chat && 'active'
             }`}
           >
@@ -345,6 +362,7 @@ export class Post extends Component<any, PostState> {
           admins={this.state.siteRes.admins}
           online={this.state.online}
           enableNsfw={this.state.siteRes.site.enable_nsfw}
+          showIcon
         />
       </div>
     );
@@ -446,10 +464,8 @@ export class Post extends Component<any, PostState> {
       this.state.comments = data.comments;
       this.state.community = data.community;
       this.state.moderators = data.moderators;
-      this.state.siteRes.admins = data.admins;
       this.state.online = data.online;
       this.state.loading = false;
-      document.title = `${this.state.post.name} - ${this.state.siteRes.site.name}`;
 
       // Get cross-posts
       if (this.state.post.url) {
@@ -473,7 +489,11 @@ export class Post extends Component<any, PostState> {
         this.state.comments.unshift(data.comment);
         this.setState(this.state);
       }
-    } else if (res.op == UserOperation.EditComment) {
+    } else if (
+      res.op == UserOperation.EditComment ||
+      res.op == UserOperation.DeleteComment ||
+      res.op == UserOperation.RemoveComment
+    ) {
       let data = res.data as CommentResponse;
       editCommentRes(data, this.state.comments);
       this.setState(this.state);
@@ -490,7 +510,13 @@ export class Post extends Component<any, PostState> {
       let data = res.data as PostResponse;
       createPostLikeRes(data, this.state.post);
       this.setState(this.state);
-    } else if (res.op == UserOperation.EditPost) {
+    } else if (
+      res.op == UserOperation.EditPost ||
+      res.op == UserOperation.DeletePost ||
+      res.op == UserOperation.RemovePost ||
+      res.op == UserOperation.LockPost ||
+      res.op == UserOperation.StickyPost
+    ) {
       let data = res.data as PostResponse;
       this.state.post = data.post;
       this.setState(this.state);
@@ -500,7 +526,11 @@ export class Post extends Component<any, PostState> {
       this.state.post = data.post;
       this.setState(this.state);
       setupTippy();
-    } else if (res.op == UserOperation.EditCommunity) {
+    } else if (
+      res.op == UserOperation.EditCommunity ||
+      res.op == UserOperation.DeleteCommunity ||
+      res.op == UserOperation.RemoveCommunity
+    ) {
       let data = res.data as CommunityResponse;
       this.state.community = data.community;
       this.state.post.community_id = data.community.id;
@@ -558,7 +588,6 @@ export class Post extends Component<any, PostState> {
       let data = res.data as GetCommunityResponse;
       this.state.community = data.community;
       this.state.moderators = data.moderators;
-      this.state.siteRes.admins = data.admins;
       this.setState(this.state);
     }
   }

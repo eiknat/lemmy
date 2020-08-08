@@ -1,4 +1,5 @@
 import { Component, linkEvent } from 'inferno';
+import { Helmet } from 'inferno-helmet';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -47,6 +48,7 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
       admins: [],
       banned: [],
       online: null,
+      version: null,
     },
     siteConfigForm: {
       config_hjson: null,
@@ -80,10 +82,18 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
     this.subscription.unsubscribe();
   }
 
+  get documentTitle(): string {
+    if (this.state.siteRes.site.name) {
+      return `${i18n.t('admin_settings')} - ${this.state.siteRes.site.name}`;
+    } else {
+      return 'Lemmy';
+    }
+  }
+
   render() {
-    console.log(this.state.siteRes.site);
     return (
       <div class="container">
+        <Helmet title={this.documentTitle} />
         {this.state.siteLoading || this.state.siteConfigLoading ? (
           <h5>
             <svg class="icon icon-spinner spin">
@@ -93,7 +103,9 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
         ) : (
           <div class="row">
             <div class="col-12 col-md-6">
-              <SiteForm site={this.state.siteRes.site} />
+              {this.state.siteRes.site.id && (
+                <SiteForm site={this.state.siteRes.site} />
+              )}
               {this.admins()}
               {this.bannedUsers()}
             </div>
@@ -114,6 +126,7 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
               <UserListing
                 user={{
                   name: admin.name,
+                  preferred_username: admin.preferred_username,
                   avatar: admin.avatar,
                   id: admin.id,
                   local: admin.local,
@@ -137,6 +150,7 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
               <UserListing
                 user={{
                   name: banned.name,
+                  preferred_username: banned.preferred_username,
                   avatar: banned.avatar,
                   id: banned.id,
                   local: banned.local,
@@ -223,9 +237,6 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
       this.state.siteRes = data;
       this.state.siteLoading = false;
       this.setState(this.state);
-      document.title = `${i18n.t('admin_settings')} - ${
-        this.state.siteRes.site.name
-      }`;
     } else if (res.op == UserOperation.EditSite) {
       let data = res.data as SiteResponse;
       this.state.siteRes.site = data.site;

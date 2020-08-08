@@ -1,4 +1,5 @@
 import { Component, linkEvent } from 'inferno';
+import { Helmet } from 'inferno-helmet';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -8,7 +9,9 @@ import {
   UserOperation,
   PasswordResetForm,
   GetSiteResponse,
+  GetCaptchaResponse,
   WebSocketJsonResponse,
+  Site,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import { wsJsonToRes, validEmail, toast, setupTippy } from '../utils';
@@ -20,12 +23,9 @@ interface State {
   registerForm: RegisterForm;
   loginLoading: boolean;
   registerLoading: boolean;
-  enable_nsfw: boolean;
-  mathQuestion: {
-    a: number;
-    b: number;
-    answer: number;
-  };
+  captcha: GetCaptchaResponse;
+  captchaPlaying: boolean;
+  site: Site;
 }
 
 function initCaptcha() {
@@ -62,11 +62,21 @@ export class Login extends Component<any, State> {
     },
     loginLoading: false,
     registerLoading: false,
-    enable_nsfw: undefined,
-    mathQuestion: {
-      a: Math.floor(Math.random() * 10) + 1,
-      b: Math.floor(Math.random() * 10) + 1,
-      answer: undefined,
+    captcha: undefined,
+    captchaPlaying: false,
+    site: {
+      id: undefined,
+      name: undefined,
+      creator_id: undefined,
+      published: undefined,
+      creator_name: undefined,
+      number_of_users: undefined,
+      number_of_posts: undefined,
+      number_of_comments: undefined,
+      number_of_communities: undefined,
+      enable_downvotes: undefined,
+      open_registration: undefined,
+      enable_nsfw: undefined,
     },
   };
 
@@ -86,6 +96,7 @@ export class Login extends Component<any, State> {
       );
 
     WebSocketService.Instance.getSite();
+    WebSocketService.Instance.getCaptcha();
   }
 
   componentDidMount() {
@@ -97,9 +108,18 @@ export class Login extends Component<any, State> {
     this.subscription.unsubscribe();
   }
 
+  get documentTitle(): string {
+    if (this.state.site.name) {
+      return `${i18n.t('login')} - ${this.state.site.name}`;
+    } else {
+      return 'Lemmy';
+    }
+  }
+
   render() {
     return (
       <div class="container">
+        <Helmet title={this.documentTitle} />
         <div class="row">
           <div class="col-12 col-lg-6 mb-4">{this.loginForm()}</div>
           <div class="col-12 col-lg-6">{this.registerForm()}</div>
@@ -195,6 +215,7 @@ export class Login extends Component<any, State> {
       </div>
     );
   }
+
   registerForm() {
     return (
       <form onSubmit={linkEvent(this, this.handleRegisterSubmit)}>
@@ -301,24 +322,38 @@ export class Login extends Component<any, State> {
             />
           </div>
         </div>
-        <div class="form-group row">
-          <label class="col-sm-10 col-form-label" htmlFor="register-math">
-            {i18n.t('what_is')}{' '}
-            {`${this.state.mathQuestion.a} + ${this.state.mathQuestion.b}?`}
-          </label>
 
-          <div class="col-sm-2">
-            <input
-              type="number"
-              id="register-math"
-              class="form-control"
-              value={this.state.mathQuestion.answer}
-              onInput={linkEvent(this, this.handleMathAnswerChange)}
-              required
-            />
+        {this.state.captcha && (
+          <div class="form-group row">
+            <label class="col-sm-2" htmlFor="register-captcha">
+              <span class="mr-2">{i18n.t('enter_code')}</span>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onClick={linkEvent(this, this.handleRegenCaptcha)}
+              >
+                <svg class="icon icon-refresh-cw">
+                  <use xlinkHref="#icon-refresh-cw"></use>
+                </svg>
+              </button>
+            </label>
+            {this.showCaptcha()}
+            <div class="col-sm-6">
+              <input
+                type="text"
+                class="form-control"
+                id="register-captcha"
+                value={this.state.registerForm.captcha_answer}
+                onInput={linkEvent(
+                  this,
+                  this.handleRegisterCaptchaAnswerChange
+                )}
+                required
+              />
+            </div>
           </div>
-        </div>
-        {this.state.enable_nsfw && (
+        )}
+        {this.state.site.enable_nsfw && (
           <div class="form-group row">
             <div class="col-sm-10">
               <div class="form-check">
@@ -348,11 +383,7 @@ export class Login extends Component<any, State> {
         </div>
         <div class="form-group row">
           <div class="col-sm-10">
-            <button
-              type="submit"
-              class="btn btn-secondary"
-              disabled={this.mathCheck}
-            >
+            <button type="submit" class="btn btn-secondary">
               {this.state.registerLoading ? (
                 <svg class="icon icon-spinner spin">
                   <use xlinkHref="#icon-spinner"></use>
@@ -364,6 +395,36 @@ export class Login extends Component<any, State> {
           </div>
         </div>
       </form>
+    );
+  }
+
+  showCaptcha() {
+    return (
+      <div class="col-sm-4">
+        {this.state.captcha.ok && (
+          <>
+            <img
+              class="rounded-top img-fluid"
+              src={this.captchaPngSrc()}
+              style="border-bottom-right-radius: 0; border-bottom-left-radius: 0;"
+            />
+            {this.state.captcha.ok.wav && (
+              <button
+                class="rounded-bottom btn btn-sm btn-secondary btn-block"
+                style="border-top-right-radius: 0; border-top-left-radius: 0;"
+                title={i18n.t('play_captcha_audio')}
+                onClick={linkEvent(this, this.handleCaptchaPlay)}
+                type="button"
+                disabled={this.state.captchaPlaying}
+              >
+                <svg class="icon icon-play">
+                  <use xlinkHref="#icon-play"></use>
+                </svg>
+              </button>
+            )}
+          </>
+        )}
+      </div>
     );
   }
 
@@ -449,9 +510,14 @@ export class Login extends Component<any, State> {
     i.setState(i.state);
   }
 
-  handleMathAnswerChange(i: Login, event: any) {
-    i.state.mathQuestion.answer = event.target.value;
+  handleRegisterCaptchaAnswerChange(i: Login, event: any) {
+    i.state.registerForm.captcha_answer = event.target.value;
     i.setState(i.state);
+  }
+
+  handleRegenCaptcha(_i: Login, _event: any) {
+    event.preventDefault();
+    WebSocketService.Instance.getCaptcha();
   }
 
   handlePasswordReset(i: Login) {
@@ -490,6 +556,9 @@ export class Login extends Component<any, State> {
         toast(i18n.t(msg.error), 'danger');
       }
       this.state = this.emptyState;
+      this.state.registerForm.captcha_answer = undefined;
+      // Refetch another captcha
+      WebSocketService.Instance.getCaptcha();
       this.setState(this.state);
       return;
     } else {
@@ -508,13 +577,19 @@ export class Login extends Component<any, State> {
         UserService.Instance.login(data);
         WebSocketService.Instance.userJoin();
         this.props.history.push('/communities');
+      } else if (res.op == UserOperation.GetCaptcha) {
+        let data = res.data as GetCaptchaResponse;
+        if (data.ok) {
+          this.state.captcha = data;
+          this.state.registerForm.captcha_uuid = data.ok.uuid;
+          this.setState(this.state);
+        }
       } else if (res.op == UserOperation.PasswordReset) {
         toast(i18n.t('reset_password_mail_sent'));
       } else if (res.op == UserOperation.GetSite) {
         let data = res.data as GetSiteResponse;
-        this.state.enable_nsfw = data.site.enable_nsfw;
+        this.state.site = data.site;
         this.setState(this.state);
-        document.title = `${i18n.t('login')} - ${data.site.name}`;
       }
     }
   }

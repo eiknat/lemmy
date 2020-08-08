@@ -2,7 +2,8 @@ import { Component, linkEvent } from 'inferno';
 import { Link } from 'inferno-router';
 import {
   PrivateMessage as PrivateMessageI,
-  EditPrivateMessageForm,
+  DeletePrivateMessageForm,
+  MarkPrivateMessageAsReadForm,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import {
@@ -15,6 +16,7 @@ import {
 } from '../utils';
 import { MomentTime } from './moment-time';
 import { PrivateMessageForm } from './private-message-form';
+import { UserListing, UserOther } from './user-listing';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
 
@@ -52,11 +54,34 @@ export class PrivateMessage extends Component<
   }
 
   get mine(): boolean {
-    return UserService.Instance.user.id == this.props.privateMessage.creator_id;
+    return (
+      UserService.Instance.user &&
+      UserService.Instance.user.id == this.props.privateMessage.creator_id
+    );
   }
 
   render() {
     let message = this.props.privateMessage;
+    let userOther: UserOther = this.mine
+      ? {
+          name: message.recipient_name,
+          preferred_username: message.recipient_preferred_username,
+          id: message.id,
+          avatar: message.recipient_avatar,
+          local: message.recipient_local,
+          actor_id: message.recipient_actor_id,
+          published: message.published,
+        }
+      : {
+          name: message.creator_name,
+          preferred_username: message.creator_preferred_username,
+          id: message.id,
+          avatar: message.creator_avatar,
+          local: message.creator_local,
+          actor_id: message.creator_actor_id,
+          published: message.published,
+        };
+
     return (
       <div class="border-top border-light">
         <div>
@@ -66,33 +91,7 @@ export class PrivateMessage extends Component<
               {this.mine ? i18n.t('to') : i18n.t('from')}
             </li>
             <li className="list-inline-item">
-              <Link
-                className="text-body font-weight-bold"
-                to={
-                  this.mine
-                    ? `/u/${message.recipient_name}`
-                    : `/u/${message.creator_name}`
-                }
-              >
-                {(this.mine
-                  ? message.recipient_avatar
-                  : message.creator_avatar) &&
-                  showAvatars() && (
-                    <img
-                      height="32"
-                      width="32"
-                      src={pictrsAvatarThumbnail(
-                        this.mine
-                          ? message.recipient_avatar
-                          : message.creator_avatar
-                      )}
-                      class="rounded-circle mr-1"
-                    />
-                  )}
-                <span>
-                  {this.mine ? message.recipient_name : message.creator_name}
-                </span>
-              </Link>
+              <UserListing user={userOther} />
             </li>
             <li className="list-inline-item">
               <span>
@@ -120,6 +119,7 @@ export class PrivateMessage extends Component<
             <PrivateMessageForm
               privateMessage={message}
               onEdit={this.handlePrivateMessageEdit}
+              onCreate={this.handlePrivateMessageCreate}
               onCancel={this.handleReplyCancel}
             />
           )}
@@ -140,7 +140,7 @@ export class PrivateMessage extends Component<
                   <>
                     <li className="list-inline-item">
                       <button
-                        class="btn btn-link btn-sm btn-animate text-muted"
+                        class="btn btn-link btn-animate text-muted"
                         onClick={linkEvent(this, this.handleMarkRead)}
                         data-tippy-content={
                           message.read
@@ -159,7 +159,7 @@ export class PrivateMessage extends Component<
                     </li>
                     <li className="list-inline-item">
                       <button
-                        class="btn btn-link btn-sm btn-animate text-muted"
+                        class="btn btn-link btn-animate text-muted"
                         onClick={linkEvent(this, this.handleReplyClick)}
                         data-tippy-content={i18n.t('reply')}
                       >
@@ -172,7 +172,7 @@ export class PrivateMessage extends Component<
                   <>
                     <li className="list-inline-item">
                       <button
-                        class="btn btn-link btn-sm btn-animate text-muted"
+                        class="btn btn-link btn-animate text-muted"
                         onClick={linkEvent(this, this.handleEditClick)}
                         data-tippy-content={i18n.t('edit')}
                       >
@@ -181,7 +181,7 @@ export class PrivateMessage extends Component<
                     </li>
                     <li className="list-inline-item">
                       <button
-                        class="btn btn-link btn-sm btn-animate text-muted"
+                        class="btn btn-link btn-animate text-muted"
                         onClick={linkEvent(this, this.handleDeleteClick)}
                         data-tippy-content={
                           !message.deleted
@@ -202,7 +202,7 @@ export class PrivateMessage extends Component<
                 )}
                 <li className="list-inline-item">
                   <button
-                    class="btn btn-link btn-sm btn-animate text-muted"
+                    class="btn btn-link btn-animate text-muted"
                     onClick={linkEvent(this, this.handleViewSource)}
                     data-tippy-content={i18n.t('view_source')}
                   >
@@ -257,11 +257,11 @@ export class PrivateMessage extends Component<
   }
 
   handleDeleteClick(i: PrivateMessage) {
-    let form: EditPrivateMessageForm = {
+    let form: DeletePrivateMessageForm = {
       edit_id: i.props.privateMessage.id,
       deleted: !i.props.privateMessage.deleted,
     };
-    WebSocketService.Instance.editPrivateMessage(form);
+    WebSocketService.Instance.deletePrivateMessage(form);
   }
 
   handleReplyCancel() {
@@ -271,11 +271,11 @@ export class PrivateMessage extends Component<
   }
 
   handleMarkRead(i: PrivateMessage) {
-    let form: EditPrivateMessageForm = {
+    let form: MarkPrivateMessageAsReadForm = {
       edit_id: i.props.privateMessage.id,
       read: !i.props.privateMessage.read,
     };
-    WebSocketService.Instance.editPrivateMessage(form);
+    WebSocketService.Instance.markPrivateMessageAsRead(form);
   }
 
   handleMessageCollapse(i: PrivateMessage) {
@@ -293,9 +293,14 @@ export class PrivateMessage extends Component<
     this.setState(this.state);
   }
 
-  handlePrivateMessageCreate() {
-    this.state.showReply = false;
-    this.setState(this.state);
-    toast(i18n.t('message_sent'));
+  handlePrivateMessageCreate(message: PrivateMessageI) {
+    if (
+      UserService.Instance.user &&
+      message.creator_id == UserService.Instance.user.id
+    ) {
+      this.state.showReply = false;
+      this.setState(this.state);
+      toast(i18n.t('message_sent'));
+    }
   }
 }

@@ -176,12 +176,19 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
     }
     // Only do the showing and hiding if logged in
     if (UserService.Instance.user) {
-      if (res.op == UserOperation.CreateComment) {
+      if (
+        res.op == UserOperation.CreateComment ||
+        res.op == UserOperation.EditComment
+      ) {
         let data = res.data as CommentResponse;
-        this.handleFinished(res.op, data);
-      } else if (res.op == UserOperation.EditComment) {
-        let data = res.data as CommentResponse;
-        this.handleFinished(res.op, data);
+
+        // This only finishes this form, if the randomly generated form_id matches the one received
+        if (this.state.commentForm.form_id == data.form_id) {
+          this.setState({ finished: true });
+
+          // Necessary because it broke tribute for some reaso
+          this.setState({ finished: false });
+        }
       }
     }
   }

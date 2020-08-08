@@ -1,5 +1,6 @@
 import { Component, linkEvent } from 'inferno';
 import { Link } from 'inferno-router';
+import { Helmet } from 'inferno-helmet';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -34,6 +35,8 @@ import { CommentNodes } from './comment-nodes';
 import { SortSelect } from './sort-select';
 import { DataTypeSelect } from './data-type-select';
 import { Sidebar } from './sidebar';
+import { CommunityLink } from './community-link';
+import { BannerIconHeader } from './banner-icon-header';
 import {
   wsJsonToRes,
   fetchLimit,
@@ -48,6 +51,7 @@ import {
   editPostFindRes,
   commentsToFlatNodes,
   setupTippy,
+  favIconUrl,
 } from '../utils';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
@@ -129,6 +133,9 @@ export class Community extends Component<any, State> {
       enable_create_communities: undefined,
       open_registration: undefined,
       enable_nsfw: undefined,
+      icon: undefined,
+      banner: undefined,
+      creator_preferred_username: undefined,
     },
   };
 
@@ -178,10 +185,34 @@ export class Community extends Component<any, State> {
     }
   }
 
+  get documentTitle(): string {
+    if (this.state.community.title) {
+      return `${this.state.community.title} - ${this.state.site.name}`;
+    } else {
+      return 'Lemmy';
+    }
+  }
+
+  get favIcon(): string {
+    return this.state.community.icon
+      ? this.state.community.icon
+      : this.state.site.icon
+      ? this.state.site.icon
+      : favIconUrl;
+  }
+
   render() {
     const isMobile = window.innerWidth < 992;
     return (
       <div class="container">
+        <Helmet title={this.documentTitle}>
+          <link
+            id="favicon"
+            rel="icon"
+            type="image/x-icon"
+            href={this.favIcon}
+          />
+        </Helmet>
         {this.state.loading ? (
           <h5>
             <svg class="icon icon-spinner spin">
@@ -295,6 +326,26 @@ export class Community extends Component<any, State> {
     );
   }
 
+  communityInfo() {
+    return (
+      <div>
+        <BannerIconHeader
+          banner={this.state.community.banner}
+          icon={this.state.community.icon}
+        />
+        <h5 class="mb-0">{this.state.community.title}</h5>
+        <CommunityLink
+          community={this.state.community}
+          realLink
+          useApubName
+          muted
+          hideAvatar
+        />
+        <hr />
+      </div>
+    );
+  }
+
   selects() {
     return (
       <div class="mb-3">
@@ -326,7 +377,7 @@ export class Community extends Component<any, State> {
       <div class="my-2">
         {this.state.page > 1 && (
           <button
-            class="btn btn-sm btn-secondary mr-1"
+            class="btn btn-secondary mr-1"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
@@ -334,7 +385,7 @@ export class Community extends Component<any, State> {
         )}
         {this.state.posts.length > 0 && (
           <button
-            class="btn btn-sm btn-secondary"
+            class="btn btn-secondary"
             onClick={linkEvent(this, this.nextPage)}
           >
             {i18n.t('next')}
@@ -426,12 +477,14 @@ export class Community extends Component<any, State> {
       let data = res.data as GetCommunityResponse;
       this.state.community = data.community;
       this.state.moderators = data.moderators;
-      this.state.admins = data.admins;
       this.state.online = data.online;
-      document.title = `/c/${this.state.community.name} - ${this.state.site.name}`;
       this.setState(this.state);
       this.fetchData();
-    } else if (res.op == UserOperation.EditCommunity) {
+    } else if (
+      res.op == UserOperation.EditCommunity ||
+      res.op == UserOperation.DeleteCommunity ||
+      res.op == UserOperation.RemoveCommunity
+    ) {
       let data = res.data as CommunityResponse;
       this.state.community = data.community;
       this.setState(this.state);
@@ -447,7 +500,13 @@ export class Community extends Component<any, State> {
       this.state.loading = false;
       this.setState(this.state);
       setupTippy();
-    } else if (res.op == UserOperation.EditPost) {
+    } else if (
+      res.op == UserOperation.EditPost ||
+      res.op == UserOperation.DeletePost ||
+      res.op == UserOperation.RemovePost ||
+      res.op == UserOperation.LockPost ||
+      res.op == UserOperation.StickyPost
+    ) {
       let data = res.data as PostResponse;
       editPostFindRes(data, this.state.posts);
       this.setState(this.state);
@@ -476,7 +535,11 @@ export class Community extends Component<any, State> {
       this.state.comments = data.comments;
       this.state.loading = false;
       this.setState(this.state);
-    } else if (res.op == UserOperation.EditComment) {
+    } else if (
+      res.op == UserOperation.EditComment ||
+      res.op == UserOperation.DeleteComment ||
+      res.op == UserOperation.RemoveComment
+    ) {
       let data = res.data as CommentResponse;
       editCommentRes(data, this.state.comments);
       this.setState(this.state);
@@ -499,6 +562,7 @@ export class Community extends Component<any, State> {
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
       this.state.site = data.site;
+      this.state.admins = data.admins;
       this.setState(this.state);
     }
   }

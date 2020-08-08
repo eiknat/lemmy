@@ -16,6 +16,7 @@ interface CommentNodesProps {
   moderators?: Array<CommunityUser>;
   admins?: Array<UserView>;
   postCreatorId?: number;
+  noBorder?: boolean;
   noIndent?: boolean;
   viewOnly?: boolean;
   locked?: boolean;
@@ -43,6 +44,7 @@ export class CommentNodes extends Component<
           <CommentNode
             key={node.comment.id}
             node={node}
+            noBorder={this.props.noBorder}
             noIndent={this.props.noIndent}
             viewOnly={this.props.viewOnly}
             locked={this.props.locked}

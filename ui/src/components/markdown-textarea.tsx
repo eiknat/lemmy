@@ -27,6 +27,7 @@ interface MarkdownTextAreaProps {
   onSubmit?(val: string, event: any): any;
   onContentChange?(val: string): any;
   onReplyCancel?(): any;
+  hideNavigationWarnings?: boolean;
 }
 
 interface MarkdownTextAreaState {
@@ -83,7 +84,7 @@ export class MarkdownTextArea extends Component<
   }
 
   componentDidUpdate() {
-    if (this.state.content) {
+    if (!this.props.hideNavigationWarnings && this.state.content) {
       window.onbeforeunload = () => true;
     } else {
       window.onbeforeunload = undefined;
@@ -115,7 +116,10 @@ export class MarkdownTextArea extends Component<
   render() {
     return (
       <form id={this.formId} onSubmit={linkEvent(this, this.handleSubmit)}>
-        <Prompt when={this.state.content} message={i18n.t('block_leaving')} />
+        <Prompt
+          when={!this.props.hideNavigationWarnings && this.state.content}
+          message={i18n.t('block_leaving')}
+        />
         <div class="form-group row">
           <div className={`col-sm-12`}>
             <textarea
@@ -128,11 +132,11 @@ export class MarkdownTextArea extends Component<
               required
               disabled={this.props.disabled}
               rows={2}
-              maxLength={10000}
+              maxLength={this.props.maxLength || 10000}
             />
             {this.state.previewMode && (
               <div
-                className="card card-body md-div"
+                className="card bg-transparent border-secondary card-body md-div"
                 dangerouslySetInnerHTML={mdToHtml(this.state.content)}
               />
             )}
@@ -285,6 +289,24 @@ export class MarkdownTextArea extends Component<
             </button>
             <button
               class="btn btn-sm text-muted"
+              data-tippy-content={i18n.t('subscript')}
+              onClick={linkEvent(this, this.handleInsertSubscript)}
+            >
+              <svg class="icon icon-inline">
+                <use xlinkHref="#icon-subscript"></use>
+              </svg>
+            </button>
+            <button
+              class="btn btn-sm text-muted"
+              data-tippy-content={i18n.t('superscript')}
+              onClick={linkEvent(this, this.handleInsertSuperscript)}
+            >
+              <svg class="icon icon-inline">
+                <use xlinkHref="#icon-superscript"></use>
+              </svg>
+            </button>
+            <button
+              class="btn btn-sm text-muted"
               data-tippy-content={i18n.t('spoiler')}
               onClick={linkEvent(this, this.handleInsertSpoiler)}
             >
@@ -408,7 +430,8 @@ export class MarkdownTextArea extends Component<
     event.preventDefault();
     i.state.loading = true;
     i.setState(i.state);
-    i.props.onSubmit(i.state.content);
+    let msg = { val: i.state.content, formId: i.formId };
+    i.props.onSubmit(msg);
   }
 
   handleKeydown(i: MarkdownTextArea, event: any) {
@@ -515,6 +538,16 @@ export class MarkdownTextArea extends Component<
   handleInsertHeader(i: MarkdownTextArea, event: any) {
     event.preventDefault();
     i.simpleInsert('#');
+  }
+
+  handleInsertSubscript(i: MarkdownTextArea, event: any) {
+    event.preventDefault();
+    i.simpleSurround('~');
+  }
+
+  handleInsertSuperscript(i: MarkdownTextArea, event: any) {
+    event.preventDefault();
+    i.simpleSurround('^');
   }
 
   simpleInsert(chars: string) {
