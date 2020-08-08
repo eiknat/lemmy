@@ -327,6 +327,7 @@ class Main extends Component<any, MainState> {
               src={`${BASE_PATH}welcome.gif`}
               className="img-fluid"
               style={{ width: '100%' }}
+              alt="welcome sign"
             />
             {this.canAdmin && (
               <ul className="list-inline mb-1 text-muted font-weight-bold">
@@ -591,6 +592,7 @@ class Main extends Component<any, MainState> {
         {this.state.page > 1 && (
           <Button
             mr={1}
+            variant="muted"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
@@ -598,6 +600,7 @@ class Main extends Component<any, MainState> {
         )}
         {this.state.posts.length > 0 && (
           <Button
+            variant="muted"
             onClick={linkEvent(this, this.nextPage)}
           >
             {i18n.t('next')}

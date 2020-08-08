@@ -39,16 +39,9 @@ export class ListingTypeSelect extends Component<
       <div className="btn-group btn-group-toggle">
         <Button
           as="label"
-          className={`
-            ${this.state.type_ == ListingType.Subscribed && 'active'}
-          `}
           disabled={UserService.Instance.user == undefined}
-          css={{
-            borderTopRightRadius: 0,
-            borderBottomRightRadius: 0,
-          }}
           variant={
-            this.state.type_ == ListingType.Subscribed ? 'highlight' : 'primary'
+            this.state.type_ == ListingType.Subscribed ? 'primary' : 'muted'
           }
         >
           <input
@@ -63,13 +56,8 @@ export class ListingTypeSelect extends Component<
         </Button>
         <Button
           as="label"
-          css={{
-            borderTopLeftRadius: 0,
-            borderBottomLeftRadius: 0,
-            // backgroundColor: this.state.type_ == ListingType.All ? 'inherit' : '#2b2a2a'
-          }}
           variant={
-            this.state.type_ == ListingType.All ? 'highlight' : 'primary'
+            this.state.type_ == ListingType.All ? 'primary' : 'muted'
           }
         >
           <input

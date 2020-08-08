@@ -719,3 +719,14 @@ a.text-body {
     flex-direction: column-reverse;
   }
 }
+
+.btn-group>label:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.btn-group>label:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+

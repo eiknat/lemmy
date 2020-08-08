@@ -38,12 +38,7 @@ export class DataTypeSelect extends Component<
       <div className="btn-group btn-group-toggle">
         <Button
           as="label"
-          css={{
-            borderTopRightRadius: 0,
-            borderBottomRightRadius: 0,
-            // backgroundColor: this.state.type_ == DataType.Post ? 'inherit' : '#2b2a2a'
-          }}
-          variant={this.state.type_ == DataType.Post ? 'highlight' : 'primary'}
+          variant={this.state.type_ == DataType.Post ? 'primary' : 'muted'}
         >
           <input
             type="radio"
@@ -56,13 +51,8 @@ export class DataTypeSelect extends Component<
         </Button>
         <Button
           as="label"
-          css={{
-            borderTopLeftRadius: 0,
-            borderBottomLeftRadius: 0,
-            // backgroundColor:  this.state.type_ == DataType.Comment ? 'inherit' : '#2b2a2a'
-          }}
           variant={
-            this.state.type_ == DataType.Comment ? 'highlight' : 'primary'
+            this.state.type_ == DataType.Comment ? 'primary' : 'muted'
           }
         >
           <input

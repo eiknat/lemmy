@@ -5,19 +5,20 @@ import { themes, variants } from '../theme';
 
 const ThemeSystem = createContext({});
 
-function ThemeSystemProvider({ children }) {
-  const [currentTheme, setCurrentTheme] = useState('chapo');
+function ThemeSystemProvider({ children, initialTheme = 'chapo' }) {
+  console.log({ initialTheme });
+  const [currentTheme, setCurrentTheme] = useState(initialTheme);
 
   const theme = Object.keys(themes).includes(currentTheme)
     ? themes[currentTheme]
     : themes.chapo;
 
   useEffect(() => {
-    const theme = UserService?.Instance?.user?.theme;
+    // const theme = UserService?.Instance?.user?.theme;
 
-    if (theme) {
-      setCurrentTheme(theme);
-    }
+    // if (theme) {
+    //   setCurrentTheme(theme);
+    // }
   }, []);
 
   useEffect(() => {
@@ -42,7 +43,10 @@ function ThemeSystemProvider({ children }) {
         setCurrentTheme,
       }}
     >
-      <ThemeProvider theme={{ ...theme, ...variants }}>
+      <ThemeProvider theme={{
+        ...variants,
+        ...theme,
+      }}>
         {children}
       </ThemeProvider>
     </ThemeSystem.Provider>

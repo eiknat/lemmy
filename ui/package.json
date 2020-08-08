@@ -8,7 +8,8 @@
     "api-test": "jest src/api_tests/api.spec.ts",
     "build": "node generate_translations.js && NODE_ENV=production vite build --base=/static/",
     "lint": "tsc --noEmit && eslint --report-unused-disable-directives --ext .js,.ts,.tsx src",
-    "start": "node generate_translations.js && vite --port 4444 --open"
+    "start": "node generate_translations.js && vite --port 4444 --open",
+    "storybook": "start-storybook"
   },
   "keywords": [],
   "dependencies": {
@@ -68,14 +69,20 @@
     "ws": "^7.3.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.11.1",
+    "@storybook/addon-info": "^5.3.19",
+    "@storybook/react": "^5.3.19",
     "@types/jest": "^26.0.8",
     "@types/node-fetch": "^2.5.7",
+    "babel-loader": "^8.1.0",
+    "babel-preset-react-app": "^9.1.2",
     "cssnano": "^4.1.10",
     "eslint": "^7.6.0",
     "eslint-plugin-inferno": "^7.20.1",
     "eslint-plugin-jane": "^8.0.5",
     "lint-staged": "^10.2.11",
     "node-fetch": "^2.6.0",
+    "react-docgen-typescript-loader": "^3.7.2",
     "sortpack": "^2.1.6",
     "source-map-loader": "^1.0.1",
     "ts-jest": "^26.1.4",

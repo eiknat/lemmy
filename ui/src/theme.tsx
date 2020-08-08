@@ -1,35 +1,37 @@
 import React from 'react';
 
 import * as allThemes from '@theme-ui/presets';
-import { Theme, ThemeProviderProps } from 'theme-ui';
+import { Select, Theme, ThemeProviderProps } from 'theme-ui';
 import { darken, lighten } from '@theme-ui/color';
 import { i18n } from './i18next';
 import { useThemeSystem } from './components/ThemeSystemProvider';
 
-const { dark } = allThemes;
+const { dark, bulma, tailwind, ...remainingThemes } = allThemes;
 
 export const variants = {
   buttons: {
     primary: {
-      color: 'text',
-      backgroundColor: 'muted',
+      color: 'background',
+      bg: 'primary',
       cursor: 'pointer',
-      // backgroundColor: 'primary',
       '&:hover': {
-        color: 'text',
         textDecoration: 'none',
-        // backgroundColor: darken('primary', 0.05),
-        backgroundColor: darken('muted', 0.1),
       },
       '&:disabled': {
-        opacity: 0.65,
+        opacity: 0.5,
         cursor: 'not-allowed',
-        backgroundColor: '#444',
       },
+    },
+    muted: {
+      bg: 'muted',
+      color: 'text',
+    },
+    secondary: {
+      color: 'background',
+      bg: 'secondary',
     },
     highlight: {
       color: 'text',
-      backgroundColor: lighten('muted', 0.1),
       '&:hover': {
         backgroundColor: 'muted',
       },
@@ -38,6 +40,7 @@ export const variants = {
       backgroundColor: 'danger',
     },
     outline: {
+      color: 'text',
       borderColor: 'muted',
       borderWidth: '1px',
       borderStyle: 'solid',
@@ -46,7 +49,7 @@ export const variants = {
   },
   forms: {
     select: {
-      borderColor: lighten('muted', 0.4),
+      // borderColor: lighten('muted', 0.4),
       backgroundColor: 'background',
       color: 'text',
     },
@@ -61,15 +64,31 @@ const defaultTheme: ThemeProviderProps<Theme> = {
     primary: '#DA1B9A',
     secondary: '#2030DF',
     accent: '#F3B90C',
-    danger: '#E74C3C',
+    danger: '#dc3545',
     muted: '#303030',
   },
+  buttons: {
+    ...variants.buttons,
+    primary: {
+      ...variants.buttons.primary,
+      color: 'text',
+      bg: 'primary'
+    },
+    secondary: {
+      ...variants.buttons.secondary,
+      color: 'text',
+      bg: 'secondary',
+    }
+  }
 };
 
 export const themes = {
-  chapo: defaultTheme,
-  ...allThemes,
+  chapo: { ...defaultTheme },
+  dark,
+  ...remainingThemes,
 };
+
+// console.log({ themes })
 
 export function ThemeSelector({ value, onChange }) {
   const { setCurrentTheme } = useThemeSystem();
@@ -81,10 +100,11 @@ export function ThemeSelector({ value, onChange }) {
   }
 
   return (
-    <select
+    <Select
       value={value}
       onChange={handleThemeChange}
-      className="ml-2 custom-select custom-select-sm w-auto"
+      // ml={2}
+      // className="ml-2 custom-select custom-select-sm w-auto"
     >
       <option disabled>{i18n.t('theme')}</option>
       {Object.keys(themes).map(theme => (
@@ -92,7 +112,7 @@ export function ThemeSelector({ value, onChange }) {
           {theme}
         </option>
       ))}
-    </select>
+    </Select>
   );
 }
 

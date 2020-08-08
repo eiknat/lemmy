@@ -296,58 +296,58 @@ class BaseUser extends Component<any, UserState> {
   viewRadios() {
     return (
       <div className="btn-group btn-group-toggle">
-        <label
-          className={`btn btn-sm btn-secondary pointer btn-outline-light
-            ${this.state.view == UserDetailsView.Overview && 'active'}
-          `}
+        <Button
+          as="label"
+          variant={this.state.view == UserDetailsView.Overview ? 'primary' : 'muted'}
         >
           <input
             type="radio"
+            className="visually-hidden"
             value={UserDetailsView.Overview}
             checked={this.state.view === UserDetailsView.Overview}
             onChange={linkEvent(this, this.handleViewChange)}
           />
           {i18n.t('overview')}
-        </label>
-        <label
-          className={`btn btn-sm btn-secondary pointer btn-outline-light
-            ${this.state.view == UserDetailsView.Comments && 'active'}
-          `}
+        </Button>
+        <Button
+          as="label"
+          variant={this.state.view == UserDetailsView.Comments ? 'primary' : 'muted'}
         >
           <input
             type="radio"
+            className="visually-hidden"
             value={UserDetailsView.Comments}
             checked={this.state.view == UserDetailsView.Comments}
             onChange={linkEvent(this, this.handleViewChange)}
           />
           {i18n.t('comments')}
-        </label>
-        <label
-          className={`btn btn-sm btn-secondary pointer btn-outline-light
-            ${this.state.view == UserDetailsView.Posts && 'active'}
-          `}
+        </Button>
+        <Button
+          as="label"
+          variant={this.state.view == UserDetailsView.Posts ? 'primary' : 'muted'}
         >
           <input
             type="radio"
+            className="visually-hidden"
             value={UserDetailsView.Posts}
             checked={this.state.view == UserDetailsView.Posts}
             onChange={linkEvent(this, this.handleViewChange)}
           />
           {i18n.t('posts')}
-        </label>
-        <label
-          className={`btn btn-sm btn-secondary pointer btn-outline-light
-            ${this.state.view == UserDetailsView.Saved && 'active'}
-          `}
+        </Button>
+        <Button
+          as="label"
+          variant={this.state.view == UserDetailsView.Saved ? 'primary' : 'muted'}
         >
           <input
+            className="visually-hidden"
             type="radio"
             value={UserDetailsView.Saved}
             checked={this.state.view == UserDetailsView.Saved}
             onChange={linkEvent(this, this.handleViewChange)}
           />
           {i18n.t('saved')}
-        </label>
+        </Button>
       </div>
     );
   }
