@@ -163,7 +163,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
       ? {
         borderLeftColor: this.state.borderColor,
         borderLeftWidth: `2px`,
-        // borderLeftStyle: `solid`,
+        borderLeftStyle: `solid`,
         }
       : {}
 
