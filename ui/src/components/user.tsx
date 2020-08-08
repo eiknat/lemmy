@@ -1282,7 +1282,7 @@ class BaseUser extends Component<any, UserState> {
             UserService.Instance.user.show_nsfw;
           this.state.userSettingsForm.theme = UserService.Instance.user.theme
             ? UserService.Instance.user.theme
-            : 'darkly';
+            : 'chapo';
           this.state.userSettingsForm.default_sort_type =
             UserService.Instance.user.default_sort_type;
           this.state.userSettingsForm.default_listing_type =

@@ -10,7 +10,7 @@ function ThemeSystemProvider({ children }) {
 
   const theme = Object.keys(themes).includes(currentTheme)
     ? themes[currentTheme]
-    : themes.dark;
+    : themes.chapo;
 
   useEffect(() => {
     const theme = UserService?.Instance?.user?.theme;
