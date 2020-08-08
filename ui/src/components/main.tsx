@@ -61,6 +61,7 @@ import { Icon } from './icon';
 import { linkEvent } from '../linkEvent';
 import { Box, Flex } from 'theme-ui';
 import Button from './elements/Button';
+import Card from './elements/Card';
 
 interface MainState {
   subscribedCommunities: Array<CommunityUser>;
@@ -212,7 +213,7 @@ class Main extends Component<any, MainState> {
       <div>
         {!this.state.loading && (
           <div>
-            <Box mb={3}>
+            <Card>
               <div className="card-body">
                 {this.trendingCommunities()}
                 {UserService.Instance.user &&
@@ -250,7 +251,7 @@ class Main extends Component<any, MainState> {
                   </Flex>
                 )}
               </div>
-            </Box>
+            </Card>
             {this.sidebar()}
             {this.donations()}
             {this.landing()}
