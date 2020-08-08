@@ -171,7 +171,7 @@ class BaseUser extends Component<any, UserState> {
     additionalPronouns: 'none',
   };
 
-  state = this.emptyState
+  state = this.emptyState;
 
   constructor(props: any, context: any) {
     super(props, context);
@@ -261,7 +261,7 @@ class BaseUser extends Component<any, UserState> {
             </svg>
           </h5>
         )}
-        <div className="row">
+        <div className="row user-settings-container">
           <main className="col-12 col-md-8" role="main">
             {!this.state.loading && this.selects()}
             <UserDetails
@@ -444,7 +444,11 @@ class BaseUser extends Component<any, UserState> {
               </table>
             </div>
             {this.isCurrentUser ? (
-              <Button css={{ width: '100%' }} mt={3} onClick={this.handleLogoutClick}>
+              <Button
+                css={{ width: '100%' }}
+                mt={3}
+                onClick={this.handleLogoutClick}
+              >
                 {i18n.t('logout')}
               </Button>
             ) : (
@@ -811,7 +815,7 @@ class BaseUser extends Component<any, UserState> {
                 >
                   {i18n.t('delete_account')}
                 </Button>
-                  {this.state.deleteAccountShowConfirm && (
+                {this.state.deleteAccountShowConfirm && (
                   <>
                     <div className="my-2 alert alert-danger" role="alert">
                       {i18n.t('delete_account_confirm')}
@@ -850,7 +854,7 @@ class BaseUser extends Component<any, UserState> {
                       {i18n.t('cancel')}
                     </button>
                   </>
-                  )}
+                )}
                 {/* <button
                   className="btn btn-block btn-danger"
 
@@ -1027,10 +1031,12 @@ class BaseUser extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleUserSettingsThemeChange = (value) => {
+  handleUserSettingsThemeChange = value => {
     changeTheme(value);
-    this.setState({ userSettingsForm: { ...this.state.userSettingsForm, theme: value } });
-  }
+    this.setState({
+      userSettingsForm: { ...this.state.userSettingsForm, theme: value },
+    });
+  };
 
   handleUserSettingsLangChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.lang = event.target.value;

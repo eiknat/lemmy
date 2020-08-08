@@ -714,3 +714,8 @@ a.text-body {
   width: 1px;
 }
 
+@media (max-width: 768px) {
+  .user-settings-container {
+    flex-direction: column-reverse;
+  }
+}
