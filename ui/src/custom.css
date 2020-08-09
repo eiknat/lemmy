@@ -730,3 +730,6 @@ a.text-body {
   border-bottom-left-radius: 0;
 }
 
+button:hover [type="button"]:hover {
+  cursor: pointer;
+}

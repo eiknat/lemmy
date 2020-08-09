@@ -16,21 +16,23 @@ export const variants = {
       cursor: 'pointer',
       '&:hover': {
         textDecoration: 'none',
+        cursor: 'pointer',
       },
       '&:disabled': {
         opacity: 0.5,
         cursor: 'not-allowed',
       },
     },
-    muted: {
-      bg: 'muted',
-      color: 'text',
-    },
     secondary: {
       color: 'background',
       bg: 'secondary',
     },
+    muted: {
+      bg: 'muted',
+      color: 'text',
+    },
     highlight: {
+      bg: 'highlight',
       color: 'text',
       '&:hover': {
         backgroundColor: 'muted',
@@ -54,6 +56,16 @@ export const variants = {
       color: 'text',
     },
   },
+  alerts: {
+    primary: {
+      color: 'background',
+      bg: 'primary',
+    },
+    muted: {
+      color: 'text',
+      bg: 'muted',
+    },
+  },
 };
 
 const defaultTheme: ThemeProviderProps<Theme> = {
@@ -72,14 +84,37 @@ const defaultTheme: ThemeProviderProps<Theme> = {
     primary: {
       ...variants.buttons.primary,
       color: 'text',
-      bg: 'primary'
+      bg: 'primary',
     },
     secondary: {
       ...variants.buttons.secondary,
       color: 'text',
       bg: 'secondary',
-    }
-  }
+    },
+    highlight: {
+      ...variants.buttons.highlight,
+      color: 'text',
+      bg: lighten('muted', 0.1),
+    },
+  },
+  alerts: {
+    ...variants.alerts,
+    primary: {
+      ...variants.alerts.primary,
+      color: 'text',
+      bg: 'primary',
+    },
+    secondary: {
+      ...variants.alerts.secondary,
+      color: 'text',
+      bg: 'secondary',
+    },
+    highlight: {
+      ...variants.alerts.highlight,
+      color: 'text',
+      bg: lighten('muted', 0.1),
+    },
+  },
 };
 
 export const themes = {
