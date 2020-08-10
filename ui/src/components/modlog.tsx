@@ -17,12 +17,14 @@ import {
   ModAdd,
   WebSocketJsonResponse,
   GetSiteResponse,
+  ModLogFilter,
 } from '../interfaces';
 import { WebSocketService } from '../services';
 import { wsJsonToRes, addTypeInfo, fetchLimit, toast } from '../utils';
 import { MomentTime } from './moment-time';
 import moment from 'moment';
 import { i18n } from '../i18next';
+import { ModlogComment } from './mod-log-comment';
 
 interface ModlogState {
   combined: Array<{
@@ -39,6 +41,7 @@ interface ModlogState {
   communityName?: string;
   page: number;
   loading: boolean;
+  filters: ModLogFilter[];
 }
 
 export class Modlog extends Component<any, ModlogState> {
@@ -47,6 +50,7 @@ export class Modlog extends Component<any, ModlogState> {
     combined: [],
     page: 1,
     loading: true,
+    filters: Object.keys(ModLogFilter) as ModLogFilter[],
   };
 
   constructor(props: any, context: any) {
@@ -122,218 +126,237 @@ export class Modlog extends Component<any, ModlogState> {
   combined() {
     return (
       <tbody>
-        {this.state.combined.map(i => (
-          <tr>
-            <td>
-              <MomentTime data={i.data} />
-            </td>
-            <td>
-              <Link to={`/u/${i.data.mod_user_name}`}>
-                {i.data.mod_user_name}
-              </Link>
-            </td>
-            <td>
-              {i.type_ == 'removed_posts' && (
-                <>
-                  {(i.data as ModRemovePost).removed ? 'Removed' : 'Restored'}
-                  <span>
-                    {' '}
-                    Post{' '}
-                    <Link to={`/post/${(i.data as ModRemovePost).post_id}`}>
-                      {(i.data as ModRemovePost).post_name}
-                    </Link>
-                  </span>
-                  <div>
-                    {(i.data as ModRemovePost).reason &&
-                      ` reason: ${(i.data as ModRemovePost).reason}`}
-                  </div>
-                </>
-              )}
-              {i.type_ == 'locked_posts' && (
-                <>
-                  {(i.data as ModLockPost).locked ? 'Locked' : 'Unlocked'}
-                  <span>
-                    {' '}
-                    Post{' '}
-                    <Link to={`/post/${(i.data as ModLockPost).post_id}`}>
-                      {(i.data as ModLockPost).post_name}
-                    </Link>
-                  </span>
-                </>
-              )}
-              {i.type_ == 'stickied_posts' && (
-                <>
-                  {(i.data as ModStickyPost).stickied
-                    ? 'Stickied'
-                    : 'Unstickied'}
-                  <span>
-                    {' '}
-                    Post{' '}
-                    <Link to={`/post/${(i.data as ModStickyPost).post_id}`}>
-                      {(i.data as ModStickyPost).post_name}
-                    </Link>
-                  </span>
-                </>
-              )}
-              {i.type_ == 'removed_comments' && (
-                <>
-                  {(i.data as ModRemoveComment).removed
-                    ? 'Removed'
-                    : 'Restored'}
-                  <span>
-                    {' '}
-                    Comment{' '}
-                    <Link
-                      to={`/post/${
-                        (i.data as ModRemoveComment).post_id
-                      }/comment/${(i.data as ModRemoveComment).comment_id}`}
-                    >
-                      {(i.data as ModRemoveComment).comment_content}
-                    </Link>
-                  </span>
-                  <span>
-                    {' '}
-                    by{' '}
-                    <Link
-                      to={`/u/${
-                        (i.data as ModRemoveComment).comment_user_name
-                      }`}
-                    >
-                      {(i.data as ModRemoveComment).comment_user_name}
-                    </Link>
-                  </span>
-                  <div>
-                    {(i.data as ModRemoveComment).reason &&
-                      ` reason: ${(i.data as ModRemoveComment).reason}`}
-                  </div>
-                </>
-              )}
-              {i.type_ == 'removed_communities' && (
-                <>
-                  {(i.data as ModRemoveCommunity).removed
-                    ? 'Removed'
-                    : 'Restored'}
-                  <span>
-                    {' '}
-                    Community{' '}
-                    <Link
-                      to={`/c/${(i.data as ModRemoveCommunity).community_name}`}
-                    >
-                      {(i.data as ModRemoveCommunity).community_name}
-                    </Link>
-                  </span>
-                  <div>
-                    {(i.data as ModRemoveCommunity).reason &&
-                      ` reason: ${(i.data as ModRemoveCommunity).reason}`}
-                  </div>
-                  <div>
-                    {(i.data as ModRemoveCommunity).expires &&
-                      ` expires: ${moment
-                        .utc((i.data as ModRemoveCommunity).expires)
-                        .fromNow()}`}
-                  </div>
-                </>
-              )}
-              {i.type_ == 'banned_from_community' && (
-                <>
-                  <span>
-                    {(i.data as ModBanFromCommunity).banned
-                      ? 'Banned '
-                      : 'Unbanned '}{' '}
-                  </span>
-                  <span>
-                    <Link
-                      to={`/u/${
-                        (i.data as ModBanFromCommunity).other_user_name
-                      }`}
-                    >
-                      {(i.data as ModBanFromCommunity).other_user_name}
-                    </Link>
-                  </span>
-                  <span> from the community </span>
-                  <span>
-                    <Link
-                      to={`/c/${
-                        (i.data as ModBanFromCommunity).community_name
-                      }`}
-                    >
-                      {(i.data as ModBanFromCommunity).community_name}
-                    </Link>
-                  </span>
-                  <div>
-                    {(i.data as ModBanFromCommunity).reason &&
-                      ` reason: ${(i.data as ModBanFromCommunity).reason}`}
-                  </div>
-                  <div>
-                    {(i.data as ModBanFromCommunity).expires &&
-                      ` expires: ${moment
-                        .utc((i.data as ModBanFromCommunity).expires)
-                        .fromNow()}`}
-                  </div>
-                </>
-              )}
-              {i.type_ == 'added_to_community' && (
-                <>
-                  <span>
-                    {(i.data as ModAddCommunity).removed
-                      ? 'Removed '
-                      : 'Appointed '}{' '}
-                  </span>
-                  <span>
-                    <Link
-                      to={`/u/${(i.data as ModAddCommunity).other_user_name}`}
-                    >
-                      {(i.data as ModAddCommunity).other_user_name}
-                    </Link>
-                  </span>
-                  <span> as a mod to the community </span>
-                  <span>
-                    <Link
-                      to={`/c/${(i.data as ModAddCommunity).community_name}`}
-                    >
-                      {(i.data as ModAddCommunity).community_name}
-                    </Link>
-                  </span>
-                </>
-              )}
-              {i.type_ == 'banned' && (
-                <>
-                  <span>
-                    {(i.data as ModBan).banned ? 'Banned ' : 'Unbanned '}{' '}
-                  </span>
-                  <span>
-                    <Link to={`/u/${(i.data as ModBan).other_user_name}`}>
-                      {(i.data as ModBan).other_user_name}
-                    </Link>
-                  </span>
-                  <div>
-                    {(i.data as ModBan).reason &&
-                      ` reason: ${(i.data as ModBan).reason}`}
-                  </div>
-                  <div>
-                    {(i.data as ModBan).expires &&
-                      ` expires: ${moment
-                        .utc((i.data as ModBan).expires)
-                        .fromNow()}`}
-                  </div>
-                </>
-              )}
-              {i.type_ == 'added' && (
-                <>
-                  <span>
-                    {(i.data as ModAdd).removed ? 'Removed ' : 'Appointed '}{' '}
-                  </span>
-                  <span>
-                    <Link to={`/u/${(i.data as ModAdd).other_user_name}`}>
-                      {(i.data as ModAdd).other_user_name}
-                    </Link>
-                  </span>
-                  <span> as an admin </span>
-                </>
-              )}
-            </td>
-          </tr>
-        ))}
+        {this.state.combined
+          .filter(i => this.state.filters.includes(i.type_ as ModLogFilter))
+          .map(i => (
+            <tr>
+              <td>
+                <MomentTime data={i.data} />
+              </td>
+              <td>
+                <Link to={`/u/${i.data.mod_user_name}`}>
+                  {i.data.mod_user_name}
+                </Link>
+              </td>
+              <td>
+                {i.type_ == 'removed_posts' && (
+                  <>
+                    {(i.data as ModRemovePost).removed ? 'Removed' : 'Restored'}
+                    <span>
+                      {' '}
+                      Post{' '}
+                      <Link to={`/post/${(i.data as ModRemovePost).post_id}`}>
+                        {(i.data as ModRemovePost).post_name}
+                      </Link>
+                    </span>
+                    <div>
+                      {(i.data as ModRemovePost).reason &&
+                        ` reason: ${(i.data as ModRemovePost).reason}`}
+                    </div>
+                  </>
+                )}
+                {i.type_ == 'locked_posts' && (
+                  <>
+                    {(i.data as ModLockPost).locked ? 'Locked' : 'Unlocked'}
+                    <span>
+                      {' '}
+                      Post{' '}
+                      <Link to={`/post/${(i.data as ModLockPost).post_id}`}>
+                        {(i.data as ModLockPost).post_name}
+                      </Link>
+                    </span>
+                  </>
+                )}
+                {i.type_ == 'stickied_posts' && (
+                  <>
+                    {(i.data as ModStickyPost).stickied
+                      ? 'Stickied'
+                      : 'Unstickied'}
+                    <span>
+                      {' '}
+                      Post{' '}
+                      <Link to={`/post/${(i.data as ModStickyPost).post_id}`}>
+                        {(i.data as ModStickyPost).post_name}
+                      </Link>
+                    </span>
+                  </>
+                )}
+                {i.type_ == 'removed_comments' && (
+                  <>
+                    {(i.data as ModRemoveComment).removed
+                      ? 'Removed'
+                      : 'Restored'}
+                    <span>
+                      {' '}
+                      Comment{' '}
+                      <Link
+                        to={`/post/${
+                          (i.data as ModRemoveComment).post_id
+                        }/comment/${(i.data as ModRemoveComment).comment_id}`}
+                      >
+                        {(i.data as ModRemoveComment).comment_content.slice(
+                          0,
+                          100
+                        )}
+                        {(i.data as ModRemoveComment).comment_content.length >
+                          100 && '...'}
+                      </Link>
+                    </span>
+                    {/* only show this expanding section for long comments */}
+                    {(i.data as ModRemoveComment).comment_content.length >
+                      100 && (
+                      <>
+                        <br />
+                        <ModlogComment>
+                          {(i.data as ModRemoveComment).comment_content}
+                        </ModlogComment>
+                      </>
+                    )}
+                    <span>
+                      {' '}
+                      by{' '}
+                      <Link
+                        to={`/u/${
+                          (i.data as ModRemoveComment).comment_user_name
+                        }`}
+                      >
+                        {(i.data as ModRemoveComment).comment_user_name}
+                      </Link>
+                    </span>
+                    <div>
+                      {(i.data as ModRemoveComment).reason &&
+                        ` reason: ${(i.data as ModRemoveComment).reason}`}
+                    </div>
+                  </>
+                )}
+                {i.type_ == 'removed_communities' && (
+                  <>
+                    {(i.data as ModRemoveCommunity).removed
+                      ? 'Removed'
+                      : 'Restored'}
+                    <span>
+                      {' '}
+                      Community{' '}
+                      <Link
+                        to={`/c/${
+                          (i.data as ModRemoveCommunity).community_name
+                        }`}
+                      >
+                        {(i.data as ModRemoveCommunity).community_name}
+                      </Link>
+                    </span>
+                    <div>
+                      {(i.data as ModRemoveCommunity).reason &&
+                        ` reason: ${(i.data as ModRemoveCommunity).reason}`}
+                    </div>
+                    <div>
+                      {(i.data as ModRemoveCommunity).expires &&
+                        ` expires: ${moment
+                          .utc((i.data as ModRemoveCommunity).expires)
+                          .fromNow()}`}
+                    </div>
+                  </>
+                )}
+                {i.type_ == 'banned_from_community' && (
+                  <>
+                    <span>
+                      {(i.data as ModBanFromCommunity).banned
+                        ? 'Banned '
+                        : 'Unbanned '}{' '}
+                    </span>
+                    <span>
+                      <Link
+                        to={`/u/${
+                          (i.data as ModBanFromCommunity).other_user_name
+                        }`}
+                      >
+                        {(i.data as ModBanFromCommunity).other_user_name}
+                      </Link>
+                    </span>
+                    <span> from the community </span>
+                    <span>
+                      <Link
+                        to={`/c/${
+                          (i.data as ModBanFromCommunity).community_name
+                        }`}
+                      >
+                        {(i.data as ModBanFromCommunity).community_name}
+                      </Link>
+                    </span>
+                    <div>
+                      {(i.data as ModBanFromCommunity).reason &&
+                        ` reason: ${(i.data as ModBanFromCommunity).reason}`}
+                    </div>
+                    <div>
+                      {(i.data as ModBanFromCommunity).expires &&
+                        ` expires: ${moment
+                          .utc((i.data as ModBanFromCommunity).expires)
+                          .fromNow()}`}
+                    </div>
+                  </>
+                )}
+                {i.type_ == 'added_to_community' && (
+                  <>
+                    <span>
+                      {(i.data as ModAddCommunity).removed
+                        ? 'Removed '
+                        : 'Appointed '}{' '}
+                    </span>
+                    <span>
+                      <Link
+                        to={`/u/${(i.data as ModAddCommunity).other_user_name}`}
+                      >
+                        {(i.data as ModAddCommunity).other_user_name}
+                      </Link>
+                    </span>
+                    <span> as a mod to the community </span>
+                    <span>
+                      <Link
+                        to={`/c/${(i.data as ModAddCommunity).community_name}`}
+                      >
+                        {(i.data as ModAddCommunity).community_name}
+                      </Link>
+                    </span>
+                  </>
+                )}
+                {i.type_ == 'banned' && (
+                  <>
+                    <span>
+                      {(i.data as ModBan).banned ? 'Banned ' : 'Unbanned '}{' '}
+                    </span>
+                    <span>
+                      <Link to={`/u/${(i.data as ModBan).other_user_name}`}>
+                        {(i.data as ModBan).other_user_name}
+                      </Link>
+                    </span>
+                    <div>
+                      {(i.data as ModBan).reason &&
+                        ` reason: ${(i.data as ModBan).reason}`}
+                    </div>
+                    <div>
+                      {(i.data as ModBan).expires &&
+                        ` expires: ${moment
+                          .utc((i.data as ModBan).expires)
+                          .fromNow()}`}
+                    </div>
+                  </>
+                )}
+                {i.type_ == 'added' && (
+                  <>
+                    <span>
+                      {(i.data as ModAdd).removed ? 'Removed ' : 'Appointed '}{' '}
+                    </span>
+                    <span>
+                      <Link to={`/u/${(i.data as ModAdd).other_user_name}`}>
+                        {(i.data as ModAdd).other_user_name}
+                      </Link>
+                    </span>
+                    <span> as an admin </span>
+                  </>
+                )}
+              </td>
+            </tr>
+          ))}
       </tbody>
     );
   }
@@ -349,6 +372,24 @@ export class Modlog extends Component<any, ModlogState> {
           </h5>
         ) : (
           <div>
+            <div>
+              {Object.keys(ModLogFilter).map(filter => (
+                <div className="form-check form-check-inline">
+                  <label className="form-check-label mod-log-filter-label">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      name={filter}
+                      checked={this.state.filters.includes(
+                        filter as ModLogFilter
+                      )}
+                      onChange={this.handleFilterChange}
+                    />
+                    {filter.replace(/_/g, ' ')}
+                  </label>
+                </div>
+              ))}
+            </div>
             <div>
               <div style="display:inline-block; margin-top:6px">
                 <h5>
@@ -408,6 +449,21 @@ export class Modlog extends Component<any, ModlogState> {
       </div>
     );
   }
+
+  handleFilterChange = e => {
+    const name = e.target.name;
+    const { filters } = this.state;
+
+    if (filters.includes(name)) {
+      this.setState({
+        filters: [
+          ...this.state.filters.filter(filterName => filterName !== name),
+        ],
+      });
+    } else {
+      this.setState({ filters: [...this.state.filters, name] });
+    }
+  };
 
   nextPage(i: Modlog) {
     i.state.page++;
