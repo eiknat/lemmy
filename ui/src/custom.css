@@ -623,3 +623,7 @@ a.text-body {
     width: 100%;
   }
 }
+
+.mod-log-filter-label {
+  text-transform: capitalize;
+}

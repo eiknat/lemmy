@@ -1146,3 +1146,15 @@ export enum UserDetailsView {
   Posts,
   Saved,
 }
+
+export enum ModLogFilter {
+  removed_posts = 'removed_posts',
+  locked_posts = 'locked_posts',
+  stickied_posts = 'stickied_posts',
+  removed_comments = 'removed_comments',
+  removed_communities = 'removed_communities',
+  banned_from_community = 'banned_from_community',
+  added_to_community = 'added_to_community',
+  added = 'added',
+  banned = 'banned',
+}
