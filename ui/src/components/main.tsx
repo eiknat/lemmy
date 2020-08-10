@@ -476,6 +476,10 @@ export class Main extends Component<any, MainState> {
     );
   }
 
+  siteName() {
+    return <h5 class="mb-0">{`${this.state.siteRes.site.name}`}</h5>;
+  }
+
   donations() {
     return (
       <div class="card border-secondary mb-3">
@@ -487,6 +491,94 @@ export class Main extends Component<any, MainState> {
           </a>
         </div>
       </div>
+    );
+  }
+
+  admins() {
+    return (
+      <ul class="mt-1 list-inline small mb-0">
+        <li class="list-inline-item">{i18n.t('admins')}:</li>
+        {this.state.siteRes.admins.map(admin => (
+          <li class="list-inline-item">
+            <UserListing
+              user={{
+                name: admin.name,
+                preferred_username: admin.preferred_username,
+                avatar: admin.avatar,
+                local: admin.local,
+                actor_id: admin.actor_id,
+                id: admin.id,
+              }}
+            />
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  badges() {
+    return (
+      <ul class="my-2 list-inline">
+        {/*
+              <li className="list-inline-item badge badge-light">
+                {i18n.t('number_online', { count: this.state.siteRes.online })}
+              </li>
+              */}
+        <li className="list-inline-item badge badge-light">
+          {i18n.t('number_of_users', {
+            count: this.state.siteRes.site.number_of_users,
+          })}
+        </li>
+        <li className="list-inline-item badge badge-light">
+          {i18n.t('number_of_communities', {
+            count: this.state.siteRes.site.number_of_communities,
+          })}
+        </li>
+        <li className="list-inline-item badge badge-light">
+          {i18n.t('number_of_posts', {
+            count: this.state.siteRes.site.number_of_posts,
+          })}
+        </li>
+        <li className="list-inline-item badge badge-light">
+          {i18n.t('number_of_comments', {
+            count: this.state.siteRes.site.number_of_comments,
+          })}
+        </li>
+        <li className="list-inline-item">
+          <Link className="badge badge-light" to="/modlog">
+            {i18n.t('modlog')}
+          </Link>
+        </li>
+      </ul>
+    );
+  }
+
+  adminButtons() {
+    return (
+      this.canAdmin && (
+        <ul class="list-inline mb-1 text-muted font-weight-bold">
+          <li className="list-inline-item-action">
+            <span
+              class="pointer"
+              onClick={linkEvent(this, this.handleEditClick)}
+              data-tippy-content={i18n.t('edit')}
+            >
+              <svg class="icon icon-inline">
+                <use xlinkHref="#icon-edit"></use>
+              </svg>
+            </span>
+          </li>
+        </ul>
+      )
+    );
+  }
+
+  siteDescription() {
+    return (
+      <div
+        className="md-div"
+        dangerouslySetInnerHTML={mdToHtml(this.state.siteRes.site.description)}
+      />
     );
   }
 

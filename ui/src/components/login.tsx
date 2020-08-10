@@ -542,6 +542,23 @@ export class Login extends Component<any, State> {
     );
   }
 
+  handleCaptchaPlay(i: Login) {
+    event.preventDefault();
+    let snd = new Audio('data:audio/wav;base64,' + i.state.captcha.ok.wav);
+    snd.play();
+    i.state.captchaPlaying = true;
+    i.setState(i.state);
+    snd.addEventListener('ended', () => {
+      snd.currentTime = 0;
+      i.state.captchaPlaying = false;
+      i.setState(this.state);
+    });
+  }
+
+  captchaPngSrc() {
+    return `data:image/png;base64,${this.state.captcha.ok.png}`;
+  }
+
   parseMessage(msg: WebSocketJsonResponse) {
     let res = wsJsonToRes(msg);
     if (msg.error) {
