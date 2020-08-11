@@ -700,7 +700,6 @@ export class Main extends Component<any, MainState> {
       this.state.siteRes.site = data.site;
       this.state.showEditSite = false;
       this.setState(this.state);
-      toast(i18n.t('site_saved'));
     } else if (res.op == UserOperation.GetPosts) {
       let data = res.data as GetPostsResponse;
       this.state.posts = data.posts;
