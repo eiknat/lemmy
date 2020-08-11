@@ -28,6 +28,20 @@ interface CommentNodesProps {
   maxView?: number;
 }
 
+function sorter({ sort, sortType, nodes, maxView }): Array<CommentNodeI> {
+  if (sort !== undefined) {
+    commentSort(nodes, sort);
+  } else if (sortType !== undefined) {
+    commentSortSortType(nodes, sortType);
+  }
+
+  if (maxView) {
+    return nodes.slice(0, maxView);
+  }
+
+  return nodes;
+}
+
 export class CommentNodes extends Component<
   CommentNodesProps,
   CommentNodesState
@@ -36,10 +50,40 @@ export class CommentNodes extends Component<
     super(props, context);
   }
 
+  state = {
+    nodes: sorter({
+      sort: this.props.sort,
+      sortType: this.props.sortType,
+      nodes: this.props.nodes,
+      maxView: this.props.maxView
+    }),
+  }
+
+  componentDidUpdate(prevProps) {
+    // only update nodes when sort type or max view is changed
+    if (
+      this.props.sort !== prevProps.sort ||
+      this.props.sortType !== prevProps.sortType ||
+      this.props.maxView !== prevProps.maxView
+    ) {
+      this.setState({
+        nodes: sorter({
+          sort: this.props.sort,
+          sortType: this.props.sortType,
+          nodes: this.props.nodes,
+          maxView: this.props.maxView
+        })
+      })
+    } else if (this.props.nodes !== prevProps.nodes) {
+      // if the comments themselves changes, update them but don't re-sort them
+      this.setState({ nodes: this.props.nodes });
+    }
+  }
+
   render() {
     return (
       <div className="comments">
-        {this.sorter().map(node => (
+        {this.state.nodes.map(node => (
           <CommentNode
             key={node.comment.id}
             node={node}
@@ -63,15 +107,15 @@ export class CommentNodes extends Component<
 
   sorter(): Array<CommentNodeI> {
     if (this.props.sort !== undefined) {
-      commentSort(this.props.nodes, this.props.sort);
+      commentSort(this.state.nodes, this.props.sort);
     } else if (this.props.sortType !== undefined) {
-      commentSortSortType(this.props.nodes, this.props.sortType);
+      commentSortSortType(this.state.nodes, this.props.sortType);
     }
 
     if (this.props.maxView) {
-      return this.props.nodes.slice(0, this.props.maxView);
+      return this.state.nodes.slice(0, this.props.maxView);
     }
 
-    return this.props.nodes;
+    return this.state.nodes;
   }
 }
