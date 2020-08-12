@@ -490,8 +490,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             <div class="row">
               <div className="details col-12">
                 <ul class="list-inline mb-0 text-muted small">
-                  <li className="list-inline-item">
-                    <span>{i18n.t('by')} </span>
+                  <li className="flex-wrap">
+                    <span className="mr-1">{i18n.t('by')} </span>
                     <UserListing
                       user={{
                         name: post.creator_name,
@@ -534,34 +534,37 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                         />
                       </span>
                     )}
+                    <div className="list-inline-item ml-2">•</div>
+                    <div>
+                      <MomentTime data={post} />
+                    </div>
+                    {post.stickied && (
+                      <small
+                        className="unselectable pointer ml-1 font-italic"
+                        data-tippy-content={i18n.t('stickied')}
+                      >
+                        {/* <svg class={`icon custom-icon text-success`}>
+                        <use xlinkHref="#icon-pin"></use>
+                      </svg> */}
+                        <Icon className="icon text-success" name="pin" />
+                      </small>
+                    )}
+                    {post.locked && (
+                      <small
+                        className="unselectable pointer ml-1 text-muted font-italic"
+                        data-tippy-content={i18n.t('locked')}
+                      >
+                        <svg class={`icon custom-icon text-danger`}>
+                          <use xlinkHref="#icon-lock"></use>
+                        </svg>
+                      </small>
+                    )}
                   </li>
-                  <li className="list-inline-item">•</li>
-                  <li className="list-inline-item">
+                  {/* <li className="list-inline-item">
                     <span>
                       <MomentTime data={post} />
                     </span>
-                  </li>
-                  {post.stickied && (
-                    <small
-                      className="unselectable pointer ml-1 font-italic"
-                      data-tippy-content={i18n.t('stickied')}
-                    >
-                      {/* <svg class={`icon custom-icon text-success`}>
-                        <use xlinkHref="#icon-pin"></use>
-                      </svg> */}
-                      <Icon className="icon text-success" name="pin" />
-                    </small>
-                  )}
-                  {post.locked && (
-                    <small
-                      className="unselectable pointer ml-1 text-muted font-italic"
-                      data-tippy-content={i18n.t('locked')}
-                    >
-                      <svg class={`icon custom-icon text-danger`}>
-                        <use xlinkHref="#icon-lock"></use>
-                      </svg>
-                    </small>
-                  )}
+                  </li> */}
                 </ul>
                 {this.props.post.duplicates && (
                   <ul class="list-inline mb-1 small text-muted">
