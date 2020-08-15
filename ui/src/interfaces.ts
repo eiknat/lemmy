@@ -70,6 +70,19 @@ export enum UserOperation {
   GetSiteModerators,
   GetUserTag,
   SetUserTag,
+  GetCaptchaResponse,
+}
+
+export interface GetCaptchaResponse {
+  ok?: {
+    png: string;
+    wav?: string;
+    uuid: string;
+  };
+  hcaptcha?: {
+    site_key: string;
+    verify_url: string;
+  };
 }
 
 export enum CommentSortType {
@@ -637,7 +650,6 @@ export interface ModAdd {
 export interface LoginForm {
   username_or_email: string;
   password: string;
-  captcha_id: string;
 }
 
 export interface RegisterForm {
@@ -647,7 +659,9 @@ export interface RegisterForm {
   password_verify: string;
   admin: boolean;
   show_nsfw: boolean;
-  captcha_id: string;
+  captcha_uuid?: string;
+  captcha_answer?: string;
+  hcaptcha_id?: string;
   pronouns?: string;
 }
 

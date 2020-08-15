@@ -16,7 +16,6 @@ import {
 import { WebSocketService, UserService } from '../services';
 import { wsJsonToRes, validEmail, toast, setupTippy } from '../utils';
 import { i18n } from '../i18next';
-import { HCAPTCHA_SITE_KEY } from '../env';
 
 interface State {
   loginForm: LoginForm;
@@ -28,20 +27,6 @@ interface State {
   site: Site;
 }
 
-function initCaptcha() {
-  // ignoring these warnings because it's a global
-  // @ts-ignore
-  // eslint-disable-next-line no-undef
-  const widgetID = hcaptcha.render('h-captcha', {
-    sitekey: HCAPTCHA_SITE_KEY,
-  });
-  // @ts-ignore
-  // eslint-disable-next-line no-undef
-  const widgetIDRegister = hcaptcha.render('h-captcha-register', {
-    sitekey: HCAPTCHA_SITE_KEY,
-  });
-}
-
 export class Login extends Component<any, State> {
   private subscription: Subscription;
 
@@ -49,7 +34,6 @@ export class Login extends Component<any, State> {
     loginForm: {
       username_or_email: undefined,
       password: undefined,
-      captcha_id: undefined,
     },
     registerForm: {
       username: undefined,
@@ -57,7 +41,9 @@ export class Login extends Component<any, State> {
       password_verify: undefined,
       admin: false,
       show_nsfw: false,
-      captcha_id: undefined,
+      captcha_uuid: undefined,
+      captcha_answer: undefined,
+      hcaptcha_id: undefined,
       pronouns: null,
     },
     loginLoading: false,
@@ -77,6 +63,7 @@ export class Login extends Component<any, State> {
       enable_downvotes: undefined,
       open_registration: undefined,
       enable_nsfw: undefined,
+      enable_create_communities: undefined,
     },
   };
 
@@ -101,7 +88,6 @@ export class Login extends Component<any, State> {
 
   componentDidMount() {
     setupTippy();
-    initCaptcha();
   }
 
   componentWillUnmount() {
@@ -187,16 +173,6 @@ export class Login extends Component<any, State> {
                 </button>
               )}
             </div>
-          </div>
-          <div class="form-group row">
-            {/*hcaptcha target*/}
-            <div
-              className="h-captcha"
-              class="col-sm-10"
-              id="h-captcha"
-              data-sitekey={HCAPTCHA_SITE_KEY}
-              data-theme="dark"
-            />
           </div>
           <div class="form-group row">
             <div class="col-sm-10">
@@ -325,32 +301,45 @@ export class Login extends Component<any, State> {
 
         {this.state.captcha && (
           <div class="form-group row">
-            <label class="col-sm-2" htmlFor="register-captcha">
-              <span class="mr-2">{i18n.t('enter_code')}</span>
-              <button
-                type="button"
-                class="btn btn-secondary"
-                onClick={linkEvent(this, this.handleRegenCaptcha)}
-              >
-                <svg class="icon icon-refresh-cw">
-                  <use xlinkHref="#icon-refresh-cw"></use>
-                </svg>
-              </button>
-            </label>
+            {this.state.captcha.ok && (
+              <label class="col-sm-2" htmlFor="register-captcha">
+                <span class="mr-2">{i18n.t('enter_code')}</span>
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  onClick={linkEvent(this, this.handleRegenCaptcha)}
+                >
+                  <svg class="icon icon-refresh-cw">
+                    <use xlinkHref="#icon-refresh-cw"></use>
+                  </svg>
+                </button>
+              </label>
+            )}
             {this.showCaptcha()}
-            <div class="col-sm-6">
-              <input
-                type="text"
-                class="form-control"
-                id="register-captcha"
-                value={this.state.registerForm.captcha_answer}
-                onInput={linkEvent(
-                  this,
-                  this.handleRegisterCaptchaAnswerChange
-                )}
-                required
+            {this.state.captcha.ok && (
+              <div class="col-sm-6">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="register-captcha"
+                  value={this.state.registerForm.captcha_answer}
+                  onInput={linkEvent(
+                    this,
+                    this.handleRegisterCaptchaAnswerChange
+                  )}
+                  required
+                />
+              </div>
+            )}
+            {this.state.captcha.hcaptcha && (
+              <div
+                className="h-captcha h-captcha-register"
+                class="col-sm-10"
+                id="h-captcha"
+                data-sitekey={this.state.captcha.hcaptcha.site_key}
+                data-theme="dark"
               />
-            </div>
+            )}
           </div>
         )}
         {this.state.site.enable_nsfw && (
@@ -371,16 +360,6 @@ export class Login extends Component<any, State> {
             </div>
           </div>
         )}
-        <div class="form-group row">
-          {/*hcaptcha target*/}
-          <div
-            className="h-captcha h-captcha-register"
-            class="col-sm-10"
-            id="h-captcha-register"
-            data-sitekey={HCAPTCHA_SITE_KEY}
-            data-theme="dark"
-          />
-        </div>
         <div class="form-group row">
           <div class="col-sm-10">
             <button type="submit" class="btn btn-secondary">
@@ -437,9 +416,6 @@ export class Login extends Component<any, State> {
     i.state.loginForm.password = (document.getElementById(
       'login-password'
     ) as HTMLInputElement).value;
-    i.state.loginForm.captcha_id = document.querySelector(
-      "textarea[name='h-captcha-response']"
-    ).value;
     i.setState(i.state);
     WebSocketService.Instance.login(i.state.loginForm);
   }
@@ -466,20 +442,22 @@ export class Login extends Component<any, State> {
   handleRegisterSubmit(i: Login, event: any) {
     event.preventDefault();
     i.state.registerLoading = true;
-    i.state.registerForm.captcha_id = (document.querySelectorAll(
-      "textarea[name='h-captcha-response']"
-    )[1] as HTMLInputElement).value;
+    if (i.state.captcha) {
+      if (i.state.captcha.hcaptcha) {
+        i.state.registerForm.hcaptcha_id = (document.querySelectorAll(
+          "textarea[name='h-captcha-response']"
+        )[0] as HTMLInputElement).value;
+      }
+    }
     i.setState(i.state);
 
-    if (!i.mathCheck) {
-      WebSocketService.Instance.register({
-        ...i.state.registerForm,
-        pronouns:
-          i.state.registerForm.pronouns === 'none'
-            ? null
-            : i.state.registerForm.pronouns,
-      });
-    }
+    WebSocketService.Instance.register({
+      ...i.state.registerForm,
+      pronouns:
+        i.state.registerForm.pronouns === 'none'
+          ? null
+          : i.state.registerForm.pronouns,
+    });
   }
 
   handleRegisterUsernameChange(i: Login, event: any) {
@@ -535,13 +513,6 @@ export class Login extends Component<any, State> {
     toast(i18n.t('email_required'), 'danger');
   }
 
-  get mathCheck(): boolean {
-    return (
-      this.state.mathQuestion.answer !=
-      this.state.mathQuestion.a + this.state.mathQuestion.b
-    );
-  }
-
   handleCaptchaPlay(i: Login) {
     event.preventDefault();
     let snd = new Audio('data:audio/wav;base64,' + i.state.captcha.ok.wav);
@@ -559,21 +530,24 @@ export class Login extends Component<any, State> {
     return `data:image/png;base64,${this.state.captcha.ok.png}`;
   }
 
+  initHCaptcha() {
+    const widgetID = hcaptcha.render('h-captcha', {
+      sitekey: this.state.captcha.hcaptcha.site_key,
+    });
+  }
+
   parseMessage(msg: WebSocketJsonResponse) {
     let res = wsJsonToRes(msg);
     if (msg.error) {
-      if (msg.error.includes('invalid_captcha')) {
-        let error_codes = msg.error.split(';'); //captcha error codes are sent deliniated with semicolons
-        let error_message = '';
-        error_codes.forEach(item => (error_message += i18n.t(item)));
-        toast(error_message, 'danger');
+      if (this.state.captcha.hcaptcha) {
         document.getElementById('h-captcha').innerHTML = '';
-        initCaptcha();
-      } else {
-        toast(i18n.t(msg.error), 'danger');
       }
+
+      toast(i18n.t(msg.error), 'danger');
+
       this.state = this.emptyState;
       this.state.registerForm.captcha_answer = undefined;
+      this.state.registerForm.hcaptcha_id = undefined;
       // Refetch another captcha
       WebSocketService.Instance.getCaptcha();
       this.setState(this.state);
@@ -596,10 +570,15 @@ export class Login extends Component<any, State> {
         this.props.history.push('/communities');
       } else if (res.op == UserOperation.GetCaptcha) {
         let data = res.data as GetCaptchaResponse;
-        if (data.ok) {
+        if (data.ok || data.hcaptcha) {
           this.state.captcha = data;
-          this.state.registerForm.captcha_uuid = data.ok.uuid;
+          if (data.ok) {
+            this.state.registerForm.captcha_uuid = data.ok.uuid;
+          }
           this.setState(this.state);
+          if (data.hcaptcha) {
+            this.initHCaptcha();
+          }
         }
       } else if (res.op == UserOperation.PasswordReset) {
         toast(i18n.t('reset_password_mail_sent'));
