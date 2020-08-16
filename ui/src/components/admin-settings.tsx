@@ -1,0 +1,278 @@
+import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import { Subscription } from 'rxjs';
+import { retryWhen, delay, take } from 'rxjs/operators';
+import {
+  UserOperation,
+  SiteResponse,
+  GetSiteResponse,
+  SiteConfigForm,
+  GetSiteConfigResponse,
+  WebSocketJsonResponse,
+} from '../interfaces';
+import { WebSocketService } from '../services';
+import { wsJsonToRes, capitalizeFirstLetter, toast, randomStr } from '../utils';
+import autosize from 'autosize';
+import { SiteForm } from './site-form';
+import { UserListing } from './user-listing';
+import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
+
+interface AdminSettingsState {
+  siteRes: GetSiteResponse;
+  siteConfigRes: GetSiteConfigResponse;
+  siteConfigForm: SiteConfigForm;
+  siteLoading: boolean;
+  siteConfigLoading: boolean;
+}
+
+class BaseAdminSettings extends Component<any, AdminSettingsState> {
+  private siteConfigTextAreaId = `site-config-${randomStr()}`;
+  private subscription: Subscription;
+  private emptyState: AdminSettingsState = {
+    siteRes: {
+      site: {
+        id: null,
+        name: null,
+        creator_id: null,
+        creator_name: null,
+        published: null,
+        number_of_users: null,
+        number_of_posts: null,
+        number_of_comments: null,
+        number_of_communities: null,
+        enable_downvotes: null,
+        enable_create_communities: null,
+        open_registration: null,
+        enable_nsfw: null,
+      },
+      admins: [],
+      sitemods: [],
+      banned: [],
+      online: null,
+    },
+    siteConfigForm: {
+      config_hjson: null,
+      auth: null,
+    },
+    siteConfigRes: {
+      config_hjson: null,
+    },
+    siteLoading: true,
+    siteConfigLoading: true,
+  };
+
+  state = this.emptyState
+
+  componentDidMount() {
+    this.subscription = WebSocketService.Instance.subject
+      .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
+      .subscribe(
+        msg => this.parseMessage(msg),
+        err => console.error(err),
+        () => console.log('complete')
+      );
+
+    WebSocketService.Instance.getSite();
+    WebSocketService.Instance.getSiteConfig();
+  }
+
+  componentWillUnmount() {
+    this.subscription.unsubscribe();
+  }
+
+  render() {
+    console.log(this.state.siteRes.site);
+    return (
+      <div className="container">
+        {this.state.siteLoading || this.state.siteConfigLoading ? (
+          <h5>
+            <svg className="icon icon-spinner spin">
+              <use xlinkHref="#icon-spinner" />
+            </svg>
+          </h5>
+        ) : (
+          <div className="row">
+            <div className="col-12 col-md-6">
+              <SiteForm site={this.state.siteRes.site} />
+              {this.admins()}
+              {this.sitemods()}
+              {this.bannedUsers()}
+            </div>
+            <div className="col-12 col-md-6">{this.adminSettings()}</div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  admins() {
+    return (
+      <>
+        <h5>{capitalizeFirstLetter(i18n.t('admins'))}</h5>
+        <ul className="list-unstyled">
+          {this.state.siteRes.admins.map(admin => (
+            <li key={admin.id} className="list-inline-item">
+              <UserListing
+                user={{
+                  name: admin.name,
+                  avatar: admin.avatar,
+                  id: admin.id,
+                  local: admin.local,
+                  actor_id: admin.actor_id,
+                }}
+              />
+            </li>
+          ))}
+        </ul>
+      </>
+    );
+  }
+
+  sitemods() {
+    return (
+      <>
+        <h5>{capitalizeFirstLetter(i18n.t('sitemods'))}</h5>
+        <ul className="list-unstyled">
+          {this.state.siteRes.sitemods.map(sitemod => (
+            <li key={sitemod.id} className="list-inline-item">
+              <UserListing
+                user={{
+                  name: sitemod.name,
+                  avatar: sitemod.avatar,
+                  id: sitemod.id,
+                  local: sitemod.local,
+                  actor_id: sitemod.actor_id,
+                }}
+              />
+            </li>
+          ))}
+        </ul>
+      </>
+    );
+  }
+
+  bannedUsers() {
+    return (
+      <>
+        <h5>{i18n.t('banned_users')}</h5>
+        <ul className="list-unstyled">
+          {this.state.siteRes.banned.map(banned => (
+            <li key={banned.id} className="list-inline-item">
+              <UserListing
+                user={{
+                  name: banned.name,
+                  avatar: banned.avatar,
+                  id: banned.id,
+                  local: banned.local,
+                  actor_id: banned.actor_id,
+                }}
+              />
+            </li>
+          ))}
+        </ul>
+      </>
+    );
+  }
+
+  adminSettings() {
+    return (
+      <div>
+        <h5>{i18n.t('admin_settings')}</h5>
+        <form onSubmit={linkEvent(this, this.handleSiteAdminConfigSubmit)}>
+          <div className="form-group row">
+            <label
+              className="col-12 col-form-label"
+              htmlFor={this.siteConfigTextAreaId}
+            >
+              {i18n.t('site_config')}
+            </label>
+            <div className="col-12">
+              <textarea
+                id={this.siteConfigTextAreaId}
+                value={this.state.siteConfigForm.config_hjson}
+                onChange={linkEvent(this, this.handleSiteConfigHjsonChange)}
+                className="form-control text-monospace"
+                rows={3}
+              />
+            </div>
+          </div>
+          <div className="form-group row">
+            <div className="col-12">
+              <button type="submit" className="btn btn-secondary mr-2">
+                {this.state.siteConfigLoading ? (
+                  <svg className="icon icon-spinner spin">
+                    <use xlinkHref="#icon-spinner" />
+                  </svg>
+                ) : (
+                  capitalizeFirstLetter(i18n.t('save'))
+                )}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  handleSiteAdminConfigSubmit(i: AdminSettings, event: any) {
+    event.preventDefault();
+    i.state.siteConfigLoading = true;
+    WebSocketService.Instance.saveSiteConfig(i.state.siteConfigForm);
+    i.setState(i.state);
+  }
+
+  handleSiteConfigHjsonChange(i: AdminSettings, event: any) {
+    i.state.siteConfigForm.config_hjson = event.target.value;
+    i.setState(i.state);
+  }
+
+  parseMessage(msg: WebSocketJsonResponse) {
+    console.log(msg);
+    let res = wsJsonToRes(msg);
+    if (msg.error) {
+      toast(i18n.t(msg.error), 'danger');
+      this.props.history.push('/');
+      this.state.siteLoading = false;
+      this.state.siteConfigLoading = false;
+      this.setState(this.state);
+      return;
+    } else if (msg.reconnect) {
+    } else if (res.op == UserOperation.GetSite) {
+      let data = res.data as GetSiteResponse;
+
+      // This means it hasn't been set up yet
+      if (!data.site) {
+        this.props.history.push('/setup');
+      }
+      this.state.siteRes = data;
+      this.state.siteLoading = false;
+      this.setState(this.state);
+    } else if (res.op == UserOperation.EditSite) {
+      let data = res.data as SiteResponse;
+      this.state.siteRes.site = data.site;
+      this.setState(this.state);
+      document.title = `${i18n.t('admin_settings')} - ${
+        this.state.siteRes.site.name
+      }`;
+      toast(i18n.t('site_saved'));
+    } else if (res.op == UserOperation.GetSiteConfig) {
+      let data = res.data as GetSiteConfigResponse;
+      this.state.siteConfigRes = data;
+      this.state.siteConfigLoading = false;
+      this.state.siteConfigForm.config_hjson = this.state.siteConfigRes.config_hjson;
+      this.setState(this.state);
+      var textarea: any = document.getElementById(this.siteConfigTextAreaId);
+      autosize(textarea);
+    } else if (res.op == UserOperation.SaveSiteConfig) {
+      let data = res.data as GetSiteConfigResponse;
+      this.state.siteConfigRes = data;
+      this.state.siteConfigForm.config_hjson = this.state.siteConfigRes.config_hjson;
+      this.state.siteConfigLoading = false;
+      toast(i18n.t('site_saved'));
+      this.setState(this.state);
+    }
+  }
+}
+
+export const AdminSettings = withRouter(BaseAdminSettings);

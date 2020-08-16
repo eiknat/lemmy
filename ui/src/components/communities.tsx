@@ -1,0 +1,246 @@
+import React, { Component } from 'react';
+import { Subscription } from 'rxjs';
+import { retryWhen, delay, take } from 'rxjs/operators';
+import {
+  UserOperation,
+  Community,
+  ListCommunitiesResponse,
+  CommunityResponse,
+  FollowCommunityForm,
+  ListCommunitiesForm,
+  SortType,
+  WebSocketJsonResponse,
+  GetSiteResponse,
+} from '../interfaces';
+import { WebSocketService } from '../services';
+import { wsJsonToRes, toast, getPageFromProps } from '../utils';
+import { CommunityLink } from './community-link';
+import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
+
+const communityLimit = 100;
+
+interface CommunitiesState {
+  communities: Array<Community>;
+  page: number;
+  loading: boolean;
+}
+
+interface CommunitiesProps {
+  page: number;
+}
+
+export class Communities extends Component<any, CommunitiesState> {
+  private subscription: Subscription;
+  private emptyState: CommunitiesState = {
+    communities: [],
+    loading: true,
+    page: getPageFromProps(this.props),
+  };
+
+  constructor(props: any, context: any) {
+    super(props, context);
+    this.state = this.emptyState;
+    this.subscription = WebSocketService.Instance.subject
+      .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
+      .subscribe(
+        msg => this.parseMessage(msg),
+        err => console.error(err),
+        () => console.log('complete')
+      );
+
+    this.refetch();
+    WebSocketService.Instance.getSite();
+  }
+
+  componentWillUnmount() {
+    this.subscription.unsubscribe();
+  }
+
+  static getDerivedStateFromProps(props: any): CommunitiesProps {
+    return {
+      page: getPageFromProps(props),
+    };
+  }
+
+  componentDidUpdate(_: any, lastState: CommunitiesState) {
+    if (lastState.page !== this.state.page) {
+      this.setState({ loading: true });
+      this.refetch();
+    }
+  }
+
+  render() {
+    return (
+      <div className="container">
+        {this.state.loading ? (
+          <h5>
+            <svg className="icon icon-spinner spin">
+              <use xlinkHref="#icon-spinner" />
+            </svg>
+          </h5>
+        ) : (
+          <div>
+            <h5>{i18n.t('list_of_communities')}</h5>
+            <div className="table-responsive">
+              <table id="community_table" className="table table-sm table-hover">
+                <thead className="pointer">
+                  <tr>
+                    <th>{i18n.t('name')}</th>
+                    <th className="d-none d-lg-table-cell">{i18n.t('title')}</th>
+                    <th>{i18n.t('category')}</th>
+                    <th className="text-right">{i18n.t('subscribers')}</th>
+                    <th className="text-right d-none d-lg-table-cell">
+                      {i18n.t('posts')}
+                    </th>
+                    <th className="text-right d-none d-lg-table-cell">
+                      {i18n.t('comments')}
+                    </th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {this.state.communities.map(community => (
+                    <tr key={community.id}>
+                      <td>
+                        <CommunityLink community={community} />
+                      </td>
+                      <td className="d-none d-lg-table-cell">{community.title}</td>
+                      <td>{community.category_name}</td>
+                      <td className="text-right">
+                        {community.number_of_subscribers}
+                      </td>
+                      <td className="text-right d-none d-lg-table-cell">
+                        {community.number_of_posts}
+                      </td>
+                      <td className="text-right d-none d-lg-table-cell">
+                        {community.number_of_comments}
+                      </td>
+                      <td className="text-right">
+                        {community.subscribed ? (
+                          <span
+                            className="pointer btn-link"
+                            onClick={linkEvent(
+                              community.id,
+                              this.handleUnsubscribe
+                            )}
+                          >
+                            {i18n.t('unsubscribe')}
+                          </span>
+                        ) : (
+                          <span
+                            className="pointer btn-link"
+                            onClick={linkEvent(
+                              community.id,
+                              this.handleSubscribe
+                            )}
+                          >
+                            {i18n.t('subscribe')}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {this.paginator()}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  paginator() {
+    return (
+      <div className="mt-2">
+        {this.state.page > 1 && (
+          <button
+            className="btn btn-sm btn-secondary mr-1"
+            onClick={linkEvent(this, this.prevPage)}
+          >
+            {i18n.t('prev')}
+          </button>
+        )}
+
+        {this.state.communities.length > 0 && (
+          <button
+            className="btn btn-sm btn-secondary"
+            onClick={linkEvent(this, this.nextPage)}
+          >
+            {i18n.t('next')}
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  updateUrl(paramUpdates: CommunitiesProps) {
+    const page = paramUpdates.page || this.state.page;
+    this.props.history.push(`/communities/page/${page}`);
+  }
+
+  nextPage(i: Communities) {
+    i.updateUrl({ page: i.state.page + 1 });
+  }
+
+  prevPage(i: Communities) {
+    i.updateUrl({ page: i.state.page - 1 });
+  }
+
+  handleUnsubscribe(communityId: number) {
+    let form: FollowCommunityForm = {
+      community_id: communityId,
+      follow: false,
+    };
+    WebSocketService.Instance.followCommunity(form);
+  }
+
+  handleSubscribe(communityId: number) {
+    let form: FollowCommunityForm = {
+      community_id: communityId,
+      follow: true,
+    };
+    WebSocketService.Instance.followCommunity(form);
+  }
+
+  refetch() {
+    let listCommunitiesForm: ListCommunitiesForm = {
+      sort: SortType[SortType.TopAll],
+      limit: communityLimit,
+      page: this.state.page,
+    };
+
+    WebSocketService.Instance.listCommunities(listCommunitiesForm);
+  }
+
+  parseMessage(msg: WebSocketJsonResponse) {
+    console.log(msg);
+    let res = wsJsonToRes(msg);
+    if (msg.error) {
+      toast(i18n.t(msg.error), 'danger');
+      return;
+    } else if (res.op == UserOperation.ListCommunities) {
+      let data = res.data as ListCommunitiesResponse;
+      this.setState({
+        communities: data.communities.sort(
+          (a, b) => b.number_of_subscribers - a.number_of_subscribers),
+        loading: false,
+      }, () => {
+        window.scrollTo(0, 0);
+        // XXX: Sort this table?
+        let table = document.querySelector('#community_table');
+        return table;
+      });
+    } else if (res.op == UserOperation.FollowCommunity) {
+      let data = res.data as CommunityResponse;
+      let found = this.state.communities.find(c => c.id == data.community.id);
+      found.subscribed = data.community.subscribed;
+      found.number_of_subscribers = data.community.number_of_subscribers;
+      this.setState(this.state);
+    } else if (res.op == UserOperation.GetSite) {
+      let data = res.data as GetSiteResponse;
+      document.title = `${i18n.t('communities')} - ${data.site.name}`;
+    }
+  }
+}

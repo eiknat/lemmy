@@ -1,0 +1,131 @@
+import React, { Component } from 'react';
+import { Subscription } from 'rxjs';
+import { withRouter } from 'react-router-dom';
+import { retryWhen, delay, take } from 'rxjs/operators';
+import { PostForm } from './post-form';
+import { toast, wsJsonToRes } from '../utils';
+import { WebSocketService, UserService } from '../services';
+import {
+  UserOperation,
+  PostFormParams,
+  WebSocketJsonResponse,
+  GetSiteResponse,
+  Site,
+} from '../interfaces';
+import { i18n } from '../i18next';
+
+interface CreatePostState {
+  site: Site;
+}
+
+export class BaseCreatePost extends Component<any, CreatePostState> {
+  private subscription: Subscription;
+  private emptyState: CreatePostState = {
+    site: {
+      id: undefined,
+      name: undefined,
+      creator_id: undefined,
+      published: undefined,
+      creator_name: undefined,
+      number_of_users: undefined,
+      number_of_posts: undefined,
+      number_of_comments: undefined,
+      number_of_communities: undefined,
+      enable_downvotes: undefined,
+      enable_create_communities: undefined,
+      open_registration: undefined,
+      enable_nsfw: undefined,
+    },
+  };
+
+  state = this.emptyState
+
+  constructor(props: any, context: any) {
+    super(props, context);
+    this.handlePostCreate = this.handlePostCreate.bind(this);
+  }
+
+  componentDidMount() {
+    if (!UserService.Instance.user) {
+      toast(i18n.t('not_logged_in'), 'danger');
+      this.props.history.push(`/login`);
+    }
+
+    this.subscription = WebSocketService.Instance.subject
+      .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
+      .subscribe(
+        msg => this.parseMessage(msg),
+        err => console.error(err),
+        () => console.log('complete')
+      );
+
+    WebSocketService.Instance.getSite();
+  }
+
+  componentWillUnmount() {
+    this.subscription.unsubscribe();
+  }
+
+  render() {
+    return (
+      <div className="container">
+        <div className="row">
+          <div className="col-12 col-lg-6 offset-lg-3 mb-4">
+            <h5>{i18n.t('create_post')}</h5>
+            <PostForm
+              onCreate={this.handlePostCreate}
+              params={this.params}
+              enableDownvotes={this.state.site.enable_downvotes}
+              enableNsfw={this.state.site.enable_nsfw}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  get params(): PostFormParams {
+    let urlParams = new URLSearchParams(this.props.location.search);
+    let params: PostFormParams = {
+      name: urlParams.get('title'),
+      community: urlParams.get('community') || this.prevCommunityName,
+      body: urlParams.get('body'),
+      url: urlParams.get('url'),
+    };
+
+    return params;
+  }
+
+  get prevCommunityName(): string {
+    if (this.props.match.params.name) {
+      return this.props.match.params.name;
+    } else if (this.props.location.state) {
+      let lastLocation = this.props.location.state.prevPath;
+      if (lastLocation.includes('/c/')) {
+        return lastLocation.split('/c/')[1];
+      }
+    }
+    return undefined;
+  }
+
+  handlePostCreate(id: number) {
+    this.props.history.push(`/post/${id}`);
+  }
+
+  parseMessage(msg: WebSocketJsonResponse) {
+    console.log(msg);
+    let res = wsJsonToRes(msg);
+    if (msg.error) {
+      toast(i18n.t(msg.error), 'danger');
+      return;
+    } else if (res.op == UserOperation.GetSite) {
+      let data = res.data as GetSiteResponse;
+      this.setState({
+        site: data.site
+      });
+      document.title = `${i18n.t('create_post')} - ${data.site.name}`;
+    }
+  }
+}
+
+export const CreatePost = withRouter(BaseCreatePost);
