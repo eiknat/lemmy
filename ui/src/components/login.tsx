@@ -68,25 +68,21 @@ export class Login extends Component<any, State> {
     },
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
+  state = this.emptyState;
 
-    this.state = this.emptyState;
-
+  componentDidMount() {
     this.handlePronounsChange = this.handlePronounsChange.bind(this);
 
     this.subscription = WebSocketService.Instance.subject
-                                        .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
-                                        .subscribe(
-                                          msg => this.parseMessage(msg),
-                                          err => console.error(err),
-                                          () => console.log('complete')
-                                        );
+      .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
+      .subscribe(
+        msg => this.parseMessage(msg),
+        err => console.error(err),
+        () => console.log('complete')
+      );
 
     WebSocketService.Instance.getSite();
-  }
 
-  componentDidMount() {
     setupTippy();
   }
 
@@ -165,8 +161,7 @@ export class Login extends Component<any, State> {
               )}
             </div>
           </div>
-          <div className="form-group row">
-          </div>
+          <div className="form-group row" />
           <div className="form-group row">
             <div className="col-sm-10">
               <button type="submit" className="btn btn-secondary">
@@ -190,7 +185,10 @@ export class Login extends Component<any, State> {
         <h5>{i18n.t('sign_up')}</h5>
 
         <div className="form-group row">
-          <label className="col-sm-2 col-form-label" htmlFor="register-username">
+          <label
+            className="col-sm-2 col-form-label"
+            htmlFor="register-username"
+          >
             {i18n.t('username')}
           </label>
 
@@ -235,7 +233,10 @@ export class Login extends Component<any, State> {
         </div>
 
         <div className="form-group row">
-          <label className="col-sm-2 col-form-label" htmlFor="register-pronouns">
+          <label
+            className="col-sm-2 col-form-label"
+            htmlFor="register-pronouns"
+          >
             {i18n.t('pronouns')}
           </label>
           <div className="col-sm-10">
@@ -255,7 +256,10 @@ export class Login extends Component<any, State> {
         </div>
 
         <div className="form-group row">
-          <label className="col-sm-2 col-form-label" htmlFor="register-password">
+          <label
+            className="col-sm-2 col-form-label"
+            htmlFor="register-password"
+          >
             {i18n.t('password')}
           </label>
           <div className="col-sm-10">
@@ -302,7 +306,7 @@ export class Login extends Component<any, State> {
                   onClick={linkEvent(this, this.handleRegenCaptcha)}
                 >
                   <svg className="icon icon-refresh-cw">
-                    <use xlinkHref="#icon-refresh-cw"></use>
+                    <use xlinkHref="#icon-refresh-cw" />
                   </svg>
                 </button>
               </label>
@@ -344,7 +348,10 @@ export class Login extends Component<any, State> {
                   checked={this.state.registerForm.show_nsfw}
                   onChange={linkEvent(this, this.handleRegisterShowNsfwChange)}
                 />
-                <label className="form-check-label" htmlFor="register-show-nsfw">
+                <label
+                  className="form-check-label"
+                  htmlFor="register-show-nsfw"
+                >
                   {i18n.t('show_nsfw')}
                 </label>
               </div>
@@ -353,8 +360,7 @@ export class Login extends Component<any, State> {
         )}
         <div className="form-group row">
           <div className="col-sm-10">
-            <button
-              type="submit" className="btn btn-secondary">
+            <button type="submit" className="btn btn-secondary">
               {this.state.registerLoading ? (
                 <svg className="icon icon-spinner spin">
                   <use xlinkHref="#icon-spinner" />
@@ -376,20 +382,21 @@ export class Login extends Component<any, State> {
           <>
             <img
               className="rounded-top img-fluid"
+              alt="captcha"
               src={this.captchaPngSrc()}
-              style="border-bottom-right-radius: 0; border-bottom-left-radius: 0;"
+              style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}
             />
             {this.state.captcha.ok.wav && (
               <button
                 className="rounded-bottom btn btn-sm btn-secondary btn-block"
-                style="border-top-right-radius: 0; border-top-left-radius: 0;"
+                style={{ borderTopRightRadius: 0, borderTopLeftRadius: 0 }}
                 title={i18n.t('play_captcha_audio')}
                 onClick={linkEvent(this, this.handleCaptchaPlay)}
                 type="button"
                 disabled={this.state.captchaPlaying}
               >
                 <svg className="icon icon-play">
-                  <use xlinkHref="#icon-play"></use>
+                  <use xlinkHref="#icon-play" />
                 </svg>
               </button>
             )}
@@ -404,15 +411,15 @@ export class Login extends Component<any, State> {
     let userOrEmail = (document.getElementById(
       'login-email-or-username'
     ) as HTMLInputElement).value;
-    let pw = (document.getElementById('login-password'
-    ) as HTMLInputElement).value;
+    let pw = (document.getElementById('login-password') as HTMLInputElement)
+      .value;
     let newState = {
       ...i.state,
       loginLoading: true,
       loginForm: {
         username_or_email: userOrEmail,
-        password: pw
-      }
+        password: pw,
+      },
     };
     i.setState(newState);
     WebSocketService.Instance.login(i.state.loginForm);
@@ -441,7 +448,7 @@ export class Login extends Component<any, State> {
     event.preventDefault();
     let newState = {
       ...i.state,
-      registerLoading: true
+      registerLoading: true,
     };
     if (i.state.captcha) {
       if (i.state.captcha.hcaptcha) {
@@ -456,43 +463,43 @@ export class Login extends Component<any, State> {
       ...i.state.registerForm,
       pronouns:
         i.state.registerForm.pronouns === 'none'
-        ? null
-        : i.state.registerForm.pronouns,
+          ? null
+          : i.state.registerForm.pronouns,
     });
   }
 
   handleRegisterUsernameChange(i: Login, event: any) {
-    let newState = {...i.state};
+    let newState = { ...i.state };
     newState.registerForm.username = event.target.value;
     i.setState(newState);
   }
 
   handleRegisterEmailChange(i: Login, event: any) {
-    let newState = {...i.state};
+    let newState = { ...i.state };
     newState.registerForm.email = event.target.value;
     i.setState(newState);
   }
 
   handleRegisterPasswordChange(i: Login, event: any) {
-    let newState = {...i.state};
+    let newState = { ...i.state };
     newState.registerForm.password = event.target.value;
     i.setState(newState);
   }
 
   handleRegisterPasswordVerifyChange(i: Login, event: any) {
-    let newState = {...i.state};
+    let newState = { ...i.state };
     newState.registerForm.password_verify = event.target.value;
     i.setState(newState);
   }
 
   handleRegisterShowNsfwChange(i: Login, event: any) {
-    let newState = {...i.state};
+    let newState = { ...i.state };
     newState.registerForm.show_nsfw = event.target.checked;
     i.setState(newState);
   }
 
   handleRegisterCaptchaAnswerChange(i: Login, event: any) {
-    let newState = {...i.state};
+    let newState = { ...i.state };
     newState.registerForm.captcha_answer = event.target.value;
     i.setState(newState);
   }
@@ -521,17 +528,17 @@ export class Login extends Component<any, State> {
     event.preventDefault();
     let snd = new Audio('data:audio/wav;base64,' + i.state.captcha.ok.wav);
     snd.play();
-    i.setState({...i.state, captchaPlaying: true});
+    i.setState({ ...i.state, captchaPlaying: true });
     snd.addEventListener('ended', () => {
       snd.currentTime = 0;
-      i.setState({...this.state, captchaPlaying: false});
+      i.setState({ ...this.state, captchaPlaying: false });
     });
   }
 
   captchaPngSrc() {
     return `data:image/png;base64,${this.state.captcha.ok.png}`;
   }
-  
+
   initHCaptcha() {
     const widgetID = hcaptcha.render('h-captcha', {
       sitekey: this.state.captcha.hcaptcha.site_key,
@@ -541,9 +548,9 @@ export class Login extends Component<any, State> {
   parseMessage(msg: WebSocketJsonResponse) {
     console.log(msg);
     let res = wsJsonToRes(msg);
-    let newState = {...this.emptyState};
+    let newState = { ...this.emptyState };
     if (msg.error) {
-      if (this.state.captcha.hcaptcha) {
+      if (this.state.captcha?.hcaptcha) {
         document.getElementById('h-captcha').innerHTML = '';
       }
       toast(i18n.t(msg.error), 'danger');
@@ -569,7 +576,7 @@ export class Login extends Component<any, State> {
       } else if (res.op == UserOperation.GetCaptcha) {
         let data = res.data as GetCaptchaResponse;
         if (data.ok || data.hcaptcha) {
-          newState = {...this.state, captcha: data};
+          newState = { ...this.state, captcha: data };
           if (data.ok) {
             newState.registerForm.captcha_uuid = data.ok.uuid;
           }
@@ -582,7 +589,7 @@ export class Login extends Component<any, State> {
         toast(i18n.t('reset_password_mail_sent'));
       } else if (res.op == UserOperation.GetSite) {
         let data = res.data as GetSiteResponse;
-        newState = {...this.state, site: data.site};
+        newState = { ...this.state, site: data.site };
         this.setState(newState);
       }
     }

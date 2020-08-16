@@ -136,10 +136,11 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     saveLoading: false,
   };
 
+  state = this.emptyState;
+
   constructor(props: any, context: any) {
     super(props, context);
 
-    this.state = this.emptyState;
     this.handleReplyCancel = this.handleReplyCancel.bind(this);
     this.handleCommentUpvote = this.handleCommentUpvote.bind(this);
     this.handleCommentDownvote = this.handleCommentDownvote.bind(this);
@@ -159,13 +160,14 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   render() {
     let node = this.props.node;
 
-    const borderStyle = !this.props.noIndent && this.props.node.comment.parent_id
-      ? {
-        borderLeftColor: this.state.borderColor,
-        borderLeftWidth: `2px`,
-        borderLeftStyle: `solid`,
-        }
-      : {}
+    const borderStyle =
+      !this.props.noIndent && this.props.node.comment.parent_id
+        ? {
+            borderLeftColor: this.state.borderColor,
+            borderLeftWidth: `2px`,
+            borderLeftStyle: `solid`,
+          }
+        : {};
 
     return (
       <div
@@ -615,13 +617,12 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                   >
                                     {i18n.t('unban_from_site')}
                                   </button>
-                                )
-                              )}
+                                ))}
                             </>
-                            )}
-                            {/* Admins can appoint admins and sitemods */}
-                            {this.canAdmin && (
-                              <>
+                          )}
+                          {/* Admins can appoint admins and sitemods */}
+                          {this.canAdmin && (
+                            <>
                               {!node.comment.banned &&
                                 (!this.state.showConfirmAppointAsAdmin ? (
                                   <button
@@ -663,7 +664,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                               {!node.comment.banned &&
                                 (!this.state.showConfirmAppointAsSitemod ? (
                                   <button
-                                  className="btn btn-link btn-animate text-muted"
+                                    className="btn btn-link btn-animate text-muted"
                                     onClick={linkEvent(
                                       this,
                                       this.handleShowConfirmAppointAsSitemod
@@ -982,13 +983,13 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
 
   handleReplyClick(i: CommentNode) {
     i.setState({
-      showReply: true
+      showReply: true,
     });
   }
 
   handleEditClick(i: CommentNode) {
     i.setState({
-      showEdit: true
+      showEdit: true,
     });
   }
 

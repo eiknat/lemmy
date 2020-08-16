@@ -51,14 +51,16 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
     finished: false,
   };
 
+  state = this.emptyState;
+
   constructor(props: any, context: any) {
     super(props, context);
 
     this.handleCommentSubmit = this.handleCommentSubmit.bind(this);
     this.handleReplyCancel = this.handleReplyCancel.bind(this);
+  }
 
-    this.state = this.emptyState;
-
+  componentDidMount() {
     if (this.props.node) {
       if (this.props.edit) {
         this.state.commentForm.edit_id = this.props.node.comment.id;
@@ -142,7 +144,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
         data.comment.content)
     ) {
       this.setState({
-        finished: true
+        finished: true,
       });
     }
   }
@@ -172,7 +174,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
 
     if (msg.error) {
       this.setState({
-        finished: true
+        finished: true,
       });
       return;
     }

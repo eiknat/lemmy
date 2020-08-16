@@ -52,8 +52,9 @@ import {
   createPostLikeFindRes,
   editPostFindRes,
   commentsToFlatNodes,
-  setupTippy} from '../utils';
-import { BASE_PATH } from "../isProduction";
+  setupTippy,
+} from '../utils';
+import { BASE_PATH } from '../isProduction';
 import { i18n } from '../i18next';
 import { Trans, withTranslation } from 'react-i18next';
 import { PATREON_URL } from '../constants';
@@ -245,7 +246,11 @@ class Main extends Component<any, MainState> {
                   )}
                 {this.showCreateCommunity() && (
                   <Flex>
-                    <Button css={{ width: '100%' }} as={Link} to="/create_community">
+                    <Button
+                      css={{ width: '100%', color: '#fff !important' }}
+                      as={Link}
+                      to="/create_community"
+                    >
                       {i18n.t('create_a_community')}
                     </Button>
                   </Flex>
@@ -347,7 +352,8 @@ class Main extends Component<any, MainState> {
             </div>
             <ul className="my-2 list-inline">
               <li className="list-inline-item user-online-badge mb-1">
-                <Icon name="hexbear" className="mr-2" /> {i18n.t('number_online', { count: this.state.siteRes.online })}
+                <Icon name="hexbear" className="mr-2" />{' '}
+                {i18n.t('number_online', { count: this.state.siteRes.online })}
               </li>
               <li className="list-inline-item badge badge-secondary">
                 {i18n.t('number_of_users', {
@@ -599,10 +605,7 @@ class Main extends Component<any, MainState> {
           </Button>
         )}
         {this.state.posts.length > 0 && (
-          <Button
-            variant="muted"
-            onClick={linkEvent(this, this.nextPage)}
-          >
+          <Button variant="muted" onClick={linkEvent(this, this.nextPage)}>
             {i18n.t('next')}
           </Button>
         )}
@@ -620,20 +623,20 @@ class Main extends Component<any, MainState> {
   }
 
   toggleMobileFilters(i: Main) {
-    i.setState((prevState) => ({
-      filtersOpen: !prevState.filtersOpen
+    i.setState(prevState => ({
+      filtersOpen: !prevState.filtersOpen,
     }));
   }
 
   handleEditClick(i: Main) {
     this.setState({
-      showEditSite: true
+      showEditSite: true,
     });
   }
 
   handleEditCancel() {
     this.setState({
-      showEditSite: false
+      showEditSite: false,
     });
   }
 
@@ -699,12 +702,12 @@ class Main extends Component<any, MainState> {
     } else if (res.op === UserOperation.GetFollowedCommunities) {
       let data = res.data as GetFollowedCommunitiesResponse;
       this.setState({
-        subscribedCommunities: data.communities
+        subscribedCommunities: data.communities,
       });
     } else if (res.op === UserOperation.ListCommunities) {
       let data = res.data as ListCommunitiesResponse;
       this.setState({
-        trendingCommunities: data.communities
+        trendingCommunities: data.communities,
       });
     } else if (res.op === UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
@@ -713,36 +716,45 @@ class Main extends Component<any, MainState> {
         this.props.history.push('/setup');
       } else {
         console.log('data.site is missing', data.site);
-        this.setState({
-          siteRes: {
-            admins: data.admins,
-            sitemods: data.sitemods,
-            site: data.site,
-            banned: data.banned,
-            online: data.online
+        this.setState(
+          {
+            siteRes: {
+              admins: data.admins,
+              sitemods: data.sitemods,
+              site: data.site,
+              banned: data.banned,
+              online: data.online,
+            },
           },
-        }, () => {
-          document.title = `${this.state.siteRes.site.name}`;
-        });
+          () => {
+            document.title = `${this.state.siteRes.site.name}`;
+          }
+        );
       }
     } else if (res.op === UserOperation.EditSite) {
       let data = res.data as SiteResponse;
-      this.setState({
-        siteRes: {
-          ...this.state.siteRes,
-          site: data.site,
+      this.setState(
+        {
+          siteRes: {
+            ...this.state.siteRes,
+            site: data.site,
+          },
+        },
+        () => {
+          toast(i18n.t('site_saved'));
         }
-      }, () => {
-        toast(i18n.t('site_saved'));
-      });
+      );
     } else if (res.op === UserOperation.GetPosts) {
       let data = res.data as GetPostsResponse;
-      this.setState({
-        posts: data.posts,
-        loading: false,
-      }, () => {
-        setupTippy();
-      });
+      this.setState(
+        {
+          posts: data.posts,
+          loading: false,
+        },
+        () => {
+          setupTippy();
+        }
+      );
     } else if (res.op === UserOperation.CreatePost) {
       let data = res.data as PostResponse;
 
@@ -783,16 +795,16 @@ class Main extends Component<any, MainState> {
       this.setState({
         siteRes: {
           ...this.state.siteRes,
-          admins: data.admins
-        }
+          admins: data.admins,
+        },
       });
     } else if (res.op === UserOperation.AddSitemod) {
       let data = res.data as AddSitemodResponse;
       this.setState({
         siteRes: {
           ...this.state.siteRes,
-          sitemods: data.sitemods
-        }
+          sitemods: data.sitemods,
+        },
       });
     } else if (res.op === UserOperation.BanUser) {
       let data = res.data as BanUserResponse;
@@ -816,7 +828,7 @@ class Main extends Component<any, MainState> {
       let data = res.data as GetCommentsResponse;
       this.setState({
         comments: data.comments,
-        loading: false
+        loading: false,
       });
     } else if (res.op == UserOperation.EditComment) {
       let data = res.data as CommentResponse;

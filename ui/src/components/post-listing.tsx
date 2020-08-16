@@ -103,6 +103,44 @@ export function PostListingButton({
   );
 }
 
+const VoteButtons = ({
+  my_vote,
+  handlePostLike,
+  handlePostDisLike,
+  enableDownvotes,
+  score,
+  pointsTippy,
+}) => (
+  <>
+    <button
+      className={`btn-animate btn btn-link p-0 ${
+        my_vote === 1 ? 'text-info' : 'text-muted'
+      }`}
+      onClick={handlePostLike}
+      data-tippy-content={i18n.t('upvote')}
+    >
+      <Icon name="upvote" className="icon upvote" />
+    </button>
+    <div
+      className="unselectable pointer font-weight-bold text-muted px-1 py-1"
+      data-tippy-content={pointsTippy}
+    >
+      {score}
+    </div>
+    {enableDownvotes && (
+      <button
+        className={`btn-animate btn btn-link p-0 ${
+          my_vote === -1 ? 'text-danger' : 'text-muted'
+        }`}
+        onClick={handlePostDisLike}
+        data-tippy-content={i18n.t('downvote')}
+      >
+        <Icon name="downvote" className="icon downvote" />
+      </button>
+    )}
+  </>
+);
+
 class BasePostListing extends Component<PostListingProps, PostListingState> {
   private emptyState: PostListingState = {
     showEdit: false,
@@ -204,6 +242,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
         className={`img-fluid thumbnail rounded ${
           (post.nsfw || post.community_nsfw) && 'img-blur'
         }`}
+        alt={post.name}
         src={src}
       />
     );
@@ -302,13 +341,14 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
               target="_blank"
               title={post.url}
               rel="noreferrer"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+              }}
             >
-              <Icon
-                className="icon thumbnail"
-                size="40px"
-                name="link"
-              />
+              <Icon className="icon thumbnail" size="40px" name="link" />
             </a>
           </div>
         );
@@ -337,6 +377,274 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     }
   }
 
+  listingActions() {
+    let post = this.props.post;
+
+    const isMobile = window.innerWidth < 768;
+    return (
+      <div className="details col-12">
+        <ul className="list-inline mb-0 text-muted small">
+          <li className="list-inline-item">
+            <span>{i18n.t('by')} </span>
+            <UserListing
+              user={{
+                name: post.creator_name,
+                avatar: post.creator_avatar,
+                id: post.creator_id,
+                local: post.creator_local,
+                actor_id: post.creator_actor_id,
+              }}
+            />
+            {this.isAdmin && (
+              <RoleBadge role="admin" tooltipText={i18n.t('admin')}>
+                {i18n.t('admin')[0]}
+              </RoleBadge>
+            )}
+            {this.isMod && !this.isAdmin && (
+              <RoleBadge role="mod" tooltipText={i18n.t('mod')}>
+                {i18n.t('mod')[0]}
+              </RoleBadge>
+            )}
+            {post.creator_tags?.pronouns ? (
+              <span className="badge mx-1 comment-badge pronouns-badge">
+                {post.creator_tags.pronouns.split(',').join('/')}
+              </span>
+            ) : null}
+            {(post.banned_from_community || post.banned) && (
+              <span className="mx-1 badge badge-danger">
+                {i18n.t('banned')}
+              </span>
+            )}
+            {this.props.showCommunity && (
+              <span>
+                <span> {i18n.t('to')} </span>
+                <CommunityLink
+                  community={{
+                    name: post.community_name,
+                    id: post.community_id,
+                    local: post.community_local,
+                    actor_id: post.community_actor_id,
+                  }}
+                />
+              </span>
+            )}
+          </li>
+          <li className="list-inline-item">•</li>
+          <li className="list-inline-item">
+            <span>
+              <MomentTime data={post} />
+            </span>
+          </li>
+          {post.stickied && (
+            <small
+              className="unselectable pointer ml-1 font-italic"
+              data-tippy-content={i18n.t('stickied')}
+            >
+              {/* <svg className={`icon custom-icon text-success`}>
+                        <use xlinkHref="#icon-pin"></use>
+                      </svg> */}
+              <Icon className="icon text-success" name="pin" />
+            </small>
+          )}
+          {post.locked && (
+            <small
+              className="unselectable pointer ml-1 text-muted font-italic"
+              data-tippy-content={i18n.t('locked')}
+            >
+              <svg className="icon custom-icon text-danger">
+                <use xlinkHref="#icon-lock" />
+              </svg>
+            </small>
+          )}
+        </ul>
+        {this.props.post.duplicates && (
+          <ul className="list-inline mb-1 small text-muted">
+            <>
+              <li className="list-inline-item mr-2">
+                {i18n.t('cross_posted_to')}
+              </li>
+              {this.props.post.duplicates.map(post => (
+                <li className="list-inline-item mr-2" key={post.id}>
+                  <Link to={`/post/${post.id}`}>{post.community_name}</Link>
+                </li>
+              ))}
+            </>
+          </ul>
+        )}
+        {this.state.showRemoveDialog && (
+          <form
+            className="form-inline"
+            onSubmit={linkEvent(this, this.handleModRemoveSubmit)}
+          >
+            <input
+              type="text"
+              className="form-control mr-2"
+              placeholder={i18n.t('reason')}
+              value={this.state.removeReason}
+              onChange={this.handleModRemoveReasonChange}
+            />
+            <button type="submit" className="btn btn-secondary">
+              {i18n.t('remove_post')}
+            </button>
+          </form>
+        )}
+        {this.state.showBanDialog && (
+          <form onSubmit={this.handleModBanBothSubmit}>
+            <div className="form-group row">
+              <label className="col-form-label" htmlFor="post-listing-reason">
+                {i18n.t('reason')}
+              </label>
+              <input
+                type="text"
+                id="post-listing-reason"
+                className="form-control mr-2"
+                placeholder={i18n.t('reason')}
+                value={this.state.banReason}
+                onChange={this.handleModBanReasonChange}
+              />
+            </div>
+            {/* TODO hold off on expires until later */}
+            {/* <div className="form-group row"> */}
+            {/*   <label className="col-form-label">Expires</label> */}
+            {/*   <input type="date" className="form-control mr-2" placeholder={i18n.t('expires')} value={this.state.banExpires} onChange={linkEvent(this, this.handleModBanExpiresChange)} /> */}
+            {/* </div> */}
+            <div className="form-group row">
+              <button type="submit" className="btn btn-secondary">
+                {i18n.t('ban')} {post.creator_name}
+              </button>
+            </div>
+          </form>
+        )}
+        {this.state.showReportDialog && (
+          <form
+            className="mt-2"
+            onSubmit={linkEvent(this, this.handleReportSubmit)}
+          >
+            <div className="form-group row">
+              <label
+                className="col-form-label"
+                htmlFor="post-listing-report-reason"
+              >
+                {i18n.t('reason')}
+              </label>
+              <input
+                type="text"
+                id="post-listing-report-reason"
+                className="form-control mr-2"
+                placeholder={i18n.t('reason')}
+                value={this.state.reportReason}
+                onChange={linkEvent(this, this.handleReportReasonChange)}
+                maxLength={600}
+              />
+            </div>
+            <div className="form-group row">
+              <button type="submit" className="btn btn-secondary">
+                {i18n.t('submit_report')}
+              </button>
+            </div>
+            <div className="row mt-1">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={linkEvent(this, this.handleReportPost)}
+              >
+                {i18n.t('cancel')}
+              </button>
+            </div>
+          </form>
+        )}
+        <div className="post-listing-details">
+          {/* <div className="mobile-vote-bar">
+                    <VoteButtons
+                        my_vote={this.state.my_vote}
+                        enableDownvotes={this.props.enableDownvotes}
+                        score={this.state.score}
+                        handlePostDisLike={linkEvent(this, this.handlePostDisLike)}
+                        handlePostLike={linkEvent(this, this.handlePostLike)}
+                        pointsTippy={this.pointsTippy}
+                      />
+                  </div> */}
+          <Link
+            className="text-muted"
+            title={i18n.t('number_of_comments', {
+              count: post.number_of_comments,
+            })}
+            to={`/post/${post.id}`}
+          >
+            <Icon name="comment" className="icon mr-1" />
+            {isMobile
+              ? post.number_of_comments
+              : i18n.t('number_of_comments', {
+                  count: post.number_of_comments,
+                })}
+          </Link>
+          {/* {this.state.upvotes !== this.state.score && (
+                    <>
+                      <span
+                        className="unselectable pointer mx-1 inline-vote-details"
+                        data-tippy-content={this.pointsTippy}
+                      >
+                        <div className="list-inline-item text-muted">
+                          <Icon name="upvote" className="icon mr-1" />
+                          {this.state.upvotes}
+                        </div>
+                        <div className="list-inline-item text-muted">
+                          <Icon name="downvote" className="icon mr-1" />
+                          {this.state.downvotes}
+                        </div>
+                      </span>
+                    </>
+                  )} */}
+          {UserService.Instance.user && (
+            <>
+              {!this.props.showBody && (
+                <>
+                  <li className="list-inline-item">
+                    <PostListingButton
+                      onClick={this.handleSavePostClick}
+                      data-tippy-content={
+                        post.saved ? i18n.t('unsave') : i18n.t('save')
+                      }
+                    >
+                      <Icon
+                        name={
+                          this.state.localPostSaved ? 'star' : 'starOutline'
+                        }
+                        className={`icon icon-inline ${
+                          this.state.localPostSaved && 'text-warning'
+                        }`}
+                      />
+                    </PostListingButton>
+                  </li>
+                  <li className="list-inline-item">
+                    <Link
+                      to={`/create_post${this.crossPostParams}`}
+                      title={i18n.t('cross_post')}
+                    >
+                      <PostListingButton>
+                        <svg className="icon icon-inline">
+                          <use xlinkHref="#icon-copy" />
+                        </svg>
+                      </PostListingButton>
+                    </Link>
+                  </li>
+                  <li className="list-inline-item">
+                    <PostListingButton
+                      onClick={this.handleReportPost}
+                      data-tippy-content={i18n.t('snitch')}
+                    >
+                      <Icon name="report" />
+                    </PostListingButton>
+                  </li>
+                </>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   listing() {
     let post = this.props.post;
 
@@ -344,38 +652,20 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
 
     return (
       <div>
-        <div className="row">
+        <div className="row post-listing-row">
           <div
             className={`vote-bar small text-center ${
               post.stickied ? 'stickied-border' : ''
             }`}
           >
-            <button
-              className={`btn-animate btn btn-link p-0 ${
-                this.state.my_vote === 1 ? 'text-info' : 'text-muted'
-              }`}
-              onClick={linkEvent(this, this.handlePostLike)}
-              data-tippy-content={i18n.t('upvote')}
-            >
-              <Icon name="upvote" className="icon upvote" />
-            </button>
-            <div
-              className="unselectable pointer font-weight-bold text-muted px-1 py-1"
-              data-tippy-content={this.pointsTippy}
-            >
-              {this.state.score}
-            </div>
-            {this.props.enableDownvotes && (
-              <button
-                className={`btn-animate btn btn-link p-0 ${
-                  this.state.my_vote === -1 ? 'text-danger' : 'text-muted'
-                }`}
-                onClick={linkEvent(this, this.handlePostDisLike)}
-                data-tippy-content={i18n.t('downvote')}
-              >
-                <Icon name="downvote" className="icon downvote" />
-              </button>
-            )}
+            <VoteButtons
+              my_vote={this.state.my_vote}
+              enableDownvotes={this.props.enableDownvotes}
+              score={this.state.score}
+              handlePostDisLike={linkEvent(this, this.handlePostDisLike)}
+              handlePostLike={linkEvent(this, this.handlePostLike)}
+              pointsTippy={this.pointsTippy}
+            />
           </div>
           {/* show thumbnail when not expanded or content is a video */}
           {(!isMobile ||
@@ -473,6 +763,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                               ) : (
                                 <img
                                   className="img-fluid img-expanded mt-2"
+                                  alt={`expanded for post ${post.name}`}
                                   src={this.getImage()}
                                 />
                               )}
@@ -505,273 +796,12 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                 </div>
               </div>
             </div>
-            <div className="row">
-              <div className="details col-12">
-                <ul className="list-inline mb-0 text-muted small">
-                  <li className="list-inline-item">
-                    <span>{i18n.t('by')} </span>
-                    <UserListing
-                      user={{
-                        name: post.creator_name,
-                        avatar: post.creator_avatar,
-                        id: post.creator_id,
-                        local: post.creator_local,
-                        actor_id: post.creator_actor_id,
-                      }}
-                    />
-                    {this.isAdmin && (
-                      <RoleBadge role="admin" tooltipText={i18n.t('admin')}>
-                        {i18n.t('admin')[0]}
-                      </RoleBadge>
-                    )}
-                    {this.isMod && !this.isAdmin && (
-                      <RoleBadge role="mod" tooltipText={i18n.t('mod')}>
-                        {i18n.t('mod')[0]}
-                      </RoleBadge>
-                    )}
-                    {post.creator_tags?.pronouns ? (
-                      <span className="badge mx-1 comment-badge pronouns-badge">
-                        {post.creator_tags.pronouns.split(',').join('/')}
-                      </span>
-                    ) : null}
-                    {(post.banned_from_community || post.banned) && (
-                      <span className="mx-1 badge badge-danger">
-                        {i18n.t('banned')}
-                      </span>
-                    )}
-                    {this.props.showCommunity && (
-                      <span>
-                        <span> {i18n.t('to')} </span>
-                        <CommunityLink
-                          community={{
-                            name: post.community_name,
-                            id: post.community_id,
-                            local: post.community_local,
-                            actor_id: post.community_actor_id,
-                          }}
-                        />
-                      </span>
-                    )}
-                  </li>
-                  <li className="list-inline-item">•</li>
-                  <li className="list-inline-item">
-                    <span>
-                      <MomentTime data={post} />
-                    </span>
-                  </li>
-                  {post.stickied && (
-                    <small
-                      className="unselectable pointer ml-1 font-italic"
-                      data-tippy-content={i18n.t('stickied')}
-                    >
-                      {/* <svg className={`icon custom-icon text-success`}>
-                        <use xlinkHref="#icon-pin"></use>
-                      </svg> */}
-                      <Icon className="icon text-success" name="pin" />
-                    </small>
-                  )}
-                  {post.locked && (
-                    <small
-                      className="unselectable pointer ml-1 text-muted font-italic"
-                      data-tippy-content={i18n.t('locked')}
-                    >
-                      <svg className="icon custom-icon text-danger">
-                        <use xlinkHref="#icon-lock" />
-                      </svg>
-                    </small>
-                  )}
-                </ul>
-                {this.props.post.duplicates && (
-                  <ul className="list-inline mb-1 small text-muted">
-                    <>
-                      <li className="list-inline-item mr-2">
-                        {i18n.t('cross_posted_to')}
-                      </li>
-                      {this.props.post.duplicates.map(post => (
-                        <li
-                          className="list-inline-item mr-2"
-                          key={post.id}
-                        >
-                          <Link to={`/post/${post.id}`}>
-                            {post.community_name}
-                          </Link>
-                        </li>
-                      ))}
-                    </>
-                  </ul>
-                )}
-                {this.state.showRemoveDialog && (
-                  <form
-                    className="form-inline"
-                    onSubmit={linkEvent(this, this.handleModRemoveSubmit)}
-                  >
-                    <input
-                      type="text"
-                      className="form-control mr-2"
-                      placeholder={i18n.t('reason')}
-                      value={this.state.removeReason}
-                      onChange={this.handleModRemoveReasonChange}
-                    />
-                    <button type="submit" className="btn btn-secondary">
-                      {i18n.t('remove_post')}
-                    </button>
-                  </form>
-                )}
-                {this.state.showBanDialog && (
-                  <form onSubmit={this.handleModBanBothSubmit}>
-                    <div className="form-group row">
-                      <label
-                        className="col-form-label"
-                        htmlFor="post-listing-reason"
-                      >
-                        {i18n.t('reason')}
-                      </label>
-                      <input
-                        type="text"
-                        id="post-listing-reason"
-                        className="form-control mr-2"
-                        placeholder={i18n.t('reason')}
-                        value={this.state.banReason}
-                        onChange={this.handleModBanReasonChange}
-                      />
-                    </div>
-                    {/* TODO hold off on expires until later */}
-                    {/* <div className="form-group row"> */}
-                    {/*   <label className="col-form-label">Expires</label> */}
-                    {/*   <input type="date" className="form-control mr-2" placeholder={i18n.t('expires')} value={this.state.banExpires} onChange={linkEvent(this, this.handleModBanExpiresChange)} /> */}
-                    {/* </div> */}
-                    <div className="form-group row">
-                      <button type="submit" className="btn btn-secondary">
-                        {i18n.t('ban')} {post.creator_name}
-                      </button>
-                    </div>
-                  </form>
-                )}
-                {this.state.showReportDialog && (
-                  <form
-                    className="mt-2"
-                    onSubmit={linkEvent(this, this.handleReportSubmit)}
-                  >
-                    <div className="form-group row">
-                      <label
-                        className="col-form-label"
-                        htmlFor="post-listing-report-reason"
-                      >
-                        {i18n.t('reason')}
-                      </label>
-                      <input
-                        type="text"
-                        id="post-listing-report-reason"
-                        className="form-control mr-2"
-                        placeholder={i18n.t('reason')}
-                        value={this.state.reportReason}
-                        onChange={linkEvent(
-                          this,
-                          this.handleReportReasonChange
-                        )}
-                        maxLength={600}
-                      />
-                    </div>
-                    <div className="form-group row">
-                      <button type="submit" className="btn btn-secondary">
-                        {i18n.t('submit_report')}
-                      </button>
-                    </div>
-                    <div className="row mt-1">
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={linkEvent(this, this.handleReportPost)}
-                      >
-                        {i18n.t('cancel')}
-                      </button>
-                    </div>
-                  </form>
-                )}
-                <div className="post-listing-details">
-                  <Link
-                    className="text-muted"
-                    title={i18n.t('number_of_comments', {
-                      count: post.number_of_comments,
-                    })}
-                    to={`/post/${post.id}`}
-                  >
-                    <Icon name="comment" className="icon mr-1" />
-                    {isMobile
-                      ? post.number_of_comments
-                      : i18n.t('number_of_comments', {
-                          count: post.number_of_comments,
-                        })}
-                  </Link>
-                  {/* {this.state.upvotes !== this.state.score && (
-                    <>
-                      <span
-                        className="unselectable pointer mx-1 inline-vote-details"
-                        data-tippy-content={this.pointsTippy}
-                      >
-                        <div className="list-inline-item text-muted">
-                          <Icon name="upvote" className="icon mr-1" />
-                          {this.state.upvotes}
-                        </div>
-                        <div className="list-inline-item text-muted">
-                          <Icon name="downvote" className="icon mr-1" />
-                          {this.state.downvotes}
-                        </div>
-                      </span>
-                    </>
-                  )} */}
-                  {UserService.Instance.user && (
-                    <>
-                      {!this.props.showBody && (
-                        <>
-                          <li className="list-inline-item">
-                            <PostListingButton
-                              onClick={this.handleSavePostClick}
-                              data-tippy-content={
-                                post.saved ? i18n.t('unsave') : i18n.t('save')
-                              }
-                            >
-                              <Icon
-                                name={
-                                  this.state.localPostSaved
-                                    ? 'star'
-                                    : 'starOutline'
-                                }
-                                className={`icon icon-inline ${
-                                  this.state.localPostSaved && 'text-warning'
-                                }`}
-                              />
-                            </PostListingButton>
-                          </li>
-                          <li className="list-inline-item">
-                            <Link
-                              to={`/create_post${this.crossPostParams}`}
-                              title={i18n.t('cross_post')}
-                            >
-                              <PostListingButton>
-                                <svg className="icon icon-inline">
-                                  <use xlinkHref="#icon-copy" />
-                                </svg>
-                              </PostListingButton>
-                            </Link>
-                          </li>
-                          <li className="list-inline-item">
-                            <PostListingButton
-                              onClick={this.handleReportPost}
-                              data-tippy-content={i18n.t('snitch')}
-                            >
-                              <Icon name="report" />
-                            </PostListingButton>
-                          </li>
-                        </>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
+            <div className="row">{this.listingActions()}</div>
           </div>
         </div>
+        {/* <div className="row only-mobile mt-2">
+          {this.listingActions()}
+        </div> */}
         <ul className="list-inline mb-1 text-muted font-weight-bold">
           {UserService.Instance.user && (
             <>

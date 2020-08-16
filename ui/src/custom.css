@@ -733,3 +733,34 @@ a.text-body {
 button:hover [type="button"]:hover {
   cursor: pointer;
 }
+
+.mobile-vote-bar {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .only-mobile {
+  display: none;
+  }
+}
+
+/* post listing mobile styles */
+@media (max-width: 768px) {
+  .vote-bar {
+    /* display: none; */
+  }
+
+  .only-desktop {
+    display: none;
+  }
+
+  .mobile-vote-bar {
+    display: flex;
+    align-items: center;
+  }
+
+  .post-listing-row {
+    /* flex-direction: row-reverse; */
+    /* flex-direction: column-re; */
+  }
+}
