@@ -401,14 +401,20 @@ export class Login extends Component<any, State> {
 
   handleLoginSubmit(i: Login, event: any) {
     event.preventDefault();
-    i.state.loginLoading = true;
-    i.state.loginForm.username_or_email = (document.getElementById(
+    let userOrEmail = (document.getElementById(
       'login-email-or-username'
     ) as HTMLInputElement).value;
-    i.state.loginForm.password = (document.getElementById(
-      'login-password'
+    let pw = (document.getElementById('login-password'
     ) as HTMLInputElement).value;
-    i.setState(i.state);
+    let newState = {
+      ...i.state,
+      loginLoading: true,
+      loginForm: {
+        username_or_email: userOrEmail,
+        password: pw
+      }
+    };
+    i.setState(newState);
     WebSocketService.Instance.login(i.state.loginForm);
   }
 
@@ -433,15 +439,18 @@ export class Login extends Component<any, State> {
 
   handleRegisterSubmit(i: Login, event: any) {
     event.preventDefault();
-    i.state.registerLoading = true;
+    let newState = {
+      ...i.state,
+      registerLoading: true
+    };
     if (i.state.captcha) {
       if (i.state.captcha.hcaptcha) {
-        i.state.registerForm.hcaptcha_id = (document.querySelectorAll(
+        newState.registerForm.hcaptcha_id = (document.querySelectorAll(
           "textarea[name='h-captcha-response']"
         )[0] as HTMLInputElement).value;
       }
     }
-    i.setState(i.state);
+    i.setState(newState);
 
     WebSocketService.Instance.register({
       ...i.state.registerForm,
@@ -452,56 +461,59 @@ export class Login extends Component<any, State> {
     });
   }
 
-handleRegisterUsernameChange(i: Login, event: any) {
-  i.state.registerForm.username = event.target.value;
-  i.setState(i.state);
-}
-
-handleRegisterEmailChange(i: Login, event: any) {
-  i.state.registerForm.email = event.target.value;
-  if (i.state.registerForm.email == '') {
-    i.state.registerForm.email = undefined;
+  handleRegisterUsernameChange(i: Login, event: any) {
+    let newState = {...i.state};
+    newState.registerForm.username = event.target.value;
+    i.setState(newState);
   }
-  i.setState(i.state);
-}
 
-handleRegisterPasswordChange(i: Login, event: any) {
-  i.state.registerForm.password = event.target.value;
-  i.setState(i.state);
-}
+  handleRegisterEmailChange(i: Login, event: any) {
+    let newState = {...i.state};
+    newState.registerForm.email = event.target.value;
+    i.setState(newState);
+  }
 
-handleRegisterPasswordVerifyChange(i: Login, event: any) {
-  i.state.registerForm.password_verify = event.target.value;
-  i.setState(i.state);
-}
+  handleRegisterPasswordChange(i: Login, event: any) {
+    let newState = {...i.state};
+    newState.registerForm.password = event.target.value;
+    i.setState(newState);
+  }
 
-handleRegisterShowNsfwChange(i: Login, event: any) {
-  i.state.registerForm.show_nsfw = event.target.checked;
-  i.setState(i.state);
-}
+  handleRegisterPasswordVerifyChange(i: Login, event: any) {
+    let newState = {...i.state};
+    newState.registerForm.password_verify = event.target.value;
+    i.setState(newState);
+  }
 
-handleRegisterCaptchaAnswerChange(i: Login, event: any) {
-  i.state.registerForm.captcha_answer = event.target.value;
-  i.setState(i.state);
-}
+  handleRegisterShowNsfwChange(i: Login, event: any) {
+    let newState = {...i.state};
+    newState.registerForm.show_nsfw = event.target.checked;
+    i.setState(newState);
+  }
 
-handleRegenCaptcha(_i: Login, _event: any) {
-  event.preventDefault();
-  WebSocketService.Instance.getCaptcha();
-}
+  handleRegisterCaptchaAnswerChange(i: Login, event: any) {
+    let newState = {...i.state};
+    newState.registerForm.captcha_answer = event.target.value;
+    i.setState(newState);
+  }
 
-handlePasswordReset(i: Login) {
-  event.preventDefault();
-  let resetForm: PasswordResetForm = {
-    email: i.state.loginForm.username_or_email,
-  };
-  WebSocketService.Instance.passwordReset(resetForm);
-}
+  handleRegenCaptcha(_i: Login, _event: any) {
+    event.preventDefault();
+    WebSocketService.Instance.getCaptcha();
+  }
+
+  handlePasswordReset(i: Login) {
+    event.preventDefault();
+    let resetForm: PasswordResetForm = {
+      email: i.state.loginForm.username_or_email,
+    };
+    WebSocketService.Instance.passwordReset(resetForm);
+  }
 
   handleInvalidPasswordReset(i: Login, event: any) {
-  document
-    .getElementById('login-email-or-username')
-    .classList.add('is-invalid');
+    document
+      .getElementById('login-email-or-username')
+      .classList.add('is-invalid');
     toast(i18n.t('email_required'), 'danger');
   }
 
@@ -509,12 +521,10 @@ handlePasswordReset(i: Login) {
     event.preventDefault();
     let snd = new Audio('data:audio/wav;base64,' + i.state.captcha.ok.wav);
     snd.play();
-    i.state.captchaPlaying = true;
-    i.setState(i.state);
+    i.setState({...i.state, captchaPlaying: true});
     snd.addEventListener('ended', () => {
       snd.currentTime = 0;
-      i.state.captchaPlaying = false;
-      i.setState(this.state);
+      i.setState({...this.state, captchaPlaying: false});
     });
   }
 
@@ -531,44 +541,39 @@ handlePasswordReset(i: Login) {
   parseMessage(msg: WebSocketJsonResponse) {
     console.log(msg);
     let res = wsJsonToRes(msg);
+    let newState = {...this.emptyState};
     if (msg.error) {
       if (this.state.captcha.hcaptcha) {
         document.getElementById('h-captcha').innerHTML = '';
       }
-
       toast(i18n.t(msg.error), 'danger');
 
-      this.state = this.emptyState;
-      this.state.registerForm.captcha_answer = undefined;
-      this.state.registerForm.hcaptcha_id = undefined;
       // Refetch another captcha
       WebSocketService.Instance.getCaptcha();
-      this.setState(this.state);
+      this.setState(newState);
       return;
     } else {
       if (res.op == UserOperation.Login) {
         let data = res.data as LoginResponse;
-        this.state = this.emptyState;
-        this.setState(this.state);
+        this.setState(newState);
         UserService.Instance.login(data);
         WebSocketService.Instance.userJoin();
         toast(i18n.t('logged_in'));
         this.props.history.push('/');
       } else if (res.op == UserOperation.Register) {
         let data = res.data as LoginResponse;
-        this.state = this.emptyState;
-        this.setState(this.state);
+        this.setState(newState);
         UserService.Instance.login(data);
         WebSocketService.Instance.userJoin();
         this.props.history.push('/communities');
       } else if (res.op == UserOperation.GetCaptcha) {
         let data = res.data as GetCaptchaResponse;
         if (data.ok || data.hcaptcha) {
-          this.state.captcha = data;
+          newState = {...this.state, captcha: data};
           if (data.ok) {
-            this.state.registerForm.captcha_uuid = data.ok.uuid;
+            newState.registerForm.captcha_uuid = data.ok.uuid;
           }
-          this.setState(this.state);
+          this.setState(newState);
           if (data.hcaptcha) {
             this.initHCaptcha();
           }
@@ -577,8 +582,8 @@ handlePasswordReset(i: Login) {
         toast(i18n.t('reset_password_mail_sent'));
       } else if (res.op == UserOperation.GetSite) {
         let data = res.data as GetSiteResponse;
-        this.state.site = data.site;
-        this.setState(this.state);
+        newState = {...this.state, site: data.site};
+        this.setState(newState);
       }
     }
   }
