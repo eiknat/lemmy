@@ -377,7 +377,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                   <h5 className="mb-0 d-inline">
                     {this.props.showBody && post.url ? (
                       <a
-                        className="text-body"
+                        className="text-body post-title-link"
                         href={post.url}
                         target="_blank"
                         title={post.url}
@@ -522,7 +522,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       </span>
                     )}
                     {this.props.showCommunity && (
-                      <span>
+                      <span className="ml-2">
                         <span> {i18n.t('to')} </span>
                         <CommunityLink
                           community={{

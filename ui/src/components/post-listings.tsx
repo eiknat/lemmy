@@ -42,7 +42,7 @@ export class PostListings extends Component<
 
   //have we updated? revert scroll to top (bug on inferno side?) - scroll back to previous pos
   componentDidUpdate() {
-    // window.scrollTo(0, this.state.scrollPos);
+    window.scrollTo(0, this.state.scrollPos);
   }
 
   render() {
