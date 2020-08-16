@@ -133,9 +133,9 @@ class Main extends Component<any, MainState> {
     loading: true,
     posts: [],
     comments: [],
-    listingType: getListingTypeFromProps(this.props),
-    dataType: getDataTypeFromProps(this.props),
-    sort: getSortTypeFromProps(this.props),
+    listingType: getListingTypeFromProps(this.props) || ListingType.Subscribed,
+    dataType: getDataTypeFromProps(this.props) || DataType.Post,
+    sort: getSortTypeFromProps(this.props) || SortType.Hot,
     page: getPageFromProps(this.props),
     filtersOpen: false,
   };

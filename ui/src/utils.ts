@@ -769,7 +769,7 @@ function communitySearch(text: string, cb: any) {
 export function getListingTypeFromProps(props: any): ListingType {
   return props.match.params.listing_type
     ? routeListingTypeToEnum(props.match.params.listing_type)
-    : UserService.Instance.user
+    : UserService.Instance.user && UserService.Instance.user.default_listing_type
     ? UserService.Instance.user.default_listing_type
     : ListingType.All;
 }
@@ -784,7 +784,7 @@ export function getDataTypeFromProps(props: any): DataType {
 export function getSortTypeFromProps(props: any): SortType {
   return props.match.params.sort
     ? routeSortTypeToEnum(props.match.params.sort)
-    : UserService.Instance.user
+    : UserService.Instance.user && UserService.Instance.user.default_sort_type
     ? UserService.Instance.user.default_sort_type
     : SortType.Hot;
 }

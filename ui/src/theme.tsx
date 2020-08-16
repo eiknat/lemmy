@@ -17,6 +17,7 @@ export const variants = {
       '&:hover': {
         textDecoration: 'none',
         cursor: 'pointer',
+        color: 'background',
       },
       '&:disabled': {
         opacity: 0.5,
@@ -44,7 +45,7 @@ export const variants = {
     outline: {
       color: 'text',
       borderColor: 'muted',
-      borderWidth: '1px',
+      borderWidth: '2px',
       borderStyle: 'solid',
       backgroundColor: 'transparent',
     },
@@ -73,7 +74,8 @@ const defaultTheme: ThemeProviderProps<Theme> = {
   colors: {
     ...dark.colors,
     background: '#222',
-    primary: '#DA1B9A',
+    // primary: '#DA1B9A',
+    primary: '#A4288B',
     secondary: '#2030DF',
     accent: '#F3B90C',
     danger: '#dc3545',
@@ -85,6 +87,9 @@ const defaultTheme: ThemeProviderProps<Theme> = {
       ...variants.buttons.primary,
       color: 'text',
       bg: 'primary',
+      '&:hover': {
+        bg: 'primary',
+      }
     },
     secondary: {
       ...variants.buttons.secondary,

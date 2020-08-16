@@ -214,7 +214,8 @@ export class BaseCommunity extends Component<any, State> {
                       </div>
                     </div>
                     {this.state.community.subscribed ? (
-                      <Button
+                        <Button
+                          variant="outline"
                         onClick={linkEvent(
                           this.state.community.id,
                           this.handleUnsubscribe
@@ -223,7 +224,8 @@ export class BaseCommunity extends Component<any, State> {
                         {i18n.t('unsubscribe')}
                       </Button>
                     ) : (
-                      <Button
+                          <Button
+                            variant="outline"
                         onClick={linkEvent(
                           this.state.community.id,
                             this.handleSubscribe
@@ -235,7 +237,7 @@ export class BaseCommunity extends Component<any, State> {
                     )}
                       <div className="community-button-separator" />
                       <Link to={`/create_post?community=${this.state.community.name}`} style={{ display: 'block' }}>
-                        <Button variant="secondary">
+                        <Button variant="primary">
 
                           {isMobile ? '+' : 'Create Post'}
                         </Button>
