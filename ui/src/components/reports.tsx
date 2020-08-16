@@ -49,7 +49,7 @@ interface ReportsState {
   autoResolve: boolean;
 }
 
-export class BaseReports extends Component<{}, ReportsState> {
+export class BaseReports extends Component<any, ReportsState> {
   private subscription: Subscription;
   constructor(props: any, context: any) {
     super(props);
@@ -199,7 +199,7 @@ export class BaseReports extends Component<{}, ReportsState> {
           }
 
           return (
-            <div className="mx-3">
+            <div className="mx-3" key={communityUser.id}>
               <div className="row mb-2">
                 <h4>
                   <Link to={`/c/${community_name}`}>{community_name}</Link>
@@ -235,7 +235,7 @@ export class BaseReports extends Component<{}, ReportsState> {
                         <p>no reports</p>
                       ) : (
                         postReportsByCommunity[community_id].map(report => (
-                          <div className="mb-4">
+                          <div className="mb-4" key={report.id}>
                             <div
                               style={{
                                 width: '100%',
@@ -324,7 +324,7 @@ export class BaseReports extends Component<{}, ReportsState> {
                         <p>no reports</p>
                       ) : (
                         commentReportsByCommunity[community_id].map(report => (
-                          <div className="mb-4">
+                          <div className="mb-4" key={report.id}>
                             <div
                               style={{
                                 width: '100%',

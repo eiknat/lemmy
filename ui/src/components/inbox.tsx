@@ -75,7 +75,7 @@ export class Inbox extends Component<any, InboxState> {
     enableDownvotes: undefined,
   };
 
-  state = this.emptyState
+  state = this.emptyState;
 
   componentDidMount() {
     this.handleSortChange = this.handleSortChange.bind(this);
@@ -301,6 +301,7 @@ export class Inbox extends Component<any, InboxState> {
       <div>
         {this.state.mentions.map(mention => (
           <CommentNodes
+            key={mention.id}
             nodes={[{ comment: mention }]}
             noIndent
             markable
@@ -317,7 +318,7 @@ export class Inbox extends Component<any, InboxState> {
     return (
       <div>
         {this.state.messages.map(message => (
-          <PrivateMessage privateMessage={message} />
+          <PrivateMessage key={message.id} privateMessage={message} />
         ))}
       </div>
     );
@@ -347,37 +348,49 @@ export class Inbox extends Component<any, InboxState> {
   }
 
   nextPage(i: Inbox) {
-    i.setState((prevState) => ({
-      page: prevState.page + 1
-    }), () => {
-      i.refetch();
-    });
+    i.setState(
+      prevState => ({
+        page: prevState.page + 1,
+      }),
+      () => {
+        i.refetch();
+      }
+    );
   }
 
   prevPage(i: Inbox) {
-    i.setState((prevState) => ({
-      page: prevState.page - 1
-    }), () => {
-      i.refetch();
-    });
+    i.setState(
+      prevState => ({
+        page: prevState.page - 1,
+      }),
+      () => {
+        i.refetch();
+      }
+    );
   }
 
   handleUnreadOrAllChange(i: Inbox, event: any) {
-    i.setState({
-      unreadOrAll: Number(event.target.value),
-      page: 1
-    }, () => {
-      i.refetch();
-    });
+    i.setState(
+      {
+        unreadOrAll: Number(event.target.value),
+        page: 1,
+      },
+      () => {
+        i.refetch();
+      }
+    );
   }
 
   handleMessageTypeChange(i: Inbox, event: any) {
-    i.setState({
-      messageType: Number(event.target.value),
-      page: 1
-    }, () => {
-      i.refetch();
-    });
+    i.setState(
+      {
+        messageType: Number(event.target.value),
+        page: 1,
+      },
+      () => {
+        i.refetch();
+      }
+    );
   }
 
   refetch() {
@@ -406,24 +419,30 @@ export class Inbox extends Component<any, InboxState> {
   }
 
   handleSortChange(val: SortType) {
-    this.setState({
-      sort: val,
-      page: 1
-    }, () => {
-      this.refetch();
-    });
+    this.setState(
+      {
+        sort: val,
+        page: 1,
+      },
+      () => {
+        this.refetch();
+      }
+    );
   }
 
   markAllAsRead(i: Inbox) {
     WebSocketService.Instance.markAllAsRead();
-    i.setState({
-      replies: [],
-      mentions: [],
-      messages: [],
-    }, () => {
-      i.sendUnreadCount();
-      window.scrollTo(0, 0);
-    });
+    i.setState(
+      {
+        replies: [],
+        mentions: [],
+        messages: [],
+      },
+      () => {
+        i.sendUnreadCount();
+        window.scrollTo(0, 0);
+      }
+    );
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
@@ -436,31 +455,40 @@ export class Inbox extends Component<any, InboxState> {
       this.refetch();
     } else if (res.op == UserOperation.GetReplies) {
       let data = res.data as GetRepliesResponse;
-      this.setState({
-        replies: data.replies,
-      }, () => {
-        this.sendUnreadCount();
-        window.scrollTo(0, 0);
-        setupTippy();
-      });
+      this.setState(
+        {
+          replies: data.replies,
+        },
+        () => {
+          this.sendUnreadCount();
+          window.scrollTo(0, 0);
+          setupTippy();
+        }
+      );
     } else if (res.op == UserOperation.GetUserMentions) {
       let data = res.data as GetUserMentionsResponse;
-      this.setState({
-        mentions: data.mentions,
-      }, () => {
-        this.sendUnreadCount();
-        window.scrollTo(0, 0);
-        setupTippy();
-      });
+      this.setState(
+        {
+          mentions: data.mentions,
+        },
+        () => {
+          this.sendUnreadCount();
+          window.scrollTo(0, 0);
+          setupTippy();
+        }
+      );
     } else if (res.op == UserOperation.GetPrivateMessages) {
       let data = res.data as PrivateMessagesResponse;
-      this.setState({
-        messages: data.messages,
-      }, () => {
-        this.sendUnreadCount();
-        window.scrollTo(0, 0);
-        setupTippy();
-      });
+      this.setState(
+        {
+          messages: data.messages,
+        },
+        () => {
+          this.sendUnreadCount();
+          window.scrollTo(0, 0);
+          setupTippy();
+        }
+      );
     } else if (res.op == UserOperation.EditPrivateMessage) {
       let data = res.data as PrivateMessageResponse;
       let found: PrivateMessageI = this.state.messages.find(

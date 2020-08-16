@@ -226,7 +226,7 @@ export class Search extends Component<any, SearchState> {
               {i18n.t('communities')}
             </option>
             <option value={SearchType.Users}>{i18n.t('users')}</option>
-            </Select>
+          </Select>
         </Box>
         <span>
           <SortSelect
@@ -280,7 +280,7 @@ export class Search extends Component<any, SearchState> {
     return (
       <div>
         {combined.map(i => (
-          <div className="row">
+          <div className="row" key={i.data.id}>
             <div className="col-12">
               {i.type_ == 'posts' && (
                 <PostListing
@@ -339,7 +339,7 @@ export class Search extends Component<any, SearchState> {
     return (
       <>
         {this.state.searchResponse.posts.map(post => (
-          <div className="row">
+          <div className="row" key={post.id}>
             <div className="col-12">
               <PostListing
                 post={post}
@@ -359,7 +359,7 @@ export class Search extends Component<any, SearchState> {
     return (
       <>
         {this.state.searchResponse.communities.map(community => (
-          <div className="row">
+          <div className="row" key={community.id}>
             <div className="col-12">{this.communityListing(community)}</div>
           </div>
         ))}
@@ -386,7 +386,7 @@ export class Search extends Component<any, SearchState> {
     return (
       <>
         {this.state.searchResponse.users.map(user => (
-          <div className="row">
+          <div className="row" key={user.id}>
             <div className="col-12">
               <span>
                 @
@@ -508,15 +508,18 @@ export class Search extends Component<any, SearchState> {
       return;
     } else if (res.op == UserOperation.Search) {
       let data = res.data as SearchResponse;
-      this.setState({
-        searchResponse: data,
-        loading: false,
-      }, () => {
-        document.title = `${i18n.t('search')} - ${this.state.q} - ${
-          this.state.site.name
-        }`;
-        window.scrollTo(0, 0);
-      });
+      this.setState(
+        {
+          searchResponse: data,
+          loading: false,
+        },
+        () => {
+          document.title = `${i18n.t('search')} - ${this.state.q} - ${
+            this.state.site.name
+          }`;
+          window.scrollTo(0, 0);
+        }
+      );
     } else if (res.op == UserOperation.CreateCommentLike) {
       let data = res.data as CommentResponse;
       createCommentLikeRes(data, this.state.searchResponse.comments);
@@ -527,11 +530,14 @@ export class Search extends Component<any, SearchState> {
       this.setState(this.state);
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-      this.setState({
-        site: data.site
-      }, () => {
-        document.title = `${i18n.t('search')} - ${data.site.name}`;
-      });
+      this.setState(
+        {
+          site: data.site,
+        },
+        () => {
+          document.title = `${i18n.t('search')} - ${data.site.name}`;
+        }
+      );
     }
   }
 }

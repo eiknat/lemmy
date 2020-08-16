@@ -203,6 +203,7 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
       <div>
         {this.state.posts.map(post => (
           <PostListing
+            key={post.id}
             post={post}
             admins={this.state.admins}
             sitemods={this.state.sitemods}
@@ -239,11 +240,11 @@ class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
   }
 
   nextPage(i: BaseUserDetails) {
-    i.props.onPageChange((i.props.page) + 1);
+    i.props.onPageChange(i.props.page + 1);
   }
 
   prevPage(i: BaseUserDetails) {
-    i.props.onPageChange((i.props.page) - 1);
+    i.props.onPageChange(i.props.page - 1);
   }
 
   parseMessage(msg: WebSocketJsonResponse) {

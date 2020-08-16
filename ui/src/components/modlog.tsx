@@ -124,7 +124,7 @@ export class Modlog extends Component<any, ModlogState> {
     return (
       <tbody>
         {this.state.combined.map(i => (
-          <tr>
+          <tr key={i.data.id}>
             <td>
               <MomentTime data={i.data} />
             </td>
@@ -351,10 +351,12 @@ export class Modlog extends Component<any, ModlogState> {
         ) : (
           <div>
             <div>
-              <div style={{
-                display: "inline-block",
-                marginTop: "6px"
-              }}>
+              <div
+                style={{
+                  display: 'inline-block',
+                  marginTop: '6px',
+                }}
+              >
                 <h5>
                   {this.state.communityName && (
                     <Link
@@ -367,16 +369,20 @@ export class Modlog extends Component<any, ModlogState> {
                   <span>{i18n.t('modlog')}</span>
                 </h5>
               </div>
-              <div style={{
-                display: "inline-block",
-                float: "right"
-              }}>
-                <h6 style={{
-                  border: "3px solid #000000",
-                  padding: "5px",
-                  backgroundColor: "#F39C12",
-                  color: "#111111"
-                }}>
+              <div
+                style={{
+                  display: 'inline-block',
+                  float: 'right',
+                }}
+              >
+                <h6
+                  style={{
+                    border: '3px solid #000000',
+                    padding: '5px',
+                    backgroundColor: '#F39C12',
+                    color: '#111111',
+                  }}
+                >
                   {i18n.t('modlog_warning')}
                 </h6>
               </div>
