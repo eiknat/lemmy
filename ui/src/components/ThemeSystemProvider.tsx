@@ -3,7 +3,12 @@ import { ThemeProvider } from 'theme-ui';
 import { UserService } from '../services';
 import { themes, variants } from '../theme';
 
-const ThemeSystem = createContext({});
+interface ThemeSystemState {
+  currentTheme: string;
+  setCurrentTheme: (string) => void;
+}
+
+const ThemeSystem = createContext({} as ThemeSystemState);
 
 function ThemeSystemProvider({ children, initialTheme = 'chapo' }) {
   console.log({ initialTheme });
@@ -15,7 +20,6 @@ function ThemeSystemProvider({ children, initialTheme = 'chapo' }) {
 
   useEffect(() => {
     // const theme = UserService?.Instance?.user?.theme;
-
     // if (theme) {
     //   setCurrentTheme(theme);
     // }
@@ -43,10 +47,12 @@ function ThemeSystemProvider({ children, initialTheme = 'chapo' }) {
         setCurrentTheme,
       }}
     >
-      <ThemeProvider theme={{
-        ...variants,
-        ...theme,
-      }}>
+      <ThemeProvider
+        theme={{
+          ...variants,
+          ...theme,
+        }}
+      >
         {children}
       </ThemeProvider>
     </ThemeSystem.Provider>

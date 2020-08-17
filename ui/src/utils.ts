@@ -52,13 +52,13 @@ import { UserService, WebSocketService } from './services';
 
 import Tribute from 'tributejs/src/Tribute.js';
 import markdown_it from 'markdown-it';
-import markdownitEmoji from "markdown-it-emoji/light";
+import markdownitEmoji from 'markdown-it-emoji/light';
 import markdown_it_container from 'markdown-it-container';
 import iterator from 'markdown-it-for-inline';
 import emojiShortName from 'emoji-short-name';
 import Toastify from 'toastify-js';
 import tippy from 'tippy.js';
-import { EmojiButton } from '@joeattardi/emoji-button';
+// import { EmojiButton } from '@joeattardi/emoji-button';
 
 import { customEmojis, replaceEmojis } from './custom-emojis';
 import moment from 'moment';
@@ -71,7 +71,7 @@ export const sortingHelpUrl = `${helpGuideUrl}#sorting`;
 export const archiveUrl = 'https://archive.is';
 
 export const postRefetchSeconds: number = 60 * 1000;
-export const fetchLimit: number = 20;
+export const fetchLimit = 20;
 export const commentFetchLimit = 15;
 export const mentionDropdownFetchLimit = 10;
 
@@ -124,11 +124,11 @@ export const themes = [
   'lux',
 ];
 
-export const emojiPicker = new EmojiButton({
-  style: 'twemoji',
-  theme: 'dark',
-  position: 'auto-start',
-});
+// export const emojiPicker = new EmojiButton({
+//   style: 'twemoji',
+//   theme: 'dark',
+//   position: 'auto-start',
+// });
 
 const DEFAULT_ALPHABET =
   'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -138,7 +138,7 @@ function getRandomCharFromAlphabet(alphabet: string): string {
 }
 
 export function randomStr(
-  idDesiredLength: number = 20,
+  idDesiredLength = 20,
   alphabet = DEFAULT_ALPHABET
 ): string {
   /**
@@ -236,7 +236,7 @@ export function canMod(
   user: User,
   modIds: Array<number>,
   creator_id: number,
-  onSelf: boolean = false
+  onSelf = false
 ): boolean {
   // You can do moderator actions only on the mods added after you.
   if (user) {
@@ -334,8 +334,8 @@ export async function getPageTitle(url: string | null) {
 
 export function debounce(
   func: any,
-  wait: number = 1000,
-  immediate: boolean = false
+  wait = 1000,
+  immediate = false
 ) {
   // 'private' variable for instance
   // The returned function will be able to reference this due to closure.
@@ -455,8 +455,8 @@ export function getMomentLanguage(): string {
   return lang;
 }
 
-export function setTheme(theme: string = 'chapo', loggedIn: boolean = false) {
-  const event = new CustomEvent("change-theme", { detail: theme });
+export function setTheme(theme = 'chapo', loggedIn = false) {
+  const event = new CustomEvent('change-theme', { detail: theme });
   document.dispatchEvent(event);
 }
 
@@ -511,7 +511,7 @@ export function isCakeDay(published: string): boolean {
 }
 
 // Converts to image thumbnail
-export function pictrsImage(hash: string, thumbnail: boolean = false): string {
+export function pictrsImage(hash: string, thumbnail = false): string {
   let root = `/pictrs/image`;
 
   // Necessary for other servers / domains
@@ -531,7 +531,7 @@ export function isCommentType(item: Comment | PrivateMessage): item is Comment {
   return (item as Comment).community_id !== undefined;
 }
 
-export function toast(text: string, background: string = 'success') {
+export function toast(text: string, background = 'success') {
   let backgroundColor = `var(--${background})`;
   Toastify({
     text: text,
@@ -626,8 +626,7 @@ export function setupTribute(): Tribute {
           // }),
           {
             key: 'logo',
-            val:
-              `<img className="icon icon-navbar" src="${BASE_PATH}logo.png" alt="vaporwave hammer and sickle logo, courtesy of ancestral potato">`,
+            val: `<img className="icon icon-navbar" src="${BASE_PATH}logo.png" alt="vaporwave hammer and sickle logo, courtesy of ancestral potato">`,
           },
           ...customEmojis,
         ],
@@ -769,7 +768,8 @@ function communitySearch(text: string, cb: any) {
 export function getListingTypeFromProps(props: any): ListingType {
   return props.match.params.listing_type
     ? routeListingTypeToEnum(props.match.params.listing_type)
-    : UserService.Instance.user && UserService.Instance.user.default_listing_type
+    : UserService.Instance.user &&
+      UserService.Instance.user.default_listing_type
     ? UserService.Instance.user.default_listing_type
     : ListingType.All;
 }
@@ -1001,7 +1001,7 @@ function randomHsl() {
   return `hsla(${Math.random() * 360}, 100%, 50%, 1)`;
 }
 
-export function previewLines(text: string, lines: number = 3): string {
+export function previewLines(text: string, lines = 3): string {
   // Use lines * 2 because markdown requires 2 lines
   return text
     .split('\n')
@@ -1117,4 +1117,3 @@ export const getAllUserModeratedCommunities = ({
     return agg;
   }, []);
 };
-

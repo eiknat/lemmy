@@ -12,7 +12,7 @@ import {
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import { wsJsonToRes, validEmail, toast, setupTippy } from '../utils';
-import { BASE_PATH } from "../isProduction";
+import { BASE_PATH } from '../isProduction';
 import { i18n } from '../i18next';
 import { linkEvent } from '../linkEvent';
 
@@ -31,6 +31,7 @@ export class WelcomePage extends Component<any, State> {
     loginForm: {
       username_or_email: undefined,
       password: undefined,
+      // @ts-ignore
       captcha_id: undefined,
     },
     registerForm: {
@@ -40,6 +41,7 @@ export class WelcomePage extends Component<any, State> {
       admin: false,
       sitemod: false,
       show_nsfw: false,
+      // @ts-ignore
       captcha_id: undefined,
     },
     loginLoading: false,
@@ -174,7 +176,10 @@ export class WelcomePage extends Component<any, State> {
         <h5>{i18n.t('sign_up')}</h5>
 
         <div className="form-group row">
-          <label className="col-sm-2 col-form-label" htmlFor="register-username">
+          <label
+            className="col-sm-2 col-form-label"
+            htmlFor="register-username"
+          >
             {i18n.t('username')}
           </label>
 
@@ -211,7 +216,10 @@ export class WelcomePage extends Component<any, State> {
         </div>
 
         <div className="form-group row">
-          <label className="col-sm-2 col-form-label" htmlFor="register-password">
+          <label
+            className="col-sm-2 col-form-label"
+            htmlFor="register-password"
+          >
             {i18n.t('password')}
           </label>
           <div className="col-sm-10">
@@ -257,7 +265,10 @@ export class WelcomePage extends Component<any, State> {
                   checked={this.state.registerForm.show_nsfw}
                   onChange={linkEvent(this, this.handleRegisterShowNsfwChange)}
                 />
-                <label className="form-check-label" htmlFor="register-show-nsfw">
+                <label
+                  className="form-check-label"
+                  htmlFor="register-show-nsfw"
+                >
                   {i18n.t('show_nsfw')}
                 </label>
               </div>
@@ -298,6 +309,7 @@ export class WelcomePage extends Component<any, State> {
 
   handleLoginSubmit(i: WelcomePage, event: any) {
     event.preventDefault();
+    // @ts-ignore
     i.state.loginLoading = true;
     i.state.loginForm.username_or_email = (document.getElementById(
       'login-email-or-username'
@@ -321,6 +333,7 @@ export class WelcomePage extends Component<any, State> {
 
   handleRegisterSubmit(i: WelcomePage, event: any) {
     event.preventDefault();
+    // @ts-ignore
     i.state.registerLoading = true;
     i.setState(i.state);
 
@@ -377,6 +390,7 @@ export class WelcomePage extends Component<any, State> {
       this.setState(this.state);
       return;
     } else {
+      // @ts-ignore
       if (res.op == UserOperation.WelcomePage) {
         let data = res.data as LoginResponse;
         this.state = this.emptyState;
@@ -396,6 +410,7 @@ export class WelcomePage extends Component<any, State> {
         toast(i18n.t('reset_password_mail_sent'));
       } else if (res.op == UserOperation.GetSite) {
         let data = res.data as GetSiteResponse;
+        // @ts-ignore
         this.state.enable_nsfw = data.site.enable_nsfw;
         this.setState(this.state);
         document.title = `${i18n.t('login')} - ${data.site.name}`;

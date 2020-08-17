@@ -385,10 +385,9 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
     this.setState({ removeReason: event.target.value });
   };
 
-  handleModRemoveExpiresChange(i: Sidebar, event: any) {
-    i.state.removeExpires = event.target.value;
-    i.setState(i.state);
-  }
+  handleModRemoveExpiresChange = (event: any) => {
+    this.setState({ removeExpires: event.target.value });
+  };
 
   handleModRemoveSubmit = (i: Sidebar) => {
     event.preventDefault();

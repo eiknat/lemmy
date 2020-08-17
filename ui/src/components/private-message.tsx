@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   PrivateMessage as PrivateMessageI,
   EditPrivateMessageForm,
+  MarkPrivateMessageReadForm,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import {
@@ -53,7 +54,9 @@ export class PrivateMessage extends Component<
   }
 
   get mine(): boolean {
-    return UserService.Instance.user.id == this.props.privateMessage.creator_id;
+    return (
+      UserService.Instance.user?.id == this.props.privateMessage.creator_id
+    );
   }
 
   render() {
@@ -82,6 +85,11 @@ export class PrivateMessage extends Component<
                     <img
                       height="32"
                       width="32"
+                      alt={`user avatar for ${
+                        this.mine
+                          ? message.recipient_name
+                          : message.creator_name
+                      }`}
                       src={pictrsAvatarThumbnail(
                         this.mine
                           ? message.recipient_avatar
@@ -103,7 +111,7 @@ export class PrivateMessage extends Component<
             <li className="list-inline-item">
               <div
                 className="pointer text-monospace"
-                onClick={linkEvent(this, this.handleMessageCollapse)}
+                onClick={this.handleMessageCollapse}
               >
                 {this.state.collapsed ? (
                   <svg className="icon icon-inline">
@@ -161,7 +169,7 @@ export class PrivateMessage extends Component<
                     <li className="list-inline-item">
                       <button
                         className="btn btn-link btn-sm btn-animate text-muted"
-                        onClick={linkEvent(this, this.handleReplyClick)}
+                        onClick={this.handleReplyClick}
                         data-tippy-content={i18n.t('reply')}
                       >
                         <Icon name="reply" />
@@ -174,7 +182,7 @@ export class PrivateMessage extends Component<
                     <li className="list-inline-item">
                       <button
                         className="btn btn-link btn-sm btn-animate text-muted"
-                        onClick={linkEvent(this, this.handleEditClick)}
+                        onClick={this.handleEditClick}
                         data-tippy-content={i18n.t('edit')}
                       >
                         <Icon name="edit" />
@@ -204,7 +212,7 @@ export class PrivateMessage extends Component<
                 <li className="list-inline-item">
                   <button
                     className="btn btn-link btn-sm btn-animate text-muted"
-                    onClick={linkEvent(this, this.handleViewSource)}
+                    onClick={this.handleViewSource}
                     data-tippy-content={i18n.t('view_source')}
                   >
                     <svg
@@ -247,15 +255,13 @@ export class PrivateMessage extends Component<
     return { __html: html };
   }
 
-  handleReplyClick(i: PrivateMessage) {
-    i.state.showReply = true;
-    i.setState(i.state);
-  }
+  handleReplyClick = () => {
+    this.setState({ showReply: true });
+  };
 
-  handleEditClick(i: PrivateMessage) {
-    i.state.showEdit = true;
-    i.setState(i.state);
-  }
+  handleEditClick = () => {
+    this.setState({ showEdit: true });
+  };
 
   handleDeleteClick(i: PrivateMessage) {
     let form: EditPrivateMessageForm = {
@@ -268,37 +274,39 @@ export class PrivateMessage extends Component<
   handleReplyCancel() {
     this.setState({
       showReply: false,
-      showEdit: false
+      showEdit: false,
     });
   }
 
   handleMarkRead(i: PrivateMessage) {
-    let form: EditPrivateMessageForm = {
+    // let form: EditPrivateMessageForm = {
+    //   edit_id: i.props.privateMessage.id,
+    //   read: !i.props.privateMessage.read,
+    // };
+    const form: MarkPrivateMessageReadForm = {
       edit_id: i.props.privateMessage.id,
       read: !i.props.privateMessage.read,
     };
-    WebSocketService.Instance.editPrivateMessage(form);
+    WebSocketService.Instance.markPrivateMessageRead(form);
   }
 
-  handleMessageCollapse(i: PrivateMessage) {
-    i.state.collapsed = !i.state.collapsed;
-    i.setState(i.state);
-  }
+  handleMessageCollapse = () => {
+    this.setState({ collapsed: !this.state.collapsed });
+  };
 
-  handleViewSource(i: PrivateMessage) {
-    i.state.viewSource = !i.state.viewSource;
-    i.setState(i.state);
-  }
+  handleViewSource = () => {
+    this.setState({ viewSource: !this.state.viewSource });
+  };
 
   handlePrivateMessageEdit() {
     this.setState({
-      showEdit: false
+      showEdit: false,
     });
   }
 
   handlePrivateMessageCreate() {
     this.setState({
-      showReply: false
+      showReply: false,
     });
     toast(i18n.t('message_sent'));
   }

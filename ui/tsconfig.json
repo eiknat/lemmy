@@ -6,7 +6,7 @@
       "DOM.Iterable",
       "ESNext"
     ],
-    "types": [],
+    "types": ["node"],
     "allowJs": false,
     "skipLibCheck": false,
     "esModuleInterop": false,
@@ -23,5 +23,5 @@
   "include": [
     "src", "public/assets"
   ],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "exclude": ["node_modules", "**/*.spec.ts", "src/components/welcome.tsx"]
 }
