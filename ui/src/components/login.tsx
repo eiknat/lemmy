@@ -16,6 +16,7 @@ import { WebSocketService, UserService } from '../services';
 import { wsJsonToRes, validEmail, toast, setupTippy } from '../utils';
 import { i18n } from '../i18next';
 import { linkEvent } from '../linkEvent';
+import { Icon } from './icon';
 
 interface State {
   loginForm: LoginForm;
@@ -82,6 +83,7 @@ export class Login extends Component<any, State> {
       );
 
     WebSocketService.Instance.getSite();
+    WebSocketService.Instance.getCaptcha();
 
     setupTippy();
   }
@@ -305,9 +307,7 @@ export class Login extends Component<any, State> {
                   className="btn btn-secondary"
                   onClick={linkEvent(this, this.handleRegenCaptcha)}
                 >
-                  <svg className="icon icon-refresh-cw">
-                    <use xlinkHref="#icon-refresh-cw" />
-                  </svg>
+                  <Icon name="refresh" className="icon icon-refresh-cw" />
                 </button>
               </label>
             )}
@@ -337,40 +337,40 @@ export class Login extends Component<any, State> {
             )}
           </div>
         )}
-        {this.state.site.enable_nsfw && (
-          <div className="form-group row">
-            <div className="col-sm-10">
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  id="register-show-nsfw"
-                  type="checkbox"
-                  checked={this.state.registerForm.show_nsfw}
-                  onChange={linkEvent(this, this.handleRegisterShowNsfwChange)}
-                />
-                <label
-                  className="form-check-label"
-                  htmlFor="register-show-nsfw"
-                >
-                  {i18n.t('show_nsfw')}
-                </label>
+          {this.state.site.enable_nsfw && (
+            <div className="form-group row">
+              <div className="col-sm-10">
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    id="register-show-nsfw"
+                    type="checkbox"
+                    checked={this.state.registerForm.show_nsfw}
+                    onChange={linkEvent(this, this.handleRegisterShowNsfwChange)}
+                  />
+                  <label
+                    className="form-check-label"
+                    htmlFor="register-show-nsfw"
+                  >
+                    {i18n.t('show_nsfw')}
+                  </label>
+                </div>
               </div>
             </div>
+          )}
+          <div className="form-group row">
+            <div className="col-sm-10">
+              <button type="submit" className="btn btn-secondary">
+                {this.state.registerLoading ? (
+                  <svg className="icon icon-spinner spin">
+                    <use xlinkHref="#icon-spinner" />
+                  </svg>
+                ) : (
+                  i18n.t('sign_up')
+                )}
+              </button>
+            </div>
           </div>
-        )}
-        <div className="form-group row">
-          <div className="col-sm-10">
-            <button type="submit" className="btn btn-secondary">
-              {this.state.registerLoading ? (
-                <svg className="icon icon-spinner spin">
-                  <use xlinkHref="#icon-spinner" />
-                </svg>
-              ) : (
-                i18n.t('sign_up')
-              )}
-            </button>
-          </div>
-        </div>
       </form>
     );
   }
@@ -540,8 +540,9 @@ export class Login extends Component<any, State> {
   }
 
   initHCaptcha() {
+    // I believe this comes in from the hcaptcha CDN
     // @ts-ignore
-    const widgetID = hcaptcha.render('h-captcha', {
+    hcaptcha.render('h-captcha', {
       sitekey: this.state.captcha.hcaptcha.site_key,
     });
   }
