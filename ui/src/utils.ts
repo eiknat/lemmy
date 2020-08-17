@@ -332,11 +332,7 @@ export async function getPageTitle(url: string | null) {
   return json.title;
 }
 
-export function debounce(
-  func: any,
-  wait = 1000,
-  immediate = false
-) {
+export function debounce(func: any, wait = 1000, immediate = false) {
   // 'private' variable for instance
   // The returned function will be able to reference this due to closure.
   // Each call to the returned function will share this common timer.
@@ -1117,3 +1113,33 @@ export const getAllUserModeratedCommunities = ({
     return agg;
   }, []);
 };
+
+// any of these comment changes should trigger a re-render
+export function isCommentChanged(operation: UserOperation): boolean {
+  return (
+    operation == UserOperation.EditComment ||
+    operation == UserOperation.MarkCommentAsRead ||
+    operation == UserOperation.RemoveComment ||
+    operation == UserOperation.DeleteComment
+  );
+}
+
+// any of these post changes should trigger a re-render
+export function isPostChanged(operation: UserOperation): boolean {
+  return (
+    operation == UserOperation.EditPost ||
+    operation == UserOperation.DeletePost ||
+    operation == UserOperation.RemovePost ||
+    operation == UserOperation.LockPost ||
+    operation == UserOperation.StickyPost
+  );
+}
+
+// any of these message changes should trigger a re-render
+export function isMessageChanged(operation: UserOperation): boolean {
+  return (
+    operation == UserOperation.EditPrivateMessage ||
+    operation == UserOperation.MarkPrivateMessageAsRead ||
+    operation == UserOperation.DeletePrivateMessage
+  );
+}

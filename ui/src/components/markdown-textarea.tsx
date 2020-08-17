@@ -69,8 +69,7 @@ export class MarkdownTextArea extends Component<
 
       this.tribute.attach(textarea);
       textarea.addEventListener('tribute-replaced', () => {
-        this.state.content = textarea.value;
-        this.setState(this.state);
+        this.setState({ content: textarea.value });
         autosize.update(textarea);
       });
 
@@ -130,7 +129,7 @@ export class MarkdownTextArea extends Component<
 
   render() {
     return (
-      <form id={this.formId} onSubmit={linkEvent(this, this.handleSubmit)}>
+      <form id={this.formId} onSubmit={this.handleSubmit}>
         <Prompt when={!!this.state.content} message={i18n.t('block_leaving')} />
         <div className="form-group row">
           <div className="col-sm-12">
@@ -138,8 +137,8 @@ export class MarkdownTextArea extends Component<
               id={this.id}
               className={`form-control ${this.state.previewMode && 'd-none'}`}
               value={this.state.content}
-              onChange={linkEvent(this, this.handleContentChange)}
-              onKeyDown={linkEvent(this, this.handleKeydown)}
+              onChange={this.handleContentChange}
+              onKeyDown={this.handleKeydown}
               // onPaste={linkEvent(this, this.handleImageUploadPaste)}
               required
               disabled={this.props.disabled}
@@ -185,7 +184,7 @@ export class MarkdownTextArea extends Component<
                 className={`btn btn-sm btn-secondary mr-2 ${
                   this.state.previewMode && 'active'
                 }`}
-                onClick={linkEvent(this, this.handlePreviewToggle)}
+                onClick={this.handlePreviewToggle}
               >
                 {i18n.t('preview')}
               </button>
@@ -213,7 +212,7 @@ export class MarkdownTextArea extends Component<
             <button
               className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('link')}
-              onClick={linkEvent(this, this.handleInsertLink)}
+              onClick={this.handleInsertLink}
             >
               <svg className="icon icon-inline">
                 <use xlinkHref="#icon-link" />
@@ -320,7 +319,7 @@ export class MarkdownTextArea extends Component<
             <button
               className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('spoiler')}
-              onClick={linkEvent(this, this.handleInsertSpoiler)}
+              onClick={this.handleInsertSpoiler}
             >
               <svg className="icon icon-inline">
                 <use xlinkHref="#icon-alert-triangle" />
@@ -428,39 +427,35 @@ export class MarkdownTextArea extends Component<
     this.setState({ showEmojiPicker: !this.state.showEmojiPicker });
   };
 
-  handleContentChange(i: MarkdownTextArea, event: any) {
-    i.state.content = event.target.value;
-    i.setState(i.state);
-    if (i.props.onContentChange) {
-      i.props.onContentChange(i.state.content);
+  handleContentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    this.setState({ content: event.target.value });
+    if (this.props.onContentChange) {
+      this.props.onContentChange(this.state.content);
     }
-  }
+  };
 
-  handlePreviewToggle(i: MarkdownTextArea, event: any) {
+  handlePreviewToggle = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    i.state.previewMode = !i.state.previewMode;
-    i.setState(i.state);
-  }
+    this.setState({ previewMode: !this.state.previewMode });
+  };
 
-  handleSubmit(i: MarkdownTextArea, event: any) {
+  handleSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    i.state.loading = true;
-    i.setState(i.state);
-    i.props.onSubmit(i.state.content, event);
-  }
+    this.setState({ loading: true });
+    this.props.onSubmit(this.state.content, event);
+  };
 
-  handleKeydown(i: MarkdownTextArea, event: any) {
+  handleKeydown = (event: React.KeyboardEvent) => {
     // if enter was pressed
     if (event.keyCode === 13) {
       // while command (mac) or ctrl is pressed
       if (event.metaKey || event.ctrlKey) {
         // submit comment
-        i.state.loading = true;
-        i.setState(i.state);
-        i.props.onSubmit(i.state.content, event);
+        this.setState({ loading: true });
+        this.props.onSubmit(this.state.content, event);
       }
     }
-  }
+  };
 
   handleReplyCancel(i: MarkdownTextArea) {
     i.props.onReplyCancel();
@@ -473,59 +468,56 @@ export class MarkdownTextArea extends Component<
     this.toggleEmojiPicker();
   };
 
-  handleInsertLink(i: MarkdownTextArea, event: any) {
+  handleInsertLink = (event: any) => {
     event.preventDefault();
-    if (!i.state.content) {
-      i.state.content = '';
-    }
-    let textarea: any = document.getElementById(i.id);
-    let start: number = textarea.selectionStart;
-    let end: number = textarea.selectionEnd;
 
-    if (start !== end) {
-      let selectedText = i.state.content.substring(start, end);
-      i.state.content = `${i.state.content.substring(
-        0,
-        start
-      )} [${selectedText}]() ${i.state.content.substring(end)}`;
-      textarea.focus();
-      setTimeout(() => (textarea.selectionEnd = end + 4), 10);
-    } else {
-      i.state.content += '[]()';
-      textarea.focus();
-      setTimeout(() => (textarea.selectionEnd -= 1), 10);
-    }
-    i.setState(i.state);
-  }
-
-  simpleSurround(chars: string) {
-    this.simpleSurroundBeforeAfter(chars, chars);
-  }
-
-  simpleSurroundBeforeAfter(beforeChars: string, afterChars: string) {
-    if (!this.state.content) {
-      this.state.content = '';
-    }
+    let content = this.state.content || '';
     let textarea: any = document.getElementById(this.id);
     let start: number = textarea.selectionStart;
     let end: number = textarea.selectionEnd;
 
     if (start !== end) {
       let selectedText = this.state.content.substring(start, end);
-      this.state.content = `${this.state.content.substring(
+      content = `${this.state.content.substring(
+        0,
+        start
+      )} [${selectedText}]() ${this.state.content.substring(end)}`;
+      textarea.focus();
+      setTimeout(() => (textarea.selectionEnd = end + 4), 10);
+    } else {
+      content += '[]()';
+      textarea.focus();
+      setTimeout(() => (textarea.selectionEnd -= 1), 10);
+    }
+    this.setState({ content });
+  };
+
+  simpleSurround = (chars: string) => {
+    this.simpleSurroundBeforeAfter(chars, chars);
+  };
+
+  simpleSurroundBeforeAfter = (beforeChars: string, afterChars: string) => {
+    let content = this.state.content || '';
+    let textarea: any = document.getElementById(this.id);
+    let start: number = textarea.selectionStart;
+    let end: number = textarea.selectionEnd;
+
+    if (start !== end) {
+      let selectedText = this.state.content.substring(start, end);
+      content = `${this.state.content.substring(
         0,
         start - 1
       )} ${beforeChars}${selectedText}${afterChars} ${this.state.content.substring(
         end + 1
       )}`;
     } else {
-      this.state.content += `${beforeChars}___${afterChars}`;
+      content += `${beforeChars}___${afterChars}`;
     }
-    this.setState(this.state);
+    this.setState({ content });
     setTimeout(() => {
       autosize.update(textarea);
     }, 10);
-  }
+  };
 
   handleInsertBold(i: MarkdownTextArea, event: any) {
     event.preventDefault();
@@ -562,27 +554,23 @@ export class MarkdownTextArea extends Component<
     i.simpleInsert('#');
   }
 
-  simpleInsert(chars: string) {
-    if (!this.state.content) {
-      this.state.content = `${chars} `;
-    } else {
-      this.state.content += `\n${chars} `;
-    }
+  simpleInsert = (chars: string) => {
+    const content = !this.state.content ? `${chars} ` : `\n${chars} `;
 
     let textarea: any = document.getElementById(this.id);
     textarea.focus();
     setTimeout(() => {
       autosize.update(textarea);
     }, 10);
-    this.setState(this.state);
-  }
+    this.setState({ content });
+  };
 
-  handleInsertSpoiler(i: MarkdownTextArea, event: any) {
+  handleInsertSpoiler = (event: React.SyntheticEvent) => {
     event.preventDefault();
     let beforeChars = `\n::: spoiler ${i18n.t('spoiler')}\n`;
     let afterChars = '\n:::\n';
-    i.simpleSurroundBeforeAfter(beforeChars, afterChars);
-  }
+    this.simpleSurroundBeforeAfter(beforeChars, afterChars);
+  };
 
   quoteInsert() {
     let textarea: any = document.getElementById(this.id);
@@ -593,8 +581,9 @@ export class MarkdownTextArea extends Component<
           .split('\n')
           .map(t => `> ${t}`)
           .join('\n') + '\n\n';
-      this.state.content = quotedText;
-      this.setState(this.state);
+      this.setState({
+        content: quotedText,
+      });
       // Not sure why this needs a delay
       setTimeout(() => autosize.update(textarea), 10);
     }

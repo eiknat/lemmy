@@ -4,9 +4,13 @@ import { setTheme } from '../utils';
 import jwt_decode from 'jwt-decode';
 import { Subject, BehaviorSubject } from 'rxjs';
 
+type InternalValues = {
+  unreadCount?: number;
+};
+
 export class UserService {
   private static _instance: UserService;
-  public user: User;
+  public user: User & InternalValues;
   public claims: Claims;
   public jwtSub: Subject<string> = new Subject<string>();
   public unreadCountSub: BehaviorSubject<number> = new BehaviorSubject<number>(

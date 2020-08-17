@@ -48,6 +48,8 @@ import {
   editPostFindRes,
   commentsToFlatNodes,
   setupTippy,
+  isCommentChanged,
+  isPostChanged,
 } from '../utils';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
@@ -214,8 +216,8 @@ export class BaseCommunity extends Component<any, State> {
                       </div>
                     </div>
                     {this.state.community.subscribed ? (
-                        <Button
-                          variant="outline"
+                      <Button
+                        variant="outline"
                         onClick={linkEvent(
                           this.state.community.id,
                           this.handleUnsubscribe
@@ -224,24 +226,25 @@ export class BaseCommunity extends Component<any, State> {
                         {i18n.t('unsubscribe')}
                       </Button>
                     ) : (
-                          <Button
-                            variant="outline"
+                      <Button
+                        variant="outline"
                         onClick={linkEvent(
                           this.state.community.id,
-                            this.handleSubscribe
-                            )
-                            }
+                          this.handleSubscribe
+                        )}
                       >
                         {i18n.t('subscribe')}
                       </Button>
                     )}
-                      <div className="community-button-separator" />
-                      <Link to={`/create_post?community=${this.state.community.name}`} style={{ display: 'block' }}>
-                        <Button variant="primary">
-
-                          {isMobile ? '+' : 'Create Post'}
-                        </Button>
-                      </Link>
+                    <div className="community-button-separator" />
+                    <Link
+                      to={`/create_post?community=${this.state.community.name}`}
+                      style={{ display: 'block' }}
+                    >
+                      <Button variant="primary">
+                        {isMobile ? '+' : 'Create Post'}
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -351,12 +354,12 @@ export class BaseCommunity extends Component<any, State> {
   }
 
   nextPage(i: BaseCommunity) {
-    i.updateUrl({ page: (i.state.page as number) + 1 });
+    i.updateUrl({ page: (i.state.page) + 1 });
     window.scrollTo(0, 0);
   }
 
   prevPage(i: BaseCommunity) {
-    i.updateUrl({ page: (i.state.page as number) - 1 });
+    i.updateUrl({ page: (i.state.page) - 1 });
     window.scrollTo(0, 0);
   }
 
@@ -430,20 +433,23 @@ export class BaseCommunity extends Component<any, State> {
       this.fetchData();
     } else if (res.op == UserOperation.GetCommunity) {
       let data = res.data as GetCommunityResponse;
-      this.setState({
-        community: data.community,
-        moderators: data.moderators,
-        admins: data.admins,
-        sitemods: data.sitemods,
-        online: data.online,
-      }, () => {
-        this.fetchData();
-      });
+      this.setState(
+        {
+          community: data.community,
+          moderators: data.moderators,
+          admins: data.admins,
+          sitemods: data.sitemods,
+          online: data.online,
+        },
+        () => {
+          this.fetchData();
+        }
+      );
       document.title = `/c/${this.state.community.name} - ${this.state.site.name}`;
     } else if (res.op == UserOperation.EditCommunity) {
       let data = res.data as CommunityResponse;
       this.setState({
-        community: data.community
+        community: data.community,
       });
     } else if (res.op == UserOperation.FollowCommunity) {
       let data = res.data as CommunityResponse;
@@ -453,13 +459,16 @@ export class BaseCommunity extends Component<any, State> {
       this.setState(this.state);
     } else if (res.op == UserOperation.GetPosts) {
       let data = res.data as GetPostsResponse;
-      this.setState({
-        posts: data.posts,
-        loading: false
-      }, () => {
-        setupTippy()
-      });
-    } else if (res.op == UserOperation.EditPost) {
+      this.setState(
+        {
+          posts: data.posts,
+          loading: false,
+        },
+        () => {
+          setupTippy();
+        }
+      );
+    } else if (isPostChanged(res.op)) {
       let data = res.data as PostResponse;
       editPostFindRes(data, this.state.posts);
       this.setState(this.state);
@@ -474,7 +483,7 @@ export class BaseCommunity extends Component<any, State> {
     } else if (res.op == UserOperation.AddModToCommunity) {
       let data = res.data as AddModToCommunityResponse;
       this.setState({
-        moderators: data.moderators
+        moderators: data.moderators,
       });
     } else if (res.op == UserOperation.BanFromCommunity) {
       let data = res.data as BanFromCommunityResponse;
@@ -486,9 +495,9 @@ export class BaseCommunity extends Component<any, State> {
       let data = res.data as GetCommentsResponse;
       this.setState({
         comments: data.comments,
-        loading: false
+        loading: false,
       });
-    } else if (res.op == UserOperation.EditComment) {
+    } else if (isCommentChanged(res.op)) {
       let data = res.data as CommentResponse;
       editCommentRes(data, this.state.comments);
       this.setState(this.state);
@@ -509,7 +518,7 @@ export class BaseCommunity extends Component<any, State> {
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
       this.setState({
-        site: data.site
+        site: data.site,
       });
     }
   }

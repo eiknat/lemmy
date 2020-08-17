@@ -18,6 +18,9 @@ import {
   BanType,
   CommentSortType,
   SortType,
+  DeleteCommentForm,
+  RemoveCommentForm,
+  MarkCommentReadForm,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import {
@@ -180,6 +183,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
           className={`details comment-node border-top py-2 ${
             this.isCommentNew ? 'mark' : ''
           }`}
+          // @ts-ignore
           style={borderStyle}
         >
           <div
@@ -304,7 +308,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   {this.props.markable && (
                     <button
                       className="btn btn-link btn-animate text-muted"
-                      onClick={linkEvent(this, this.handleMarkRead)}
+                      onClick={this.handleMarkRead}
                       data-tippy-content={
                         node.comment.read
                           ? i18n.t('mark_as_unread')
@@ -479,10 +483,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                               ) : (
                                 <button
                                   className="btn btn-link btn-animate text-muted"
-                                  onClick={linkEvent(
-                                    this,
-                                    this.handleModRemoveSubmit
-                                  )}
+                                  onClick={this.handleModRemoveSubmit}
                                 >
                                   {i18n.t('restore')}
                                 </button>
@@ -751,10 +752,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
         </div>
         {/* end of details */}
         {this.state.showRemoveDialog && (
-          <form
-            className="form-inline"
-            onSubmit={linkEvent(this, this.handleModRemoveSubmit)}
-          >
+          <form className="form-inline" onSubmit={this.handleModRemoveSubmit}>
             <input
               type="text"
               className="form-control mr-2"
@@ -994,16 +992,12 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   }
 
   handleDeleteClick(i: CommentNode) {
-    let deleteForm: CommentFormI = {
-      content: i.props.node.comment.content,
+    let deleteForm: DeleteCommentForm = {
       edit_id: i.props.node.comment.id,
-      creator_id: i.props.node.comment.creator_id,
-      post_id: i.props.node.comment.post_id,
-      parent_id: i.props.node.comment.parent_id,
       deleted: !i.props.node.comment.deleted,
       auth: null,
     };
-    WebSocketService.Instance.editComment(deleteForm);
+    WebSocketService.Instance.deleteComment(deleteForm);
   }
 
   handleSaveCommentClick(i: CommentNode) {
@@ -1095,48 +1089,38 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     i.setState(i.state);
   }
 
-  handleModRemoveSubmit(i: CommentNode) {
+  handleModRemoveSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    let form: CommentFormI = {
-      content: i.props.node.comment.content,
-      edit_id: i.props.node.comment.id,
-      creator_id: i.props.node.comment.creator_id,
-      post_id: i.props.node.comment.post_id,
-      parent_id: i.props.node.comment.parent_id,
-      removed: !i.props.node.comment.removed,
-      reason: i.state.removeReason,
+    let form: RemoveCommentForm = {
+      edit_id: this.props.node.comment.id,
+      removed: !this.props.node.comment.removed,
+      reason: this.state.removeReason,
       auth: null,
     };
-    WebSocketService.Instance.editComment(form);
+    WebSocketService.Instance.removeComment(form);
 
-    i.state.showRemoveDialog = false;
-    i.setState(i.state);
-  }
+    this.setState({ showRemoveDialog: false });
+  };
 
-  handleMarkRead(i: CommentNode) {
+  handleMarkRead = () => {
     // if it has a user_mention_id field, then its a mention
-    if (i.props.node.comment.user_mention_id) {
+    if (this.props.node.comment.user_mention_id) {
       let form: EditUserMentionForm = {
-        user_mention_id: i.props.node.comment.user_mention_id,
-        read: !i.props.node.comment.read,
+        user_mention_id: this.props.node.comment.user_mention_id,
+        read: !this.props.node.comment.read,
       };
       WebSocketService.Instance.editUserMention(form);
     } else {
-      let form: CommentFormI = {
-        content: i.props.node.comment.content,
-        edit_id: i.props.node.comment.id,
-        creator_id: i.props.node.comment.creator_id,
-        post_id: i.props.node.comment.post_id,
-        parent_id: i.props.node.comment.parent_id,
-        read: !i.props.node.comment.read,
+      let form: MarkCommentReadForm = {
+        edit_id: this.props.node.comment.id,
+        read: !this.props.node.comment.read,
         auth: null,
       };
-      WebSocketService.Instance.editComment(form);
+      WebSocketService.Instance.markCommentAsRead(form);
     }
 
-    i.state.readLoading = true;
-    i.setState(this.state);
-  }
+    this.setState({ readLoading: true });
+  };
 
   handleModBanFromCommunityShow(i: CommentNode) {
     i.state.showBanDialog = !i.state.showBanDialog;

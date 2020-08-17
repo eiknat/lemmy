@@ -29,6 +29,7 @@ import {
   saveCommentRes,
   createCommentLikeRes,
   createPostLikeFindRes,
+  isCommentChanged,
 } from '../utils';
 import { PostListing } from './post-listing';
 import { CommentNodes } from './comment-nodes';
@@ -278,7 +279,7 @@ class BaseUserDetails extends Component<
       this.setState({
         comments: this.state.comments,
       });
-    } else if (res.op == UserOperation.EditComment) {
+    } else if (isCommentChanged(res.op)) {
       const data = res.data as CommentResponse;
       editCommentRes(data, this.state.comments);
       this.setState({

@@ -14,15 +14,15 @@ import {
   GetReportCountResponse,
   GetCommunityResponse,
   Community as CommunityI,
+  RemovePostForm,
 } from '../interfaces';
 import { UserService, WebSocketService } from '../services';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { wsJsonToRes, toast } from '../utils';
+import { wsJsonToRes, toast, isCommentChanged, isPostChanged } from '../utils';
 import { i18n } from '../i18next';
 import { MomentTime } from './moment-time';
 import { Link, withRouter } from 'react-router-dom';
-import { linkEvent } from '../linkEvent';
 
 interface ReportsState {
   moderates: Array<CommunityUser>;
@@ -496,14 +496,10 @@ export class BaseReports extends Component<any, ReportsState> {
     const { post_name, community_id, creator_id, post_id, id } = this.state
       .currentRemoveDialog as PostReport;
 
-    let form: PostForm = {
-      name: post_name,
-      community_id,
+    let form: RemovePostForm = {
       edit_id: post_id,
-      creator_id,
       removed: true,
       reason: this.state.removeReason,
-      nsfw: true,
       auth: null,
     };
 
@@ -511,7 +507,7 @@ export class BaseReports extends Component<any, ReportsState> {
       this.handleResolvePostReport(id, community_id);
     }
 
-    WebSocketService.Instance.editPost(form);
+    WebSocketService.Instance.removePost(form);
 
     this.setState({
       currentRemoveDialog: null,
@@ -672,9 +668,9 @@ export class BaseReports extends Component<any, ReportsState> {
           [community_id]: data.reports,
         },
       }));
-    } else if (res.op === UserOperation.EditComment) {
+    } else if (isCommentChanged(res.op)) {
       toast(i18n.t('comment_removed'));
-    } else if (res.op === UserOperation.EditPost) {
+    } else if (isPostChanged(res.op)) {
       toast(i18n.t('post_removed'));
     } else if (res.op === UserOperation.BanFromCommunity) {
       toast(i18n.t('user_banned'));

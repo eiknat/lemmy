@@ -9,12 +9,19 @@ export enum UserOperation {
   GetCommunity,
   CreateComment,
   EditComment,
+  DeleteComment,
+  RemoveComment,
   SaveComment,
+  MarkCommentAsRead,
   CreateCommentLike,
   GetPosts,
   CreatePostLike,
   EditPost,
+  RemovePost,
+  DeletePost,
   SavePost,
+  LockPost,
+  StickyPost,
   EditCommunity,
   FollowCommunity,
   GetFollowedCommunities,
@@ -43,6 +50,7 @@ export enum UserOperation {
   EditPrivateMessage,
   GetPrivateMessages,
   MarkPrivateMessageAsRead,
+  DeletePrivateMessage,
   UserJoin,
   GetComments,
   GetSiteConfig,
@@ -735,6 +743,31 @@ export interface GetPostForm {
   auth?: string;
 }
 
+export interface RemovePostForm {
+  edit_id: number;
+  removed: boolean;
+  reason?: string;
+  auth?: string;
+}
+
+export interface DeletePostForm {
+  edit_id: number;
+  deleted: boolean;
+  auth?: string;
+}
+
+export interface LockPostForm {
+  edit_id: number;
+  locked: boolean;
+  auth?: string;
+}
+
+export interface StickyPostForm {
+  edit_id: number;
+  stickied: boolean;
+  auth?: string;
+}
+
 export interface GetPostResponse {
   post: Post;
   comments: Array<Comment>;
@@ -768,9 +801,28 @@ export interface CommentForm {
   auth: string;
 }
 
+export interface DeleteCommentForm {
+  edit_id: number;
+  deleted: boolean;
+  auth?: string;
+}
+
+export interface RemoveCommentForm {
+  edit_id: number;
+  removed: boolean;
+  reason?: string;
+  auth?: string;
+}
+
 export interface SaveCommentForm {
   comment_id: number;
   save: boolean;
+  auth?: string;
+}
+
+export interface MarkCommentReadForm {
+  edit_id: number;
+  read: boolean;
   auth?: string;
 }
 
@@ -953,6 +1005,12 @@ export interface EditPrivateMessageForm {
 export interface MarkPrivateMessageReadForm {
   edit_id: number;
   read: boolean;
+  auth?: string;
+}
+
+export interface DeletePrivateMessageForm {
+  edit_id: number;
+  deleted: boolean;
   auth?: string;
 }
 

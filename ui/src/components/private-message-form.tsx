@@ -21,6 +21,7 @@ import {
   wsJsonToRes,
   toast,
   setupTippy,
+  isMessageChanged,
 } from '../utils';
 import { UserListing } from './user-listing';
 import { MarkdownTextArea } from './markdown-textarea';
@@ -258,7 +259,7 @@ export class PrivateMessageForm extends Component<
       toast(i18n.t(msg.error), 'danger');
       this.setState({ loading: false });
       return;
-    } else if (res.op == UserOperation.EditPrivateMessage) {
+    } else if (isMessageChanged(res.op)) {
       let data = res.data as PrivateMessageResponse;
       this.setState({ loading: false });
       this.props.onEdit(data.message);

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 import { WebSocketService, UserService } from '../services';
 import {
   Post,
@@ -16,6 +16,10 @@ import {
   AddSitemodForm,
   TransferSiteForm,
   TransferCommunityForm,
+  DeletePostForm,
+  RemovePostForm,
+  LockPostForm,
+  StickyPostForm,
 } from '../interfaces';
 import { MomentTime } from './moment-time';
 import { PostForm } from './post-form';
@@ -141,7 +145,10 @@ const VoteButtons = ({
   </>
 );
 
-class BasePostListing extends Component<PostListingProps, PostListingState> {
+class BasePostListing extends Component<
+  PostListingProps & RouteComponentProps,
+  PostListingState
+> {
   private emptyState: PostListingState = {
     showEdit: false,
     showRemoveDialog: false,
@@ -165,13 +172,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     localPostSaved: this.props.post.saved,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
-
-    this.state = this.emptyState;
-    this.handlePostLike = this.handlePostLike.bind(this);
-    this.handlePostDisLike = this.handlePostDisLike.bind(this);
-  }
+  state = this.emptyState;
 
   componentDidMount() {
     // scroll to top of page when loading post listing
@@ -472,10 +473,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
           </ul>
         )}
         {this.state.showRemoveDialog && (
-          <form
-            className="form-inline"
-            onSubmit={linkEvent(this, this.handleModRemoveSubmit)}
-          >
+          <form className="form-inline" onSubmit={this.handleModRemoveSubmit}>
             <input
               type="text"
               className="form-control mr-2"
@@ -662,8 +660,8 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
               my_vote={this.state.my_vote}
               enableDownvotes={this.props.enableDownvotes}
               score={this.state.score}
-              handlePostDisLike={linkEvent(this, this.handlePostDisLike)}
-              handlePostLike={linkEvent(this, this.handlePostLike)}
+              handlePostDisLike={this.handlePostDisLike}
+              handlePostLike={this.handlePostLike}
               pointsTippy={this.pointsTippy}
             />
           </div>
@@ -860,7 +858,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                   <li className="list-inline-item">
                     <button
                       className="btn btn-sm btn-link btn-animate text-muted"
-                      onClick={linkEvent(this, this.handleDeleteClick)}
+                      onClick={this.handleDeleteClick}
                       data-tippy-content={
                         !post.deleted ? i18n.t('delete') : i18n.t('restore')
                       }
@@ -911,7 +909,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                       <li className="list-inline-item">
                         <button
                           className="btn btn-sm btn-link btn-animate text-muted"
-                          onClick={linkEvent(this, this.handleModLock)}
+                          onClick={this.handleModLock}
                           data-tippy-content={
                             post.locked ? i18n.t('unlock') : i18n.t('lock')
                           }
@@ -928,7 +926,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                       <li className="list-inline-item">
                         <button
                           className="btn btn-sm btn-link btn-animate text-muted"
-                          onClick={linkEvent(this, this.handleModSticky)}
+                          onClick={this.handleModSticky}
                           data-tippy-content={
                             post.stickied
                               ? i18n.t('unsticky')
@@ -959,7 +957,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
                       ) : (
                         <span
                           className="pointer"
-                          onClick={linkEvent(this, this.handleModRemoveSubmit)}
+                          onClick={this.handleModRemoveSubmit}
                         >
                           {i18n.t('restore')}
                         </span>
@@ -1245,67 +1243,69 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     );
   }
 
-  handlePostLike(i: BasePostListing) {
+  handlePostLike = (i: BasePostListing) => {
     if (!UserService.Instance.user) {
       this.props.history.push(`/login`);
     }
 
     let new_vote = i.state.my_vote === 1 ? 0 : 1;
+    const newState = { ...this.state };
 
     if (i.state.my_vote === 1) {
-      i.state.score--;
-      i.state.upvotes--;
-    } else if (i.state.my_vote === -1) {
-      i.state.downvotes--;
-      i.state.upvotes++;
-      i.state.score += 2;
+      newState.score--;
+      newState.upvotes--;
+    } else if (this.state.my_vote === -1) {
+      newState.downvotes--;
+      newState.upvotes++;
+      newState.score += 2;
     } else {
-      i.state.upvotes++;
-      i.state.score++;
+      newState.upvotes++;
+      newState.score++;
     }
 
-    i.state.my_vote = new_vote;
+    newState.my_vote = new_vote;
 
     let form: CreatePostLikeForm = {
-      post_id: i.props.post.id,
-      score: i.state.my_vote,
+      post_id: this.props.post.id,
+      score: this.state.my_vote,
     };
 
     WebSocketService.Instance.likePost(form);
-    i.setState(i.state);
+    this.setState(newState);
     setupTippy();
-  }
+  };
 
-  handlePostDisLike(i: BasePostListing) {
+  handlePostDisLike = () => {
     if (!UserService.Instance.user) {
       this.props.history.push(`/login`);
     }
 
-    let new_vote = i.state.my_vote === -1 ? 0 : -1;
+    let new_vote = this.state.my_vote === -1 ? 0 : -1;
+    const newState = { ...this.state };
 
-    if (i.state.my_vote === 1) {
-      i.state.score -= 2;
-      i.state.upvotes--;
-      i.state.downvotes++;
-    } else if (i.state.my_vote === -1) {
-      i.state.downvotes--;
-      i.state.score++;
+    if (this.state.my_vote === 1) {
+      newState.score -= 2;
+      newState.upvotes--;
+      newState.downvotes++;
+    } else if (this.state.my_vote === -1) {
+      newState.downvotes--;
+      newState.score++;
     } else {
-      i.state.downvotes++;
-      i.state.score--;
+      newState.downvotes++;
+      newState.score--;
     }
 
-    i.state.my_vote = new_vote;
+    newState.my_vote = new_vote;
 
     let form: CreatePostLikeForm = {
-      post_id: i.props.post.id,
-      score: i.state.my_vote,
+      post_id: this.props.post.id,
+      score: this.state.my_vote,
     };
 
     WebSocketService.Instance.likePost(form);
-    i.setState(i.state);
+    this.setState(newState);
     setupTippy();
-  }
+  };
 
   handleEditClick = () => {
     this.setState({
@@ -1326,20 +1326,14 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     });
   };
 
-  handleDeleteClick(i: BasePostListing) {
-    let deleteForm: PostFormI = {
-      body: i.props.post.body,
-      community_id: i.props.post.community_id,
-      name: i.props.post.name,
-      url: i.props.post.url,
-      edit_id: i.props.post.id,
-      creator_id: i.props.post.creator_id,
-      deleted: !i.props.post.deleted,
-      nsfw: i.props.post.nsfw,
+  handleDeleteClick = () => {
+    let deleteForm: DeletePostForm = {
+      edit_id: this.props.post.id,
+      deleted: !this.props.post.deleted,
       auth: null,
     };
-    WebSocketService.Instance.editPost(deleteForm);
-  }
+    WebSocketService.Instance.deletePost(deleteForm);
+  };
 
   handleSavePostClick = () => {
     let saved =
@@ -1381,49 +1375,37 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     });
   };
 
-  handleModRemoveSubmit(i: BasePostListing) {
+  handleModRemoveSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    let form: PostFormI = {
-      name: i.props.post.name,
-      community_id: i.props.post.community_id,
-      edit_id: i.props.post.id,
-      creator_id: i.props.post.creator_id,
-      removed: !i.props.post.removed,
-      reason: i.state.removeReason,
-      nsfw: i.props.post.nsfw,
+    let form: RemovePostForm = {
+      edit_id: this.props.post.id,
+      removed: !this.props.post.removed,
+      reason: this.state.removeReason,
       auth: null,
     };
-    WebSocketService.Instance.editPost(form);
-    i.setState({
+    WebSocketService.Instance.removePost(form);
+    this.setState({
       showRemoveDialog: false,
     });
-  }
+  };
 
-  handleModLock(i: BasePostListing) {
-    let form: PostFormI = {
-      name: i.props.post.name,
-      community_id: i.props.post.community_id,
-      edit_id: i.props.post.id,
-      creator_id: i.props.post.creator_id,
-      nsfw: i.props.post.nsfw,
-      locked: !i.props.post.locked,
+  handleModLock = () => {
+    let form: LockPostForm = {
+      edit_id: this.props.post.id,
+      locked: !this.props.post.locked,
       auth: null,
     };
-    WebSocketService.Instance.editPost(form);
-  }
+    WebSocketService.Instance.lockPost(form);
+  };
 
-  handleModSticky(i: BasePostListing) {
-    let form: PostFormI = {
-      name: i.props.post.name,
-      community_id: i.props.post.community_id,
-      edit_id: i.props.post.id,
-      creator_id: i.props.post.creator_id,
-      nsfw: i.props.post.nsfw,
-      stickied: !i.props.post.stickied,
+  handleModSticky = () => {
+    let form: StickyPostForm = {
+      edit_id: this.props.post.id,
+      stickied: !this.props.post.stickied,
       auth: null,
     };
-    WebSocketService.Instance.editPost(form);
-  }
+    WebSocketService.Instance.stickyPost(form);
+  };
 
   handleModBanFromCommunityShow = () => {
     this.setState({

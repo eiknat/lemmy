@@ -34,14 +34,14 @@ import {
   hostname,
   pictrsDeleteToast,
   validTitle,
+  isPostChanged,
 } from '../utils';
 // import Choices from 'choices.js';
 import { i18n } from '../i18next';
 import { cleanURL } from '../clean-url';
 import { Icon } from './icon';
 import { linkEvent } from '../linkEvent';
-import matchSorter from 'match-sorter'
-
+import matchSorter from 'match-sorter';
 
 import {
   Combobox,
@@ -50,8 +50,8 @@ import {
   ComboboxList,
   ComboboxOption,
   ComboboxOptionText,
-} from "@reach/combobox";
-import "@reach/combobox/styles.css";
+} from '@reach/combobox';
+import '@reach/combobox/styles.css';
 import { Button } from 'theme-ui';
 
 export const MAX_POST_TITLE_LENGTH = 160;
@@ -59,9 +59,9 @@ export const MAX_POST_BODY_LENGTH = 20000;
 export const MAX_COMMENT_LENGTH = 10000;
 
 function CommunityInput({ communities, onSelect }) {
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState('');
   const results = matchSorter(communities, value, {
-    keys: [(item) => `${item.name}`]
+    keys: [item => `${item.name}`],
   });
 
   function handleChange(e) {
@@ -79,8 +79,8 @@ function CommunityInput({ communities, onSelect }) {
     <Combobox
       aria-label="Communities"
       openOnFocus
-      onSelect={(name) => {
-        const community = communities.find(comm => comm.name === name)
+      onSelect={name => {
+        const community = communities.find(comm => comm.name === name);
         setValue(community.name);
         onSelect(community.id);
       }}
@@ -93,23 +93,23 @@ function CommunityInput({ communities, onSelect }) {
         placeholder={i18n.t('select_a_community')}
       />
       <ComboboxPopover className="shadow-popup">
-          {results.length > 0 ? (
-            <ComboboxList persistSelection>
-              {results.slice(0, 10).map((result, index) => (
-                <ComboboxOption
-                  key={index}
-                  value={result.name}
-                />
-              ))}
-            </ComboboxList>
-          ) : (
-            <div data-reach-combobox-popover style={{ fontSize: '16px', padding: 8, paddingTop: 0 }}>
-              No results found
-            </div>
-          )}
-        </ComboboxPopover>
+        {results.length > 0 ? (
+          <ComboboxList persistSelection>
+            {results.slice(0, 10).map((result, index) => (
+              <ComboboxOption key={index} value={result.name} />
+            ))}
+          </ComboboxList>
+        ) : (
+          <div
+            data-reach-combobox-popover
+            style={{ fontSize: '16px', padding: 8, paddingTop: 0 }}
+          >
+            No results found
+          </div>
+        )}
+      </ComboboxPopover>
     </Combobox>
-  )
+  );
 }
 
 interface PostFormProps {
@@ -260,20 +260,19 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       this.state.postForm.name === null ||
       this.state.postForm.name.trim() === '';
 
-    const communities = this.state.communities
-                    .filter(community => {
-                      // don't allow crossposting to same community as original
-                      if (this.state.crosspostCommunityId) {
-                        // remove main community
-                        const MAIN_COMMUNITY_ID = 2;
-                        return (
-                          community.id !== this.state.crosspostCommunityId &&
-                          community.id != MAIN_COMMUNITY_ID
-                        );
-                      }
+    const communities = this.state.communities.filter(community => {
+      // don't allow crossposting to same community as original
+      if (this.state.crosspostCommunityId) {
+        // remove main community
+        const MAIN_COMMUNITY_ID = 2;
+        return (
+          community.id !== this.state.crosspostCommunityId &&
+          community.id != MAIN_COMMUNITY_ID
+        );
+      }
 
-                      return true;
-                    })
+      return true;
+    });
     return (
       <div>
         <Prompt
@@ -354,7 +353,11 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                 </svg>
               )}
               {isImage(this.state.postForm.url) && (
-                <img src={this.state.postForm.url} alt="post form thumbnail" className="img-fluid" />
+                <img
+                  src={this.state.postForm.url}
+                  alt="post form thumbnail"
+                  className="img-fluid"
+                />
               )}
               {this.state.crossPosts.length > 0 && (
                 <>
@@ -623,9 +626,9 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     this.setState(this.state);
   }
 
-  handlePostCommunityChange = (community_id) => {
-    this.setState({ postForm: { ...this.state.postForm, community_id, }});
-  }
+  handlePostCommunityChange = community_id => {
+    this.setState({ postForm: { ...this.state.postForm, community_id } });
+  };
 
   handlePostNsfwChange(i: PostForm, event: any) {
     i.state.postForm.nsfw = event.target.checked;
@@ -752,14 +755,21 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     } else if (res.op == UserOperation.ListCommunities) {
       let data = res.data as ListCommunitiesResponse;
       // this.state.communities = data.communities;
-      this.setState({ communities: data.communities })
+      this.setState({ communities: data.communities });
       if (this.props.post) {
-        this.setState({ postForm: { ...this.state.postForm, community_id: this.props.post.community_id } });
+        this.setState({
+          postForm: {
+            ...this.state.postForm,
+            community_id: this.props.post.community_id,
+          },
+        });
       } else if (this.props.params && this.props.params.community) {
         let foundCommunityId = data.communities.find(
           r => r.name == this.props.params.community
         ).id;
-        this.setState({ postForm: { ...this.state.postForm, community_id: foundCommunityId } });
+        this.setState({
+          postForm: { ...this.state.postForm, community_id: foundCommunityId },
+        });
       } else {
         // By default, the null valued 'Select a Community'
       }
@@ -776,7 +786,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
         this.state.loading = false;
         this.props.onCreate(data.post.id);
       }
-    } else if (res.op == UserOperation.EditPost) {
+    } else if (isPostChanged(res.op)) {
       let data = res.data as PostResponse;
       if (data.post.creator_id == UserService.Instance.user.id) {
         this.state.loading = false;

@@ -540,6 +540,7 @@ export class Login extends Component<any, State> {
   }
 
   initHCaptcha() {
+    // @ts-ignore
     const widgetID = hcaptcha.render('h-captcha', {
       sitekey: this.state.captcha.hcaptcha.site_key,
     });

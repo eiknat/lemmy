@@ -4,6 +4,7 @@ import {
   PrivateMessage as PrivateMessageI,
   EditPrivateMessageForm,
   MarkPrivateMessageReadForm,
+  DeletePrivateMessageForm,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import {
@@ -54,6 +55,8 @@ export class PrivateMessage extends Component<
   }
 
   get mine(): boolean {
+    console.log(UserService.Instance.user?.id);
+    console.log(this.props.privateMessage.creator_id);
     return (
       UserService.Instance.user?.id == this.props.privateMessage.creator_id
     );
@@ -191,7 +194,7 @@ export class PrivateMessage extends Component<
                     <li className="list-inline-item">
                       <button
                         className="btn btn-link btn-sm btn-animate text-muted"
-                        onClick={linkEvent(this, this.handleDeleteClick)}
+                        onClick={this.handleDeleteClick}
                         data-tippy-content={
                           !message.deleted
                             ? i18n.t('delete')
@@ -263,13 +266,13 @@ export class PrivateMessage extends Component<
     this.setState({ showEdit: true });
   };
 
-  handleDeleteClick(i: PrivateMessage) {
-    let form: EditPrivateMessageForm = {
-      edit_id: i.props.privateMessage.id,
-      deleted: !i.props.privateMessage.deleted,
+  handleDeleteClick = () => {
+    let form: DeletePrivateMessageForm = {
+      edit_id: this.props.privateMessage.id,
+      deleted: !this.props.privateMessage.deleted,
     };
-    WebSocketService.Instance.editPrivateMessage(form);
-  }
+    WebSocketService.Instance.deletePrivateMessage(form);
+  };
 
   handleReplyCancel() {
     this.setState({

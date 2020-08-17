@@ -3,11 +3,12 @@ import { WebSocketService } from '../services';
 import { i18n } from '../i18next';
 import { Trans } from 'react-i18next';
 import { repoUrl } from '../utils';
-import { BASE_PATH } from "../isProduction";
+import { BASE_PATH } from '../isProduction';
 
 export class About extends Component<any, any> {
   componentDidMount() {
     document.title = `${i18n.t('about')} - ${
+      // @ts-ignore
       WebSocketService.Instance?.site?.name || 'ChapoChat'
     }`;
     window.scrollTo(0, 0);

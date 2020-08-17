@@ -9,7 +9,12 @@ import {
   UserOperation,
   CommentResponse,
 } from '../interfaces';
-import { capitalizeFirstLetter, wsJsonToRes, toast } from '../utils';
+import {
+  capitalizeFirstLetter,
+  wsJsonToRes,
+  toast,
+  isCommentChanged,
+} from '../utils';
 import { WebSocketService, UserService } from '../services';
 import { i18n } from '../i18next';
 import { Trans } from 'react-i18next';
@@ -140,7 +145,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
       // text edit only
 
       (data.comment.creator_id == UserService.Instance.user.id &&
-        op == UserOperation.EditComment &&
+        isCommentChanged(op) &&
         data.comment.content)
     ) {
       this.setState({
@@ -183,7 +188,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
       if (res.op == UserOperation.CreateComment) {
         let data = res.data as CommentResponse;
         this.handleFinished(res.op, data);
-      } else if (res.op == UserOperation.EditComment) {
+      } else if (isCommentChanged(res.op)) {
         let data = res.data as CommentResponse;
         this.handleFinished(res.op, data);
       }

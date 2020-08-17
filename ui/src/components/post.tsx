@@ -41,6 +41,8 @@ import {
   setupTippy,
   commentFetchLimit,
   debounce,
+  isCommentChanged,
+  isPostChanged,
 } from '../utils';
 import { PostListing } from './post-listing';
 import { Sidebar } from './sidebar';
@@ -197,6 +199,7 @@ export class Post extends Component<any, PostState> {
       };
       WebSocketService.Instance.editComment(form);
       UserService.Instance.user.unreadCount--;
+      // @ts-ignore
       UserService.Instance.sub.next({
         user: UserService.Instance.user,
       });
@@ -484,7 +487,7 @@ export class Post extends Component<any, PostState> {
         this.state.comments.unshift(data.comment);
         this.setState(this.state);
       }
-    } else if (res.op == UserOperation.EditComment) {
+    } else if (isCommentChanged(res.op)) {
       let data = res.data as CommentResponse;
       editCommentRes(data, this.state.comments);
       this.setState(this.state);
@@ -501,7 +504,7 @@ export class Post extends Component<any, PostState> {
       let data = res.data as PostResponse;
       createPostLikeRes(data, this.state.post);
       this.setState(this.state);
-    } else if (res.op == UserOperation.EditPost) {
+    } else if (isPostChanged(res.op)) {
       let data = res.data as PostResponse;
       this.state.post = data.post;
       this.setState(this.state);

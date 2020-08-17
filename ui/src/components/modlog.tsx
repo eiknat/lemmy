@@ -50,13 +50,13 @@ export class Modlog extends Component<any, ModlogState> {
     loading: true,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
+  state = this.emptyState;
 
-    this.state = this.emptyState;
-    this.state.communityId = this.props.match.params.community_id
+  componentDidMount() {
+    const communityId = this.props.match.params.community_id
       ? Number(this.props.match.params.community_id)
       : undefined;
+    this.setState({ communityId });
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
       .subscribe(
@@ -95,36 +95,37 @@ export class Modlog extends Component<any, ModlogState> {
     );
     let added = addTypeInfo(res.added, 'added');
     let banned = addTypeInfo(res.banned, 'banned');
-    this.state.combined = [];
+    // this.state.combined = [];
+    const updatedState: any = { combined: [] };
 
-    this.state.combined.push(...removed_posts);
-    this.state.combined.push(...locked_posts);
-    this.state.combined.push(...stickied_posts);
-    this.state.combined.push(...removed_comments);
-    this.state.combined.push(...removed_communities);
-    this.state.combined.push(...banned_from_community);
-    this.state.combined.push(...added_to_community);
-    this.state.combined.push(...added);
-    this.state.combined.push(...banned);
+    updatedState.combined.push(...removed_posts);
+    updatedState.combined.push(...locked_posts);
+    updatedState.combined.push(...stickied_posts);
+    updatedState.combined.push(...removed_comments);
+    updatedState.combined.push(...removed_communities);
+    updatedState.combined.push(...banned_from_community);
+    updatedState.combined.push(...added_to_community);
+    updatedState.combined.push(...added);
+    updatedState.combined.push(...banned);
 
     if (this.state.communityId && this.state.combined.length > 0) {
-      this.state.communityName = (this.state.combined[0]
+      updatedState.communityName = (this.state.combined[0]
         .data as ModRemovePost).community_name;
     }
 
     // Sort them by time
-    this.state.combined.sort((a, b) =>
+    updatedState.combined.sort((a, b) =>
       b.data.when_.localeCompare(a.data.when_)
     );
 
-    this.setState(this.state);
+    this.setState(updatedState);
   }
 
   combined() {
     return (
       <tbody>
         {this.state.combined.map(i => (
-          <tr key={i.data.id}>
+          <tr key={`${i.type_}-${i.data.id}`}>
             <td>
               <MomentTime data={i.data} />
             </td>
@@ -412,32 +413,27 @@ export class Modlog extends Component<any, ModlogState> {
         {this.state.page > 1 && (
           <button
             className="btn btn-sm btn-secondary mr-1"
-            onClick={linkEvent(this, this.prevPage)}
+            onClick={this.prevPage}
           >
             {i18n.t('prev')}
           </button>
         )}
-        <button
-          className="btn btn-sm btn-secondary"
-          onClick={linkEvent(this, this.nextPage)}
-        >
+        <button className="btn btn-sm btn-secondary" onClick={this.nextPage}>
           {i18n.t('next')}
         </button>
       </div>
     );
   }
 
-  nextPage(i: Modlog) {
-    i.state.page++;
-    i.setState(i.state);
-    i.refetch();
-  }
+  nextPage = () => {
+    this.setState({ page: this.state.page + 1 });
+    this.refetch();
+  };
 
-  prevPage(i: Modlog) {
-    i.state.page--;
-    i.setState(i.state);
-    i.refetch();
-  }
+  prevPage = () => {
+    this.setState({ page: Math.max(this.state.page - 1, 0) });
+    this.refetch();
+  };
 
   refetch() {
     let modlogForm: GetModlogForm = {

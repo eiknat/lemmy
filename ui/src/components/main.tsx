@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -53,6 +53,8 @@ import {
   editPostFindRes,
   commentsToFlatNodes,
   setupTippy,
+  isCommentChanged,
+  isPostChanged,
 } from '../utils';
 import { BASE_PATH } from '../isProduction';
 import { i18n } from '../i18next';
@@ -104,7 +106,7 @@ interface UrlParams {
   page?: number;
 }
 
-class Main extends Component<any, MainState> {
+class Main extends Component<MainProps & RouteComponentProps, MainState> {
   private subscription: Subscription;
   private emptyState: MainState = {
     subscribedCommunities: [],
@@ -249,6 +251,7 @@ class Main extends Component<any, MainState> {
                     <Button
                       css={{ width: '100%', color: '#fff !important' }}
                       as={Link}
+                      // @ts-ignore
                       to="/create_community"
                     >
                       {i18n.t('create_a_community')}
@@ -783,7 +786,7 @@ class Main extends Component<any, MainState> {
         }
       }
       this.setState(this.state);
-    } else if (res.op === UserOperation.EditPost) {
+    } else if (isPostChanged(res.op)) {
       let data = res.data as PostResponse;
       editPostFindRes(data, this.state.posts);
       this.setState(this.state);
@@ -831,7 +834,7 @@ class Main extends Component<any, MainState> {
         comments: data.comments,
         loading: false,
       });
-    } else if (res.op == UserOperation.EditComment) {
+    } else if (isCommentChanged(res.op)) {
       let data = res.data as CommentResponse;
       editCommentRes(data, this.state.comments);
       this.setState(this.state);
@@ -866,4 +869,5 @@ class Main extends Component<any, MainState> {
   }
 }
 
+// @ts-ignore
 export default withTranslation()(withRouter(Main));

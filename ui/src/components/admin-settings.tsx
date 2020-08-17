@@ -62,7 +62,7 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
     siteConfigLoading: true,
   };
 
-  state = this.emptyState
+  state = this.emptyState;
 
   componentDidMount() {
     this.subscription = WebSocketService.Instance.subject
@@ -179,7 +179,7 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
     return (
       <div>
         <h5>{i18n.t('admin_settings')}</h5>
-        <form onSubmit={linkEvent(this, this.handleSiteAdminConfigSubmit)}>
+        <form onSubmit={this.handleSiteAdminConfigSubmit}>
           <div className="form-group row">
             <label
               className="col-12 col-form-label"
@@ -191,7 +191,7 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
               <textarea
                 id={this.siteConfigTextAreaId}
                 value={this.state.siteConfigForm.config_hjson}
-                onChange={linkEvent(this, this.handleSiteConfigHjsonChange)}
+                onChange={this.handleSiteConfigHjsonChange}
                 className="form-control text-monospace"
                 rows={3}
               />
@@ -215,17 +215,22 @@ class BaseAdminSettings extends Component<any, AdminSettingsState> {
     );
   }
 
-  handleSiteAdminConfigSubmit(i: AdminSettings, event: any) {
+  handleSiteAdminConfigSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    i.state.siteConfigLoading = true;
-    WebSocketService.Instance.saveSiteConfig(i.state.siteConfigForm);
-    i.setState(i.state);
-  }
+    WebSocketService.Instance.saveSiteConfig(this.state.siteConfigForm);
+    this.setState({ siteConfigLoading: true });
+  };
 
-  handleSiteConfigHjsonChange(i: AdminSettings, event: any) {
-    i.state.siteConfigForm.config_hjson = event.target.value;
-    i.setState(i.state);
-  }
+  handleSiteConfigHjsonChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    this.setState({
+      siteConfigForm: {
+        ...this.state.siteConfigForm,
+        config_hjson: event.target.value,
+      },
+    });
+  };
 
   parseMessage(msg: WebSocketJsonResponse) {
     console.log(msg);

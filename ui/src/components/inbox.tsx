@@ -29,6 +29,8 @@ import {
   createCommentLikeRes,
   commentsToFlatNodes,
   setupTippy,
+  isCommentChanged,
+  isMessageChanged,
 } from '../utils';
 import { CommentNodes } from './comment-nodes';
 import { PrivateMessage } from './private-message';
@@ -489,10 +491,7 @@ export class Inbox extends Component<any, InboxState> {
           setupTippy();
         }
       );
-    } else if (
-      res.op == UserOperation.EditPrivateMessage ||
-      res.op == UserOperation.MarkPrivateMessageAsRead
-    ) {
+    } else if (isMessageChanged(res.op)) {
       let data = res.data as PrivateMessageResponse;
       let found: PrivateMessageI = this.state.messages.find(
         m => m.id === data.message.id
@@ -515,7 +514,7 @@ export class Inbox extends Component<any, InboxState> {
       setupTippy();
     } else if (res.op == UserOperation.MarkAllAsRead) {
       // Moved to be instant
-    } else if (res.op == UserOperation.EditComment) {
+    } else if (isCommentChanged(res.op)) {
       let data = res.data as CommentResponse;
       editCommentRes(data, this.state.replies);
 
