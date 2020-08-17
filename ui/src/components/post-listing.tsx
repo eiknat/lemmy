@@ -42,6 +42,8 @@ import { i18n } from '../i18next';
 import { Icon } from './icon';
 import { RoleBadge } from './comment-node';
 import { linkEvent } from '../linkEvent';
+import { Box, Flex, Heading, Text } from 'theme-ui';
+import Button from './elements/Button';
 
 interface PostListingState {
   showEdit: boolean;
@@ -143,7 +145,100 @@ const VoteButtons = ({
       </button>
     )}
   </>
-);
+  );
+
+function MobilePostListing({ post, my_vote, handlePostLike,
+  handlePostDisLike,
+  enableDownvotes,
+  score,
+  pointsTippy,
+  localPostSaved,
+  handleSavePostClick,
+  thumbnail,
+}) {
+  console.log({ post })
+  return (
+    <Flex css={{ flexDirection: 'column' }}>
+      <Heading as="h5" mb={1}>{post.name}</Heading>
+      {/* {thumbnail && thumbnail()} */}
+      {isImage(post.url) && (
+        <img className="img-fluid my-2" alt={post.name} src={post.url} />
+      )}
+      {post.body && (
+        <Text css={{ border: '1px solid rgb(68, 68, 68)', padding: '8px', borderRadius: '4px' }} my={2}>
+          {post.body}
+        </Text>
+      )}
+      <Box my={1}>
+        <span> {i18n.t('to')} </span>
+        <CommunityLink
+          community={{
+            name: post.community_name,
+            id: post.community_id,
+            local: post.community_local,
+            actor_id: post.community_actor_id,
+          }}
+        />
+        <span> {i18n.t('by')} </span>
+          <UserListing
+            user={{
+              name: post.creator_name,
+              avatar: post.creator_avatar,
+              id: post.creator_id,
+              local: post.creator_local,
+              actor_id: post.creator_actor_id,
+            }}
+          />
+        <span>
+          {' '}- <MomentTime data={post} />
+        </span>
+      </Box>
+      <Flex css={{ alignItems: 'center' }} mt={3}>
+        <Button onClick={handlePostLike} p={1} variant="muted" color={my_vote === 1 ? '#fffc00' : 'inherit'}>
+          <Icon name="upvote" className="icon upvote" />
+        </Button>
+        <Box mx={2}>
+          {score}
+        </Box>
+        <Button onClick={handlePostDisLike} p={1} variant="muted" color={my_vote === -1 ? '#dd17b9' : 'inherit'}>
+          <Icon name="downvote" className="icon downvote" />
+        </Button>
+        <Box mx={3}>
+          <Link
+            className="text-muted"
+            title={i18n.t('number_of_comments', {
+              count: post.number_of_comments,
+            })}
+            to={`/post/${post.id}`}
+          >
+            <Icon name="comment" className="icon mr-1" />
+            {post.number_of_comments}
+          </Link>
+        </Box>
+        <Button
+          variant="muted"
+          p={1}
+          onClick={handleSavePostClick}
+          data-tippy-content={
+            post.saved ? i18n.t('unsave') : i18n.t('save')
+          }
+        >
+          <Icon
+            name={
+              localPostSaved ? 'star' : 'starOutline'
+            }
+            className={`icon icon-inline ${
+              localPostSaved && 'text-warning'
+            }`}
+          />
+        </Button>
+        <Button mx={2} p={1} variant="muted" css={{ marginLeft: 'auto' }}>
+          <Icon name="more" />
+        </Button>
+      </Flex>
+    </Flex>
+  )
+}
 
 class BasePostListing extends Component<
   PostListingProps & RouteComponentProps,
@@ -264,7 +359,7 @@ class BasePostListing extends Component<
     }
   }
 
-  thumbnail() {
+  thumbnail = () => {
     let post = this.props.post;
 
     if (isImage(post.url)) {
@@ -643,10 +738,22 @@ class BasePostListing extends Component<
     );
   }
 
-  listing() {
+  listing = () => {
     let post = this.props.post;
 
     const isMobile = window.innerWidth < 768;
+
+    if (isMobile) {
+      return (<MobilePostListing my_vote={this.state.my_vote} post={post} enableDownvotes={this.props.enableDownvotes}
+              score={this.state.score}
+              handlePostDisLike={this.handlePostDisLike}
+              handlePostLike={this.handlePostLike}
+        pointsTippy={this.pointsTippy}
+        thumbnail={this.thumbnail}
+        localPostSaved={this.state.localPostSaved}
+        handleSavePostClick={this.handleSavePostClick}
+      />)
+    }
 
     return (
       <div>
@@ -1243,15 +1350,15 @@ class BasePostListing extends Component<
     );
   }
 
-  handlePostLike = (i: BasePostListing) => {
+  handlePostLike = () => {
     if (!UserService.Instance.user) {
       this.props.history.push(`/login`);
     }
 
-    let new_vote = i.state.my_vote === 1 ? 0 : 1;
+    let new_vote = this.state.my_vote === 1 ? 0 : 1;
     const newState = { ...this.state };
 
-    if (i.state.my_vote === 1) {
+    if (this.state.my_vote === 1) {
       newState.score--;
       newState.upvotes--;
     } else if (this.state.my_vote === -1) {
