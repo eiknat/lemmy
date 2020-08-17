@@ -86,11 +86,23 @@ export class MarkdownTextArea extends Component<
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     if (this.state.content) {
       window.onbeforeunload = () => true;
     } else {
       window.onbeforeunload = undefined;
+    }
+
+    if (this.props.finished && !prevProps.finished) {
+      let prevState = {...this.state};
+      prevState.content = '';
+      prevState.loading = false;
+      prevState.previewMode = false;
+      this.setState(prevState);
+      if (this.props.replyType) {
+        this.props.onReplyCancel();
+      }
+
     }
   }
 
