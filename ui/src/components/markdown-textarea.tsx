@@ -6,7 +6,7 @@ import {
   markdownHelpUrl,
   setupTribute,
   setupTippy,
-  emojiPicker,
+  // emojiPicker,
 } from '../utils';
 import { UserService } from '../services';
 import autosize from 'autosize';
@@ -15,8 +15,8 @@ import { i18n } from '../i18next';
 import emojiShortName from 'emoji-short-name';
 import { Icon } from './icon';
 import { linkEvent } from '../linkEvent';
-import 'emoji-mart/css/emoji-mart.css'
-import { Picker } from 'emoji-mart'
+import 'emoji-mart/css/emoji-mart.css';
+import { Picker } from 'emoji-mart';
 import { customEmojis } from '../custom-emojis';
 
 interface MarkdownTextAreaProps {
@@ -94,7 +94,7 @@ export class MarkdownTextArea extends Component<
     }
 
     if (this.props.finished && !prevProps.finished) {
-      let prevState = {...this.state};
+      let prevState = { ...this.state };
       prevState.content = '';
       prevState.loading = false;
       prevState.previewMode = false;
@@ -259,11 +259,17 @@ export class MarkdownTextArea extends Component<
               {this.state.showEmojiPicker && (
                 <>
                   <div className="emoji-picker-container">
-                  <Picker custom={customEmojis} onSelect={this.handleInsertEmoji} theme="auto" />
+                    <Picker
+                      custom={customEmojis}
+                      onSelect={this.handleInsertEmoji}
+                      theme="auto"
+                    />
                   </div>
                   <div
-                    onClick={this.toggleEmojiPicker} className="click-away-container" />
-                  </>
+                    onClick={this.toggleEmojiPicker}
+                    className="click-away-container"
+                  />
+                </>
               )}
             </span>
             <button
@@ -335,20 +341,20 @@ export class MarkdownTextArea extends Component<
     );
   }
 
-  setupEmojiPicker() {
-    emojiPicker.on('emoji', twemojiHtmlStr => {
-      if (this.state.content == null) {
-        this.state.content = '';
-      }
-      var el = document.createElement('div');
-      el.innerHTML = twemojiHtmlStr;
-      let nativeUnicode = (el.childNodes[0] as HTMLElement).getAttribute('alt');
-      let shortName = `:${emojiShortName[nativeUnicode]}:`;
+  // setupEmojiPicker() {
+  //   emojiPicker.on('emoji', twemojiHtmlStr => {
+  //     if (this.state.content == null) {
+  //       this.state.content = '';
+  //     }
+  //     var el = document.createElement('div');
+  //     el.innerHTML = twemojiHtmlStr;
+  //     let nativeUnicode = (el.childNodes[0] as HTMLElement).getAttribute('alt');
+  //     let shortName = `:${emojiShortName[nativeUnicode]}:`;
 
-      this.state.content += shortName;
-      this.setState(this.state);
-    });
-  }
+  //     this.state.content += shortName;
+  //     this.setState(this.state);
+  //   });
+  // }
 
   // handleImageUploadPaste(i: MarkdownTextArea, event: any) {
   //   let image = event.clipboardData.files[0];
@@ -413,14 +419,14 @@ export class MarkdownTextArea extends Component<
   //     });
   // }
 
-  handleEmojiPickerClick(_i: MarkdownTextArea, event: any) {
-    event.preventDefault();
-    emojiPicker.togglePicker(event.target);
-  }
+  // handleEmojiPickerClick(_i: MarkdownTextArea, event: any) {
+  //   event.preventDefault();
+  //   emojiPicker.togglePicker(event.target);
+  // }
 
   toggleEmojiPicker = () => {
     this.setState({ showEmojiPicker: !this.state.showEmojiPicker });
-  }
+  };
 
   handleContentChange(i: MarkdownTextArea, event: any) {
     i.state.content = event.target.value;
@@ -460,12 +466,12 @@ export class MarkdownTextArea extends Component<
     i.props.onReplyCancel();
   }
 
-  handleInsertEmoji = ({ colons: shortcode }: { colons: string}) => {
+  handleInsertEmoji = ({ colons: shortcode }: { colons: string }) => {
     const { content } = this.state;
     // pad the emoji with spaces
     this.setState({ content: `${content} ${shortcode} ` });
     this.toggleEmojiPicker();
-  }
+  };
 
   handleInsertLink(i: MarkdownTextArea, event: any) {
     event.preventDefault();

@@ -33,7 +33,7 @@ function Form() {
         </Label>
       </Box>
       <Label htmlFor="comment">Comment</Label>
-      <Textarea name="comment" id="comment" rows="6" mb={3} />
+      <Textarea name="comment" id="comment" rows={6} mb={3} />
       <Flex mb={3}>
         <Label>
           <Radio name="letter" /> Alpha

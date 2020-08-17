@@ -274,7 +274,7 @@ export class Inbox extends Component<any, InboxState> {
               enableDownvotes={this.state.enableDownvotes}
             />
           ) : (
-            <PrivateMessage privateMessage={i} />
+            <PrivateMessage key={i.id} privateMessage={i} />
           )
         )}
       </div>
@@ -489,7 +489,10 @@ export class Inbox extends Component<any, InboxState> {
           setupTippy();
         }
       );
-    } else if (res.op == UserOperation.EditPrivateMessage) {
+    } else if (
+      res.op == UserOperation.EditPrivateMessage ||
+      res.op == UserOperation.MarkPrivateMessageAsRead
+    ) {
       let data = res.data as PrivateMessageResponse;
       let found: PrivateMessageI = this.state.messages.find(
         m => m.id === data.message.id
@@ -596,7 +599,7 @@ export class Inbox extends Component<any, InboxState> {
       this.state.replies.filter(r => !r.read).length +
       this.state.mentions.filter(r => !r.read).length +
       this.state.messages.filter(
-        r => !r.read && r.creator_id !== UserService.Instance.user.id
+        r => !r.read && r.creator_id !== UserService.Instance?.user?.id
       ).length
     );
   }

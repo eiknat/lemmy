@@ -42,6 +42,7 @@ export enum UserOperation {
   CreatePrivateMessage,
   EditPrivateMessage,
   GetPrivateMessages,
+  MarkPrivateMessageAsRead,
   UserJoin,
   GetComments,
   GetSiteConfig,
@@ -946,6 +947,12 @@ export interface EditPrivateMessageForm {
   content?: string;
   deleted?: boolean;
   read?: boolean;
+  auth?: string;
+}
+
+export interface MarkPrivateMessageReadForm {
+  edit_id: number;
+  read: boolean;
   auth?: string;
 }
 

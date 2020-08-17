@@ -33,7 +33,7 @@ import {
 import { PostListing } from './post-listing';
 import { CommentNodes } from './comment-nodes';
 import { linkEvent } from '../linkEvent';
-import { withRouter } from 'react-router-dom';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 interface UserDetailsProps {
   username?: string;
@@ -58,7 +58,10 @@ interface UserDetailsState {
   sitemods: Array<UserView>;
 }
 
-class BaseUserDetails extends Component<UserDetailsProps, UserDetailsState> {
+class BaseUserDetails extends Component<
+  UserDetailsProps & RouteComponentProps,
+  UserDetailsState
+> {
   private subscription: Subscription;
   constructor(props: any, context: any) {
     super(props, context);

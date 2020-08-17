@@ -13,7 +13,6 @@
   },
   "keywords": [],
   "dependencies": {
-    "@joeattardi/emoji-button": "^4.0.2",
     "@pika/react": "^16.13.1",
     "@pika/react-dom": "^16.13.1",
     "@reach/combobox": "^0.10.5",

@@ -61,13 +61,9 @@ export class PrivateMessageForm extends Component<
     showDisclaimer: false,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
+  state = this.emptyState;
 
-    this.state = this.emptyState;
-
-    this.handleContentChange = this.handleContentChange.bind(this);
-
+  componentDidMount() {
     if (this.props.privateMessage) {
       this.state.privateMessageForm = {
         content: this.props.privateMessage.content,
@@ -92,9 +88,7 @@ export class PrivateMessageForm extends Component<
         err => console.error(err),
         () => console.log('complete')
       );
-  }
 
-  componentDidMount() {
     setupTippy();
   }
 
@@ -115,6 +109,7 @@ export class PrivateMessageForm extends Component<
     return (
       <div>
         <Prompt
+          // @ts-ignore
           when={!this.state.loading && this.state.privateMessageForm.content}
           message={i18n.t('block_leaving')}
         />
@@ -229,7 +224,7 @@ export class PrivateMessageForm extends Component<
         i.state.privateMessageForm
       );
     }
-    this.setState({ loading: true });
+    i.setState({ loading: true });
   }
 
   handleRecipientChange(i: PrivateMessageForm, event: any) {
@@ -237,10 +232,11 @@ export class PrivateMessageForm extends Component<
     i.setState(i.state);
   }
 
-  handleContentChange(val: string) {
-    this.state.privateMessageForm.content = val;
-    this.setState(this.state);
-  }
+  handleContentChange = (val: string) => {
+    this.setState({
+      privateMessageForm: { ...this.state.privateMessageForm, content: val },
+    });
+  };
 
   handleCancel(i: PrivateMessageForm) {
     i.props.onCancel();

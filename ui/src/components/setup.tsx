@@ -30,7 +30,7 @@ export class Setup extends Component<any, State> {
       admin: true,
       sitemod: true,
       show_nsfw: true,
-      captcha_id: '',
+      // captcha_id: '',
     },
     doneRegisteringUser: false,
     userLoading: false,
@@ -77,7 +77,7 @@ export class Setup extends Component<any, State> {
 
   registerUser() {
     return (
-      <form onSubmit={linkEvent(this, this.handleRegisterSubmit)}>
+      <form onSubmit={this.handleRegisterSubmit}>
         <h5>{i18n.t('setup_admin')}</h5>
         <div className="form-group row">
           <label className="col-sm-2 col-form-label" htmlFor="username">
@@ -161,13 +161,11 @@ export class Setup extends Component<any, State> {
     );
   }
 
-  handleRegisterSubmit(i: Setup, event: any) {
+  handleRegisterSubmit = (event: any) => {
     event.preventDefault();
-    i.state.userLoading = true;
-    i.setState(i.state);
-    event.preventDefault();
-    WebSocketService.Instance.register(i.state.userForm);
-  }
+    this.setState({ userLoading: true });
+    WebSocketService.Instance.register(this.state.userForm);
+  };
 
   handleRegisterUsernameChange(i: Setup, event: any) {
     i.state.userForm.username = event.target.value;
@@ -194,16 +192,19 @@ export class Setup extends Component<any, State> {
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
       this.setState({
-        userLoading: false
+        userLoading: false,
       });
     } else if (res.op == UserOperation.Register) {
       let data = res.data as LoginResponse;
-      this.setState({
-        userLoading: false,
-        doneRegisteringUser: true
-      }, () => {
-        UserService.Instance.login(data)
-      });
+      this.setState(
+        {
+          userLoading: false,
+          doneRegisteringUser: true,
+        },
+        () => {
+          UserService.Instance.login(data);
+        }
+      );
     } else if (res.op == UserOperation.CreateSite) {
       this.props.history.push('/');
     }

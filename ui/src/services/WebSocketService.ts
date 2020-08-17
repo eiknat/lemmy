@@ -56,6 +56,7 @@ import {
   EditCommunitySettingsForm,
   GetUserTagForm,
   SetUserTagForm,
+  MarkPrivateMessageReadForm,
 } from '../interfaces';
 import { UserService } from './';
 import { i18n } from '../i18next';
@@ -346,6 +347,13 @@ export class WebSocketService {
     this.ws.send(this.wsSendWrapper(UserOperation.EditPrivateMessage, form));
   }
 
+  public markPrivateMessageRead(form: MarkPrivateMessageReadForm) {
+    this.setAuth(form);
+    this.ws.send(
+      this.wsSendWrapper(UserOperation.MarkPrivateMessageAsRead, form)
+    );
+  }
+
   public getPrivateMessages(form: GetPrivateMessagesForm) {
     this.setAuth(form);
     this.ws.send(this.wsSendWrapper(UserOperation.GetPrivateMessages, form));
@@ -420,7 +428,7 @@ export class WebSocketService {
     return JSON.stringify(send);
   }
 
-  private setAuth(obj: any, throwErr: boolean = true) {
+  private setAuth(obj: any, throwErr = true) {
     obj.auth = UserService.Instance.auth;
     if (obj.auth == null && throwErr) {
       toast(i18n.t('not_logged_in'), 'danger');
