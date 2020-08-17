@@ -31,12 +31,11 @@ import {
   toast,
   randomStr,
   setupTippy,
-  hostname,
+  // hostname,
   pictrsDeleteToast,
   validTitle,
   isPostChanged,
 } from '../utils';
-// import Choices from 'choices.js';
 import { i18n } from '../i18next';
 import { cleanURL } from '../clean-url';
 import { Icon } from './icon';
@@ -49,7 +48,6 @@ import {
   ComboboxPopover,
   ComboboxList,
   ComboboxOption,
-  ComboboxOptionText,
 } from '@reach/combobox';
 import '@reach/combobox/styles.css';
 import { Button } from 'theme-ui';
@@ -58,13 +56,13 @@ export const MAX_POST_TITLE_LENGTH = 160;
 export const MAX_POST_BODY_LENGTH = 20000;
 export const MAX_COMMENT_LENGTH = 10000;
 
-function CommunityInput({ communities, onSelect }) {
+function CommunityInput({ communities, onSelect }: any) {
   const [value, setValue] = useState('');
   const results = matchSorter(communities, value, {
-    keys: [item => `${item.name}`],
+    keys: [(item: Community) => `${item.name}`],
   });
 
-  function handleChange(e) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setValue(e.target.value);
   }
 
@@ -134,17 +132,17 @@ interface PostFormState {
   crosspostCommunityId?: number;
 }
 
-export const TextAreaWithCounter = ({ maxLength, value, ...props }) => {
+export const TextAreaWithCounter = ({ maxLength, value = '', ...props }: { value: string, maxLength: number } & React.HTMLProps<HTMLTextAreaElement>) => {
   const characterLimitExceeded = value && value.length > maxLength;
   return (
     <>
       <textarea value={value || ''} {...props} />
-      {props.value && (
+      {value && (
         <div className="mt-2">
           <span
             style={{ color: characterLimitExceeded ? 'var(--red)' : 'inherit' }}
           >
-            {props.value.length.toLocaleString()}{' '}
+            {value.length.toLocaleString()}{' '}
           </span>{' '}
           / {maxLength.toLocaleString()}
         </div>
@@ -626,7 +624,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     this.setState(this.state);
   }
 
-  handlePostCommunityChange = community_id => {
+  handlePostCommunityChange = (community_id: number) => {
     this.setState({ postForm: { ...this.state.postForm, community_id } });
   };
 

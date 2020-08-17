@@ -1031,7 +1031,7 @@ class BaseUser extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleUserSettingsThemeChange = value => {
+  handleUserSettingsThemeChange = (value: string) => {
     changeTheme(value);
     this.setState({
       userSettingsForm: { ...this.state.userSettingsForm, theme: value },

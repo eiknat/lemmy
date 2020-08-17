@@ -80,23 +80,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     siteLoading: true,
   };
 
-  state = {
-    isLoggedIn: false,
-    unreadCount: 0,
-    replies: [],
-    mentions: [],
-    messages: [],
-    expanded: false,
-    siteName: undefined,
-    version: undefined,
-    admins: [],
-    sitemods: [],
-    searchParam: '',
-    toggleSearch: false,
-    creatingCommunitiesEnabled: false,
-    communityDropdownShown: false,
-    siteLoading: false,
-  };
+  state = this.emptyState;
 
   componentDidMount() {
     // Subscribe to user changes

@@ -114,7 +114,7 @@ const VoteButtons = ({
   enableDownvotes,
   score,
   pointsTippy,
-}) => (
+}: any) => (
   <>
     <button
       className={`btn-animate btn btn-link p-0 ${

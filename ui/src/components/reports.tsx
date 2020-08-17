@@ -128,13 +128,13 @@ export class BaseReports extends Component<any, ReportsState> {
     });
   }
 
-  fetchReportCount(communityId) {
+  fetchReportCount(communityId: number) {
     WebSocketService.Instance.getReportCount({
       community: communityId,
     });
   }
 
-  fetchCommunity(communityId, communityName) {
+  fetchCommunity(communityId: number, communityName: string) {
     WebSocketService.Instance.getCommunity({
       id: communityId,
       name: communityName,

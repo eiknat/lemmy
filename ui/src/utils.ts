@@ -1098,6 +1098,9 @@ export const doesUserModerateCommunity = ({
 export const getAllUserModeratedCommunities = ({
   moderatorId,
   siteModerators,
+}: {
+  moderatorId: number
+  siteModerators: CommunityModsState | null
 }) => {
   return Object.keys(siteModerators).reduce((agg, communityId) => {
     if (

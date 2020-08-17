@@ -21,7 +21,7 @@
     "jsx": "react"
   },
   "include": [
-    "src", "public/assets"
+    "src", "public/assets", "types.d.ts"
   ],
   "exclude": ["node_modules", "**/*.spec.ts", "src/components/welcome.tsx"]
 }

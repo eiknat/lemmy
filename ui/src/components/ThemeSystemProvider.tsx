@@ -5,12 +5,12 @@ import { themes, variants } from '../theme';
 
 interface ThemeSystemState {
   currentTheme: string;
-  setCurrentTheme: (string) => void;
+  setCurrentTheme: (name: string) => void;
 }
 
 const ThemeSystem = createContext({} as ThemeSystemState);
 
-function ThemeSystemProvider({ children, initialTheme = 'chapo' }) {
+function ThemeSystemProvider({ children, initialTheme = 'chapo' }: { children: React.ReactNode,initialTheme?: string }) {
   console.log({ initialTheme });
   const [currentTheme, setCurrentTheme] = useState(initialTheme);
 
@@ -26,7 +26,7 @@ function ThemeSystemProvider({ children, initialTheme = 'chapo' }) {
   }, []);
 
   useEffect(() => {
-    function handleThemeChange(e) {
+    function handleThemeChange(e: any) {
       if (Object.keys(themes).includes(e.detail)) {
         setCurrentTheme(e.detail);
       } else {
