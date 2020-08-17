@@ -466,7 +466,7 @@ export class BaseReports extends Component<any, ReportsState> {
       community_id,
       post_id,
       id,
-    } = this.state.currentRemoveDialog;
+    } = this.state.currentRemoveDialog as CommentReport;
 
     const form: CommentForm = {
       content: comment_text,
@@ -493,13 +493,8 @@ export class BaseReports extends Component<any, ReportsState> {
   handleRemovePostSubmit() {
     event.preventDefault();
 
-    const {
-      post_name,
-      community_id,
-      creator_id,
-      post_id,
-      id,
-    } = this.state.currentRemoveDialog;
+    const { post_name, community_id, creator_id, post_id, id } = this.state
+      .currentRemoveDialog as PostReport;
 
     let form: PostForm = {
       name: post_name,

@@ -339,7 +339,7 @@ class Main extends Component<any, MainState> {
                 <li className="list-inline-item-action">
                   <span
                     className="pointer"
-                    onClick={linkEvent(this, this.handleEditClick)}
+                    onClick={this.handleEditClick}
                     data-tippy-content={i18n.t('edit')}
                   >
                     <Icon name="edit" />
@@ -628,11 +628,11 @@ class Main extends Component<any, MainState> {
     }));
   }
 
-  handleEditClick(i: Main) {
+  handleEditClick = () => {
     this.setState({
       showEditSite: true,
     });
-  }
+  };
 
   handleEditCancel() {
     this.setState({
@@ -716,6 +716,7 @@ class Main extends Component<any, MainState> {
         this.props.history.push('/setup');
       } else {
         console.log('data.site is missing', data.site);
+        console.log({ siteData: data.site });
         this.setState(
           {
             siteRes: {

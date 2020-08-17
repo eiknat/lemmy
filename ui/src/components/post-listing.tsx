@@ -248,7 +248,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
     );
   }
 
-  getImage(thumbnail: boolean = false) {
+  getImage(thumbnail = false) {
     let post = this.props.post;
     if (isImage(post.url)) {
       if (post.url.includes('pictrs')) {
@@ -322,7 +322,7 @@ class BasePostListing extends Component<PostListingProps, PostListingState> {
         return (
           <div className="embed-responsive embed-responsive-16by9">
             <video
-              playsinline
+              playsInline
               muted
               loop
               controls

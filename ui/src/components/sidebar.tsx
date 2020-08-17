@@ -183,7 +183,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
                   <li className="list-inline-item-action">
                     <span
                       className="pointer"
-                      onClick={linkEvent(this, this.handleEditClick)}
+                      onClick={this.handleEditClick}
                       data-tippy-content={i18n.t('edit')}
                     >
                       <Icon name="edit" />
@@ -212,25 +212,26 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
                   )}
                 </>
               )}
-              {this.canAdmin || this.canSitemod && (
-                <li className="list-inline-item">
-                  {!this.props.community.removed ? (
-                    <span
-                      className="pointer"
-                      onClick={linkEvent(this, this.handleModRemoveShow)}
-                    >
-                      {i18n.t('remove')}
-                    </span>
-                  ) : (
-                    <span
-                      className="pointer"
-                      onClick={linkEvent(this, this.handleModRemoveSubmit)}
-                    >
-                      {i18n.t('restore')}
-                    </span>
-                  )}
-                </li>
-              )}
+              {this.canAdmin ||
+                (this.canSitemod && (
+                  <li className="list-inline-item">
+                    {!this.props.community.removed ? (
+                      <span
+                        className="pointer"
+                        onClick={linkEvent(this, this.handleModRemoveShow)}
+                      >
+                        {i18n.t('remove')}
+                      </span>
+                    ) : (
+                      <span
+                        className="pointer"
+                        onClick={linkEvent(this, this.handleModRemoveSubmit)}
+                      >
+                        {i18n.t('restore')}
+                      </span>
+                    )}
+                  </li>
+                ))}
             </ul>
             {this.state.showRemoveDialog && (
               <form onSubmit={linkEvent(this, this.handleModRemoveSubmit)}>
@@ -244,7 +245,7 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
                     className="form-control mr-2"
                     placeholder={i18n.t('optional')}
                     value={this.state.removeReason}
-                    onInput={linkEvent(this, this.handleModRemoveReasonChange)}
+                    onInput={this.handleModRemoveReasonChange}
                   />
                 </div>
                 {/* TODO hold off on expires for now */}
@@ -306,20 +307,17 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
     );
   }
 
-  handleEditClick(i: Sidebar) {
-    i.state.showEdit = true;
-    i.setState(i.state);
-  }
+  handleEditClick = () => {
+    this.setState({ showEdit: true });
+  };
 
-  handleEditCommunity() {
-    this.state.showEdit = false;
-    this.setState(this.state);
-  }
+  handleEditCommunity = () => {
+    this.setState({ showEdit: false });
+  };
 
-  handleEditCancel() {
-    this.state.showEdit = false;
-    this.setState(this.state);
-  }
+  handleEditCancel = () => {
+    this.setState({ showEdit: false });
+  };
 
   handleDeleteClick(i: Sidebar) {
     event.preventDefault();
@@ -378,22 +376,21 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
     );
   }
 
-  handleModRemoveShow(i: Sidebar) {
-    i.state.showRemoveDialog = true;
-    i.setState(i.state);
-  }
+  handleModRemoveShow = () => {
+    // i.state.showRemoveDialog = true;
+    this.setState({ showRemoveDialog: true });
+  };
 
-  handleModRemoveReasonChange(i: Sidebar, event: any) {
-    i.state.removeReason = event.target.value;
-    i.setState(i.state);
-  }
+  handleModRemoveReasonChange = (event: any) => {
+    this.setState({ removeReason: event.target.value });
+  };
 
   handleModRemoveExpiresChange(i: Sidebar, event: any) {
     i.state.removeExpires = event.target.value;
     i.setState(i.state);
   }
 
-  handleModRemoveSubmit(i: Sidebar) {
+  handleModRemoveSubmit = (i: Sidebar) => {
     event.preventDefault();
     let deleteForm: CommunityFormI = {
       name: i.props.community.name,
@@ -408,7 +405,6 @@ export class Sidebar extends Component<SidebarProps, SidebarState> {
     };
     WebSocketService.Instance.editCommunity(deleteForm);
 
-    i.state.showRemoveDialog = false;
-    i.setState(i.state);
-  }
+    this.setState({ showRemoveDialog: false });
+  };
 }

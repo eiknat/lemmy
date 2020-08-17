@@ -4,6 +4,7 @@
     "browser": true
   },
   "plugins": [
+    "@typescript-eslint",
     "jane"
   ],
   "settings": {
@@ -14,7 +15,8 @@
   "extends": [
     "plugin:jane/recommended",
     "plugin:jane/react",
-    "plugin:jane/typescript"
+    "plugin:jane/typescript",
+    "plugin:@typescript-eslint/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {

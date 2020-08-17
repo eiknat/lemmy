@@ -97,7 +97,6 @@ export class Post extends Component<any, PostState> {
         number_of_communities: undefined,
         enable_create_communities: undefined,
         enable_downvotes: undefined,
-        enable_create_communities: undefined,
         open_registration: undefined,
         enable_nsfw: undefined,
       },
@@ -105,13 +104,12 @@ export class Post extends Component<any, PostState> {
     },
   };
 
-  state = this.emptyState
+  state = this.emptyState;
 
   // constructor(props: any, context: any) {
   //   super(props, context);
 
   //   this.state = this.emptyState;
-
 
   // }
 
@@ -400,7 +398,7 @@ export class Post extends Component<any, PostState> {
     return tree;
   }
 
-  setDepth(node: CommentNodeI, i: number = 0): void {
+  setDepth(node: CommentNodeI, i = 0): void {
     for (let child of node.children) {
       child.comment.depth = i;
       this.setDepth(child, i + 1);

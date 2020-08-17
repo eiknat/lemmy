@@ -8,7 +8,7 @@ import { useThemeSystem } from './components/ThemeSystemProvider';
 
 const { dark, bulma, tailwind, ...remainingThemes } = allThemes;
 
-export const variants = {
+export const variants: any = {
   buttons: {
     primary: {
       color: 'background',
@@ -89,7 +89,7 @@ const defaultTheme: ThemeProviderProps<Theme> = {
       bg: 'primary',
       '&:hover': {
         bg: 'primary',
-      }
+      },
     },
     secondary: {
       ...variants.buttons.secondary,

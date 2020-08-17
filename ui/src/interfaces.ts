@@ -855,7 +855,7 @@ export interface GetSiteResponse {
   sitemods: Array<UserView>;
   banned: Array<UserView>;
   online: number;
-  version: string;
+  version?: string;
   my_user?: User;
 }
 
