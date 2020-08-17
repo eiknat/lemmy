@@ -16,6 +16,7 @@
     "@pika/react": "^16.13.1",
     "@pika/react-dom": "^16.13.1",
     "@reach/combobox": "^0.10.5",
+    "@reach/menu-button": "^0.10.5",
     "@theme-ui/color": "^0.3.1",
     "@theme-ui/presets": "^0.3.0",
     "@types/autosize": "^3.0.7",
@@ -70,7 +71,7 @@
   "devDependencies": {
     "@babel/core": "^7.11.1",
     "@storybook/addon-info": "^5.3.19",
-    "@storybook/react": "^5.3.19",
+    "@storybook/react": "^6.0.12",
     "@types/jest": "^26.0.8",
     "@types/node-fetch": "^2.5.7",
     "@typescript-eslint/eslint-plugin": "^3.9.0",

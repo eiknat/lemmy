@@ -764,3 +764,7 @@ button:hover [type="button"]:hover {
     /* flex-direction: column-re; */
   }
 }
+
+[data-reach-menu-item][data-selected] {
+  background: #666;
+}

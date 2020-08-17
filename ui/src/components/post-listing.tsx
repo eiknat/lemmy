@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 import { WebSocketService, UserService } from '../services';
 import {
@@ -147,115 +147,138 @@ const VoteButtons = ({
   </>
 );
 
-// function MobilePostListing({
-//   post,
-//   my_vote,
-//   handlePostLike,
-//   handlePostDisLike,
-//   enableDownvotes,
-//   score,
-//   pointsTippy,
-//   localPostSaved,
-//   handleSavePostClick,
-//   thumbnail,
-// }) {
-//   console.log({ post });
-//   return (
-//     <Flex css={{ flexDirection: 'column' }}>
-//       <Heading as="h5" mb={1} color="text">
-//         {post.name}
-//       </Heading>
-//       <Box>
-//         <span> {i18n.t('to')} </span>
-//         <CommunityLink
-//           community={{
-//             name: post.community_name,
-//             id: post.community_id,
-//             local: post.community_local,
-//             actor_id: post.community_actor_id,
-//           }}
-//         />
-//         <span> {i18n.t('by')} </span>
-//         <UserListing
-//           user={{
-//             name: post.creator_name,
-//             avatar: post.creator_avatar,
-//             id: post.creator_id,
-//             local: post.creator_local,
-//             actor_id: post.creator_actor_id,
-//           }}
-//         />
-//         <span>
-//           {' '}
-//           - <MomentTime data={post} />
-//         </span>
-//       </Box>
-//       {/* {thumbnail && thumbnail()} */}
-//       {isImage(post.url) && (
-//         <img className="img-fluid my-2" alt={post.name} src={post.url} />
-//       )}
-//       {post.body && (
-//         <Text
-//           css={{
-//             border: '1px solid rgb(68, 68, 68)',
-//             padding: '8px',
-//             borderRadius: '4px',
-//           }}
-//           my={2}
-//         >
-//           {post.body}
-//         </Text>
-//       )}
-//       <Flex css={{ alignItems: 'center' }} mt={3}>
-//         <Button
-//           onClick={handlePostLike}
-//           p={2}
-//           variant="muted"
-//           color={my_vote === 1 ? '#fffc00' : 'inherit'}
-//         >
-//           <Icon name="upvote" className="icon upvote" />
-//         </Button>
-//         <Box mx={2}>{score}</Box>
-//         <Button
-//           disabled={!enableDownvotes}
-//           onClick={handlePostDisLike}
-//           p={2}
-//           variant="muted"
-//           color={my_vote === -1 ? '#dd17b9' : 'inherit'}
-//         >
-//           <Icon name="downvote" className="icon downvote" />
-//         </Button>
-//         <Box mx={3}>
-//           <Button variant="muted"
-//             as={Link}
-//             p={2}
-//             title={i18n.t('number_of_comments', {
-//               count: post.number_of_comments,
-//             })}
-//             to={`/post/${post.id}`}
-//           >
-//             <Icon name="comment" className="icon mr-1" />
-//             {post.number_of_comments}
-//           </Button>
-//         </Box>
-//         <Button
-//           variant="muted"
-//           p={2}
-//           onClick={handleSavePostClick}
-//           data-tippy-content={post.saved ? i18n.t('unsave') : i18n.t('save')}
-//         >
-//           <Icon
-//             name={localPostSaved ? 'star' : 'starOutline'}
-//             className={`icon icon-inline ${localPostSaved && 'text-warning'}`}
-//           />
-//         </Button>
-//         <Button mx={2} p={2} variant="muted" css={{ marginLeft: 'auto' }}>
-//           <Icon name="more" />
-//         </Button>
-//       </Flex>
-//     </Flex>
-//   );
-// }
+const MobilePostListing = ({
+  post,
+  my_vote,
+  handlePostLike,
+  handlePostDisLike,
+  enableDownvotes,
+  score,
+  pointsTippy,
+  localPostSaved,
+  handleSavePostClick,
+  thumbnail,
+  handleReportPost,
+}) => {
+  console.log({ post })
+  const [actionsVisible, setActionsVisible] = useState(false);
+  return (
+    <Flex css={{ flexDirection: 'column' }}>
+      <Heading as="h5" mb={1} color="text">
+        {post.name}
+      </Heading>
+      <Box>
+        <UserListing
+          user={{
+            name: post.creator_name,
+            avatar: post.creator_avatar,
+            id: post.creator_id,
+            local: post.creator_local,
+            actor_id: post.creator_actor_id,
+          }}
+        />
+        {/* {isAdmin && (
+          <RoleBadge role="admin" tooltipText={i18n.t('admin')}>
+            {i18n.t('admin')[0]}
+          </RoleBadge>
+        )}
+        {isMod && !isAdmin && (
+          <RoleBadge role="mod" tooltipText={i18n.t('mod')}>
+            {i18n.t('mod')[0]}
+          </RoleBadge>
+        )} */}
+        {post.creator_tags?.pronouns ? (
+          <span className="badge mx-1 comment-badge pronouns-badge">
+            {post.creator_tags.pronouns.split(',').join('/')}
+          </span>
+        ) : null}
+        <span> {i18n.t('to')} </span>
+        <CommunityLink
+          community={{
+            name: post.community_name,
+            id: post.community_id,
+            local: post.community_local,
+            actor_id: post.community_actor_id,
+          }}
+        />
+        <span>
+          {' '}
+          - <MomentTime data={post} />
+        </span>
+      </Box>
+      {/* {thumbnail && thumbnail()} */}
+      {isImage(post.url) && (
+        <img className="img-fluid my-2" alt={post.name} src={post.url} />
+      )}
+      {post.body && (
+        <Text
+          css={{
+            border: '1px solid rgb(68, 68, 68)',
+            padding: '8px',
+            borderRadius: '4px',
+          }}
+          my={3}
+        >
+          {post.body}
+        </Text>
+      )}
+      <Flex css={{ alignItems: 'center' }} mt={3}>
+        <Button
+          onClick={handlePostLike}
+          p={2}
+          variant="muted"
+          color={my_vote === 1 ? '#fffc00' : 'inherit'}
+        >
+          <Icon name="upvote" className="icon upvote" />
+        </Button>
+        <Box mx={3}>{score}</Box>
+        <Button
+          disabled={!enableDownvotes}
+          onClick={handlePostDisLike}
+          p={2}
+          variant="muted"
+          color={my_vote === -1 ? '#dd17b9' : 'inherit'}
+        >
+          <Icon name="downvote" className="icon downvote" />
+        </Button>
+        <Box mx={3}>
+          <Button variant="muted"
+            as={Link}
+            p={2}
+            title={i18n.t('number_of_comments', {
+              count: post.number_of_comments,
+            })}
+            to={`/post/${post.id}`}
+          >
+            <Icon name="comment" className="icon mr-1" />
+            {post.number_of_comments}
+          </Button>
+        </Box>
+        <Button
+          variant="muted"
+          p={2}
+          onClick={handleSavePostClick}
+          data-tippy-content={post.saved ? i18n.t('unsave') : i18n.t('save')}
+        >
+          <Icon
+            name={localPostSaved ? 'star' : 'starOutline'}
+            className={`icon icon-inline ${localPostSaved && 'text-warning'}`}
+          />
+        </Button>
+        <Button onClick={() => setActionsVisible(prev => !prev)} mx={2} p={2} variant="muted" css={{ marginLeft: 'auto' }}>
+          <Icon name="more" />
+        </Button>
+      </Flex>
+      {actionsVisible && (
+        <Flex my={2}>
+          <Button variant="muted" onClick={handleReportPost}>
+            <Icon name="report" />
+          </Button>
+        </Flex>
+      )}
+    </Flex>
+  );
+}
 
 class BasePostListing extends Component<
   PostListingProps & RouteComponentProps,
@@ -490,10 +513,11 @@ class BasePostListing extends Component<
     }
   };
 
-  listingActions() {
+  listingActions = () => {
     let post = this.props.post;
 
     const isMobile = window.innerWidth < 768;
+
     return (
       <div className="details col-12">
         <ul className="list-inline mb-0 text-muted small">
@@ -584,96 +608,8 @@ class BasePostListing extends Component<
             </>
           </ul>
         )}
-        {this.state.showRemoveDialog && (
-          <form className="form-inline" onSubmit={this.handleModRemoveSubmit}>
-            <input
-              type="text"
-              className="form-control mr-2"
-              placeholder={i18n.t('reason')}
-              value={this.state.removeReason}
-              onChange={this.handleModRemoveReasonChange}
-            />
-            <button type="submit" className="btn btn-secondary">
-              {i18n.t('remove_post')}
-            </button>
-          </form>
-        )}
-        {this.state.showBanDialog && (
-          <form onSubmit={this.handleModBanBothSubmit}>
-            <div className="form-group row">
-              <label className="col-form-label" htmlFor="post-listing-reason">
-                {i18n.t('reason')}
-              </label>
-              <input
-                type="text"
-                id="post-listing-reason"
-                className="form-control mr-2"
-                placeholder={i18n.t('reason')}
-                value={this.state.banReason}
-                onChange={this.handleModBanReasonChange}
-              />
-            </div>
-            {/* TODO hold off on expires until later */}
-            {/* <div className="form-group row"> */}
-            {/*   <label className="col-form-label">Expires</label> */}
-            {/*   <input type="date" className="form-control mr-2" placeholder={i18n.t('expires')} value={this.state.banExpires} onChange={linkEvent(this, this.handleModBanExpiresChange)} /> */}
-            {/* </div> */}
-            <div className="form-group row">
-              <button type="submit" className="btn btn-secondary">
-                {i18n.t('ban')} {post.creator_name}
-              </button>
-            </div>
-          </form>
-        )}
-        {this.state.showReportDialog && (
-          <form
-            className="mt-2"
-            onSubmit={linkEvent(this, this.handleReportSubmit)}
-          >
-            <div className="form-group row">
-              <label
-                className="col-form-label"
-                htmlFor="post-listing-report-reason"
-              >
-                {i18n.t('reason')}
-              </label>
-              <input
-                type="text"
-                id="post-listing-report-reason"
-                className="form-control mr-2"
-                placeholder={i18n.t('reason')}
-                value={this.state.reportReason}
-                onChange={linkEvent(this, this.handleReportReasonChange)}
-                maxLength={600}
-              />
-            </div>
-            <div className="form-group row">
-              <button type="submit" className="btn btn-secondary">
-                {i18n.t('submit_report')}
-              </button>
-            </div>
-            <div className="row mt-1">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={linkEvent(this, this.handleReportPost)}
-              >
-                {i18n.t('cancel')}
-              </button>
-            </div>
-          </form>
-        )}
+        {this.listingForms()}
         <div className="post-listing-details">
-          {/* <div className="mobile-vote-bar">
-                    <VoteButtons
-                        my_vote={this.state.my_vote}
-                        enableDownvotes={this.props.enableDownvotes}
-                        score={this.state.score}
-                        handlePostDisLike={linkEvent(this, this.handlePostDisLike)}
-                        handlePostLike={linkEvent(this, this.handlePostLike)}
-                        pointsTippy={this.pointsTippy}
-                      />
-                  </div> */}
           <Link
             className="text-muted"
             title={i18n.t('number_of_comments', {
@@ -755,6 +691,87 @@ class BasePostListing extends Component<
     );
   }
 
+  listingForms = () => {
+      return (
+        <>
+          {this.state.showRemoveDialog && (
+          <form className="form-inline" onSubmit={this.handleModRemoveSubmit}>
+            <input
+              type="text"
+              className="form-control mr-2"
+              placeholder={i18n.t('reason')}
+              value={this.state.removeReason}
+              onChange={this.handleModRemoveReasonChange}
+            />
+            <button type="submit" className="btn btn-secondary">
+              {i18n.t('remove_post')}
+            </button>
+          </form>
+        )}
+        {this.state.showBanDialog && (
+          <form onSubmit={this.handleModBanBothSubmit}>
+            <div className="form-group row">
+              <label className="col-form-label" htmlFor="post-listing-reason">
+                {i18n.t('reason')}
+              </label>
+              <input
+                type="text"
+                id="post-listing-reason"
+                className="form-control mr-2"
+                placeholder={i18n.t('reason')}
+                value={this.state.banReason}
+                onChange={this.handleModBanReasonChange}
+              />
+            </div>
+            <div className="form-group row">
+              <button type="submit" className="btn btn-secondary">
+                {i18n.t('ban')} {post.creator_name}
+              </button>
+            </div>
+          </form>
+        )}
+        {this.state.showReportDialog && (
+          <form
+            className="mt-2"
+            onSubmit={linkEvent(this, this.handleReportSubmit)}
+          >
+            <div className="form-group row">
+              <label
+                className="col-form-label"
+                htmlFor="post-listing-report-reason"
+              >
+                {i18n.t('reason')}
+              </label>
+              <input
+                type="text"
+                id="post-listing-report-reason"
+                className="form-control mr-2"
+                placeholder={i18n.t('reason')}
+                value={this.state.reportReason}
+                onChange={linkEvent(this, this.handleReportReasonChange)}
+                maxLength={600}
+              />
+            </div>
+            <div className="form-group row">
+              <button type="submit" className="btn btn-secondary">
+                {i18n.t('submit_report')}
+              </button>
+            </div>
+            <div className="row mt-1">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={linkEvent(this, this.handleReportPost)}
+              >
+                {i18n.t('cancel')}
+              </button>
+            </div>
+          </form>
+        )}
+        </>
+      )
+    }
+
   listing = () => {
     let post = this.props.post;
 
@@ -762,6 +779,7 @@ class BasePostListing extends Component<
 
     // if (isMobile) {
     //   return (
+    //     <>
     //     <MobilePostListing
     //       my_vote={this.state.my_vote}
     //       post={post}
@@ -773,7 +791,12 @@ class BasePostListing extends Component<
     //       thumbnail={this.thumbnail}
     //       localPostSaved={this.state.localPostSaved}
     //       handleSavePostClick={this.handleSavePostClick}
-    //     />
+    //       handleReportPost={this.handleReportPost}
+    //       />
+    //       <Box p={2}>
+    //         {this.listingForms()}
+    //       </Box>
+    //     </>
     //   );
     // }
 
