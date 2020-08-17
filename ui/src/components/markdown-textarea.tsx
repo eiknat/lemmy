@@ -102,7 +102,6 @@ export class MarkdownTextArea extends Component<
       if (this.props.replyType) {
         this.props.onReplyCancel();
       }
-
     }
   }
 
