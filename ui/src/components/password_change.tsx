@@ -122,8 +122,7 @@ export class PasswordChange extends Component<any, State> {
 
   handlePasswordChangeSubmit(i: PasswordChange, event: any) {
     event.preventDefault();
-    i.state.loading = true;
-    i.setState(i.state);
+    this.setState({ loading: true });
 
     WebSocketService.Instance.passwordChange(i.state.passwordChangeForm);
   }
@@ -133,8 +132,7 @@ export class PasswordChange extends Component<any, State> {
     let res = wsJsonToRes(msg);
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
-      this.state.loading = false;
-      this.setState(this.state);
+      this.setState({ loading: false });
       return;
     } else if (res.op == UserOperation.PasswordChange) {
       let data = res.data as LoginResponse;

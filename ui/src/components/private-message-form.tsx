@@ -229,8 +229,7 @@ export class PrivateMessageForm extends Component<
         i.state.privateMessageForm
       );
     }
-    i.state.loading = true;
-    i.setState(i.state);
+    this.setState({ loading: true });
   }
 
   handleRecipientChange(i: PrivateMessageForm, event: any) {
@@ -247,38 +246,39 @@ export class PrivateMessageForm extends Component<
     i.props.onCancel();
   }
 
-  handlePreviewToggle(i: PrivateMessageForm, event: any) {
+  handlePreviewToggle = (i: PrivateMessageForm, event: any) => {
     event.preventDefault();
-    i.state.previewMode = !i.state.previewMode;
-    i.setState(i.state);
-  }
+    // i.state.previewMode = !i.state.previewMode;
+    this.setState({ previewMode: !this.state.previewMode });
+  };
 
-  handleShowDisclaimer(i: PrivateMessageForm) {
-    i.state.showDisclaimer = !i.state.showDisclaimer;
-    i.setState(i.state);
-  }
+  handleShowDisclaimer = () => {
+    this.setState({ showDisclaimer: !this.state.showDisclaimer });
+  };
 
   parseMessage(msg: WebSocketJsonResponse) {
     let res = wsJsonToRes(msg);
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
-      this.state.loading = false;
-      this.setState(this.state);
+      this.setState({ loading: false });
       return;
     } else if (res.op == UserOperation.EditPrivateMessage) {
       let data = res.data as PrivateMessageResponse;
-      this.state.loading = false;
+      this.setState({ loading: false });
       this.props.onEdit(data.message);
     } else if (res.op == UserOperation.GetUserDetails) {
       let data = res.data as UserDetailsResponse;
-      this.state.recipient = data.user;
-      this.state.privateMessageForm.recipient_id = data.user.id;
-      this.setState(this.state);
+      this.setState({
+        recipient: data.user,
+        privateMessageForm: {
+          ...this.state.privateMessageForm,
+          recipient_id: data.user.id,
+        },
+      });
     } else if (res.op == UserOperation.CreatePrivateMessage) {
       let data = res.data as PrivateMessageResponse;
-      this.state.loading = false;
+      this.setState({ loading: false });
       this.props.onCreate(data.message);
-      this.setState(this.state);
     }
   }
 }

@@ -456,7 +456,7 @@ export class Modlog extends Component<any, ModlogState> {
       return;
     } else if (res.op == UserOperation.GetModlog) {
       let data = res.data as GetModlogResponse;
-      this.state.loading = false;
+      this.setState({ loading: false });
       window.scrollTo(0, 0);
       this.setCombined(data);
     } else if (res.op == UserOperation.GetSite) {
