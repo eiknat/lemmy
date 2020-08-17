@@ -130,11 +130,16 @@ export const themes = {
 
 // console.log({ themes })
 
-export function ThemeSelector({ value, onChange }) {
+interface ThemeSelectorProps {
+  value: string;
+  onChange: (name: string) => void;
+}
+
+export function ThemeSelector({ value, onChange }: ThemeSelectorProps) {
   const { setCurrentTheme } = useThemeSystem();
   // console.log({ context });
 
-  function handleThemeChange(e) {
+  function handleThemeChange(e: React.ChangeEvent<HTMLSelectElement>) {
     setCurrentTheme(e.target.value);
     onChange(e.target.value);
   }

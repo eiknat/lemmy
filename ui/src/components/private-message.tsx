@@ -55,8 +55,6 @@ export class PrivateMessage extends Component<
   }
 
   get mine(): boolean {
-    console.log(UserService.Instance.user?.id);
-    console.log(this.props.privateMessage.creator_id);
     return (
       UserService.Instance.user?.id == this.props.privateMessage.creator_id
     );
