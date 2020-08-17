@@ -70,7 +70,18 @@ export enum UserOperation {
   SetUserTag,
   GetCaptcha,
   GetCaptchaResponse,
+  MarkPrivateMessageReadForm,
+  DeletePrivateMessageForm,
+  DeleteCommentForm,
+  RemoveCommentForm,
+  DeletePostForm,
+  RemovePostForm,
+  StickyPostForm,
+  LockPostForm,
+  MarkCommentReadForm,
 }
+
+export interface GetCaptcha {}
 
 export interface GetCaptchaResponse {
   ok?: {
@@ -1158,7 +1169,8 @@ export type MessageType =
   | CreateCommentReportForm
   | CreatePostReportForm
   | GetUserTagForm
-  | SetUserTagForm;
+  | SetUserTagForm
+  | GetCaptcha;
 
 type ResponseType =
   | SiteResponse
@@ -1194,7 +1206,8 @@ type ResponseType =
   | CreatePostReportResponse
   | CommunitySettingsResponse
   | GetSiteModeratorsResponse
-  | UserTagResponse;
+  | UserTagResponse
+  | GetCaptchaResponse;
 
 export interface WebSocketResponse {
   op: UserOperation;
