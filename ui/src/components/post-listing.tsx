@@ -145,7 +145,9 @@ const VoteButtons = ({
       </button>
     )}
   </>
-);
+  );
+
+const PostActionButton = props => <Button p={2}variant="muted" bg="transparent" {...props} />
 
 const MobilePostListing = ({
   post,
@@ -164,10 +166,40 @@ const MobilePostListing = ({
   const [actionsVisible, setActionsVisible] = useState(false);
   return (
     <Flex css={{ flexDirection: 'column' }}>
-      <Heading as="h5" mb={1} color="text">
-        {post.name}
-      </Heading>
-      <Box>
+      <Link to={`/post/${post.id}`}>
+        <Heading as="h5" mb={2} color="highlight" css={{ fontWeight: 500, fontSize: '24px' }}>
+          {post.name}
+        </Heading>
+      </Link>
+      {/* {thumbnail && thumbnail()} */}
+      {isImage(post.url) && (
+        <Box className="mobile-thumbnail" my={1}>
+          <img className="img-fluid" alt={post.name} src={post.url} />
+        </Box>
+      )}
+      {post.body && (
+        <Text
+          css={{
+            // border: '1px solid rgb(68, 68, 68)',
+            // padding: '8px',
+            borderRadius: '4px',
+          }}
+          mb={2}
+        >
+          {post.body}
+        </Text>
+      )}
+      <Box css={{ fontSize: '12px'}}>
+        <span> {i18n.t('to')} </span>
+        <CommunityLink
+          community={{
+            name: post.community_name,
+            id: post.community_id,
+            local: post.community_local,
+            actor_id: post.community_actor_id,
+          }}
+        />
+        {' '}{i18n.t('by')}{' '}
         <UserListing
           user={{
             name: post.creator_name,
@@ -192,71 +224,27 @@ const MobilePostListing = ({
             {post.creator_tags.pronouns.split(',').join('/')}
           </span>
         ) : null}
-        <span> {i18n.t('to')} </span>
-        <CommunityLink
-          community={{
-            name: post.community_name,
-            id: post.community_id,
-            local: post.community_local,
-            actor_id: post.community_actor_id,
-          }}
-        />
         <span>
           {' '}
-          - <MomentTime data={post} />
+          • <MomentTime data={post} />
         </span>
       </Box>
-      {/* {thumbnail && thumbnail()} */}
-      {isImage(post.url) && (
-        <img className="img-fluid my-2" alt={post.name} src={post.url} />
-      )}
-      {post.body && (
-        <Text
-          css={{
-            border: '1px solid rgb(68, 68, 68)',
-            padding: '8px',
-            borderRadius: '4px',
-          }}
-          my={3}
-        >
-          {post.body}
-        </Text>
-      )}
       <Flex css={{ alignItems: 'center' }} mt={3}>
-        <Button
+        <PostActionButton
           onClick={handlePostLike}
-          p={2}
-          variant="muted"
           color={my_vote === 1 ? '#fffc00' : 'inherit'}
         >
           <Icon name="upvote" className="icon upvote" />
-        </Button>
-        <Box mx={3}>{score}</Box>
-        <Button
+        </PostActionButton>
+        <Box css={{ fontSize: '14px', fontWeight: 600 }} mx={2}>{score}</Box>
+        <PostActionButton
           disabled={!enableDownvotes}
           onClick={handlePostDisLike}
-          p={2}
-          variant="muted"
           color={my_vote === -1 ? '#dd17b9' : 'inherit'}
         >
           <Icon name="downvote" className="icon downvote" />
-        </Button>
-        <Box mx={3}>
-          <Button variant="muted"
-            as={Link}
-            p={2}
-            title={i18n.t('number_of_comments', {
-              count: post.number_of_comments,
-            })}
-            to={`/post/${post.id}`}
-          >
-            <Icon name="comment" className="icon mr-1" />
-            {post.number_of_comments}
-          </Button>
-        </Box>
-        <Button
-          variant="muted"
-          p={2}
+        </PostActionButton>
+        <PostActionButton
           onClick={handleSavePostClick}
           data-tippy-content={post.saved ? i18n.t('unsave') : i18n.t('save')}
         >
@@ -264,16 +252,28 @@ const MobilePostListing = ({
             name={localPostSaved ? 'star' : 'starOutline'}
             className={`icon icon-inline ${localPostSaved && 'text-warning'}`}
           />
-        </Button>
-        <Button onClick={() => setActionsVisible(prev => !prev)} mx={2} p={2} variant="muted" css={{ marginLeft: 'auto' }}>
+        </PostActionButton>
+        <Box mx={3}>
+          <PostActionButton
+            as={Link}
+            title={i18n.t('number_of_comments', {
+              count: post.number_of_comments,
+            })}
+            to={`/post/${post.id}`}
+          >
+            <Icon name="comment" className="icon mr-1" />
+            {post.number_of_comments}
+          </PostActionButton>
+        </Box>
+        <PostActionButton onClick={() => setActionsVisible(prev => !prev)} mx={2} css={{ marginLeft: 'auto' }}>
           <Icon name="more" />
-        </Button>
+        </PostActionButton>
       </Flex>
       {actionsVisible && (
         <Flex my={2}>
-          <Button variant="muted" onClick={handleReportPost}>
+          <PostActionButton onClick={handleReportPost}>
             <Icon name="report" />
-          </Button>
+          </PostActionButton>
         </Flex>
       )}
     </Flex>

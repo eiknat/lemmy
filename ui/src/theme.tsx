@@ -80,6 +80,7 @@ const defaultTheme: ThemeProviderProps<Theme> = {
     accent: '#F3B90C',
     danger: '#dc3545',
     muted: '#303030',
+    highlight: '#00BC8C',
   },
   buttons: {
     ...variants.buttons,
