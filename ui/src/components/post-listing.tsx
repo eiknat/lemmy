@@ -40,7 +40,7 @@ import {
 } from '../utils';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
-import { RoleBadge } from './comment-node';
+import { RoleBadge } from "./RoleBadge";
 import { linkEvent } from '../linkEvent';
 import { Box, Flex, Heading, Text } from 'theme-ui';
 import Button from './elements/Button';

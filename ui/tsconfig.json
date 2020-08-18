@@ -6,7 +6,7 @@
       "DOM.Iterable",
       "ESNext"
     ],
-    "types": ["node"],
+    "types": ["node", "jest"],
     "allowJs": false,
     "skipLibCheck": false,
     "esModuleInterop": false,
@@ -21,7 +21,7 @@
     "jsx": "react"
   },
   "include": [
-    "src", "public/assets", "types.d.ts"
+    "src", "public/assets", "types.d.ts", "src/setupTests.ts", "./node_modules/@testing-library/jest-dom/extend-expect.d.ts"
   ],
   "exclude": ["node_modules", "**/*.spec.ts", "src/components/welcome.tsx"]
 }

@@ -42,6 +42,7 @@ import { CommunityLink } from './community-link';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
 import { linkEvent } from '../linkEvent';
+import { RoleBadge } from './RoleBadge';
 
 interface CommentNodeState {
   showReply: boolean;
@@ -87,25 +88,6 @@ interface CommentNodeProps {
   sort?: CommentSortType;
   sortType?: SortType;
   enableDownvotes: boolean;
-}
-
-export function RoleBadge({
-  role,
-  tooltipText,
-  children,
-}: {
-  role: 'mod' | 'admin' | 'sitemod' | 'creator';
-  children: any;
-  tooltipText: string;
-}) {
-  return (
-    <div
-      className={`badge badge-light mx-1 comment-badge ${role}-badge`}
-      data-tippy-content={tooltipText}
-    >
-      {children}
-    </div>
-  );
 }
 
 export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
