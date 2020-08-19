@@ -15,7 +15,7 @@ import React, { Component, createRef } from 'react';
 import { Subscription } from 'rxjs';
 import { WebSocketService, UserService } from '../services';
 import { retryWhen, delay, take } from 'rxjs/operators';
-import { wsJsonToRes, toast } from '../utils';
+import { wsJsonToRes, toast, api } from '../utils';
 import { i18n } from '../i18next';
 import { Link } from 'react-router-dom';
 import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
@@ -70,10 +70,6 @@ export class CommunityDropdown extends Component<
     this.handleClickOutside = this.handleClickOutside.bind(this);
 
     document.addEventListener('mousedown', this.handleClickOutside);
-
-    // @TODO Refactor into an HTTP call when CORS issues are resolved
-    // const res = await fetch('http://localhost:8536/api/v1/community/list?sort=TopAll', { mode: 'no-cors', method: 'GET', headers: { 'Content-Type': 'application/json' } });
-    // const data = await res.text();
   }
 
   componentWillUnmount() {
@@ -193,13 +189,9 @@ export class CommunityDropdown extends Component<
     );
   }
 
-  fetch() {
-    let listCommunitiesForm: ListCommunitiesForm = {
-      sort: SortType[SortType.TopAll],
-      limit: this.maxLoad,
-      page: this.state.page,
-    };
-    WebSocketService.Instance.listCommunities(listCommunitiesForm);
+  async fetch() {
+    const res = await api.get('community/list?sort=TopAll');
+    this.setState({ communities: res.data.communities, loading: false });
 
     if (UserService.Instance.user) {
       let getUserDetailsForm: GetUserDetailsForm = {
@@ -297,11 +289,11 @@ export class CommunityDropdown extends Component<
       toast(i18n.t(msg.error), 'danger');
       return;
     } else if (res.op == UserOperation.ListCommunities) {
-      let data = res.data as ListCommunitiesResponse;
-      this.setState({
-        communities: data.communities,
-        loading: false,
-      });
+      // let data = res.data as ListCommunitiesResponse;
+      // this.setState({
+      //   communities: data.communities,
+      //   loading: false,
+      // });
     } else if (res.op == UserOperation.GetUserDetails) {
       let data = res.data as UserDetailsResponse;
       this.setState(

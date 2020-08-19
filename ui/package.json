@@ -6,11 +6,11 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "api-test": "jest src/api_tests/api.spec.ts",
-    "test": "jest",
     "build": "node generate_translations.js && tsc --noEmit && NODE_ENV=production vite build --base=/static/",
     "lint": "tsc --noEmit && eslint --report-unused-disable-directives --ext .js,.ts,.tsx src",
     "start": "node generate_translations.js && vite --port 4444 --open",
-    "storybook": "start-storybook -p 9009"
+    "storybook": "start-storybook -p 9009",
+    "test": "jest"
   },
   "keywords": [],
   "dependencies": {
@@ -33,6 +33,7 @@
     "@types/testing-library__jest-dom": "^5.9.2",
     "@types/theme-ui": "^0.3.6",
     "autosize": "^4.0.2",
+    "axios": "^0.19.2",
     "body-scroll-lock": "^3.0.3",
     "bootswatch": "^4.5.0",
     "choices.js": "^9.0.1",
