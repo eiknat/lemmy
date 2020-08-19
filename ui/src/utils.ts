@@ -62,7 +62,8 @@ import tippy from 'tippy.js';
 
 import { customEmojis, replaceEmojis } from './custom-emojis';
 import moment from 'moment';
-import { BASE_PATH } from './isProduction';
+import { BASE_PATH, isProduction } from './isProduction';
+import axios from 'axios';
 
 export const repoUrl = 'https://gitlab.com/chapo-sandbox/production';
 export const helpGuideUrl = '/docs/about_guide.html';
@@ -1147,3 +1148,7 @@ export function isMessageChanged(operation: UserOperation): boolean {
     operation == UserOperation.DeletePrivateMessage
   );
 }
+
+export const api = axios.create({
+  baseURL: isProduction ? '/api/v1/' : 'http://localhost:8536/api/v1/',
+});
