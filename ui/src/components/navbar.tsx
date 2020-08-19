@@ -38,6 +38,7 @@ import { i18n } from '../i18next';
 import { Icon } from './icon';
 import { CommunityDropdown } from './community-dropdown';
 import { linkEvent } from '../linkEvent';
+import { Box } from 'theme-ui';
 
 interface NavbarState {
   isLoggedIn: boolean;
@@ -177,7 +178,12 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   navbar() {
     return (
       <>
-        <nav className="container-fluid navbar navbar-expand-md navbar-light main-navbar shadow p-0 px-3">
+        <Box
+          as="nav"
+          bg="background"
+          color="text"
+          className="container-fluid navbar navbar-expand-md navbar-light main-navbar shadow p-0 px-3"
+        >
           <a className="navbar-brand" href="/">
             <img
               src={`${BASE_PATH}hexbear_head.svg`}
@@ -373,7 +379,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
               removeDropdown={() => this.showCommunityDropdown(this)}
             />
           )}
-        </nav>
+        </Box>
         {/* empty space below navbar */}
         <div className="navbar-spacer" />
       </>
