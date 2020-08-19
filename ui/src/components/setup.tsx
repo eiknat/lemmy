@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -11,6 +11,7 @@ import { WebSocketService, UserService } from '../services';
 import { wsJsonToRes, toast } from '../utils';
 import { SiteForm } from './site-form';
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
 
 interface State {
   userForm: RegisterForm;
@@ -27,8 +28,9 @@ export class Setup extends Component<any, State> {
       password: undefined,
       password_verify: undefined,
       admin: true,
+      sitemod: true,
       show_nsfw: true,
-      captcha_id: '',
+      // captcha_id: '',
     },
     doneRegisteringUser: false,
     userLoading: false,
@@ -58,9 +60,9 @@ export class Setup extends Component<any, State> {
 
   render() {
     return (
-      <div class="container">
-        <div class="row">
-          <div class="col-12 offset-lg-3 col-lg-6">
+      <div className="container">
+        <div className="row">
+          <div className="col-12 offset-lg-3 col-lg-6">
             <h3>{i18n.t('lemmy_instance_setup')}</h3>
             {!this.state.doneRegisteringUser ? (
               this.registerUser()
@@ -75,16 +77,16 @@ export class Setup extends Component<any, State> {
 
   registerUser() {
     return (
-      <form onSubmit={linkEvent(this, this.handleRegisterSubmit)}>
+      <form onSubmit={this.handleRegisterSubmit}>
         <h5>{i18n.t('setup_admin')}</h5>
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label" htmlFor="username">
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label" htmlFor="username">
             {i18n.t('username')}
           </label>
-          <div class="col-sm-10">
+          <div className="col-sm-10">
             <input
               type="text"
-              class="form-control"
+              className="form-control"
               id="username"
               value={this.state.userForm.username}
               onInput={linkEvent(this, this.handleRegisterUsernameChange)}
@@ -95,16 +97,16 @@ export class Setup extends Component<any, State> {
             />
           </div>
         </div>
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label" htmlFor="email">
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label" htmlFor="email">
             {i18n.t('email')}
           </label>
 
-          <div class="col-sm-10">
+          <div className="col-sm-10">
             <input
               type="email"
               id="email"
-              class="form-control"
+              className="form-control"
               placeholder={i18n.t('optional')}
               value={this.state.userForm.email}
               onInput={linkEvent(this, this.handleRegisterEmailChange)}
@@ -112,42 +114,42 @@ export class Setup extends Component<any, State> {
             />
           </div>
         </div>
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label" htmlFor="password">
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label" htmlFor="password">
             {i18n.t('password')}
           </label>
-          <div class="col-sm-10">
+          <div className="col-sm-10">
             <input
               type="password"
               id="password"
               value={this.state.userForm.password}
               onInput={linkEvent(this, this.handleRegisterPasswordChange)}
-              class="form-control"
+              className="form-control"
               required
             />
           </div>
         </div>
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label" htmlFor="verify-password">
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label" htmlFor="verify-password">
             {i18n.t('verify_password')}
           </label>
-          <div class="col-sm-10">
+          <div className="col-sm-10">
             <input
               type="password"
               id="verify-password"
               value={this.state.userForm.password_verify}
               onInput={linkEvent(this, this.handleRegisterPasswordVerifyChange)}
-              class="form-control"
+              className="form-control"
               required
             />
           </div>
         </div>
-        <div class="form-group row">
-          <div class="col-sm-10">
-            <button type="submit" class="btn btn-secondary">
+        <div className="form-group row">
+          <div className="col-sm-10">
+            <button type="submit" className="btn btn-secondary">
               {this.state.userLoading ? (
-                <svg class="icon icon-spinner spin">
-                  <use xlinkHref="#icon-spinner"></use>
+                <svg className="icon icon-spinner spin">
+                  <use xlinkHref="#icon-spinner" />
                 </svg>
               ) : (
                 i18n.t('sign_up')
@@ -159,13 +161,11 @@ export class Setup extends Component<any, State> {
     );
   }
 
-  handleRegisterSubmit(i: Setup, event: any) {
+  handleRegisterSubmit = (event: any) => {
     event.preventDefault();
-    i.state.userLoading = true;
-    i.setState(i.state);
-    event.preventDefault();
-    WebSocketService.Instance.register(i.state.userForm);
-  }
+    this.setState({ userLoading: true });
+    WebSocketService.Instance.register(this.state.userForm);
+  };
 
   handleRegisterUsernameChange(i: Setup, event: any) {
     i.state.userForm.username = event.target.value;
@@ -191,15 +191,20 @@ export class Setup extends Component<any, State> {
     let res = wsJsonToRes(msg);
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
-      this.state.userLoading = false;
-      this.setState(this.state);
-      return;
+      this.setState({
+        userLoading: false,
+      });
     } else if (res.op == UserOperation.Register) {
       let data = res.data as LoginResponse;
-      this.state.userLoading = false;
-      this.state.doneRegisteringUser = true;
-      UserService.Instance.login(data);
-      this.setState(this.state);
+      this.setState(
+        {
+          userLoading: false,
+          doneRegisteringUser: true,
+        },
+        () => {
+          UserService.Instance.login(data);
+        }
+      );
     } else if (res.op == UserOperation.CreateSite) {
       this.props.history.push('/');
     }

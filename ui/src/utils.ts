@@ -1,3 +1,4 @@
+// @TODO: Figure out how to do this properly with esmodules
 import 'moment/locale/es';
 import 'moment/locale/el';
 import 'moment/locale/eu';
@@ -57,10 +58,11 @@ import iterator from 'markdown-it-for-inline';
 import emojiShortName from 'emoji-short-name';
 import Toastify from 'toastify-js';
 import tippy from 'tippy.js';
-import EmojiButton from '@joeattardi/emoji-button';
+// import { EmojiButton } from '@joeattardi/emoji-button';
+
 import { customEmojis, replaceEmojis } from './custom-emojis';
-import { match } from 'assert';
 import moment from 'moment';
+import { BASE_PATH } from './isProduction';
 
 export const repoUrl = 'https://gitlab.com/chapo-sandbox/production';
 export const helpGuideUrl = '/docs/about_guide.html';
@@ -69,7 +71,7 @@ export const sortingHelpUrl = `${helpGuideUrl}#sorting`;
 export const archiveUrl = 'https://archive.is';
 
 export const postRefetchSeconds: number = 60 * 1000;
-export const fetchLimit: number = 20;
+export const fetchLimit = 20;
 export const commentFetchLimit = 15;
 export const mentionDropdownFetchLimit = 10;
 
@@ -122,11 +124,11 @@ export const themes = [
   'lux',
 ];
 
-export const emojiPicker = new EmojiButton({
-  style: 'twemoji',
-  theme: 'dark',
-  position: 'auto-start',
-});
+// export const emojiPicker = new EmojiButton({
+//   style: 'twemoji',
+//   theme: 'dark',
+//   position: 'auto-start',
+// });
 
 const DEFAULT_ALPHABET =
   'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -136,7 +138,7 @@ function getRandomCharFromAlphabet(alphabet: string): string {
 }
 
 export function randomStr(
-  idDesiredLength: number = 20,
+  idDesiredLength = 20,
   alphabet = DEFAULT_ALPHABET
 ): string {
   /**
@@ -234,7 +236,7 @@ export function canMod(
   user: User,
   modIds: Array<number>,
   creator_id: number,
-  onSelf: boolean = false
+  onSelf = false
 ): boolean {
   // You can do moderator actions only on the mods added after you.
   if (user) {
@@ -330,11 +332,7 @@ export async function getPageTitle(url: string | null) {
   return json.title;
 }
 
-export function debounce(
-  func: any,
-  wait: number = 1000,
-  immediate: boolean = false
-) {
+export function debounce(func: any, wait = 1000, immediate = false) {
   // 'private' variable for instance
   // The returned function will be able to reference this due to closure.
   // Each call to the returned function will share this common timer.
@@ -377,7 +375,7 @@ export function debounce(
 }
 
 export function getLanguage(): string {
-  let user = UserService.Instance.user;
+  let user = UserService?.Instance?.user;
   let lang = user && user.lang ? user.lang : 'browser';
 
   if (lang == 'browser') {
@@ -453,32 +451,9 @@ export function getMomentLanguage(): string {
   return lang;
 }
 
-export function setTheme(theme: string = 'darkly', loggedIn: boolean = false) {
-  // unload all the other themes
-  for (var i = 0; i < themes.length; i++) {
-    let styleSheet = document.getElementById(themes[i]);
-    if (styleSheet) {
-      styleSheet.setAttribute('disabled', 'disabled');
-    }
-  }
-
-  // if the user is not logged in, we load the default themes and let the browser decide
-  if (!loggedIn) {
-    document.getElementById('default-light').removeAttribute('disabled');
-    document.getElementById('default-dark').removeAttribute('disabled');
-  } else {
-    document
-      .getElementById('default-light')
-      .setAttribute('disabled', 'disabled');
-    document
-      .getElementById('default-dark')
-      .setAttribute('disabled', 'disabled');
-
-    // Load the theme dynamically
-    let cssLoc = `/static/assets/css/themes/${theme}.min.css`;
-    loadCss(theme, cssLoc);
-    document.getElementById(theme).removeAttribute('disabled');
-  }
+export function setTheme(theme = 'chapo', loggedIn = false) {
+  const event = new CustomEvent('change-theme', { detail: theme });
+  document.dispatchEvent(event);
 }
 
 export function loadCss(id: string, loc: string) {
@@ -490,7 +465,7 @@ export function loadCss(id: string, loc: string) {
     link.type = 'text/css';
     link.href = loc;
     link.media = 'all';
-    head.appendChild(link);
+    head.prepend(link);
   }
 }
 
@@ -532,7 +507,7 @@ export function isCakeDay(published: string): boolean {
 }
 
 // Converts to image thumbnail
-export function pictrsImage(hash: string, thumbnail: boolean = false): string {
+export function pictrsImage(hash: string, thumbnail = false): string {
   let root = `/pictrs/image`;
 
   // Necessary for other servers / domains
@@ -552,7 +527,7 @@ export function isCommentType(item: Comment | PrivateMessage): item is Comment {
   return (item as Comment).community_id !== undefined;
 }
 
-export function toast(text: string, background: string = 'success') {
+export function toast(text: string, background = 'success') {
   let backgroundColor = `var(--${background})`;
   Toastify({
     text: text,
@@ -593,7 +568,7 @@ export function messageToastify(
   router: any
 ) {
   let backgroundColor = `var(--light)`;
-  body = '<div class="notification-text-container">' + body + '</div>';
+  body = '<div className="notification-text-container">' + body + '</div>';
   if (!UserService.Instance.user || !UserService.Instance.user.show_nsfw) {
     body = replaceImageEmbeds(body);
   }
@@ -625,6 +600,7 @@ export function testMessageToast() {
   );
 }
 
+// @ts-ignore
 export function setupTribute(): Tribute {
   return new Tribute({
     noMatchTemplate: function () {
@@ -647,8 +623,7 @@ export function setupTribute(): Tribute {
           // }),
           {
             key: 'logo',
-            val:
-              '<img class="icon icon-navbar" src="/static/assets/logo.png" alt="vaporwave hammer and sickle logo, courtesy of ancestral potato">',
+            val: `<img className="icon icon-navbar" src="${BASE_PATH}logo.png" alt="vaporwave hammer and sickle logo, courtesy of ancestral potato">`,
           },
           ...customEmojis,
         ],
@@ -790,7 +765,8 @@ function communitySearch(text: string, cb: any) {
 export function getListingTypeFromProps(props: any): ListingType {
   return props.match.params.listing_type
     ? routeListingTypeToEnum(props.match.params.listing_type)
-    : UserService.Instance.user
+    : UserService.Instance.user &&
+      UserService.Instance.user.default_listing_type
     ? UserService.Instance.user.default_listing_type
     : ListingType.All;
 }
@@ -805,7 +781,7 @@ export function getDataTypeFromProps(props: any): DataType {
 export function getSortTypeFromProps(props: any): SortType {
   return props.match.params.sort
     ? routeSortTypeToEnum(props.match.params.sort)
-    : UserService.Instance.user
+    : UserService.Instance.user && UserService.Instance.user.default_sort_type
     ? UserService.Instance.user.default_sort_type
     : SortType.Hot;
 }
@@ -867,6 +843,7 @@ export function createPostLikeRes(data: PostResponse, post: Post) {
     post.score = data.post.score;
     post.upvotes = data.post.upvotes;
     post.downvotes = data.post.downvotes;
+    post.saved = data.post.saved;
     if (data.post.my_vote !== null) {
       post.my_vote = data.post.my_vote;
     }
@@ -1021,7 +998,7 @@ function randomHsl() {
   return `hsla(${Math.random() * 360}, 100%, 50%, 1)`;
 }
 
-export function previewLines(text: string, lines: number = 3): string {
+export function previewLines(text: string, lines = 3): string {
   // Use lines * 2 because markdown requires 2 lines
   return text
     .split('\n')
@@ -1074,7 +1051,7 @@ export function imagesDownsize(
   );
   html = html.replace(
     imgTagRegex,
-    '$& class="' + (very_low ? 'notification-image' : 'comment-image') + '"'
+    '$& className="' + (very_low ? 'notification-image' : 'comment-image') + '"'
   );
   return html;
 }
@@ -1122,6 +1099,9 @@ export const doesUserModerateCommunity = ({
 export const getAllUserModeratedCommunities = ({
   moderatorId,
   siteModerators,
+}: {
+  moderatorId: number;
+  siteModerators: CommunityModsState | null;
 }) => {
   return Object.keys(siteModerators).reduce((agg, communityId) => {
     if (
@@ -1137,3 +1117,33 @@ export const getAllUserModeratedCommunities = ({
     return agg;
   }, []);
 };
+
+// any of these comment changes should trigger a re-render
+export function isCommentChanged(operation: UserOperation): boolean {
+  return (
+    operation == UserOperation.EditComment ||
+    operation == UserOperation.MarkCommentAsRead ||
+    operation == UserOperation.RemoveComment ||
+    operation == UserOperation.DeleteComment
+  );
+}
+
+// any of these post changes should trigger a re-render
+export function isPostChanged(operation: UserOperation): boolean {
+  return (
+    operation == UserOperation.EditPost ||
+    operation == UserOperation.DeletePost ||
+    operation == UserOperation.RemovePost ||
+    operation == UserOperation.LockPost ||
+    operation == UserOperation.StickyPost
+  );
+}
+
+// any of these message changes should trigger a re-render
+export function isMessageChanged(operation: UserOperation): boolean {
+  return (
+    operation == UserOperation.EditPrivateMessage ||
+    operation == UserOperation.MarkPrivateMessageAsRead ||
+    operation == UserOperation.DeletePrivateMessage
+  );
+}

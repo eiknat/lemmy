@@ -1,6 +1,7 @@
-import { Component } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
+import { withRouter } from 'react-router-dom';
 import { CommunityForm } from './community-form';
 import {
   Community,
@@ -16,19 +17,22 @@ interface CreateCommunityState {
   enableNsfw: boolean;
 }
 
-export class CreateCommunity extends Component<any, CreateCommunityState> {
+export class BaseCreateCommunity extends Component<any, CreateCommunityState> {
   private subscription: Subscription;
   private emptyState: CreateCommunityState = {
     enableNsfw: null,
   };
+
+  state = this.emptyState
   constructor(props: any, context: any) {
     super(props, context);
     this.handleCommunityCreate = this.handleCommunityCreate.bind(this);
-    this.state = this.emptyState;
+  }
 
+  componentDidMount() {
     if (!UserService.Instance.user) {
       toast(i18n.t('not_logged_in'), 'danger');
-      this.context.router.history.push(`/login`);
+      this.props.history.push(`/login`);
     }
 
     this.subscription = WebSocketService.Instance.subject
@@ -48,9 +52,9 @@ export class CreateCommunity extends Component<any, CreateCommunityState> {
 
   render() {
     return (
-      <div class="container">
-        <div class="row">
-          <div class="col-12 col-lg-6 offset-lg-3 mb-4">
+      <div className="container">
+        <div className="row">
+          <div className="col-12 col-lg-6 offset-lg-3 mb-4">
             <h5>{i18n.t('create_community')}</h5>
             <CommunityForm
               onCreate={this.handleCommunityCreate}
@@ -74,9 +78,12 @@ export class CreateCommunity extends Component<any, CreateCommunityState> {
       return;
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-      this.state.enableNsfw = data.site.enable_nsfw;
-      this.setState(this.state);
+      this.setState({
+        enableNsfw: data.site.enable_nsfw
+      });
       document.title = `${i18n.t('create_community')} - ${data.site.name}`;
     }
   }
 }
+
+export const CreateCommunity = withRouter(BaseCreateCommunity);

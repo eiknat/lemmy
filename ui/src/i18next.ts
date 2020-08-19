@@ -29,7 +29,7 @@ import { km } from './translations/km';
 import { ga } from './translations/ga';
 import { sr_Latn } from './translations/sr_Latn';
 
-// https://github.com/nimbusec-oss/inferno-i18next/blob/master/tests/T.test.js#L66
+// https://github.com/nimbusec-oss/react-i18next/blob/master/tests/T.test.js#L66
 const resources = {
   en,
   el,

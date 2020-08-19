@@ -1,8 +1,10 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { SortType } from '../interfaces';
 import { sortingHelpUrl } from '../utils';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
+import { Box, Select } from 'theme-ui';
 
 interface SortSelectProps {
   sort: SortType;
@@ -33,23 +35,24 @@ export class SortSelect extends Component<SortSelectProps, SortSelectState> {
   render() {
     return (
       <>
-        <select
-          value={this.props.sort}
-          onChange={linkEvent(this, this.handleSortChange)}
-          class="custom-select custom-select-sm w-auto mr-2"
-        >
-          <option disabled>{i18n.t('sort_type')}</option>
-          {!this.props.hideHot && (
-            <option value={SortType.Hot}>{i18n.t('hot')}</option>
-          )}
-          <option value={SortType.New}>{i18n.t('new')}</option>
-          <option disabled>─────</option>
-          <option value={SortType.TopDay}>{i18n.t('top_day')}</option>
-          <option value={SortType.TopWeek}>{i18n.t('week')}</option>
-          <option value={SortType.TopMonth}>{i18n.t('month')}</option>
-          <option value={SortType.TopYear}>{i18n.t('year')}</option>
-          <option value={SortType.TopAll}>{i18n.t('all')}</option>
-        </select>
+        <Box css={{ display: 'inline-block' }} mr={2}>
+          <Select
+            value={this.props.sort}
+            onChange={linkEvent(this, this.handleSortChange)}
+          >
+            <option disabled>{i18n.t('sort_type')}</option>
+            {!this.props.hideHot && (
+              <option value={SortType.Hot}>{i18n.t('hot')}</option>
+            )}
+            <option value={SortType.New}>{i18n.t('new')}</option>
+            <option disabled>─────</option>
+            <option value={SortType.TopDay}>{i18n.t('top_day')}</option>
+            <option value={SortType.TopWeek}>{i18n.t('week')}</option>
+            <option value={SortType.TopMonth}>{i18n.t('month')}</option>
+            <option value={SortType.TopYear}>{i18n.t('year')}</option>
+            <option value={SortType.TopAll}>{i18n.t('all')}</option>
+          </Select>
+        </Box>
         <a
           className="text-muted"
           href={sortingHelpUrl}

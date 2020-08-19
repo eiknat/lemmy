@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -24,6 +24,7 @@ import { wsJsonToRes, addTypeInfo, fetchLimit, toast } from '../utils';
 import { MomentTime } from './moment-time';
 import moment from 'moment';
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
 import { ModlogComment } from './mod-log-comment';
 
 interface ModlogState {
@@ -53,13 +54,13 @@ export class Modlog extends Component<any, ModlogState> {
     filters: Object.keys(ModLogFilter) as ModLogFilter[],
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
+  state = this.emptyState;
 
-    this.state = this.emptyState;
-    this.state.communityId = this.props.match.params.community_id
+  componentDidMount() {
+    const communityId = this.props.match.params.community_id
       ? Number(this.props.match.params.community_id)
       : undefined;
+    this.setState({ communityId });
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
       .subscribe(
@@ -98,29 +99,30 @@ export class Modlog extends Component<any, ModlogState> {
     );
     let added = addTypeInfo(res.added, 'added');
     let banned = addTypeInfo(res.banned, 'banned');
-    this.state.combined = [];
+    // this.state.combined = [];
+    const updatedState: any = { combined: [] };
 
-    this.state.combined.push(...removed_posts);
-    this.state.combined.push(...locked_posts);
-    this.state.combined.push(...stickied_posts);
-    this.state.combined.push(...removed_comments);
-    this.state.combined.push(...removed_communities);
-    this.state.combined.push(...banned_from_community);
-    this.state.combined.push(...added_to_community);
-    this.state.combined.push(...added);
-    this.state.combined.push(...banned);
+    updatedState.combined.push(...removed_posts);
+    updatedState.combined.push(...locked_posts);
+    updatedState.combined.push(...stickied_posts);
+    updatedState.combined.push(...removed_comments);
+    updatedState.combined.push(...removed_communities);
+    updatedState.combined.push(...banned_from_community);
+    updatedState.combined.push(...added_to_community);
+    updatedState.combined.push(...added);
+    updatedState.combined.push(...banned);
 
     if (this.state.communityId && this.state.combined.length > 0) {
-      this.state.communityName = (this.state.combined[0]
+      updatedState.communityName = (this.state.combined[0]
         .data as ModRemovePost).community_name;
     }
 
     // Sort them by time
-    this.state.combined.sort((a, b) =>
+    updatedState.combined.sort((a, b) =>
       b.data.when_.localeCompare(a.data.when_)
     );
 
-    this.setState(this.state);
+    this.setState(updatedState);
   }
 
   combined() {
@@ -129,7 +131,7 @@ export class Modlog extends Component<any, ModlogState> {
         {this.state.combined
           .filter(i => this.state.filters.includes(i.type_ as ModLogFilter))
           .map(i => (
-            <tr>
+            <tr key={`${i.type_}-${i.data.id}`}>
               <td>
                 <MomentTime data={i.data} />
               </td>
@@ -363,35 +365,40 @@ export class Modlog extends Component<any, ModlogState> {
 
   render() {
     return (
-      <div class="container">
+      <div className="container">
         {this.state.loading ? (
-          <h5 class="">
-            <svg class="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+          <h5>
+            <svg className="icon icon-spinner spin">
+              <use xlinkHref="#icon-spinner" />
             </svg>
           </h5>
         ) : (
           <div>
             <div>
-              {Object.keys(ModLogFilter).map(filter => (
-                <div className="form-check form-check-inline">
-                  <label className="form-check-label mod-log-filter-label">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      name={filter}
-                      checked={this.state.filters.includes(
-                        filter as ModLogFilter
-                      )}
-                      onChange={this.handleFilterChange}
-                    />
-                    {filter.replace(/_/g, ' ')}
-                  </label>
-                </div>
-              ))}
-            </div>
-            <div>
-              <div style="display:inline-block; margin-top:6px">
+              <div
+                style={{
+                  display: 'inline-block',
+                  marginTop: '6px',
+                }}
+              >
+                {Object.keys(ModLogFilter).map(filter => (
+                  <div className="form-check form-check-inline" key={filter}>
+                    <label className="form-check-label mod-log-filter-label">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        name={filter}
+                        checked={this.state.filters.includes(
+                          filter as ModLogFilter
+                        )}
+                        onChange={this.handleFilterChange}
+                      />
+                      {filter.replace(/_/g, ' ')}
+                    </label>
+                  </div>
+                ))}
+              </div>
+              <div>
                 <h5>
                   {this.state.communityName && (
                     <Link
@@ -404,15 +411,27 @@ export class Modlog extends Component<any, ModlogState> {
                   <span>{i18n.t('modlog')}</span>
                 </h5>
               </div>
-              <div style="display:inline-block; float:right;">
-                <h6 style="border:3px solid #000000; padding:5px; background-color:#F39C12; color:#111111;">
+              <div
+                style={{
+                  display: 'inline-block',
+                  float: 'right',
+                }}
+              >
+                <h6
+                  style={{
+                    border: '3px solid #000000',
+                    padding: '5px',
+                    backgroundColor: '#F39C12',
+                    color: '#111111',
+                  }}
+                >
                   {i18n.t('modlog_warning')}
                 </h6>
               </div>
             </div>
-            <div class="table-responsive">
-              <table id="modlog_table" class="table table-sm table-hover">
-                <thead class="pointer">
+            <div className="table-responsive">
+              <table id="modlog_table" className="table table-sm table-hover">
+                <thead className="pointer">
                   <tr>
                     <th> {i18n.t('time')}</th>
                     <th>{i18n.t('mod')}</th>
@@ -431,24 +450,26 @@ export class Modlog extends Component<any, ModlogState> {
 
   paginator() {
     return (
-      <div class="mt-2">
+      <div className="mt-2">
         {this.state.page > 1 && (
           <button
-            class="btn btn-sm btn-secondary mr-1"
-            onClick={linkEvent(this, this.prevPage)}
+            className="btn btn-sm btn-secondary mr-1"
+            onClick={this.prevPage}
           >
             {i18n.t('prev')}
           </button>
         )}
-        <button
-          class="btn btn-sm btn-secondary"
-          onClick={linkEvent(this, this.nextPage)}
-        >
+        <button className="btn btn-sm btn-secondary" onClick={this.nextPage}>
           {i18n.t('next')}
         </button>
       </div>
     );
   }
+
+  nextPage = () => {
+    this.setState({ page: this.state.page + 1 });
+    this.refetch();
+  };
 
   handleFilterChange = e => {
     const name = e.target.name;
@@ -465,17 +486,10 @@ export class Modlog extends Component<any, ModlogState> {
     }
   };
 
-  nextPage(i: Modlog) {
-    i.state.page++;
-    i.setState(i.state);
-    i.refetch();
-  }
-
-  prevPage(i: Modlog) {
-    i.state.page--;
-    i.setState(i.state);
-    i.refetch();
-  }
+  prevPage = () => {
+    this.setState({ page: Math.max(this.state.page - 1, 0) });
+    this.refetch();
+  };
 
   refetch() {
     let modlogForm: GetModlogForm = {
@@ -494,7 +508,7 @@ export class Modlog extends Component<any, ModlogState> {
       return;
     } else if (res.op == UserOperation.GetModlog) {
       let data = res.data as GetModlogResponse;
-      this.state.loading = false;
+      this.setState({ loading: false });
       window.scrollTo(0, 0);
       this.setCombined(data);
     } else if (res.op == UserOperation.GetSite) {

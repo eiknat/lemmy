@@ -1,27 +1,25 @@
-import { Component } from 'inferno';
+import React, { Component } from 'react';
 import { WebSocketService } from '../services';
 import { i18n } from '../i18next';
-import { T } from 'inferno-i18next';
+import { Trans } from 'react-i18next';
 import { repoUrl } from '../utils';
+import { BASE_PATH } from '../isProduction';
 
 export class About extends Component<any, any> {
-  constructor(props: any, context: any) {
-    super(props, context);
-  }
-
   componentDidMount() {
     document.title = `${i18n.t('about')} - ${
-      WebSocketService.Instance.site.name
+      // @ts-ignore
+      WebSocketService.Instance?.site?.name || 'ChapoChat'
     }`;
     window.scrollTo(0, 0);
   }
 
   render() {
     return (
-      <div class="about-container">
-        <div class="about-header">
+      <div className="about-container">
+        <div className="about-header">
           <img
-            src="/static/assets/banner.png"
+            src={`${BASE_PATH}banner.png`}
             className="img-fluid"
             alt="bear with black text reading 'you have nothing to lose but your chains'"
           />
@@ -76,7 +74,7 @@ export class About extends Component<any, any> {
 
             <div className="my-4">
               <img
-                src="/static/assets/last-comment.png"
+                src={`${BASE_PATH}last-comment.png`}
                 alt="the last comment before the r/chapotraphouse subreddit was shut down"
                 className="img-fluid"
               />

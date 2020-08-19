@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component, useState } from 'react';
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 import { WebSocketService, UserService } from '../services';
 import {
   Post,
@@ -13,8 +13,13 @@ import {
   BanUserForm,
   AddModToCommunityForm,
   AddAdminForm,
+  AddSitemodForm,
   TransferSiteForm,
   TransferCommunityForm,
+  DeletePostForm,
+  RemovePostForm,
+  LockPostForm,
+  StickyPostForm,
 } from '../interfaces';
 import { MomentTime } from './moment-time';
 import { PostForm } from './post-form';
@@ -22,7 +27,6 @@ import { IFramelyCard } from './iframely-card';
 import { UserListing } from './user-listing';
 import { CommunityLink } from './community-link';
 import {
-  md,
   mdToHtml,
   canMod,
   isMod,
@@ -33,13 +37,15 @@ import {
   pictrsImage,
   setupTippy,
   hostname,
-  previewLines,
-  toast,
 } from '../utils';
 import { i18n } from '../i18next';
-import { User } from './user';
 import { Icon } from './icon';
-import { RoleBadge } from './comment-node';
+import { RoleBadge } from './RoleBadge';
+import { linkEvent } from '../linkEvent';
+import { Box, Flex, Heading, Text, Link as StyledLink } from 'theme-ui';
+import Button from './elements/Button';
+
+const ENABLE_NEW_POST_LISTING = false;
 
 interface PostListingState {
   showEdit: boolean;
@@ -60,6 +66,8 @@ interface PostListingState {
   score: number;
   upvotes: number;
   downvotes: number;
+  localPostSaved: boolean;
+  innerWidth: number;
 }
 
 interface PostListingProps {
@@ -68,6 +76,7 @@ interface PostListingProps {
   showBody?: boolean;
   moderators?: Array<CommunityUser>;
   admins?: Array<UserView>;
+  sitemods?: Array<UserView>;
   enableDownvotes: boolean;
   enableNsfw: boolean;
 }
@@ -81,16 +90,276 @@ export function PostBody({ body }: { body: string }) {
   );
 }
 
-export class PostListing extends Component<PostListingProps, PostListingState> {
+export function PostListingButton({
+  as: Element = 'button',
+  onClick,
+  children,
+  ...props
+}: {
+  as?: any;
+  onClick?: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <Element
+      className="btn btn-sm btn-link btn-animate text-muted post-listing-button"
+      onClick={onClick}
+      type="button"
+      {...props}
+    >
+      {children}
+    </Element>
+  );
+}
+
+const VoteButtons = ({
+  my_vote,
+  handlePostLike,
+  handlePostDisLike,
+  enableDownvotes,
+  score,
+  pointsTippy,
+}: any) => (
+  <>
+    <button
+      className={`btn-animate btn btn-link p-0 ${
+        my_vote === 1 ? 'text-info' : 'text-muted'
+      }`}
+      onClick={handlePostLike}
+      data-tippy-content={i18n.t('upvote')}
+    >
+      <Icon name="upvote" className="icon upvote" />
+    </button>
+    <div
+      className="unselectable pointer font-weight-bold text-muted px-1 py-1"
+      data-tippy-content={pointsTippy}
+    >
+      {score}
+    </div>
+    {enableDownvotes && (
+      <button
+        className={`btn-animate btn btn-link p-0 ${
+          my_vote === -1 ? 'text-danger' : 'text-muted'
+        }`}
+        onClick={handlePostDisLike}
+        data-tippy-content={i18n.t('downvote')}
+      >
+        <Icon name="downvote" className="icon downvote" />
+      </button>
+    )}
+  </>
+);
+
+const PostActionButton = props => (
+  <Button p={2} variant="muted" bg="transparent" {...props} />
+);
+
+const PostIcon = props => (
+  <Box p={3} bg="background" className="mobile-icon-overlay">
+    <Icon size="18px" className="icon" {...props} />
+  </Box>
+);
+
+const MobilePostIcon = ({ post }: { post: Post }) => {
+  if (isImage(post.url)) {
+    return <PostIcon name="image" />;
+  } else if (post.thumbnail_url) {
+    return <PostIcon name="link" />;
+  } else if (post.embed_html !== null && isValidEmbed(post.url)) {
+    return <PostIcon name="link" />;
+  } else if (post.url) {
+    return <PostIcon name="link" />;
+  }
+};
+
+const MobilePostListing = ({
+  post,
+  my_vote,
+  handlePostLike,
+  handlePostDisLike,
+  enableDownvotes,
+  score,
+  pointsTippy,
+  localPostSaved,
+  handleEditClick,
+  handleSavePostClick,
+  thumbnail,
+  handleReportPost,
+  showBody,
+  handleShowAdvanced,
+}) => {
+  const [actionsVisible, setActionsVisible] = useState(false);
+  const [contentExpanded, setContentExpanded] = useState(false);
+
+  function toggleContentExpanded() {
+    setContentExpanded(prevState => !prevState);
+  }
+
+  const longPost = post.body && post.body.length > 200;
+
+  return (
+    <Flex css={{ flexDirection: 'column' }}>
+      <Link to={`/post/${post.id}`}>
+        <Heading
+          as="h5"
+          my={2}
+          color="#dedede"
+          css={{ fontWeight: 400, fontSize: '18px' }}
+        >
+          {post.name}
+        </Heading>
+      </Link>
+      {post.url && !(hostname(post.url) === window.location.hostname) && (
+        <StyledLink
+          className="text-muted font-italic"
+          href={post.url}
+          target="_blank"
+          title={post.url}
+          rel="noreferrer"
+        >
+          {hostname(post.url)}
+          <Icon className="ml-1 icon icon-inline" name="link" size="14px" />
+        </StyledLink>
+      )}
+      {isImage(post.url) && (
+        <Box
+          css={{ position: 'relative' }}
+          className={`collapsed-content collapsed-image ${
+            contentExpanded && 'expanded'
+          }`}
+          my={1}
+          onClick={toggleContentExpanded}
+        >
+          <img className="img-fluid" alt={post.name} src={post.url} />
+          <MobilePostIcon post={post} />
+        </Box>
+      )}
+      {post.body && !showBody && (
+        <Text
+          onClick={toggleContentExpanded}
+          className={`collapsed-content ${
+            (contentExpanded || !longPost) && 'expanded'
+          }`}
+          css={{
+            borderRadius: '4px',
+            fontSize: '14px',
+          }}
+          my={2}
+        >
+          {post.body}
+        </Text>
+      )}
+      <Box css={{ fontSize: '12px' }}>
+        <span> {i18n.t('to')} </span>
+        <CommunityLink
+          community={{
+            name: post.community_name,
+            id: post.community_id,
+            local: post.community_local,
+            actor_id: post.community_actor_id,
+          }}
+        />{' '}
+        {i18n.t('by')}{' '}
+        <UserListing
+          user={{
+            name: post.creator_name,
+            avatar: post.creator_avatar,
+            id: post.creator_id,
+            local: post.creator_local,
+            actor_id: post.creator_actor_id,
+          }}
+        />
+        {/* {isAdmin && (
+          <RoleBadge role="admin" tooltipText={i18n.t('admin')}>
+            {i18n.t('admin')[0]}
+          </RoleBadge>
+        )}
+        {isMod && !isAdmin && (
+          <RoleBadge role="mod" tooltipText={i18n.t('mod')}>
+            {i18n.t('mod')[0]}
+          </RoleBadge>
+        )} */}
+        {post.creator_tags?.pronouns ? (
+          <span className="badge mx-1 comment-badge pronouns-badge">
+            {post.creator_tags.pronouns.split(',').join('/')}
+          </span>
+        ) : null}
+        <span>
+          • <MomentTime data={post} />
+        </span>
+      </Box>
+      <Flex css={{ alignItems: 'center' }} mt={1}>
+        <PostActionButton
+          onClick={handlePostLike}
+          color={my_vote === 1 ? '#fffc00' : 'inherit'}
+        >
+          <Icon name="upvote" className="icon upvote" />
+        </PostActionButton>
+        <Box css={{ fontSize: '14px', fontWeight: 600 }} mx={2}>
+          {score}
+        </Box>
+        <PostActionButton
+          disabled={!enableDownvotes}
+          onClick={handlePostDisLike}
+          color={my_vote === -1 ? '#dd17b9' : 'inherit'}
+        >
+          <Icon name="downvote" className="icon downvote" />
+        </PostActionButton>
+        <PostActionButton
+          onClick={handleSavePostClick}
+          data-tippy-content={post.saved ? i18n.t('unsave') : i18n.t('save')}
+        >
+          <Icon
+            name={localPostSaved ? 'star' : 'starOutline'}
+            className={`icon icon-inline ${localPostSaved && 'text-warning'}`}
+          />
+        </PostActionButton>
+        <Box mx={3}>
+          <PostActionButton
+            as={Link}
+            title={i18n.t('number_of_comments', {
+              count: post.number_of_comments,
+            })}
+            to={`/post/${post.id}`}
+          >
+            <Icon name="comment" className="icon mr-1" />
+            {post.number_of_comments}
+          </PostActionButton>
+        </Box>
+        <PostActionButton
+          onClick={() =>
+            showBody ? handleShowAdvanced() : setActionsVisible(prev => !prev)
+          }
+          mx={2}
+          css={{ marginLeft: 'auto' }}
+        >
+          <Icon name="more" />
+        </PostActionButton>
+      </Flex>
+      {actionsVisible && !showBody && (
+        <Flex my={2}>
+          <PostActionButton onClick={handleReportPost}>
+            <Icon name="report" />
+          </PostActionButton>
+        </Flex>
+      )}
+    </Flex>
+  );
+};
+
+class BasePostListing extends Component<
+  PostListingProps & RouteComponentProps,
+  PostListingState
+> {
   private emptyState: PostListingState = {
     showEdit: false,
     showRemoveDialog: false,
-    removeReason: null,
+    removeReason: '',
     showBanDialog: false,
-    banReason: null,
-    banExpires: null,
+    banReason: '',
+    banExpires: '',
     banType: BanType.Community,
-    reportReason: null,
+    reportReason: '',
     showReportDialog: false,
     showConfirmTransferSite: false,
     showConfirmTransferCommunity: false,
@@ -101,44 +370,48 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     score: this.props.post.score,
     upvotes: this.props.post.upvotes,
     downvotes: this.props.post.downvotes,
+    // @TODO: Debug why this isn't being passed down on update
+    localPostSaved: this.props.post.saved,
+    innerWidth: window.innerWidth,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
+  state = this.emptyState;
 
-    this.state = this.emptyState;
-    this.handlePostLike = this.handlePostLike.bind(this);
-    this.handlePostDisLike = this.handlePostDisLike.bind(this);
-    this.handleEditPost = this.handleEditPost.bind(this);
-    this.handleEditCancel = this.handleEditCancel.bind(this);
-  }
-
-  componentWillMount() {
+  componentDidMount() {
     // scroll to top of page when loading post listing
     window.scrollTo(0, 0);
+    window.addEventListener('resize', this.handleResize);
   }
 
-  componentWillReceiveProps(nextProps: PostListingProps) {
-    this.state.my_vote = nextProps.post.my_vote;
-    this.state.upvotes = nextProps.post.upvotes;
-    this.state.downvotes = nextProps.post.downvotes;
-    this.state.score = nextProps.post.score;
-    if (this.props.post.id !== nextProps.post.id) {
-      this.state.imageExpanded = false;
-    }
-    this.setState(this.state);
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
   }
+
+  handleResize = () => {
+    this.setState({ innerWidth: window.innerWidth });
+  };
+
+  // @TODO: Check if this problem still persists
+  // UNSAFE_componentWillReceiveProps(nextProps: PostListingProps) {
+  //   this.setState({
+  //     my_vote: nextProps.post.my_vote,
+  //     upvotes: nextProps.post.upvotes,
+  //     downvotes: nextProps.post.downvotes,
+  //     score: nextProps.post.score,
+  //     // imageExpanded: this.props.post.id === nextProps.post.id
+  //   });
+  // }
 
   render() {
     return (
-      <div class="">
+      <div>
         {!this.state.showEdit ? (
           <>
             {this.listing()}
             {this.body()}
           </>
         ) : (
-          <div class="col-12">
+          <div className="col-12">
             <PostForm
               post={this.props.post}
               onEdit={this.handleEditPost}
@@ -154,8 +427,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
 
   body() {
     return (
-      <div class="row">
-        <div class="col-12">
+      <div className="row">
+        <div className="col-12">
           {this.props.post.url &&
             this.props.showBody &&
             this.props.post.embed_title && (
@@ -182,12 +455,13 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
         className={`img-fluid thumbnail rounded ${
           (post.nsfw || post.community_nsfw) && 'img-blur'
         }`}
+        alt={post.name}
         src={src}
       />
     );
   }
 
-  getImage(thumbnail: boolean = false) {
+  getImage(thumbnail = false) {
     let post = this.props.post;
     if (isImage(post.url)) {
       if (post.url.includes('pictrs')) {
@@ -202,18 +476,18 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     }
   }
 
-  thumbnail() {
+  thumbnail = () => {
     let post = this.props.post;
 
     if (isImage(post.url)) {
       return (
         <span
-          class="text-body pointer"
+          className="text-body pointer"
           data-tippy-content={i18n.t('expand_here')}
-          onClick={linkEvent(this, this.handleImageExpandClick)}
+          onClick={this.handleImageExpandClick}
         >
           {this.imgThumb(this.getImage(true))}
-          <Icon name="image" class="icon mini-overlay" />
+          <Icon name="image" className="icon mini-overlay" />
         </span>
       );
     } else if (post.thumbnail_url) {
@@ -221,9 +495,9 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
         <>
           {post.embed_html !== null && isValidEmbed(post.url) ? (
             <span
-              class="text-body pointer"
+              className="text-body pointer"
               data-tippy-content={i18n.t('expand_here')}
-              onClick={linkEvent(this, this.handleImageExpandClick)}
+              onClick={this.handleImageExpandClick}
             >
               {this.imgThumb(this.getImage(true))}
               <Icon className="icon mini-overlay" name="link" />
@@ -245,13 +519,13 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     } else if (post.embed_html !== null && isValidEmbed(post.url)) {
       return (
         <span
-          class="text-body pointer"
+          className="text-body pointer"
           data-tippy-content={i18n.t('expand_here')}
-          onClick={linkEvent(this, this.handleImageExpandClick)}
+          onClick={this.handleImageExpandClick}
         >
           <Icon
             className="icon thumbnail mini-overlay"
-            style="margin-top: 4px"
+            style={{ marginTop: '4px' }}
             name="link"
           />
         </span>
@@ -259,13 +533,13 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     } else if (post.url) {
       if (isVideo(post.url)) {
         return (
-          <div class="embed-responsive embed-responsive-16by9">
+          <div className="embed-responsive embed-responsive-16by9">
             <video
-              playsinline
+              playsInline
               muted
               loop
               controls
-              class="embed-responsive-item"
+              className="embed-responsive-item"
             >
               <source src={post.url} type="video/mp4" />
             </video>
@@ -273,19 +547,21 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
         );
       } else {
         return (
-          <div class="post-listing-box">
+          <div className="post-listing-box">
             <a
               className="text-body"
               href={post.url}
               target="_blank"
               title={post.url}
               rel="noreferrer"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+              }}
             >
-              <Icon
-                className="icon thumbnail mini-overlay"
-                style="margin-top: 4px"
-                name="link"
-              />
+              <Icon className="icon thumbnail" size="40px" name="link" />
             </a>
           </div>
         );
@@ -295,63 +571,331 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
         <button
           className="text-body post-body-expand-button post-listing-box"
           title={i18n.t('expand_here')}
-          onClick={
-            !this.props.showBody && linkEvent(this, this.handleImageExpandClick)
-          }
+          // onClick={() =>
+          //   !this.props.showBody && linkEvent(this, this.handleImageExpandClick)
+          // }
+          onClick={() => !this.props.showBody && this.handleImageExpandClick()}
         >
           {post.nsfw ? (
-            <svg class="icon thumbnail" style="margin-top:-3px">
-              <use xlinkHref="#icon-warning-post"></use>
+            <svg className="icon thumbnail" style={{ marginTop: '-3px' }}>
+              <use xlinkHref="#icon-warning-post" />
             </svg>
           ) : (
-            <svg class="icon thumbnail">
-              <use xlinkHref="#icon-message-square"></use>
+            <svg className="icon thumbnail">
+              <use xlinkHref="#icon-message-square" />
             </svg>
           )}
         </button>
       );
     }
-  }
+  };
 
-  listing() {
+  listingActions = () => {
     let post = this.props.post;
 
-    const isMobile = window.innerWidth < 768;
+    const isMobile = this.state.innerWidth < 768;
+
+    return (
+      <div className="details col-12">
+        <ul className="list-inline mb-0 text-muted small">
+          <li className="list-inline-item">
+            <span>{i18n.t('by')} </span>
+            <UserListing
+              user={{
+                name: post.creator_name,
+                avatar: post.creator_avatar,
+                id: post.creator_id,
+                local: post.creator_local,
+                actor_id: post.creator_actor_id,
+              }}
+            />
+            {this.isAdmin && (
+              <RoleBadge role="admin" tooltipText={i18n.t('admin')}>
+                {i18n.t('admin')[0]}
+              </RoleBadge>
+            )}
+            {this.isMod && !this.isAdmin && (
+              <RoleBadge role="mod" tooltipText={i18n.t('mod')}>
+                {i18n.t('mod')[0]}
+              </RoleBadge>
+            )}
+            {post.creator_tags?.pronouns ? (
+              <span className="badge mx-1 comment-badge pronouns-badge">
+                {post.creator_tags.pronouns.split(',').join('/')}
+              </span>
+            ) : null}
+            {(post.banned_from_community || post.banned) && (
+              <span className="mx-1 badge badge-danger">
+                {i18n.t('banned')}
+              </span>
+            )}
+            {this.props.showCommunity && (
+              <span>
+                <span> {i18n.t('to')} </span>
+                <CommunityLink
+                  community={{
+                    name: post.community_name,
+                    id: post.community_id,
+                    local: post.community_local,
+                    actor_id: post.community_actor_id,
+                  }}
+                />
+              </span>
+            )}
+          </li>
+          <li className="list-inline-item">•</li>
+          <li className="list-inline-item">
+            <span>
+              <MomentTime data={post} />
+            </span>
+          </li>
+          {post.stickied && (
+            <small
+              className="unselectable pointer ml-1 font-italic"
+              data-tippy-content={i18n.t('stickied')}
+            >
+              {/* <svg className={`icon custom-icon text-success`}>
+                        <use xlinkHref="#icon-pin"></use>
+                      </svg> */}
+              <Icon className="icon text-success" name="pin" />
+            </small>
+          )}
+          {post.locked && (
+            <small
+              className="unselectable pointer ml-1 text-muted font-italic"
+              data-tippy-content={i18n.t('locked')}
+            >
+              <svg className="icon custom-icon text-danger">
+                <use xlinkHref="#icon-lock" />
+              </svg>
+            </small>
+          )}
+        </ul>
+        {this.props.post.duplicates && (
+          <ul className="list-inline mb-1 small text-muted">
+            <>
+              <li className="list-inline-item mr-2">
+                {i18n.t('cross_posted_to')}
+              </li>
+              {this.props.post.duplicates.map(post => (
+                <li className="list-inline-item mr-2" key={post.id}>
+                  <Link to={`/post/${post.id}`}>{post.community_name}</Link>
+                </li>
+              ))}
+            </>
+          </ul>
+        )}
+        {this.listingForms()}
+        <div className="post-listing-details">
+          <Link
+            className="text-muted"
+            title={i18n.t('number_of_comments', {
+              count: post.number_of_comments,
+            })}
+            to={`/post/${post.id}`}
+          >
+            <Icon name="comment" className="icon mr-1" />
+            {isMobile
+              ? post.number_of_comments
+              : i18n.t('number_of_comments', {
+                  count: post.number_of_comments,
+                })}
+          </Link>
+          {/* {this.state.upvotes !== this.state.score && (
+                    <>
+                      <span
+                        className="unselectable pointer mx-1 inline-vote-details"
+                        data-tippy-content={this.pointsTippy}
+                      >
+                        <div className="list-inline-item text-muted">
+                          <Icon name="upvote" className="icon mr-1" />
+                          {this.state.upvotes}
+                        </div>
+                        <div className="list-inline-item text-muted">
+                          <Icon name="downvote" className="icon mr-1" />
+                          {this.state.downvotes}
+                        </div>
+                      </span>
+                    </>
+                  )} */}
+          {UserService.Instance.user && (
+            <>
+              {!this.props.showBody && (
+                <>
+                  <li className="list-inline-item">
+                    <PostListingButton
+                      onClick={this.handleSavePostClick}
+                      data-tippy-content={
+                        post.saved ? i18n.t('unsave') : i18n.t('save')
+                      }
+                    >
+                      <Icon
+                        name={
+                          this.state.localPostSaved ? 'star' : 'starOutline'
+                        }
+                        className={`icon icon-inline ${
+                          this.state.localPostSaved && 'text-warning'
+                        }`}
+                      />
+                    </PostListingButton>
+                  </li>
+                  <li className="list-inline-item">
+                    <Link
+                      to={`/create_post${this.crossPostParams}`}
+                      title={i18n.t('cross_post')}
+                    >
+                      <PostListingButton>
+                        <svg className="icon icon-inline">
+                          <use xlinkHref="#icon-copy" />
+                        </svg>
+                      </PostListingButton>
+                    </Link>
+                  </li>
+                  <li className="list-inline-item">
+                    <PostListingButton
+                      onClick={this.handleReportPost}
+                      data-tippy-content={i18n.t('snitch')}
+                    >
+                      <Icon name="report" />
+                    </PostListingButton>
+                  </li>
+                </>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  listingForms = () => {
+    const { post } = this.props;
+    return (
+      <>
+        {this.state.showRemoveDialog && (
+          <form className="form-inline" onSubmit={this.handleModRemoveSubmit}>
+            <input
+              type="text"
+              className="form-control mr-2"
+              placeholder={i18n.t('reason')}
+              value={this.state.removeReason}
+              onChange={this.handleModRemoveReasonChange}
+            />
+            <button type="submit" className="btn btn-secondary">
+              {i18n.t('remove_post')}
+            </button>
+          </form>
+        )}
+        {this.state.showBanDialog && (
+          <form onSubmit={this.handleModBanBothSubmit}>
+            <div className="form-group row">
+              <label className="col-form-label" htmlFor="post-listing-reason">
+                {i18n.t('reason')}
+              </label>
+              <input
+                type="text"
+                id="post-listing-reason"
+                className="form-control mr-2"
+                placeholder={i18n.t('reason')}
+                value={this.state.banReason}
+                onChange={this.handleModBanReasonChange}
+              />
+            </div>
+            <div className="form-group row">
+              <button type="submit" className="btn btn-secondary">
+                {i18n.t('ban')} {post.creator_name}
+              </button>
+            </div>
+          </form>
+        )}
+        {this.state.showReportDialog && (
+          <form
+            className="mt-2"
+            onSubmit={linkEvent(this, this.handleReportSubmit)}
+          >
+            <div className="form-group row">
+              <label
+                className="col-form-label"
+                htmlFor="post-listing-report-reason"
+              >
+                {i18n.t('reason')}
+              </label>
+              <input
+                type="text"
+                id="post-listing-report-reason"
+                className="form-control mr-2"
+                placeholder={i18n.t('reason')}
+                value={this.state.reportReason}
+                onChange={linkEvent(this, this.handleReportReasonChange)}
+                maxLength={600}
+              />
+            </div>
+            <div className="form-group row">
+              <button type="submit" className="btn btn-secondary">
+                {i18n.t('submit_report')}
+              </button>
+            </div>
+            <div className="row mt-1">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={linkEvent(this, this.handleReportPost)}
+              >
+                {i18n.t('cancel')}
+              </button>
+            </div>
+          </form>
+        )}
+      </>
+    );
+  };
+
+  listing = () => {
+    let post = this.props.post;
+
+    const isMobile = this.state.innerWidth < 768;
+
+    if (isMobile && ENABLE_NEW_POST_LISTING) {
+      return (
+        <>
+          <MobilePostListing
+            handleEditClick={this.handleEditClick}
+            my_vote={this.state.my_vote}
+            handleShowAdvanced={this.handleShowAdvanced}
+            post={post}
+            enableDownvotes={this.props.enableDownvotes}
+            score={this.state.score}
+            handlePostDisLike={this.handlePostDisLike}
+            handlePostLike={this.handlePostLike}
+            pointsTippy={this.pointsTippy}
+            thumbnail={this.thumbnail}
+            localPostSaved={this.state.localPostSaved}
+            handleSavePostClick={this.handleSavePostClick}
+            handleReportPost={this.handleReportPost}
+            showBody={this.props.showBody}
+          />
+          <Flex>{this.advancedActions()}</Flex>
+          {this.listingForms()}
+        </>
+      );
+    }
 
     return (
       <div>
-        <div class="row">
+        <div className="row post-listing-row">
           <div
             className={`vote-bar small text-center ${
               post.stickied ? 'stickied-border' : ''
             }`}
           >
-            <button
-              className={`btn-animate btn btn-link p-0 ${
-                this.state.my_vote == 1 ? 'text-info' : 'text-muted'
-              }`}
-              onClick={linkEvent(this, this.handlePostLike)}
-              data-tippy-content={i18n.t('upvote')}
-            >
-              <Icon name="upvote" className="icon upvote" />
-            </button>
-            <div
-              class={`unselectable pointer font-weight-bold text-muted px-1 py-1`}
-              data-tippy-content={this.pointsTippy}
-            >
-              {this.state.score}
-            </div>
-            {this.props.enableDownvotes && (
-              <button
-                className={`btn-animate btn btn-link p-0 ${
-                  this.state.my_vote == -1 ? 'text-danger' : 'text-muted'
-                }`}
-                onClick={linkEvent(this, this.handlePostDisLike)}
-                data-tippy-content={i18n.t('downvote')}
-              >
-                <Icon name="downvote" className="icon downvote" />
-              </button>
-            )}
+            <VoteButtons
+              my_vote={this.state.my_vote}
+              enableDownvotes={this.props.enableDownvotes}
+              score={this.state.score}
+              handlePostDisLike={this.handlePostDisLike}
+              handlePostLike={this.handlePostLike}
+              pointsTippy={this.pointsTippy}
+            />
           </div>
           {/* show thumbnail when not expanded or content is a video */}
           {(!isMobile ||
@@ -362,8 +906,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             post.embed_html !== null ||
             // if it's a text post (doesn't have URL) always show thumbnail when expanded
             (this.state.imageExpanded && post.body && !post.url)) && (
-            <div class="col-3 col-sm-2 pr-0 mt-1 thumbnail-wrapper">
-              <div class="position-relative">{this.thumbnail()}</div>
+            <div className="col-3 col-sm-2 pr-0 mt-1 thumbnail-wrapper">
+              <div className="position-relative">{this.thumbnail()}</div>
             </div>
           )}
           <div
@@ -371,7 +915,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               this.state.imageExpanded ? 'col-sm-12 col-md-8' : 'col-8 col-sm-9'
             } mt post-content`}
           >
-            <div class="row">
+            <div className="row">
               <div className="col-12">
                 <div className="post-title">
                   <h5 className="mb-0 d-inline">
@@ -396,8 +940,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     )}
                   </h5>
                   {post.url &&
-                    !(hostname(post.url) == window.location.hostname) && (
-                      <small class="d-inline-block">
+                    !(hostname(post.url) === window.location.hostname) && (
+                      <small className="d-inline-block">
                         <a
                           className="ml-2 text-muted font-italic"
                           href={post.url}
@@ -420,30 +964,24 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                     <>
                       {!this.state.imageExpanded ? (
                         <span
-                          class="text-monospace unselectable pointer ml-2 text-muted small"
+                          className="text-monospace unselectable pointer ml-2 text-muted small"
                           data-tippy-content={i18n.t('expand_here')}
-                          onClick={linkEvent(this, this.handleImageExpandClick)}
+                          onClick={this.handleImageExpandClick}
                         >
                           {/* keeping this for accessibility reasons */}
                         </span>
                       ) : (
                         <span>
                           <span
-                            class="text-monospace unselectable pointer ml-2 text-muted small"
-                            onClick={linkEvent(
-                              this,
-                              this.handleImageExpandClick
-                            )}
+                            className="text-monospace unselectable pointer ml-2 text-muted small"
+                            onClick={this.handleImageExpandClick}
                           >
                             {/* keeping this for accessibility reasons */}
                           </span>
                           <div>
                             <span
-                              class="pointer"
-                              onClick={linkEvent(
-                                this,
-                                this.handleImageExpandClick
-                              )}
+                              className="pointer"
+                              onClick={this.handleImageExpandClick}
                             >
                               {post.embed_html !== null &&
                               isValidEmbed(post.url) ? (
@@ -454,7 +992,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                                 />
                               ) : (
                                 <img
-                                  class="img-fluid img-expanded mt-2"
+                                  className="img-fluid img-expanded mt-2"
+                                  alt={`expanded for post ${post.name}`}
                                   src={this.getImage()}
                                 />
                               )}
@@ -474,8 +1013,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                       className="unselectable pointer ml-2 text-muted font-italic"
                       data-tippy-content={i18n.t('deleted')}
                     >
-                      <svg class={`icon icon-inline text-danger`}>
-                        <use xlinkHref="#icon-trash"></use>
+                      <svg className="icon icon-inline text-danger">
+                        <use xlinkHref="#icon-trash" />
                       </svg>
                     </small>
                   )}
@@ -487,563 +1026,339 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div className="details col-12">
-                <ul class="list-inline mb-0 text-muted small">
-                  <li className="flex-wrap">
-                    <span className="mr-1">{i18n.t('by')} </span>
-                    <UserListing
-                      user={{
-                        name: post.creator_name,
-                        avatar: post.creator_avatar,
-                        id: post.creator_id,
-                        local: post.creator_local,
-                        actor_id: post.creator_actor_id,
-                      }}
-                    />
-                    {this.isAdmin && (
-                      <RoleBadge role="admin" tooltipText={i18n.t('admin')}>
-                        {i18n.t('admin')[0]}
-                      </RoleBadge>
-                    )}
-                    {this.isMod && !this.isAdmin && (
-                      <RoleBadge role="mod" tooltipText={i18n.t('mod')}>
-                        {i18n.t('mod')[0]}
-                      </RoleBadge>
-                    )}
-                    {post.creator_tags?.pronouns ? (
-                      <span className="badge mx-1 comment-badge pronouns-badge">
-                        {post.creator_tags.pronouns.split(',').join('/')}
-                      </span>
-                    ) : null}
-                    {(post.banned_from_community || post.banned) && (
-                      <span className="mx-1 badge badge-danger">
-                        {i18n.t('banned')}
-                      </span>
-                    )}
-                    {this.props.showCommunity && (
-                      <span className="ml-2">
-                        <span> {i18n.t('to')} </span>
-                        <CommunityLink
-                          community={{
-                            name: post.community_name,
-                            id: post.community_id,
-                            local: post.community_local,
-                            actor_id: post.community_actor_id,
-                          }}
-                        />
-                      </span>
-                    )}
-                    <div className="list-inline-item ml-2">•</div>
-                    <div>
-                      <MomentTime data={post} />
-                    </div>
-                    {post.stickied && (
-                      <small
-                        className="unselectable pointer ml-1 font-italic"
-                        data-tippy-content={i18n.t('stickied')}
-                      >
-                        {/* <svg class={`icon custom-icon text-success`}>
-                        <use xlinkHref="#icon-pin"></use>
-                      </svg> */}
-                        <Icon className="icon text-success" name="pin" />
-                      </small>
-                    )}
-                    {post.locked && (
-                      <small
-                        className="unselectable pointer ml-1 text-muted font-italic"
-                        data-tippy-content={i18n.t('locked')}
-                      >
-                        <svg class={`icon custom-icon text-danger`}>
-                          <use xlinkHref="#icon-lock"></use>
-                        </svg>
-                      </small>
-                    )}
-                  </li>
-                  {/* <li className="list-inline-item">
-                    <span>
-                      <MomentTime data={post} />
-                    </span>
-                  </li> */}
-                </ul>
-                {this.props.post.duplicates && (
-                  <ul class="list-inline mb-1 small text-muted">
-                    <>
-                      <li className="list-inline-item mr-2">
-                        {i18n.t('cross_posted_to')}
-                      </li>
-                      {this.props.post.duplicates.map(post => (
-                        <li className="list-inline-item mr-2">
-                          <Link to={`/post/${post.id}`}>
-                            {post.community_name}
-                          </Link>
-                        </li>
-                      ))}
-                    </>
-                  </ul>
-                )}
-                {this.state.showRemoveDialog && (
-                  <form
-                    class="form-inline"
-                    onSubmit={linkEvent(this, this.handleModRemoveSubmit)}
-                  >
-                    <input
-                      type="text"
-                      class="form-control mr-2"
-                      placeholder={i18n.t('reason')}
-                      value={this.state.removeReason}
-                      onInput={linkEvent(
-                        this,
-                        this.handleModRemoveReasonChange
-                      )}
-                    />
-                    <button type="submit" class="btn btn-secondary">
-                      {i18n.t('remove_post')}
-                    </button>
-                  </form>
-                )}
-                {this.state.showBanDialog && (
-                  <form onSubmit={linkEvent(this, this.handleModBanBothSubmit)}>
-                    <div class="form-group row">
-                      <label
-                        class="col-form-label"
-                        htmlFor="post-listing-reason"
-                      >
-                        {i18n.t('reason')}
-                      </label>
-                      <input
-                        type="text"
-                        id="post-listing-reason"
-                        class="form-control mr-2"
-                        placeholder={i18n.t('reason')}
-                        value={this.state.banReason}
-                        onInput={linkEvent(this, this.handleModBanReasonChange)}
-                      />
-                    </div>
-                    {/* TODO hold off on expires until later */}
-                    {/* <div class="form-group row"> */}
-                    {/*   <label class="col-form-label">Expires</label> */}
-                    {/*   <input type="date" class="form-control mr-2" placeholder={i18n.t('expires')} value={this.state.banExpires} onInput={linkEvent(this, this.handleModBanExpiresChange)} /> */}
-                    {/* </div> */}
-                    <div class="form-group row">
-                      <button type="submit" class="btn btn-secondary">
-                        {i18n.t('ban')} {post.creator_name}
-                      </button>
-                    </div>
-                  </form>
-                )}
-                {this.state.showReportDialog && (
-                  <form
-                    className="mt-2"
-                    onSubmit={linkEvent(this, this.handleReportSubmit)}
-                  >
-                    <div class="form-group row">
-                      <label
-                        class="col-form-label"
-                        htmlFor="post-listing-report-reason"
-                      >
-                        {i18n.t('reason')}
-                      </label>
-                      <input
-                        type="text"
-                        id="post-listing-report-reason"
-                        class="form-control mr-2"
-                        placeholder={i18n.t('reason')}
-                        value={this.state.reportReason}
-                        onInput={linkEvent(this, this.handleReportReasonChange)}
-                        maxLength={600}
-                      />
-                    </div>
-                    <div class="form-group row">
-                      <button type="submit" class="btn btn-secondary">
-                        {i18n.t('submit_report')}
-                      </button>
-                    </div>
-                  </form>
-                )}
-                <div className="post-listing-details">
-                  <Link
-                    className="text-muted"
-                    title={i18n.t('number_of_comments', {
-                      count: post.number_of_comments,
-                    })}
-                    to={`/post/${post.id}`}
-                  >
-                    {/* <svg class="mr-1 icon icon-inline">
-                        <use xlinkHref="#icon-message-square"></use>
-                      </svg> */}
-                    <Icon name="comment" className="icon mr-1" />
-                    {i18n.t('number_of_comments', {
-                      count: post.number_of_comments,
-                    })}
-                  </Link>
-                  {UserService.Instance.user && !this.props.showBody && (
-                    <button
-                      class="btn btn-sm btn-link btn-animate text-muted p-0 px-2"
-                      onClick={linkEvent(this, this.handleReportPost)}
-                      data-tippy-content={i18n.t('snitch')}
-                    >
-                      <Icon name="report" />
-                    </button>
-                  )}
-                  {this.state.upvotes !== this.state.score && (
-                    <>
-                      <span
-                        class="unselectable pointer mx-1 inline-vote-details"
-                        data-tippy-content={this.pointsTippy}
-                      >
-                        <div className="list-inline-item text-muted">
-                          <Icon name="upvote" className="icon mr-1" />
-                          {this.state.upvotes}
-                        </div>
-                        <div className="list-inline-item text-muted">
-                          <Icon name="downvote" className="icon mr-1" />
-                          {this.state.downvotes}
-                        </div>
-                      </span>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
+            <div className="row">{this.listingActions()}</div>
           </div>
         </div>
-        <ul class="list-inline mb-1 text-muted font-weight-bold">
-          {UserService.Instance.user && (
-            <>
-              {this.props.showBody && (
-                <>
-                  <li className="list-inline-item">
-                    <button
-                      class="btn btn-sm btn-link btn-animate text-muted"
-                      onClick={linkEvent(this, this.handleSavePostClick)}
-                      data-tippy-content={
-                        post.saved ? i18n.t('unsave') : i18n.t('save')
-                      }
-                    >
-                      <Icon
-                        name="star"
-                        class={`icon icon-inline ${
-                          post.saved && 'text-warning'
-                        }`}
-                      />
-                    </button>
-                  </li>
-                  <li className="list-inline-item">
-                    <Link
-                      class="btn btn-sm btn-link btn-animate text-muted"
-                      to={`/create_post${this.crossPostParams}`}
-                      title={i18n.t('cross_post')}
-                    >
-                      <svg class="icon icon-inline">
-                        <use xlinkHref="#icon-copy"></use>
-                      </svg>
-                    </Link>
-                  </li>
-                  <li className="list-inline-item">
-                    <button
-                      class="btn btn-sm btn-link btn-animate text-muted"
-                      onClick={linkEvent(this, this.handleReportPost)}
-                      data-tippy-content={i18n.t('snitch')}
-                    >
-                      <Icon name="report" />
-                    </button>
-                  </li>
-                </>
-              )}
-              {this.myPost && this.props.showBody && (
-                <>
-                  <li className="list-inline-item">
-                    <button
-                      class="btn btn-sm btn-link btn-animate text-muted"
-                      onClick={linkEvent(this, this.handleEditClick)}
-                      data-tippy-content={i18n.t('edit')}
-                    >
-                      <Icon name="edit" />
-                    </button>
-                  </li>
-                  <li className="list-inline-item">
-                    <button
-                      class="btn btn-sm btn-link btn-animate text-muted"
-                      onClick={linkEvent(this, this.handleDeleteClick)}
-                      data-tippy-content={
-                        !post.deleted ? i18n.t('delete') : i18n.t('restore')
-                      }
-                    >
-                      <svg
-                        class={`icon icon-inline ${
-                          post.deleted && 'text-danger'
-                        }`}
-                      >
-                        <use xlinkHref="#icon-trash"></use>
-                      </svg>
-                    </button>
-                  </li>
-                </>
-              )}
-
-              {!this.state.showAdvanced && this.props.showBody ? (
-                <li className="list-inline-item">
-                  <button
-                    class="btn btn-sm btn-link btn-animate text-muted"
-                    onClick={linkEvent(this, this.handleShowAdvanced)}
-                    data-tippy-content={i18n.t('more')}
-                  >
-                    <Icon name="more" />
-                  </button>
-                </li>
-              ) : (
-                <>
-                  {this.props.showBody && post.body && (
-                    <li className="list-inline-item">
-                      <button
-                        class="btn btn-sm btn-link btn-animate text-muted"
-                        onClick={linkEvent(this, this.handleViewSource)}
-                        data-tippy-content={i18n.t('view_source')}
-                      >
-                        <svg
-                          class={`icon icon-inline ${
-                            this.state.viewSource && 'text-success'
-                          }`}
-                        >
-                          <use xlinkHref="#icon-file-text"></use>
-                        </svg>
-                      </button>
-                    </li>
-                  )}
-                  {this.canModOnSelf && (
-                    <>
-                      <li className="list-inline-item">
-                        <button
-                          class="btn btn-sm btn-link btn-animate text-muted"
-                          onClick={linkEvent(this, this.handleModLock)}
-                          data-tippy-content={
-                            post.locked ? i18n.t('unlock') : i18n.t('lock')
-                          }
-                        >
-                          <svg
-                            class={`icon icon-inline ${
-                              post.locked && 'text-danger'
-                            }`}
-                          >
-                            <use xlinkHref="#icon-lock"></use>
-                          </svg>
-                        </button>
-                      </li>
-                      <li className="list-inline-item">
-                        <button
-                          class="btn btn-sm btn-link btn-animate text-muted"
-                          onClick={linkEvent(this, this.handleModSticky)}
-                          data-tippy-content={
-                            post.stickied
-                              ? i18n.t('unsticky')
-                              : i18n.t('sticky')
-                          }
-                        >
-                          <svg
-                            class={`icon icon-inline ${
-                              post.stickied && 'text-success'
-                            }`}
-                          >
-                            <use xlinkHref="#icon-pin"></use>
-                          </svg>
-                        </button>
-                      </li>
-                    </>
-                  )}
-                  {/* Mods can ban from community, and appoint as mods to community */}
-                  {(this.canMod || this.canAdmin) && (
-                    <li className="list-inline-item">
-                      {!post.removed ? (
-                        <span
-                          class="pointer"
-                          onClick={linkEvent(this, this.handleModRemoveShow)}
-                        >
-                          {i18n.t('remove')}
-                        </span>
-                      ) : (
-                        <span
-                          class="pointer"
-                          onClick={linkEvent(this, this.handleModRemoveSubmit)}
-                        >
-                          {i18n.t('restore')}
-                        </span>
-                      )}
-                    </li>
-                  )}
-                  {this.canMod && (
-                    <>
-                      {!this.isMod && (
-                        <li className="list-inline-item">
-                          {!post.banned_from_community ? (
-                            <span
-                              class="pointer"
-                              onClick={linkEvent(
-                                this,
-                                this.handleModBanFromCommunityShow
-                              )}
-                            >
-                              {i18n.t('ban')}
-                            </span>
-                          ) : (
-                            <span
-                              class="pointer"
-                              onClick={linkEvent(
-                                this,
-                                this.handleModBanFromCommunitySubmit
-                              )}
-                            >
-                              {i18n.t('unban')}
-                            </span>
-                          )}
-                        </li>
-                      )}
-                      {!post.banned_from_community && (
-                        <li className="list-inline-item">
-                          <span
-                            class="pointer"
-                            onClick={linkEvent(
-                              this,
-                              this.handleAddModToCommunity
-                            )}
-                          >
-                            {this.isMod
-                              ? i18n.t('remove_as_mod')
-                              : i18n.t('appoint_as_mod')}
-                          </span>
-                        </li>
-                      )}
-                    </>
-                  )}
-                  {/* Community creators and admins can transfer community to another mod */}
-                  {(this.amCommunityCreator || this.canAdmin) && this.isMod && (
-                    <li className="list-inline-item">
-                      {!this.state.showConfirmTransferCommunity ? (
-                        <span
-                          class="pointer"
-                          onClick={linkEvent(
-                            this,
-                            this.handleShowConfirmTransferCommunity
-                          )}
-                        >
-                          {i18n.t('transfer_community')}
-                        </span>
-                      ) : (
-                        <>
-                          <span class="d-inline-block mr-1">
-                            {i18n.t('are_you_sure')}
-                          </span>
-                          <span
-                            class="pointer d-inline-block mr-1"
-                            onClick={linkEvent(
-                              this,
-                              this.handleTransferCommunity
-                            )}
-                          >
-                            {i18n.t('yes')}
-                          </span>
-                          <span
-                            class="pointer d-inline-block"
-                            onClick={linkEvent(
-                              this,
-                              this.handleCancelShowConfirmTransferCommunity
-                            )}
-                          >
-                            {i18n.t('no')}
-                          </span>
-                        </>
-                      )}
-                    </li>
-                  )}
-                  {/* Admins can ban from all, and appoint other admins */}
-                  {this.canAdmin && (
-                    <>
-                      {!this.isAdmin && (
-                        <li className="list-inline-item">
-                          {!post.banned ? (
-                            <span
-                              class="pointer"
-                              onClick={linkEvent(this, this.handleModBanShow)}
-                            >
-                              {i18n.t('ban_from_site')}
-                            </span>
-                          ) : (
-                            <span
-                              class="pointer"
-                              onClick={linkEvent(this, this.handleModBanSubmit)}
-                            >
-                              {i18n.t('unban_from_site')}
-                            </span>
-                          )}
-                        </li>
-                      )}
-                      {!post.banned && (
-                        <li className="list-inline-item">
-                          <span
-                            class="pointer"
-                            onClick={linkEvent(this, this.handleAddAdmin)}
-                          >
-                            {this.isAdmin
-                              ? i18n.t('remove_as_admin')
-                              : i18n.t('appoint_as_admin')}
-                          </span>
-                        </li>
-                      )}
-                    </>
-                  )}
-                  {/* Site Creator can transfer to another admin */}
-                  {this.amSiteCreator && this.isAdmin && (
-                    <li className="list-inline-item">
-                      {!this.state.showConfirmTransferSite ? (
-                        <span
-                          class="pointer"
-                          onClick={linkEvent(
-                            this,
-                            this.handleShowConfirmTransferSite
-                          )}
-                        >
-                          {i18n.t('transfer_site')}
-                        </span>
-                      ) : (
-                        <>
-                          <span class="d-inline-block mr-1">
-                            {i18n.t('are_you_sure')}
-                          </span>
-                          <span
-                            class="pointer d-inline-block mr-1"
-                            onClick={linkEvent(this, this.handleTransferSite)}
-                          >
-                            {i18n.t('yes')}
-                          </span>
-                          <span
-                            class="pointer d-inline-block"
-                            onClick={linkEvent(
-                              this,
-                              this.handleCancelShowConfirmTransferSite
-                            )}
-                          >
-                            {i18n.t('no')}
-                          </span>
-                        </>
-                      )}
-                    </li>
-                  )}
-                </>
-              )}
-            </>
-          )}
+        <ul className="list-inline mb-1 text-muted font-weight-bold">
+          {UserService.Instance.user && <>{this.advancedActions()}</>}
         </ul>
         {post.body && this.state.imageExpanded && !this.props.showBody && (
           <PostBody body={post.body} />
         )}
       </div>
     );
-  }
+  };
+
+  advancedActions = () => {
+    const { post } = this.props;
+
+    return (
+      <>
+        {this.props.showBody && (
+          <>
+            <li className="list-inline-item">
+              <PostListingButton
+                onClick={this.handleSavePostClick}
+                data-tippy-content={
+                  post.saved ? i18n.t('unsave') : i18n.t('save')
+                }
+              >
+                <Icon
+                  name={this.state.localPostSaved ? 'star' : 'starOutline'}
+                  className={`icon icon-inline ${
+                    this.state.localPostSaved && 'text-warning'
+                  }`}
+                />
+              </PostListingButton>
+            </li>
+            <li className="list-inline-item">
+              <Link
+                to={`/create_post${this.crossPostParams}`}
+                title={i18n.t('cross_post')}
+              >
+                <PostListingButton>
+                  <svg className="icon icon-inline">
+                    <use xlinkHref="#icon-copy" />
+                  </svg>
+                </PostListingButton>
+              </Link>
+            </li>
+            <li className="list-inline-item">
+              <PostListingButton
+                onClick={this.handleReportPost}
+                data-tippy-content={i18n.t('snitch')}
+              >
+                <Icon name="report" />
+              </PostListingButton>
+            </li>
+          </>
+        )}
+        {this.myPost && this.props.showBody && (
+          <>
+            <li className="list-inline-item">
+              <PostActionButton
+                onClick={this.handleEditClick}
+                data-tippy-content={i18n.t('edit')}
+              >
+                <Icon name="edit" />
+              </PostActionButton>
+            </li>
+            <li className="list-inline-item">
+              <PostActionButton
+                onClick={this.handleDeleteClick}
+                data-tippy-content={
+                  !post.deleted ? i18n.t('delete') : i18n.t('restore')
+                }
+              >
+                <svg
+                  className={`icon icon-inline ${
+                    post.deleted && 'text-danger'
+                  }`}
+                >
+                  <use xlinkHref="#icon-trash" />
+                </svg>
+              </PostActionButton>
+            </li>
+          </>
+        )}
+        {!this.state.showAdvanced && this.props.showBody ? (
+          <li
+            className={`list-inline-item ${
+              ENABLE_NEW_POST_LISTING && 'only-desktop'
+            }`}
+          >
+            <button
+              className="btn btn-sm btn-link btn-animate text-muted"
+              onClick={this.handleShowAdvanced}
+              data-tippy-content={i18n.t('more')}
+            >
+              <Icon name="more" />
+            </button>
+          </li>
+        ) : (
+          <>
+            {this.props.showBody && post.body && (
+              <li className="list-inline-item">
+                <PostActionButton
+                  // className="btn btn-sm btn-link btn-animate text-muted"
+                  onClick={linkEvent(this, this.handleViewSource)}
+                  data-tippy-content={i18n.t('view_source')}
+                >
+                  <svg
+                    className={`icon icon-inline ${
+                      this.state.viewSource && 'text-success'
+                    }`}
+                  >
+                    <use xlinkHref="#icon-file-text" />
+                  </svg>
+                </PostActionButton>
+              </li>
+            )}
+            {this.canModOnSelf && (
+              <>
+                <li className="list-inline-item">
+                  <PostActionButton
+                    // className="btn btn-sm btn-link btn-animate text-muted"
+                    onClick={this.handleModLock}
+                    data-tippy-content={
+                      post.locked ? i18n.t('unlock') : i18n.t('lock')
+                    }
+                  >
+                    <svg
+                      className={`icon icon-inline ${
+                        post.locked && 'text-danger'
+                      }`}
+                    >
+                      <use xlinkHref="#icon-lock" />
+                    </svg>
+                  </PostActionButton>
+                </li>
+                <li className="list-inline-item">
+                  <PostActionButton
+                    // className="btn btn-sm btn-link btn-animate text-muted"
+                    onClick={this.handleModSticky}
+                    data-tippy-content={
+                      post.stickied ? i18n.t('unsticky') : i18n.t('sticky')
+                    }
+                  >
+                    <svg
+                      className={`icon icon-inline ${
+                        post.stickied && 'text-success'
+                      }`}
+                    >
+                      <use xlinkHref="#icon-pin" />
+                    </svg>
+                  </PostActionButton>
+                </li>
+              </>
+            )}
+            {/* Mods can ban from community, and appoint as mods to community */}
+            {(this.canMod || this.canAdmin) && (
+              <li className="list-inline-item">
+                {!post.removed ? (
+                  <PostActionButton
+                    className="pointer"
+                    onClick={this.handleModRemoveShow}
+                  >
+                    {i18n.t('remove')}
+                  </PostActionButton>
+                ) : (
+                  <PostActionButton
+                    className="pointer"
+                    onClick={this.handleModRemoveSubmit}
+                  >
+                    {i18n.t('restore')}
+                  </PostActionButton>
+                )}
+              </li>
+            )}
+            {this.canMod && (
+              <>
+                {!this.isMod && (
+                  <li className="list-inline-item">
+                    {!post.banned_from_community ? (
+                      <PostActionButton
+                        onClick={this.handleModBanFromCommunityShow}
+                      >
+                        {i18n.t('ban')}
+                      </PostActionButton>
+                    ) : (
+                      <PostActionButton
+                        onClick={linkEvent(
+                          this,
+                          this.handleModBanFromCommunitySubmit
+                        )}
+                      >
+                        {i18n.t('unban')}
+                      </PostActionButton>
+                    )}
+                  </li>
+                )}
+                {!post.banned_from_community && (
+                  <li className="list-inline-item">
+                    <PostActionButton
+                      onClick={linkEvent(this, this.handleAddModToCommunity)}
+                    >
+                      {this.isMod
+                        ? i18n.t('remove_as_mod')
+                        : i18n.t('appoint_as_mod')}
+                    </PostActionButton>
+                  </li>
+                )}
+              </>
+            )}
+            {/* Community creators and admins can transfer community to another mod */}
+            {(this.amCommunityCreator || this.canAdmin) && this.isMod && (
+              <li className="list-inline-item">
+                {!this.state.showConfirmTransferCommunity ? (
+                  <PostActionButton
+                    onClick={linkEvent(
+                      this,
+                      this.handleShowConfirmTransferCommunity
+                    )}
+                  >
+                    {i18n.t('transfer_community')}
+                  </PostActionButton>
+                ) : (
+                  <>
+                    <span className="d-inline-block mr-1">
+                      {i18n.t('are_you_sure')}
+                    </span>
+                    <span
+                      className="pointer d-inline-block mr-1"
+                      onClick={linkEvent(this, this.handleTransferCommunity)}
+                    >
+                      {i18n.t('yes')}
+                    </span>
+                    <span
+                      className="pointer d-inline-block"
+                      onClick={linkEvent(
+                        this,
+                        this.handleCancelShowConfirmTransferCommunity
+                      )}
+                    >
+                      {i18n.t('no')}
+                    </span>
+                  </>
+                )}
+              </li>
+            )}
+            {/* Admins can ban from all, and appoint other admins */}
+            {this.canAdmin && (
+              <>
+                {!this.isAdmin && (
+                  <li className="list-inline-item">
+                    {!post.banned ? (
+                      <PostActionButton onClick={this.handleModBanShow}>
+                        {i18n.t('ban_from_site')}
+                      </PostActionButton>
+                    ) : (
+                      <PostActionButton onClick={this.handleModBanSubmit}>
+                        {i18n.t('unban_from_site')}
+                      </PostActionButton>
+                    )}
+                  </li>
+                )}
+                {!post.banned && (
+                  <li className="list-inline-item">
+                    <PostActionButton
+                      onClick={linkEvent(this, this.handleAddAdmin)}
+                    >
+                      {this.isAdmin
+                        ? i18n.t('remove_as_admin')
+                        : i18n.t('appoint_as_admin')}
+                    </PostActionButton>
+                  </li>
+                )}
+                {!post.banned && (
+                  <li className="list-inline-item">
+                    <PostActionButton
+                      onClick={linkEvent(this, this.handleAddSitemod)}
+                    >
+                      {this.isSitemod
+                        ? i18n.t('remove_as_sitemod')
+                        : i18n.t('appoint_as_sitemod')}
+                    </PostActionButton>
+                  </li>
+                )}
+              </>
+            )}
+            {/* Site Creator can transfer to another admin */}
+            {this.amSiteCreator && this.isAdmin && (
+              <li className="list-inline-item">
+                {!this.state.showConfirmTransferSite ? (
+                  <PostActionButton
+                    onClick={linkEvent(
+                      this,
+                      this.handleShowConfirmTransferSite
+                    )}
+                  >
+                    {i18n.t('transfer_site')}
+                  </PostActionButton>
+                ) : (
+                  <>
+                    <span className="d-inline-block mr-1">
+                      {i18n.t('are_you_sure')}
+                    </span>
+                    <span
+                      className="pointer d-inline-block mr-1"
+                      onClick={linkEvent(this, this.handleTransferSite)}
+                    >
+                      {i18n.t('yes')}
+                    </span>
+                    <span
+                      className="pointer d-inline-block"
+                      onClick={linkEvent(
+                        this,
+                        this.handleCancelShowConfirmTransferSite
+                      )}
+                    >
+                      {i18n.t('no')}
+                    </span>
+                  </>
+                )}
+              </li>
+            )}
+          </>
+        )}
+      </>
+    );
+  };
 
   private get myPost(): boolean {
     return (
       UserService.Instance.user &&
-      this.props.post.creator_id == UserService.Instance.user.id
+      this.props.post.creator_id === UserService.Instance.user.id
     );
   }
 
@@ -1067,10 +1382,21 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     );
   }
 
+  get isSitemod(): boolean {
+    return (
+      this.props.sitemods &&
+      isMod(
+        this.props.sitemods.map(s => s.id),
+        this.props.post.creator_id
+      )
+    );
+  }
+
   get canMod(): boolean {
-    if (this.props.admins && this.props.moderators) {
+    if (this.props.admins && this.props.sitemods && this.props.moderators) {
       let adminsThenMods = this.props.admins
         .map(a => a.id)
+        .concat(this.props.sitemods.map(s => s.id))
         .concat(this.props.moderators.map(m => m.user_id));
 
       return canMod(
@@ -1084,9 +1410,10 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
   }
 
   get canModOnSelf(): boolean {
-    if (this.props.admins && this.props.moderators) {
+    if (this.props.admins && this.props.sitemods && this.props.moderators) {
       let adminsThenMods = this.props.admins
         .map(a => a.id)
+        .concat(this.props.sitemods.map(s => s.id))
         .concat(this.props.moderators.map(m => m.user_id));
 
       return canMod(
@@ -1115,8 +1442,8 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     return (
       this.props.moderators &&
       UserService.Instance.user &&
-      this.props.post.creator_id != UserService.Instance.user.id &&
-      UserService.Instance.user.id == this.props.moderators[0].user_id
+      this.props.post.creator_id !== UserService.Instance.user.id &&
+      UserService.Instance.user.id === this.props.moderators[0].user_id
     );
   }
 
@@ -1124,113 +1451,114 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     return (
       this.props.admins &&
       UserService.Instance.user &&
-      this.props.post.creator_id != UserService.Instance.user.id &&
-      UserService.Instance.user.id == this.props.admins[0].id
+      this.props.post.creator_id !== UserService.Instance.user.id &&
+      UserService.Instance.user.id === this.props.admins[0].id
     );
   }
 
-  handlePostLike(i: PostListing) {
+  handlePostLike = () => {
     if (!UserService.Instance.user) {
-      this.context.router.history.push(`/login`);
+      this.props.history.push(`/login`);
     }
 
-    let new_vote = i.state.my_vote == 1 ? 0 : 1;
+    let new_vote = this.state.my_vote === 1 ? 0 : 1;
+    const newState = { ...this.state };
 
-    if (i.state.my_vote == 1) {
-      i.state.score--;
-      i.state.upvotes--;
-    } else if (i.state.my_vote == -1) {
-      i.state.downvotes--;
-      i.state.upvotes++;
-      i.state.score += 2;
+    if (this.state.my_vote === 1) {
+      newState.score--;
+      newState.upvotes--;
+    } else if (this.state.my_vote === -1) {
+      newState.downvotes--;
+      newState.upvotes++;
+      newState.score += 2;
     } else {
-      i.state.upvotes++;
-      i.state.score++;
+      newState.upvotes++;
+      newState.score++;
     }
 
-    i.state.my_vote = new_vote;
+    newState.my_vote = new_vote;
 
     let form: CreatePostLikeForm = {
-      post_id: i.props.post.id,
-      score: i.state.my_vote,
+      post_id: this.props.post.id,
+      score: this.state.my_vote,
     };
 
     WebSocketService.Instance.likePost(form);
-    i.setState(i.state);
+    this.setState(newState);
     setupTippy();
-  }
+  };
 
-  handlePostDisLike(i: PostListing) {
+  handlePostDisLike = () => {
     if (!UserService.Instance.user) {
-      this.context.router.history.push(`/login`);
+      this.props.history.push(`/login`);
     }
 
-    let new_vote = i.state.my_vote == -1 ? 0 : -1;
+    let new_vote = this.state.my_vote === -1 ? 0 : -1;
+    const newState = { ...this.state };
 
-    if (i.state.my_vote == 1) {
-      i.state.score -= 2;
-      i.state.upvotes--;
-      i.state.downvotes++;
-    } else if (i.state.my_vote == -1) {
-      i.state.downvotes--;
-      i.state.score++;
+    if (this.state.my_vote === 1) {
+      newState.score -= 2;
+      newState.upvotes--;
+      newState.downvotes++;
+    } else if (this.state.my_vote === -1) {
+      newState.downvotes--;
+      newState.score++;
     } else {
-      i.state.downvotes++;
-      i.state.score--;
+      newState.downvotes++;
+      newState.score--;
     }
 
-    i.state.my_vote = new_vote;
+    newState.my_vote = new_vote;
 
     let form: CreatePostLikeForm = {
-      post_id: i.props.post.id,
-      score: i.state.my_vote,
+      post_id: this.props.post.id,
+      score: this.state.my_vote,
     };
 
     WebSocketService.Instance.likePost(form);
-    i.setState(i.state);
+    this.setState(newState);
     setupTippy();
-  }
+  };
 
-  handleEditClick(i: PostListing) {
-    i.state.showEdit = true;
-    i.setState(i.state);
-  }
+  handleEditClick = () => {
+    this.setState({
+      showEdit: true,
+    });
+  };
 
-  handleEditCancel() {
-    this.state.showEdit = false;
-    this.setState(this.state);
-  }
+  handleEditCancel = () => {
+    this.setState({
+      showEdit: false,
+    });
+  };
 
   // The actual editing is done in the recieve for post
-  handleEditPost() {
-    this.state.showEdit = false;
-    this.setState(this.state);
-  }
+  handleEditPost = () => {
+    this.setState({
+      showEdit: false,
+    });
+  };
 
-  handleDeleteClick(i: PostListing) {
-    let deleteForm: PostFormI = {
-      body: i.props.post.body,
-      community_id: i.props.post.community_id,
-      name: i.props.post.name,
-      url: i.props.post.url,
-      edit_id: i.props.post.id,
-      creator_id: i.props.post.creator_id,
-      deleted: !i.props.post.deleted,
-      nsfw: i.props.post.nsfw,
+  handleDeleteClick = () => {
+    let deleteForm: DeletePostForm = {
+      edit_id: this.props.post.id,
+      deleted: !this.props.post.deleted,
       auth: null,
     };
-    WebSocketService.Instance.editPost(deleteForm);
-  }
+    WebSocketService.Instance.deletePost(deleteForm);
+  };
 
-  handleSavePostClick(i: PostListing) {
-    let saved = i.props.post.saved == undefined ? true : !i.props.post.saved;
+  handleSavePostClick = () => {
+    let saved =
+      this.props.post.saved === undefined ? true : !this.props.post.saved;
     let form: SavePostForm = {
-      post_id: i.props.post.id,
+      post_id: this.props.post.id,
       save: saved,
     };
 
     WebSocketService.Instance.savePost(form);
-  }
+    this.setState({ localPostSaved: !this.state.localPostSaved });
+  };
 
   get crossPostParams(): string {
     let params = `?title=${this.props.post.name}`;
@@ -1248,120 +1576,124 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     return params;
   }
 
-  handleModRemoveShow(i: PostListing) {
-    i.state.showRemoveDialog = true;
-    i.setState(i.state);
-  }
+  handleModRemoveShow = () => {
+    this.setState({
+      showRemoveDialog: true,
+    });
+  };
 
-  handleModRemoveReasonChange(i: PostListing, event: any) {
-    i.state.removeReason = event.target.value;
-    i.setState(i.state);
-  }
+  handleModRemoveReasonChange = (event: any) => {
+    this.setState({
+      removeReason: event.target.value,
+    });
+  };
 
-  handleModRemoveSubmit(i: PostListing) {
+  handleModRemoveSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    let form: PostFormI = {
-      name: i.props.post.name,
-      community_id: i.props.post.community_id,
-      edit_id: i.props.post.id,
-      creator_id: i.props.post.creator_id,
-      removed: !i.props.post.removed,
-      reason: i.state.removeReason,
-      nsfw: i.props.post.nsfw,
+    let form: RemovePostForm = {
+      edit_id: this.props.post.id,
+      removed: !this.props.post.removed,
+      reason: this.state.removeReason,
       auth: null,
     };
-    WebSocketService.Instance.editPost(form);
-    i.state.showRemoveDialog = false;
-    i.setState(i.state);
-  }
+    WebSocketService.Instance.removePost(form);
+    this.setState({
+      showRemoveDialog: false,
+    });
+  };
 
-  handleModLock(i: PostListing) {
-    let form: PostFormI = {
-      name: i.props.post.name,
-      community_id: i.props.post.community_id,
-      edit_id: i.props.post.id,
-      creator_id: i.props.post.creator_id,
-      nsfw: i.props.post.nsfw,
-      locked: !i.props.post.locked,
+  handleModLock = () => {
+    let form: LockPostForm = {
+      edit_id: this.props.post.id,
+      locked: !this.props.post.locked,
       auth: null,
     };
-    WebSocketService.Instance.editPost(form);
-  }
+    WebSocketService.Instance.lockPost(form);
+  };
 
-  handleModSticky(i: PostListing) {
-    let form: PostFormI = {
-      name: i.props.post.name,
-      community_id: i.props.post.community_id,
-      edit_id: i.props.post.id,
-      creator_id: i.props.post.creator_id,
-      nsfw: i.props.post.nsfw,
-      stickied: !i.props.post.stickied,
+  handleModSticky = () => {
+    let form: StickyPostForm = {
+      edit_id: this.props.post.id,
+      stickied: !this.props.post.stickied,
       auth: null,
     };
-    WebSocketService.Instance.editPost(form);
-  }
+    WebSocketService.Instance.stickyPost(form);
+  };
 
-  handleModBanFromCommunityShow(i: PostListing) {
-    i.state.showBanDialog = true;
-    i.state.banType = BanType.Community;
-    i.setState(i.state);
-  }
+  handleModBanFromCommunityShow = () => {
+    this.setState({
+      showBanDialog: true,
+      banType: BanType.Community,
+    });
+  };
 
-  handleModBanShow(i: PostListing) {
-    i.state.showBanDialog = true;
-    i.state.banType = BanType.Site;
-    i.setState(i.state);
-  }
+  handleModBanShow = () => {
+    this.setState({
+      showBanDialog: true,
+      banType: BanType.Site,
+    });
+  };
 
-  handleModBanReasonChange(i: PostListing, event: any) {
-    i.state.banReason = event.target.value;
-    i.setState(i.state);
-  }
+  handleModBanReasonChange = (event: any) => {
+    this.setState({
+      banReason: event.target.value,
+    });
+  };
 
-  handleModBanExpiresChange(i: PostListing, event: any) {
-    i.state.banExpires = event.target.value;
-    i.setState(i.state);
-  }
+  handleModBanExpiresChange = (event: any) => {
+    this.setState({
+      banReason: event.target.value,
+    });
+  };
 
-  handleModBanFromCommunitySubmit(i: PostListing) {
-    i.state.banType = BanType.Community;
-    i.setState(i.state);
-    i.handleModBanBothSubmit(i);
-  }
+  handleModBanFromCommunitySubmit = () => {
+    this.setState(
+      {
+        banType: BanType.Community,
+      },
+      () => {
+        this.handleModBanBothSubmit();
+      }
+    );
+  };
 
-  handleModBanSubmit(i: PostListing) {
-    i.state.banType = BanType.Site;
-    i.setState(i.state);
-    i.handleModBanBothSubmit(i);
-  }
+  handleModBanSubmit = () => {
+    this.setState(
+      {
+        banType: BanType.Site,
+      },
+      () => {
+        this.handleModBanBothSubmit();
+      }
+    );
+  };
 
-  handleModBanBothSubmit(i: PostListing) {
-    event.preventDefault();
-
-    if (i.state.banType == BanType.Community) {
+  handleModBanBothSubmit = () => {
+    if (this.state.banType === BanType.Community) {
       let form: BanFromCommunityForm = {
-        user_id: i.props.post.creator_id,
-        community_id: i.props.post.community_id,
-        ban: !i.props.post.banned_from_community,
-        reason: i.state.banReason,
-        expires: getUnixTime(i.state.banExpires),
+        user_id: this.props.post.creator_id,
+        community_id: this.props.post.community_id,
+        ban: !this.props.post.banned_from_community,
+        reason: this.state.banReason,
+        expires: getUnixTime(this.state.banExpires),
       };
       WebSocketService.Instance.banFromCommunity(form);
     } else {
       let form: BanUserForm = {
-        user_id: i.props.post.creator_id,
-        ban: !i.props.post.banned,
-        reason: i.state.banReason,
-        expires: getUnixTime(i.state.banExpires),
+        user_id: this.props.post.creator_id,
+        ban: !this.props.post.banned,
+        reason: this.state.banReason,
+        expires: getUnixTime(this.state.banExpires),
       };
       WebSocketService.Instance.banUser(form);
     }
 
-    i.state.showBanDialog = false;
-    i.setState(i.state);
-  }
+    this.setState({
+      showBanDialog: false,
+    });
+  };
 
-  handleAddModToCommunity(i: PostListing) {
+  handleAddModToCommunity(i: BasePostListing) {
     let form: AddModToCommunityForm = {
       user_id: i.props.post.creator_id,
       community_id: i.props.post.community_id,
@@ -1371,7 +1703,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     i.setState(i.state);
   }
 
-  handleAddAdmin(i: PostListing) {
+  handleAddAdmin(i: BasePostListing) {
     let form: AddAdminForm = {
       user_id: i.props.post.creator_id,
       added: !i.isAdmin,
@@ -1380,66 +1712,73 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     i.setState(i.state);
   }
 
-  handleShowConfirmTransferCommunity(i: PostListing) {
-    i.state.showConfirmTransferCommunity = true;
+  handleAddSitemod(i: BasePostListing) {
+    let form: AddSitemodForm = {
+      user_id: i.props.post.creator_id,
+      added: !i.isSitemod,
+    };
+    WebSocketService.Instance.addSitemod(form);
     i.setState(i.state);
   }
 
-  handleCancelShowConfirmTransferCommunity(i: PostListing) {
-    i.state.showConfirmTransferCommunity = false;
-    i.setState(i.state);
+  handleShowConfirmTransferCommunity(i: BasePostListing) {
+    i.setState({ showConfirmTransferCommunity: true });
   }
 
-  handleTransferCommunity(i: PostListing) {
+  handleCancelShowConfirmTransferCommunity(i: BasePostListing) {
+    i.setState({ showConfirmTransferCommunity: false });
+  }
+
+  handleTransferCommunity(i: BasePostListing) {
     let form: TransferCommunityForm = {
       community_id: i.props.post.community_id,
       user_id: i.props.post.creator_id,
     };
     WebSocketService.Instance.transferCommunity(form);
-    i.state.showConfirmTransferCommunity = false;
-    i.setState(i.state);
+    i.setState({ showConfirmTransferCommunity: false });
   }
 
-  handleShowConfirmTransferSite(i: PostListing) {
-    i.state.showConfirmTransferSite = true;
-    i.setState(i.state);
+  handleShowConfirmTransferSite(i: BasePostListing) {
+    i.setState({ showConfirmTransferCommunity: true });
   }
 
-  handleCancelShowConfirmTransferSite(i: PostListing) {
-    i.state.showConfirmTransferSite = false;
-    i.setState(i.state);
+  handleCancelShowConfirmTransferSite(i: BasePostListing) {
+    i.setState({ showConfirmTransferSite: false });
   }
 
-  handleTransferSite(i: PostListing) {
+  handleTransferSite(i: BasePostListing) {
     let form: TransferSiteForm = {
       user_id: i.props.post.creator_id,
     };
     WebSocketService.Instance.transferSite(form);
-    i.state.showConfirmTransferSite = false;
-    i.setState(i.state);
+    i.setState({ showConfirmTransferSite: false });
   }
 
-  handleImageExpandClick(i: PostListing) {
-    i.state.imageExpanded = !i.state.imageExpanded;
-    i.setState(i.state);
+  handleImageExpandClick = () => {
+    this.setState({
+      imageExpanded: !this.state.imageExpanded,
+    });
+  };
+
+  handleViewSource(i: BasePostListing) {
+    i.setState(prevState => ({
+      viewSource: !prevState.viewSource,
+    }));
   }
 
-  handleViewSource(i: PostListing) {
-    i.state.viewSource = !i.state.viewSource;
-    i.setState(i.state);
+  handleReportPost = () => {
+    this.setState(prevState => ({
+      showReportDialog: !prevState.showReportDialog,
+    }));
+  };
+
+  handleReportReasonChange(i: BasePostListing, event: any) {
+    i.setState({
+      reportReason: event.target.value,
+    });
   }
 
-  handleReportPost(i: PostListing) {
-    i.state.showReportDialog = !i.state.showReportDialog;
-    i.setState(i.state);
-  }
-
-  handleReportReasonChange(i: PostListing, event: any) {
-    i.state.reportReason = event.target.value;
-    i.setState(i.state);
-  }
-
-  handleReportSubmit(i: PostListing, e: any) {
+  handleReportSubmit(i: BasePostListing, e: any) {
     e.preventDefault();
 
     WebSocketService.Instance.createPostReport({
@@ -1447,17 +1786,22 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
       reason: i.state.reportReason,
     });
 
-    i.state.reportReason = null;
-    i.state.showReportDialog = false;
-
-    i.setState(i.state);
+    i.setState({
+      reportReason: null,
+      showReportDialog: false,
+    });
   }
 
-  handleShowAdvanced(i: PostListing) {
-    i.state.showAdvanced = !i.state.showAdvanced;
-    i.setState(i.state);
-    setupTippy();
-  }
+  handleShowAdvanced = () => {
+    this.setState(
+      prevState => ({
+        showAdvanced: !prevState.showAdvanced,
+      }),
+      () => {
+        setupTippy();
+      }
+    );
+  };
 
   get pointsTippy(): string {
     let points = i18n.t('number_of_points', {
@@ -1475,3 +1819,5 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     return `${points} • ${upvotes} • ${downvotes}`;
   }
 }
+
+export const PostListing = withRouter(BasePostListing);

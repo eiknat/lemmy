@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -29,12 +29,15 @@ import {
   createCommentLikeRes,
   commentsToFlatNodes,
   setupTippy,
+  isCommentChanged,
+  isMessageChanged,
 } from '../utils';
 import { CommentNodes } from './comment-nodes';
 import { PrivateMessage } from './private-message';
 import { SortSelect } from './sort-select';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
 
 enum UnreadOrAll {
   Unread,
@@ -74,10 +77,9 @@ export class Inbox extends Component<any, InboxState> {
     enableDownvotes: undefined,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
+  state = this.emptyState;
 
-    this.state = this.emptyState;
+  componentDidMount() {
     this.handleSortChange = this.handleSortChange.bind(this);
 
     this.subscription = WebSocketService.Instance.subject
@@ -98,10 +100,10 @@ export class Inbox extends Component<any, InboxState> {
 
   render() {
     return (
-      <div class="container">
-        <div class="row">
-          <div class="col-12">
-            <h5 class="mb-1">
+      <div className="container">
+        <div className="row">
+          <div className="col-12">
+            <h5 className="mb-1">
               {i18n.t('inbox')}
               <small>
                 <a
@@ -119,10 +121,10 @@ export class Inbox extends Component<any, InboxState> {
               this.state.messages.length >
               0 &&
               this.state.unreadOrAll == UnreadOrAll.Unread && (
-                <ul class="list-inline mb-1 text-muted small font-weight-bold">
+                <ul className="list-inline mb-1 text-muted small font-weight-bold">
                   <li className="list-inline-item">
                     <button
-                      class="btn btn-secondary pointer mb-2"
+                      className="btn btn-secondary pointer mb-2"
                       onClick={linkEvent(this, this.markAllAsRead)}
                     >
                       {i18n.t('mark_all_as_read')}
@@ -144,7 +146,7 @@ export class Inbox extends Component<any, InboxState> {
 
   unreadOrAllRadios() {
     return (
-      <div class="btn-group btn-group-toggle">
+      <div className="btn-group btn-group-toggle">
         <label
           className={`btn btn-sm btn-secondary pointer
             ${this.state.unreadOrAll == UnreadOrAll.Unread && 'active'}
@@ -177,7 +179,7 @@ export class Inbox extends Component<any, InboxState> {
 
   messageTypeRadios() {
     return (
-      <div class="btn-group btn-group-toggle">
+      <div className="btn-group btn-group-toggle">
         <label
           className={`btn btn-sm btn-secondary pointer btn-outline-light
             ${this.state.messageType == MessageType.All && 'active'}
@@ -237,8 +239,10 @@ export class Inbox extends Component<any, InboxState> {
   selects() {
     return (
       <div className="mb-2">
-        <span class="mr-3">{this.unreadOrAllRadios()}</span>
-        <div class="mr-3 my-2 user-view-toggle">{this.messageTypeRadios()}</div>
+        <span className="mr-3">{this.unreadOrAllRadios()}</span>
+        <div className="mr-3 my-2 user-view-toggle">
+          {this.messageTypeRadios()}
+        </div>
         <SortSelect
           sort={this.state.sort}
           onChange={this.handleSortChange}
@@ -263,6 +267,7 @@ export class Inbox extends Component<any, InboxState> {
         {combined.map(i =>
           isCommentType(i) ? (
             <CommentNodes
+              key={i.id}
               nodes={[{ comment: i }]}
               noIndent
               markable
@@ -271,7 +276,7 @@ export class Inbox extends Component<any, InboxState> {
               enableDownvotes={this.state.enableDownvotes}
             />
           ) : (
-            <PrivateMessage privateMessage={i} />
+            <PrivateMessage key={i.id} privateMessage={i} />
           )
         )}
       </div>
@@ -298,6 +303,7 @@ export class Inbox extends Component<any, InboxState> {
       <div>
         {this.state.mentions.map(mention => (
           <CommentNodes
+            key={mention.id}
             nodes={[{ comment: mention }]}
             noIndent
             markable
@@ -314,7 +320,7 @@ export class Inbox extends Component<any, InboxState> {
     return (
       <div>
         {this.state.messages.map(message => (
-          <PrivateMessage privateMessage={message} />
+          <PrivateMessage key={message.id} privateMessage={message} />
         ))}
       </div>
     );
@@ -322,10 +328,10 @@ export class Inbox extends Component<any, InboxState> {
 
   paginator() {
     return (
-      <div class="mt-2">
+      <div className="mt-2">
         {this.state.page > 1 && (
           <button
-            class="btn btn-sm btn-secondary mr-1"
+            className="btn btn-sm btn-secondary mr-1"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
@@ -333,7 +339,7 @@ export class Inbox extends Component<any, InboxState> {
         )}
         {this.unreadCount() > 0 && (
           <button
-            class="btn btn-sm btn-secondary"
+            className="btn btn-sm btn-secondary"
             onClick={linkEvent(this, this.nextPage)}
           >
             {i18n.t('next')}
@@ -344,29 +350,49 @@ export class Inbox extends Component<any, InboxState> {
   }
 
   nextPage(i: Inbox) {
-    i.state.page++;
-    i.setState(i.state);
-    i.refetch();
+    i.setState(
+      prevState => ({
+        page: prevState.page + 1,
+      }),
+      () => {
+        i.refetch();
+      }
+    );
   }
 
   prevPage(i: Inbox) {
-    i.state.page--;
-    i.setState(i.state);
-    i.refetch();
+    i.setState(
+      prevState => ({
+        page: prevState.page - 1,
+      }),
+      () => {
+        i.refetch();
+      }
+    );
   }
 
   handleUnreadOrAllChange(i: Inbox, event: any) {
-    i.state.unreadOrAll = Number(event.target.value);
-    i.state.page = 1;
-    i.setState(i.state);
-    i.refetch();
+    i.setState(
+      {
+        unreadOrAll: Number(event.target.value),
+        page: 1,
+      },
+      () => {
+        i.refetch();
+      }
+    );
   }
 
   handleMessageTypeChange(i: Inbox, event: any) {
-    i.state.messageType = Number(event.target.value);
-    i.state.page = 1;
-    i.setState(i.state);
-    i.refetch();
+    i.setState(
+      {
+        messageType: Number(event.target.value),
+        page: 1,
+      },
+      () => {
+        i.refetch();
+      }
+    );
   }
 
   refetch() {
@@ -395,20 +421,30 @@ export class Inbox extends Component<any, InboxState> {
   }
 
   handleSortChange(val: SortType) {
-    this.state.sort = val;
-    this.state.page = 1;
-    this.setState(this.state);
-    this.refetch();
+    this.setState(
+      {
+        sort: val,
+        page: 1,
+      },
+      () => {
+        this.refetch();
+      }
+    );
   }
 
   markAllAsRead(i: Inbox) {
     WebSocketService.Instance.markAllAsRead();
-    i.state.replies = [];
-    i.state.mentions = [];
-    i.state.messages = [];
-    i.sendUnreadCount();
-    window.scrollTo(0, 0);
-    i.setState(i.state);
+    i.setState(
+      {
+        replies: [],
+        mentions: [],
+        messages: [],
+      },
+      () => {
+        i.sendUnreadCount();
+        window.scrollTo(0, 0);
+      }
+    );
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
@@ -421,26 +457,41 @@ export class Inbox extends Component<any, InboxState> {
       this.refetch();
     } else if (res.op == UserOperation.GetReplies) {
       let data = res.data as GetRepliesResponse;
-      this.state.replies = data.replies;
-      this.sendUnreadCount();
-      window.scrollTo(0, 0);
-      this.setState(this.state);
-      setupTippy();
+      this.setState(
+        {
+          replies: data.replies,
+        },
+        () => {
+          this.sendUnreadCount();
+          window.scrollTo(0, 0);
+          setupTippy();
+        }
+      );
     } else if (res.op == UserOperation.GetUserMentions) {
       let data = res.data as GetUserMentionsResponse;
-      this.state.mentions = data.mentions;
-      this.sendUnreadCount();
-      window.scrollTo(0, 0);
-      this.setState(this.state);
-      setupTippy();
+      this.setState(
+        {
+          mentions: data.mentions,
+        },
+        () => {
+          this.sendUnreadCount();
+          window.scrollTo(0, 0);
+          setupTippy();
+        }
+      );
     } else if (res.op == UserOperation.GetPrivateMessages) {
       let data = res.data as PrivateMessagesResponse;
-      this.state.messages = data.messages;
-      this.sendUnreadCount();
-      window.scrollTo(0, 0);
-      this.setState(this.state);
-      setupTippy();
-    } else if (res.op == UserOperation.EditPrivateMessage) {
+      this.setState(
+        {
+          messages: data.messages,
+        },
+        () => {
+          this.sendUnreadCount();
+          window.scrollTo(0, 0);
+          setupTippy();
+        }
+      );
+    } else if (isMessageChanged(res.op)) {
       let data = res.data as PrivateMessageResponse;
       let found: PrivateMessageI = this.state.messages.find(
         m => m.id === data.message.id
@@ -463,7 +514,7 @@ export class Inbox extends Component<any, InboxState> {
       setupTippy();
     } else if (res.op == UserOperation.MarkAllAsRead) {
       // Moved to be instant
-    } else if (res.op == UserOperation.EditComment) {
+    } else if (isCommentChanged(res.op)) {
       let data = res.data as CommentResponse;
       editCommentRes(data, this.state.replies);
 
@@ -529,19 +580,17 @@ export class Inbox extends Component<any, InboxState> {
       this.setState(this.state);
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-      this.state.enableDownvotes = data.site.enable_downvotes;
-      this.setState(this.state);
-      document.title = `/u/${UserService.Instance.user.username} ${i18n.t(
+      this.setState({
+        enableDownvotes: data.site.enable_downvotes,
+      });
+      document.title = `/u/${UserService.Instance.user.name} ${i18n.t(
         'inbox'
       )} - ${data.site.name}`;
     }
   }
 
   sendUnreadCount() {
-    UserService.Instance.user.unreadCount = this.unreadCount();
-    UserService.Instance.sub.next({
-      user: UserService.Instance.user,
-    });
+    UserService.Instance.unreadCountSub.next(this.unreadCount());
   }
 
   unreadCount(): number {
@@ -549,7 +598,7 @@ export class Inbox extends Component<any, InboxState> {
       this.state.replies.filter(r => !r.read).length +
       this.state.mentions.filter(r => !r.read).length +
       this.state.messages.filter(
-        r => !r.read && r.creator_id !== UserService.Instance.user.id
+        r => !r.read && r.creator_id !== UserService.Instance?.user?.id
       ).length
     );
   }

@@ -1,4 +1,4 @@
-import { Component } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { WebSocketService } from '../services';
@@ -8,7 +8,7 @@ import {
   UserOperation,
 } from '../interfaces';
 import { i18n } from '../i18next';
-import { T } from 'inferno-i18next';
+import { Trans } from 'react-i18next';
 import { repoUrl, wsJsonToRes, toast } from '../utils';
 import { PATREON_URL } from '../constants';
 
@@ -36,14 +36,14 @@ export class Sponsors extends Component<any, any> {
   }
 
   render() {
-    return <div class="container text-center">{this.topMessage()}</div>;
+    return <div className="container text-center">{this.topMessage()}</div>;
   }
 
   topMessage() {
     return (
       <div>
         <div>
-          <h4 class="my-2">
+          <h4 className="my-2">
             Support Chapo.chat and the Chapo Collective on Liberapay
           </h4>
           <p>
@@ -51,7 +51,7 @@ export class Sponsors extends Component<any, any> {
             building an independent space for solidarity and true
             democratization on the internet.
           </p>
-          <a class="btn btn-secondary ml-2" href={PATREON_URL}>
+          <a className="btn btn-secondary ml-2" href={PATREON_URL}>
             Support on Liberapay
           </a>
         </div>
@@ -59,21 +59,21 @@ export class Sponsors extends Component<any, any> {
         <div>
           <h5>{i18n.t('donate_to_lemmy')}</h5>
           <p>
-            <T i18nKey="sponsor_message">
+            <Trans i18nKey="sponsor_message">
               #<a href={repoUrl}>#</a>
-            </T>
+            </Trans>
           </p>
-          <a class="btn btn-secondary" href="https://liberapay.com/Lemmy/">
+          <a className="btn btn-secondary" href="https://liberapay.com/Lemmy/">
             {i18n.t('support_on_liberapay')}
           </a>
           <a
-            class="btn btn-secondary ml-2"
+            className="btn btn-secondary ml-2"
             href="https://www.patreon.com/dessalines"
           >
             {i18n.t('support_on_patreon')}
           </a>
           <a
-            class="btn btn-secondary ml-2"
+            className="btn btn-secondary ml-2"
             href="https://opencollective.com/lemmy"
           >
             {i18n.t('support_on_open_collective')}

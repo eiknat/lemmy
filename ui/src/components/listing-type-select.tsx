@@ -1,8 +1,10 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { ListingType } from '../interfaces';
 import { UserService } from '../services';
 
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
+import Button from './elements/Button';
 
 interface ListingTypeSelectProps {
   type_: ListingType;
@@ -34,35 +36,39 @@ export class ListingTypeSelect extends Component<
 
   render() {
     return (
-      <div class="btn-group btn-group-toggle">
-        <label
-          className={`btn btn-sm btn-secondary
-            ${this.state.type_ == ListingType.Subscribed && 'active'}
-            ${UserService.Instance.user == undefined ? 'disabled' : 'pointer'}
-          `}
+      <div className="btn-group btn-group-toggle">
+        <Button
+          as="label"
+          disabled={UserService.Instance.user == undefined}
+          variant={
+            this.state.type_ == ListingType.Subscribed ? 'primary' : 'muted'
+          }
         >
           <input
             type="radio"
+            className="visually-hidden"
             value={ListingType.Subscribed}
             checked={this.state.type_ == ListingType.Subscribed}
             onChange={linkEvent(this, this.handleTypeChange)}
             disabled={UserService.Instance.user == undefined}
           />
           {i18n.t('subscribed')}
-        </label>
-        <label
-          className={`pointer btn btn-sm btn-secondary ${
-            this.state.type_ == ListingType.All && 'active'
-          }`}
+        </Button>
+        <Button
+          as="label"
+          variant={
+            this.state.type_ == ListingType.All ? 'primary' : 'muted'
+          }
         >
           <input
             type="radio"
+            className="visually-hidden"
             value={ListingType.All}
             checked={this.state.type_ == ListingType.All}
             onChange={linkEvent(this, this.handleTypeChange)}
           />
           {i18n.t('all')}
-        </label>
+        </Button>
       </div>
     );
   }

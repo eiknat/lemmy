@@ -1,4 +1,5 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -15,6 +16,7 @@ import autosize from 'autosize';
 import { SiteForm } from './site-form';
 import { UserListing } from './user-listing';
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
 
 interface AdminSettingsState {
   siteRes: GetSiteResponse;
@@ -24,7 +26,7 @@ interface AdminSettingsState {
   siteConfigLoading: boolean;
 }
 
-export class AdminSettings extends Component<any, AdminSettingsState> {
+class BaseAdminSettings extends Component<any, AdminSettingsState> {
   private siteConfigTextAreaId = `site-config-${randomStr()}`;
   private subscription: Subscription;
   private emptyState: AdminSettingsState = {
@@ -45,6 +47,7 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
         enable_nsfw: null,
       },
       admins: [],
+      sitemods: [],
       banned: [],
       online: null,
     },
@@ -59,11 +62,9 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
     siteConfigLoading: true,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
+  state = this.emptyState;
 
-    this.state = this.emptyState;
-
+  componentDidMount() {
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
       .subscribe(
@@ -83,21 +84,22 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
   render() {
     console.log(this.state.siteRes.site);
     return (
-      <div class="container">
+      <div className="container">
         {this.state.siteLoading || this.state.siteConfigLoading ? (
           <h5>
-            <svg class="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+            <svg className="icon icon-spinner spin">
+              <use xlinkHref="#icon-spinner" />
             </svg>
           </h5>
         ) : (
-          <div class="row">
-            <div class="col-12 col-md-6">
+          <div className="row">
+            <div className="col-12 col-md-6">
               <SiteForm site={this.state.siteRes.site} />
               {this.admins()}
+              {this.sitemods()}
               {this.bannedUsers()}
             </div>
-            <div class="col-12 col-md-6">{this.adminSettings()}</div>
+            <div className="col-12 col-md-6">{this.adminSettings()}</div>
           </div>
         )}
       </div>
@@ -108,9 +110,9 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
     return (
       <>
         <h5>{capitalizeFirstLetter(i18n.t('admins'))}</h5>
-        <ul class="list-unstyled">
+        <ul className="list-unstyled">
           {this.state.siteRes.admins.map(admin => (
-            <li class="list-inline-item">
+            <li key={admin.id} className="list-inline-item">
               <UserListing
                 user={{
                   name: admin.name,
@@ -127,13 +129,36 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
     );
   }
 
+  sitemods() {
+    return (
+      <>
+        <h5>{capitalizeFirstLetter(i18n.t('sitemods'))}</h5>
+        <ul className="list-unstyled">
+          {this.state.siteRes.sitemods.map(sitemod => (
+            <li key={sitemod.id} className="list-inline-item">
+              <UserListing
+                user={{
+                  name: sitemod.name,
+                  avatar: sitemod.avatar,
+                  id: sitemod.id,
+                  local: sitemod.local,
+                  actor_id: sitemod.actor_id,
+                }}
+              />
+            </li>
+          ))}
+        </ul>
+      </>
+    );
+  }
+
   bannedUsers() {
     return (
       <>
         <h5>{i18n.t('banned_users')}</h5>
-        <ul class="list-unstyled">
+        <ul className="list-unstyled">
           {this.state.siteRes.banned.map(banned => (
-            <li class="list-inline-item">
+            <li key={banned.id} className="list-inline-item">
               <UserListing
                 user={{
                   name: banned.name,
@@ -154,30 +179,30 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
     return (
       <div>
         <h5>{i18n.t('admin_settings')}</h5>
-        <form onSubmit={linkEvent(this, this.handleSiteConfigSubmit)}>
-          <div class="form-group row">
+        <form onSubmit={this.handleSiteAdminConfigSubmit}>
+          <div className="form-group row">
             <label
-              class="col-12 col-form-label"
+              className="col-12 col-form-label"
               htmlFor={this.siteConfigTextAreaId}
             >
               {i18n.t('site_config')}
             </label>
-            <div class="col-12">
+            <div className="col-12">
               <textarea
                 id={this.siteConfigTextAreaId}
                 value={this.state.siteConfigForm.config_hjson}
-                onInput={linkEvent(this, this.handleSiteConfigHjsonChange)}
-                class="form-control text-monospace"
+                onChange={this.handleSiteConfigHjsonChange}
+                className="form-control text-monospace"
                 rows={3}
               />
             </div>
           </div>
-          <div class="form-group row">
-            <div class="col-12">
-              <button type="submit" class="btn btn-secondary mr-2">
+          <div className="form-group row">
+            <div className="col-12">
+              <button type="submit" className="btn btn-secondary mr-2">
                 {this.state.siteConfigLoading ? (
-                  <svg class="icon icon-spinner spin">
-                    <use xlinkHref="#icon-spinner"></use>
+                  <svg className="icon icon-spinner spin">
+                    <use xlinkHref="#icon-spinner" />
                   </svg>
                 ) : (
                   capitalizeFirstLetter(i18n.t('save'))
@@ -190,24 +215,29 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
     );
   }
 
-  handleSiteConfigSubmit(i: AdminSettings, event: any) {
+  handleSiteAdminConfigSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    i.state.siteConfigLoading = true;
-    WebSocketService.Instance.saveSiteConfig(i.state.siteConfigForm);
-    i.setState(i.state);
-  }
+    WebSocketService.Instance.saveSiteConfig(this.state.siteConfigForm);
+    this.setState({ siteConfigLoading: true });
+  };
 
-  handleSiteConfigHjsonChange(i: AdminSettings, event: any) {
-    i.state.siteConfigForm.config_hjson = event.target.value;
-    i.setState(i.state);
-  }
+  handleSiteConfigHjsonChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    this.setState({
+      siteConfigForm: {
+        ...this.state.siteConfigForm,
+        config_hjson: event.target.value,
+      },
+    });
+  };
 
   parseMessage(msg: WebSocketJsonResponse) {
     console.log(msg);
     let res = wsJsonToRes(msg);
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
-      this.context.router.history.push('/');
+      this.props.history.push('/');
       this.state.siteLoading = false;
       this.state.siteConfigLoading = false;
       this.setState(this.state);
@@ -218,18 +248,18 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
 
       // This means it hasn't been set up yet
       if (!data.site) {
-        this.context.router.history.push('/setup');
+        this.props.history.push('/setup');
       }
       this.state.siteRes = data;
       this.state.siteLoading = false;
       this.setState(this.state);
-      document.title = `${i18n.t('admin_settings')} - ${
-        this.state.siteRes.site.name
-      }`;
     } else if (res.op == UserOperation.EditSite) {
       let data = res.data as SiteResponse;
       this.state.siteRes.site = data.site;
       this.setState(this.state);
+      document.title = `${i18n.t('admin_settings')} - ${
+        this.state.siteRes.site.name
+      }`;
       toast(i18n.t('site_saved'));
     } else if (res.op == UserOperation.GetSiteConfig) {
       let data = res.data as GetSiteConfigResponse;
@@ -249,3 +279,5 @@ export class AdminSettings extends Component<any, AdminSettingsState> {
     }
   }
 }
+
+export const AdminSettings = withRouter(BaseAdminSettings);

@@ -22,6 +22,7 @@ import {
   AddModToCommunityForm,
   TransferCommunityForm,
   AddAdminForm,
+  AddSitemodForm,
   TransferSiteForm,
   BanUserForm,
   SiteForm,
@@ -40,6 +41,7 @@ import {
   GetCommentsForm,
   UserJoinForm,
   GetSiteConfig,
+  GetSiteForm,
   SiteConfigForm,
   MessageType,
   WebSocketJsonResponse,
@@ -54,6 +56,15 @@ import {
   EditCommunitySettingsForm,
   GetUserTagForm,
   SetUserTagForm,
+  MarkPrivateMessageReadForm,
+  DeletePrivateMessageForm,
+  DeleteCommentForm,
+  RemoveCommentForm,
+  DeletePostForm,
+  RemovePostForm,
+  StickyPostForm,
+  LockPostForm,
+  MarkCommentReadForm,
 } from '../interfaces';
 import { UserService } from './';
 import { i18n } from '../i18next';
@@ -61,7 +72,6 @@ import { toast } from '../utils';
 import { Observable } from 'rxjs';
 import { share } from 'rxjs/operators';
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import { User } from '../components/user';
 
 export class WebSocketService {
   private static _instance: WebSocketService;
@@ -69,6 +79,7 @@ export class WebSocketService {
   public subject: Observable<any>;
 
   public admins: Array<UserView>;
+  public sitemods: Array<UserView>;
   public banned: Array<UserView>;
 
   private constructor() {
@@ -119,6 +130,10 @@ export class WebSocketService {
 
   public register(registerForm: RegisterForm) {
     this.ws.send(this.wsSendWrapper(UserOperation.Register, registerForm));
+  }
+
+  public getCaptcha() {
+    this.ws.send(this.wsSendWrapper(UserOperation.GetCaptcha, {}));
   }
 
   public createCommunity(communityForm: CommunityForm) {
@@ -183,6 +198,23 @@ export class WebSocketService {
     this.ws.send(this.wsSendWrapper(UserOperation.EditComment, commentForm));
   }
 
+  public deleteComment(commentForm: DeleteCommentForm) {
+    this.setAuth(commentForm);
+    this.ws.send(this.wsSendWrapper(UserOperation.DeleteComment, commentForm));
+  }
+
+  public removeComment(commentForm: RemoveCommentForm) {
+    this.setAuth(commentForm);
+    this.ws.send(this.wsSendWrapper(UserOperation.RemoveComment, commentForm));
+  }
+
+  public markCommentAsRead(commentForm: MarkCommentReadForm) {
+    this.setAuth(commentForm);
+    this.ws.send(
+      this.wsSendWrapper(UserOperation.MarkCommentAsRead, commentForm)
+    );
+  }
+
   public likeComment(form: CommentLikeForm) {
     this.setAuth(form);
     this.ws.send(this.wsSendWrapper(UserOperation.CreateCommentLike, form));
@@ -211,6 +243,26 @@ export class WebSocketService {
   public editPost(postForm: PostForm) {
     this.setAuth(postForm);
     this.ws.send(this.wsSendWrapper(UserOperation.EditPost, postForm));
+  }
+
+  public deletePost(postForm: DeletePostForm) {
+    this.setAuth(postForm);
+    this.ws.send(this.wsSendWrapper(UserOperation.DeletePost, postForm));
+  }
+
+  public removePost(postForm: RemovePostForm) {
+    this.setAuth(postForm);
+    this.ws.send(this.wsSendWrapper(UserOperation.RemovePost, postForm));
+  }
+
+  public lockPost(postForm: LockPostForm) {
+    this.setAuth(postForm);
+    this.ws.send(this.wsSendWrapper(UserOperation.LockPost, postForm));
+  }
+
+  public stickyPost(postForm: StickyPostForm) {
+    this.setAuth(postForm);
+    this.ws.send(this.wsSendWrapper(UserOperation.StickyPost, postForm));
   }
 
   public savePost(form: SavePostForm) {
@@ -248,6 +300,11 @@ export class WebSocketService {
     this.ws.send(this.wsSendWrapper(UserOperation.AddAdmin, form));
   }
 
+  public addSitemod(form: AddSitemodForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.AddSitemod, form));
+  }
+
   public getUserDetails(form: GetUserDetailsForm) {
     this.setAuth(form, false);
     this.ws.send(this.wsSendWrapper(UserOperation.GetUserDetails, form));
@@ -283,8 +340,9 @@ export class WebSocketService {
     this.ws.send(this.wsSendWrapper(UserOperation.EditSite, siteForm));
   }
 
-  public getSite() {
-    this.ws.send(this.wsSendWrapper(UserOperation.GetSite, {}));
+  public getSite(form: GetSiteForm = {}) {
+    this.setAuth(form, false);
+    this.ws.send(this.wsSendWrapper(UserOperation.GetSite, form));
   }
 
   public getSiteConfig() {
@@ -332,6 +390,18 @@ export class WebSocketService {
   public editPrivateMessage(form: EditPrivateMessageForm) {
     this.setAuth(form);
     this.ws.send(this.wsSendWrapper(UserOperation.EditPrivateMessage, form));
+  }
+
+  public markPrivateMessageRead(form: MarkPrivateMessageReadForm) {
+    this.setAuth(form);
+    this.ws.send(
+      this.wsSendWrapper(UserOperation.MarkPrivateMessageAsRead, form)
+    );
+  }
+
+  public deletePrivateMessage(form: DeletePrivateMessageForm) {
+    this.setAuth(form);
+    this.ws.send(this.wsSendWrapper(UserOperation.DeletePrivateMessage, form));
   }
 
   public getPrivateMessages(form: GetPrivateMessagesForm) {
@@ -408,7 +478,7 @@ export class WebSocketService {
     return JSON.stringify(send);
   }
 
-  private setAuth(obj: any, throwErr: boolean = true) {
+  private setAuth(obj: any, throwErr = true) {
     obj.auth = UserService.Instance.auth;
     if (obj.auth == null && throwErr) {
       toast(i18n.t('not_logged_in'), 'danger');

@@ -1,8 +1,10 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import {
   PrivateMessage as PrivateMessageI,
   EditPrivateMessageForm,
+  MarkPrivateMessageReadForm,
+  DeletePrivateMessageForm,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import {
@@ -17,6 +19,7 @@ import { MomentTime } from './moment-time';
 import { PrivateMessageForm } from './private-message-form';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
 
 interface PrivateMessageState {
   showReply: boolean;
@@ -52,15 +55,17 @@ export class PrivateMessage extends Component<
   }
 
   get mine(): boolean {
-    return UserService.Instance.user.id == this.props.privateMessage.creator_id;
+    return (
+      UserService.Instance.user?.id == this.props.privateMessage.creator_id
+    );
   }
 
   render() {
     let message = this.props.privateMessage;
     return (
-      <div class="border-top border-light">
+      <div className="border-top border-light">
         <div>
-          <ul class="list-inline mb-0 text-muted small">
+          <ul className="list-inline mb-0 text-muted small">
             {/* TODO refactor this */}
             <li className="list-inline-item">
               {this.mine ? i18n.t('to') : i18n.t('from')}
@@ -81,12 +86,17 @@ export class PrivateMessage extends Component<
                     <img
                       height="32"
                       width="32"
+                      alt={`user avatar for ${
+                        this.mine
+                          ? message.recipient_name
+                          : message.creator_name
+                      }`}
                       src={pictrsAvatarThumbnail(
                         this.mine
                           ? message.recipient_avatar
                           : message.creator_avatar
                       )}
-                      class="rounded-circle mr-1"
+                      className="rounded-circle mr-1"
                     />
                   )}
                 <span>
@@ -102,15 +112,15 @@ export class PrivateMessage extends Component<
             <li className="list-inline-item">
               <div
                 className="pointer text-monospace"
-                onClick={linkEvent(this, this.handleMessageCollapse)}
+                onClick={this.handleMessageCollapse}
               >
                 {this.state.collapsed ? (
-                  <svg class="icon icon-inline">
-                    <use xlinkHref="#icon-plus-square"></use>
+                  <svg className="icon icon-inline">
+                    <use xlinkHref="#icon-plus-square" />
                   </svg>
                 ) : (
-                  <svg class="icon icon-inline">
-                    <use xlinkHref="#icon-minus-square"></use>
+                  <svg className="icon icon-inline">
+                    <use xlinkHref="#icon-minus-square" />
                   </svg>
                 )}
               </div>
@@ -135,12 +145,12 @@ export class PrivateMessage extends Component<
                   )}
                 />
               )}
-              <ul class="list-inline mb-0 text-muted font-weight-bold">
+              <ul className="list-inline mb-0 text-muted font-weight-bold">
                 {!this.mine && (
                   <>
                     <li className="list-inline-item">
                       <button
-                        class="btn btn-link btn-sm btn-animate text-muted"
+                        className="btn btn-link btn-sm btn-animate text-muted"
                         onClick={linkEvent(this, this.handleMarkRead)}
                         data-tippy-content={
                           message.read
@@ -149,18 +159,18 @@ export class PrivateMessage extends Component<
                         }
                       >
                         <svg
-                          class={`icon icon-inline ${
+                          className={`icon icon-inline ${
                             message.read && 'text-success'
                           }`}
                         >
-                          <use xlinkHref="#icon-check"></use>
+                          <use xlinkHref="#icon-check" />
                         </svg>
                       </button>
                     </li>
                     <li className="list-inline-item">
                       <button
-                        class="btn btn-link btn-sm btn-animate text-muted"
-                        onClick={linkEvent(this, this.handleReplyClick)}
+                        className="btn btn-link btn-sm btn-animate text-muted"
+                        onClick={this.handleReplyClick}
                         data-tippy-content={i18n.t('reply')}
                       >
                         <Icon name="reply" />
@@ -172,8 +182,8 @@ export class PrivateMessage extends Component<
                   <>
                     <li className="list-inline-item">
                       <button
-                        class="btn btn-link btn-sm btn-animate text-muted"
-                        onClick={linkEvent(this, this.handleEditClick)}
+                        className="btn btn-link btn-sm btn-animate text-muted"
+                        onClick={this.handleEditClick}
                         data-tippy-content={i18n.t('edit')}
                       >
                         <Icon name="edit" />
@@ -181,8 +191,8 @@ export class PrivateMessage extends Component<
                     </li>
                     <li className="list-inline-item">
                       <button
-                        class="btn btn-link btn-sm btn-animate text-muted"
-                        onClick={linkEvent(this, this.handleDeleteClick)}
+                        className="btn btn-link btn-sm btn-animate text-muted"
+                        onClick={this.handleDeleteClick}
                         data-tippy-content={
                           !message.deleted
                             ? i18n.t('delete')
@@ -190,11 +200,11 @@ export class PrivateMessage extends Component<
                         }
                       >
                         <svg
-                          class={`icon icon-inline ${
+                          className={`icon icon-inline ${
                             message.deleted && 'text-danger'
                           }`}
                         >
-                          <use xlinkHref="#icon-trash"></use>
+                          <use xlinkHref="#icon-trash" />
                         </svg>
                       </button>
                     </li>
@@ -202,16 +212,16 @@ export class PrivateMessage extends Component<
                 )}
                 <li className="list-inline-item">
                   <button
-                    class="btn btn-link btn-sm btn-animate text-muted"
-                    onClick={linkEvent(this, this.handleViewSource)}
+                    className="btn btn-link btn-sm btn-animate text-muted"
+                    onClick={this.handleViewSource}
                     data-tippy-content={i18n.t('view_source')}
                   >
                     <svg
-                      class={`icon icon-inline ${
+                      className={`icon icon-inline ${
                         this.state.viewSource && 'text-success'
                       }`}
                     >
-                      <use xlinkHref="#icon-file-text"></use>
+                      <use xlinkHref="#icon-file-text" />
                     </svg>
                   </button>
                 </li>
@@ -228,7 +238,7 @@ export class PrivateMessage extends Component<
           />
         )}
         {/* A collapsed clearfix */}
-        {this.state.collapsed && <div class="row col-12"></div>}
+        {this.state.collapsed && <div className="row col-12" />}
       </div>
     );
   }
@@ -246,56 +256,59 @@ export class PrivateMessage extends Component<
     return { __html: html };
   }
 
-  handleReplyClick(i: PrivateMessage) {
-    i.state.showReply = true;
-    i.setState(i.state);
-  }
+  handleReplyClick = () => {
+    this.setState({ showReply: true });
+  };
 
-  handleEditClick(i: PrivateMessage) {
-    i.state.showEdit = true;
-    i.setState(i.state);
-  }
+  handleEditClick = () => {
+    this.setState({ showEdit: true });
+  };
 
-  handleDeleteClick(i: PrivateMessage) {
-    let form: EditPrivateMessageForm = {
-      edit_id: i.props.privateMessage.id,
-      deleted: !i.props.privateMessage.deleted,
+  handleDeleteClick = () => {
+    let form: DeletePrivateMessageForm = {
+      edit_id: this.props.privateMessage.id,
+      deleted: !this.props.privateMessage.deleted,
     };
-    WebSocketService.Instance.editPrivateMessage(form);
-  }
+    WebSocketService.Instance.deletePrivateMessage(form);
+  };
 
   handleReplyCancel() {
-    this.state.showReply = false;
-    this.state.showEdit = false;
-    this.setState(this.state);
+    this.setState({
+      showReply: false,
+      showEdit: false,
+    });
   }
 
   handleMarkRead(i: PrivateMessage) {
-    let form: EditPrivateMessageForm = {
+    // let form: EditPrivateMessageForm = {
+    //   edit_id: i.props.privateMessage.id,
+    //   read: !i.props.privateMessage.read,
+    // };
+    const form: MarkPrivateMessageReadForm = {
       edit_id: i.props.privateMessage.id,
       read: !i.props.privateMessage.read,
     };
-    WebSocketService.Instance.editPrivateMessage(form);
+    WebSocketService.Instance.markPrivateMessageRead(form);
   }
 
-  handleMessageCollapse(i: PrivateMessage) {
-    i.state.collapsed = !i.state.collapsed;
-    i.setState(i.state);
-  }
+  handleMessageCollapse = () => {
+    this.setState({ collapsed: !this.state.collapsed });
+  };
 
-  handleViewSource(i: PrivateMessage) {
-    i.state.viewSource = !i.state.viewSource;
-    i.setState(i.state);
-  }
+  handleViewSource = () => {
+    this.setState({ viewSource: !this.state.viewSource });
+  };
 
   handlePrivateMessageEdit() {
-    this.state.showEdit = false;
-    this.setState(this.state);
+    this.setState({
+      showEdit: false,
+    });
   }
 
   handlePrivateMessageCreate() {
-    this.state.showReply = false;
-    this.setState(this.state);
+    this.setState({
+      showReply: false,
+    });
     toast(i18n.t('message_sent'));
   }
 }
