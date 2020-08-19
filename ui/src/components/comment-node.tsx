@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import {
   CommentNode as CommentNodeI,
   CommentLikeForm,
@@ -12,11 +12,15 @@ import {
   UserView,
   AddModToCommunityForm,
   AddAdminForm,
+  AddSitemodForm,
   TransferCommunityForm,
   TransferSiteForm,
   BanType,
   CommentSortType,
   SortType,
+  DeleteCommentForm,
+  RemoveCommentForm,
+  MarkCommentReadForm,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import {
@@ -36,8 +40,9 @@ import { CommentNodes } from './comment-nodes';
 import { UserListing } from './user-listing';
 import { CommunityLink } from './community-link';
 import { i18n } from '../i18next';
-import { replaceEmojis } from '../custom-emojis';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
+import { RoleBadge } from './RoleBadge';
 
 interface CommentNodeState {
   showReply: boolean;
@@ -53,6 +58,7 @@ interface CommentNodeState {
   showConfirmTransferCommunity: boolean;
   showConfirmAppointAsMod: boolean;
   showConfirmAppointAsAdmin: boolean;
+  showConfirmAppointAsSitemod: boolean;
   showReportDialog: boolean;
   collapsed: boolean;
   viewSource: boolean;
@@ -75,31 +81,13 @@ interface CommentNodeProps {
   showContext?: boolean;
   moderators: Array<CommunityUser>;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
   // TODO is this necessary, can't I get it from the node itself?
   postCreatorId?: number;
   showCommunity?: boolean;
   sort?: CommentSortType;
   sortType?: SortType;
   enableDownvotes: boolean;
-}
-
-export function RoleBadge({
-  role,
-  tooltipText,
-  children,
-}: {
-  role: 'mod' | 'admin' | 'creator';
-  children: any;
-  tooltipText: string;
-}) {
-  return (
-    <div
-      className={`badge badge-light mx-1 comment-badge ${role}-badge`}
-      data-tippy-content={tooltipText}
-    >
-      {children}
-    </div>
-  );
 }
 
 export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
@@ -120,6 +108,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     showConfirmTransferCommunity: false,
     showConfirmAppointAsMod: false,
     showConfirmAppointAsAdmin: false,
+    showConfirmAppointAsSitemod: false,
     showReportDialog: false,
     my_vote: this.props.node.comment.my_vote,
     score: this.props.node.comment.score,
@@ -132,27 +121,38 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     saveLoading: false,
   };
 
+  state = this.emptyState;
+
   constructor(props: any, context: any) {
     super(props, context);
 
-    this.state = this.emptyState;
     this.handleReplyCancel = this.handleReplyCancel.bind(this);
     this.handleCommentUpvote = this.handleCommentUpvote.bind(this);
     this.handleCommentDownvote = this.handleCommentDownvote.bind(this);
   }
 
-  componentWillReceiveProps(nextProps: CommentNodeProps) {
-    this.state.my_vote = nextProps.node.comment.my_vote;
-    this.state.upvotes = nextProps.node.comment.upvotes;
-    this.state.downvotes = nextProps.node.comment.downvotes;
-    this.state.score = nextProps.node.comment.score;
-    this.state.readLoading = false;
-    this.state.saveLoading = false;
-    this.setState(this.state);
+  UNSAFE_componentWillReceiveProps(nextProps: CommentNodeProps) {
+    this.setState({
+      my_vote: nextProps.node.comment.my_vote,
+      upvotes: nextProps.node.comment.upvotes,
+      downvotes: nextProps.node.comment.downvotes,
+      score: nextProps.node.comment.score,
+      readLoading: false,
+      saveLoading: false,
+    });
   }
 
   render() {
     let node = this.props.node;
+
+    const borderStyle =
+      !this.props.noIndent && this.props.node.comment.parent_id
+        ? {
+            borderLeftColor: this.state.borderColor,
+            borderLeftWidth: `2px`,
+            borderLeftStyle: `solid`,
+          }
+        : {};
 
     return (
       <div
@@ -162,23 +162,20 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
       >
         <div
           id={`comment-${node.comment.id}`}
-          className={`details comment-node border-top border-light py-2 ${
+          className={`details comment-node border-top py-2 ${
             this.isCommentNew ? 'mark' : ''
           }`}
-          style={
-            !this.props.noIndent &&
-            this.props.node.comment.parent_id &&
-            `border-left: 2px ${this.state.borderColor} solid !important`
-          }
+          // @ts-ignore
+          style={borderStyle}
         >
           <div
-            class={`${
+            className={`${
               !this.props.noIndent &&
               this.props.node.comment.parent_id &&
               'ml-2'
             }`}
           >
-            <div class="d-flex flex-wrap align-items-center text-muted small">
+            <div className="d-flex flex-wrap align-items-center text-muted small">
               <div
                 className="unselectable pointer mr-2 comment-expand-button"
                 onClick={linkEvent(this, this.handleCommentCollapse)}
@@ -189,7 +186,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   <Icon name="minus" size="16px" />
                 )}
               </div>
-              <span class="mr-2">
+              <span className="mr-2">
                 <UserListing
                   user={{
                     name: node.comment.creator_name,
@@ -201,6 +198,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   }}
                   isMod={this.isMod}
                   isAdmin={this.isAdmin}
+                  isSitemod={this.isSitemod}
                 />
               </span>
               {this.isAdmin && (
@@ -208,7 +206,12 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                   {i18n.t('admin')[0]}
                 </RoleBadge>
               )}
-              {this.isMod && !this.isAdmin && (
+              {this.isSitemod && (
+                <RoleBadge role="sitemod" tooltipText={i18n.t('sitemod')}>
+                  {i18n.t('sitemod')[0]}
+                </RoleBadge>
+              )}
+              {this.isMod && !this.isAdmin && !this.isSitemod && (
                 <RoleBadge role="mod" tooltipText={i18n.t('mod')}>
                   {i18n.t('mod')[0]}
                 </RoleBadge>
@@ -230,7 +233,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
               )}
               {this.props.showCommunity && (
                 <>
-                  <span class="mx-1">{i18n.t('to')}</span>
+                  <span className="mx-1">{i18n.t('to')}</span>
                   <CommunityLink
                     community={{
                       name: node.comment.community_name,
@@ -239,8 +242,8 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                       actor_id: node.comment.community_actor_id,
                     }}
                   />
-                  <span class="mx-2">•</span>
-                  <Link class="mr-2" to={`/post/${node.comment.post_id}`}>
+                  <span className="mx-2">•</span>
+                  <Link className="mr-2" to={`/post/${node.comment.post_id}`}>
                     {node.comment.post_name}
                   </Link>
                 </>
@@ -252,8 +255,8 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                 onClick={linkEvent(node, this.handleCommentUpvote)}
                 data-tippy-content={this.pointsTippy}
               >
-                <Icon name="hexbear" class="icon mr-1 mb-1" />
-                <span class="mr-1">{this.state.score}</span>
+                <Icon name="hexbear" className="icon mr-1 mb-1" />
+                <span className="mr-1">{this.state.score}</span>
               </button>
               <span className="mr-1">•</span>
               <span>
@@ -282,12 +285,12 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                     )}
                   />
                 )}
-                <div class="d-flex justify-content-between justify-content-lg-start flex-wrap text-muted font-weight-bold">
+                <div className="d-flex justify-content-between justify-content-lg-start flex-wrap text-muted font-weight-bold">
                   {this.props.showContext && this.linkBtn}
                   {this.props.markable && (
                     <button
-                      class="btn btn-link btn-animate text-muted"
-                      onClick={linkEvent(this, this.handleMarkRead)}
+                      className="btn btn-link btn-animate text-muted"
+                      onClick={this.handleMarkRead}
                       data-tippy-content={
                         node.comment.read
                           ? i18n.t('mark_as_unread')
@@ -298,11 +301,11 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                         this.loadingIcon
                       ) : (
                         <svg
-                          class={`icon icon-inline ${
+                          className={`icon icon-inline ${
                             node.comment.read && 'text-success'
                           }`}
                         >
-                          <use xlinkHref="#icon-check"></use>
+                          <use xlinkHref="#icon-check" />
                         </svg>
                       )}
                     </button>
@@ -318,7 +321,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                       >
                         <Icon name="upvote" />
                         {this.state.upvotes !== this.state.score && (
-                          <span class="ml-1">{this.state.upvotes}</span>
+                          <span className="ml-1">{this.state.upvotes}</span>
                         )}
                       </button>
                       {this.props.enableDownvotes && (
@@ -333,12 +336,12 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                         >
                           <Icon name="downvote" />
                           {this.state.upvotes !== this.state.score && (
-                            <span class="ml-1">{this.state.downvotes}</span>
+                            <span className="ml-1">{this.state.downvotes}</span>
                           )}
                         </button>
                       )}
                       <button
-                        class="btn btn-link btn-animate text-muted"
+                        className="btn btn-link btn-animate text-muted"
                         onClick={linkEvent(this, this.handleReplyClick)}
                         data-tippy-content={i18n.t('reply')}
                       >
@@ -355,21 +358,21 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                       ) : (
                         <>
                           {!this.myComment && (
-                            <button class="btn btn-link btn-animate">
+                            <button className="btn btn-link btn-animate">
                               <Link
-                                class="text-muted"
+                                className="text-muted"
                                 to={`/create_private_message?recipient_id=${node.comment.creator_id}`}
                                 title={i18n.t('message').toLowerCase()}
                               >
-                                <svg class="icon">
-                                  <use xlinkHref="#icon-mail"></use>
+                                <svg className="icon">
+                                  <use xlinkHref="#icon-mail" />
                                 </svg>
                               </Link>
                             </button>
                           )}
                           {!this.props.showContext && this.linkBtn}
                           <button
-                            class="btn btn-link btn-animate text-muted"
+                            className="btn btn-link btn-animate text-muted"
                             onClick={linkEvent(
                               this,
                               this.handleSaveCommentClick
@@ -384,7 +387,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                               this.loadingIcon
                             ) : (
                               <Icon
-                                class={`icon icon-inline ${
+                                className={`icon icon-inline ${
                                   node.comment.saved && 'text-warning'
                                 }`}
                                 name="star"
@@ -397,24 +400,24 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                             data-tippy-content={i18n.t('view_source')}
                           >
                             <svg
-                              class={`icon icon-inline ${
+                              className={`icon icon-inline ${
                                 this.state.viewSource && 'text-success'
                               }`}
                             >
-                              <use xlinkHref="#icon-file-text"></use>
+                              <use xlinkHref="#icon-file-text" />
                             </svg>
                           </button>
                           {this.myComment ? (
                             <>
                               <button
-                                class="btn btn-link btn-animate text-muted"
+                                className="btn btn-link btn-animate text-muted"
                                 onClick={linkEvent(this, this.handleEditClick)}
                                 data-tippy-content={i18n.t('edit')}
                               >
                                 <Icon name="edit" />
                               </button>
                               <button
-                                class="btn btn-link btn-animate text-muted"
+                                className="btn btn-link btn-animate text-muted"
                                 onClick={linkEvent(
                                   this,
                                   this.handleDeleteClick
@@ -426,17 +429,17 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                 }
                               >
                                 <svg
-                                  class={`icon icon-inline ${
+                                  className={`icon icon-inline ${
                                     node.comment.deleted && 'text-danger'
                                   }`}
                                 >
-                                  <use xlinkHref="#icon-trash"></use>
+                                  <use xlinkHref="#icon-trash" />
                                 </svg>
                               </button>
                             </>
                           ) : (
                             <button
-                              class="btn btn-sm btn-link btn-animate text-muted small"
+                              className="btn btn-sm btn-link btn-animate text-muted small"
                               onClick={linkEvent(
                                 this,
                                 this.handleReportComment
@@ -446,12 +449,12 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                               <Icon name="report" />
                             </button>
                           )}
-                          {/* Admins and mods can remove comments */}
+                          {/* Admins, sitemods, and mods can remove comments */}
                           {(this.canMod || this.canAdmin) && (
                             <>
                               {!node.comment.removed ? (
                                 <button
-                                  class="btn btn-link btn-animate text-muted"
+                                  className="btn btn-link btn-animate text-muted"
                                   onClick={linkEvent(
                                     this,
                                     this.handleModRemoveShow
@@ -461,11 +464,8 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                 </button>
                               ) : (
                                 <button
-                                  class="btn btn-link btn-animate text-muted"
-                                  onClick={linkEvent(
-                                    this,
-                                    this.handleModRemoveSubmit
-                                  )}
+                                  className="btn btn-link btn-animate text-muted"
+                                  onClick={this.handleModRemoveSubmit}
                                 >
                                   {i18n.t('restore')}
                                 </button>
@@ -478,7 +478,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                               {!this.isMod &&
                                 (!node.comment.banned_from_community ? (
                                   <button
-                                    class="btn btn-link btn-animate text-muted"
+                                    className="btn btn-link btn-animate text-muted"
                                     onClick={linkEvent(
                                       this,
                                       this.handleModBanFromCommunityShow
@@ -488,7 +488,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                   </button>
                                 ) : (
                                   <button
-                                    class="btn btn-link btn-animate text-muted"
+                                    className="btn btn-link btn-animate text-muted"
                                     onClick={linkEvent(
                                       this,
                                       this.handleModBanFromCommunitySubmit
@@ -500,7 +500,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                               {!node.comment.banned_from_community &&
                                 (!this.state.showConfirmAppointAsMod ? (
                                   <button
-                                    class="btn btn-link btn-animate text-muted"
+                                    className="btn btn-link btn-animate text-muted"
                                     onClick={linkEvent(
                                       this,
                                       this.handleShowConfirmAppointAsMod
@@ -512,11 +512,11 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                   </button>
                                 ) : (
                                   <>
-                                    <button class="btn btn-link btn-animate text-muted">
+                                    <button className="btn btn-link btn-animate text-muted">
                                       {i18n.t('are_you_sure')}
                                     </button>
                                     <button
-                                      class="btn btn-link btn-animate text-muted"
+                                      className="btn btn-link btn-animate text-muted"
                                       onClick={linkEvent(
                                         this,
                                         this.handleAddModToCommunity
@@ -525,7 +525,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                       {i18n.t('yes')}
                                     </button>
                                     <button
-                                      class="btn btn-link btn-animate text-muted"
+                                      className="btn btn-link btn-animate text-muted"
                                       onClick={linkEvent(
                                         this,
                                         this.handleCancelConfirmAppointAsMod
@@ -542,7 +542,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                             this.isMod &&
                             (!this.state.showConfirmTransferCommunity ? (
                               <button
-                                class="btn btn-link btn-animate text-muted"
+                                className="btn btn-link btn-animate text-muted"
                                 onClick={linkEvent(
                                   this,
                                   this.handleShowConfirmTransferCommunity
@@ -552,11 +552,11 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                               </button>
                             ) : (
                               <>
-                                <button class="btn btn-link btn-animate text-muted">
+                                <button className="btn btn-link btn-animate text-muted">
                                   {i18n.t('are_you_sure')}
                                 </button>
                                 <button
-                                  class="btn btn-link btn-animate text-muted"
+                                  className="btn btn-link btn-animate text-muted"
                                   onClick={linkEvent(
                                     this,
                                     this.handleTransferCommunity
@@ -565,7 +565,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                   {i18n.t('yes')}
                                 </button>
                                 <button
-                                  class="btn btn-link btn-animate text-muted"
+                                  className="btn btn-link btn-animate text-muted"
                                   onClick={linkEvent(
                                     this,
                                     this
@@ -576,13 +576,13 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                 </button>
                               </>
                             ))}
-                          {/* Admins can ban from all, and appoint other admins */}
-                          {this.canAdmin && (
+                          {/* Admins and sitmods can ban from all */}
+                          {(this.canAdmin || this.canSitemod) && (
                             <>
                               {!this.isAdmin &&
                                 (!node.comment.banned ? (
                                   <button
-                                    class="btn btn-link btn-animate text-muted"
+                                    className="btn btn-link btn-animate text-muted"
                                     onClick={linkEvent(
                                       this,
                                       this.handleModBanShow
@@ -592,7 +592,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                   </button>
                                 ) : (
                                   <button
-                                    class="btn btn-link btn-animate text-muted"
+                                    className="btn btn-link btn-animate text-muted"
                                     onClick={linkEvent(
                                       this,
                                       this.handleModBanSubmit
@@ -601,10 +601,15 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                     {i18n.t('unban_from_site')}
                                   </button>
                                 ))}
+                            </>
+                          )}
+                          {/* Admins can appoint admins and sitemods */}
+                          {this.canAdmin && (
+                            <>
                               {!node.comment.banned &&
                                 (!this.state.showConfirmAppointAsAdmin ? (
                                   <button
-                                    class="btn btn-link btn-animate text-muted"
+                                    className="btn btn-link btn-animate text-muted"
                                     onClick={linkEvent(
                                       this,
                                       this.handleShowConfirmAppointAsAdmin
@@ -616,11 +621,11 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                   </button>
                                 ) : (
                                   <>
-                                    <button class="btn btn-link btn-animate text-muted">
+                                    <button className="btn btn-link btn-animate text-muted">
                                       {i18n.t('are_you_sure')}
                                     </button>
                                     <button
-                                      class="btn btn-link btn-animate text-muted"
+                                      className="btn btn-link btn-animate text-muted"
                                       onClick={linkEvent(
                                         this,
                                         this.handleAddAdmin
@@ -629,10 +634,48 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                       {i18n.t('yes')}
                                     </button>
                                     <button
-                                      class="btn btn-link btn-animate text-muted"
+                                      className="btn btn-link btn-animate text-muted"
                                       onClick={linkEvent(
                                         this,
                                         this.handleCancelConfirmAppointAsAdmin
+                                      )}
+                                    >
+                                      {i18n.t('no')}
+                                    </button>
+                                  </>
+                                ))}
+                              {!node.comment.banned &&
+                                (!this.state.showConfirmAppointAsSitemod ? (
+                                  <button
+                                    className="btn btn-link btn-animate text-muted"
+                                    onClick={linkEvent(
+                                      this,
+                                      this.handleShowConfirmAppointAsSitemod
+                                    )}
+                                  >
+                                    {this.isSitemod
+                                      ? i18n.t('remove_as_sitemod')
+                                      : i18n.t('appoint_as_sitemod')}
+                                  </button>
+                                ) : (
+                                  <>
+                                    <button className="btn btn-link btn-animate text-muted">
+                                      {i18n.t('are_you_sure')}
+                                    </button>
+                                    <button
+                                      className="btn btn-link btn-animate text-muted"
+                                      onClick={linkEvent(
+                                        this,
+                                        this.handleAddSitemod
+                                      )}
+                                    >
+                                      {i18n.t('yes')}
+                                    </button>
+                                    <button
+                                      className="btn btn-link btn-animate text-muted"
+                                      onClick={linkEvent(
+                                        this,
+                                        this.handleCancelConfirmAppointAsSitemod
                                       )}
                                     >
                                       {i18n.t('no')}
@@ -646,7 +689,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                             this.isAdmin &&
                             (!this.state.showConfirmTransferSite ? (
                               <button
-                                class="btn btn-link btn-animate text-muted"
+                                className="btn btn-link btn-animate text-muted"
                                 onClick={linkEvent(
                                   this,
                                   this.handleShowConfirmTransferSite
@@ -656,11 +699,11 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                               </button>
                             ) : (
                               <>
-                                <button class="btn btn-link btn-animate text-muted">
+                                <button className="btn btn-link btn-animate text-muted">
                                   {i18n.t('are_you_sure')}
                                 </button>
                                 <button
-                                  class="btn btn-link btn-animate text-muted"
+                                  className="btn btn-link btn-animate text-muted"
                                   onClick={linkEvent(
                                     this,
                                     this.handleTransferSite
@@ -669,7 +712,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
                                   {i18n.t('yes')}
                                 </button>
                                 <button
-                                  class="btn btn-link btn-animate text-muted"
+                                  className="btn btn-link btn-animate text-muted"
                                   onClick={linkEvent(
                                     this,
                                     this.handleCancelShowConfirmTransferSite
@@ -691,41 +734,38 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
         </div>
         {/* end of details */}
         {this.state.showRemoveDialog && (
-          <form
-            class="form-inline"
-            onSubmit={linkEvent(this, this.handleModRemoveSubmit)}
-          >
+          <form className="form-inline" onSubmit={this.handleModRemoveSubmit}>
             <input
               type="text"
-              class="form-control mr-2"
+              className="form-control mr-2"
               placeholder={i18n.t('reason')}
               value={this.state.removeReason}
               onInput={linkEvent(this, this.handleModRemoveReasonChange)}
             />
-            <button type="submit" class="btn btn-secondary">
+            <button type="submit" className="btn btn-secondary">
               {i18n.t('remove_comment')}
             </button>
           </form>
         )}
         {this.state.showBanDialog && (
           <form onSubmit={linkEvent(this, this.handleModBanBothSubmit)}>
-            <div class="form-group row">
-              <label class="col-form-label">{i18n.t('reason')}</label>
+            <div className="form-group row">
+              <label className="col-form-label">{i18n.t('reason')}</label>
               <input
                 type="text"
-                class="form-control mr-2"
+                className="form-control mr-2"
                 placeholder={i18n.t('reason')}
                 value={this.state.banReason}
                 onInput={linkEvent(this, this.handleModBanReasonChange)}
               />
             </div>
             {/* TODO hold off on expires until later */}
-            {/* <div class="form-group row"> */}
-            {/*   <label class="col-form-label">Expires</label> */}
-            {/*   <input type="date" class="form-control mr-2" placeholder={i18n.t('expires')} value={this.state.banExpires} onInput={linkEvent(this, this.handleModBanExpiresChange)} /> */}
+            {/* <div className="form-group row"> */}
+            {/*   <label className="col-form-label">Expires</label> */}
+            {/*   <input type="date" className="form-control mr-2" placeholder={i18n.t('expires')} value={this.state.banExpires} onInput={linkEvent(this, this.handleModBanExpiresChange)} /> */}
             {/* </div> */}
-            <div class="form-group row">
-              <button type="submit" class="btn btn-secondary">
+            <div className="form-group row">
+              <button type="submit" className="btn btn-secondary">
                 {i18n.t('ban')} {node.comment.creator_name}
               </button>
             </div>
@@ -734,24 +774,24 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
         {this.state.showReportDialog && (
           <form
             onSubmit={linkEvent(this, this.handleReportSubmit)}
-            class="px-2"
+            className="px-2"
           >
-            <div class="form-group row">
-              <label class="col-form-label" htmlFor="comment-report-dialog">
+            <div className="form-group row">
+              <label className="col-form-label" htmlFor="comment-report-dialog">
                 {i18n.t('reason')}
               </label>
               <input
                 id="comment-report-dialog"
                 type="text"
-                class="form-control mr-2"
+                className="form-control mr-2"
                 placeholder={i18n.t('reason')}
                 value={this.state.reportReason}
                 onInput={linkEvent(this, this.handleReportReasonChange)}
                 maxLength={600}
               />
             </div>
-            <div class="form-group row">
-              <button type="submit" class="btn btn-secondary">
+            <div className="form-group row">
+              <button type="submit" className="btn btn-secondary">
                 {i18n.t('submit_report')}
               </button>
             </div>
@@ -771,6 +811,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
             locked={this.props.locked}
             moderators={this.props.moderators}
             admins={this.props.admins}
+            sitemods={this.props.sitemods}
             postCreatorId={this.props.postCreatorId}
             sort={this.props.sort}
             sortType={this.props.sortType}
@@ -778,7 +819,7 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
           />
         )}
         {/* A collapsed clearfix */}
-        {this.state.collapsed && <div class="row col-12"></div>}
+        {this.state.collapsed && <div className="row col-12" />}
       </div>
     );
   }
@@ -787,12 +828,12 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     let node = this.props.node;
     return (
       <Link
-        class="btn btn-link btn-animate text-muted"
+        className="btn btn-link btn-animate text-muted"
         to={`/post/${node.comment.post_id}/comment/${node.comment.id}`}
         title={this.props.showContext ? i18n.t('show_context') : i18n.t('link')}
       >
-        <svg class="icon icon-inline">
-          <use xlinkHref="#icon-link"></use>
+        <svg className="icon icon-inline">
+          <use xlinkHref="#icon-link" />
         </svg>
       </Link>
     );
@@ -800,8 +841,8 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
 
   get loadingIcon() {
     return (
-      <svg class="icon icon-spinner spin">
-        <use xlinkHref="#icon-spinner"></use>
+      <svg className="icon icon-spinner spin">
+        <use xlinkHref="#icon-spinner" />
       </svg>
     );
   }
@@ -833,19 +874,29 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     );
   }
 
+  get isSitemod(): boolean {
+    return (
+      this.props.sitemods &&
+      isMod(
+        this.props.sitemods.map(s => s.id),
+        this.props.node.comment.creator_id
+      )
+    );
+  }
+
   get isPostCreator(): boolean {
     return this.props.node.comment.creator_id == this.props.postCreatorId;
   }
 
   get canMod(): boolean {
-    if (this.props.admins && this.props.moderators) {
-      let adminsThenMods = this.props.admins
+    if (this.props.admins && this.props.sitemods && this.props.moderators) {
+      let adminsThenSitemodsThenMods = this.props.admins
         .map(a => a.id)
+        .concat(this.props.sitemods.map(s => s.id))
         .concat(this.props.moderators.map(m => m.user_id));
-
       return canMod(
         UserService.Instance.user,
-        adminsThenMods,
+        adminsThenSitemodsThenMods,
         this.props.node.comment.creator_id
       );
     } else {
@@ -859,6 +910,17 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
       canMod(
         UserService.Instance.user,
         this.props.admins.map(a => a.id),
+        this.props.node.comment.creator_id
+      )
+    );
+  }
+
+  get canSitemod(): boolean {
+    return (
+      this.props.sitemods &&
+      canMod(
+        UserService.Instance.user,
+        this.props.sitemods.map(s => s.id),
         this.props.node.comment.creator_id
       )
     );
@@ -900,26 +962,24 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   }
 
   handleReplyClick(i: CommentNode) {
-    i.state.showReply = true;
-    i.setState(i.state);
+    i.setState({
+      showReply: true,
+    });
   }
 
   handleEditClick(i: CommentNode) {
-    i.state.showEdit = true;
-    i.setState(i.state);
+    i.setState({
+      showEdit: true,
+    });
   }
 
   handleDeleteClick(i: CommentNode) {
-    let deleteForm: CommentFormI = {
-      content: i.props.node.comment.content,
+    let deleteForm: DeleteCommentForm = {
       edit_id: i.props.node.comment.id,
-      creator_id: i.props.node.comment.creator_id,
-      post_id: i.props.node.comment.post_id,
-      parent_id: i.props.node.comment.parent_id,
       deleted: !i.props.node.comment.deleted,
       auth: null,
     };
-    WebSocketService.Instance.editComment(deleteForm);
+    WebSocketService.Instance.deleteComment(deleteForm);
   }
 
   handleSaveCommentClick(i: CommentNode) {
@@ -939,9 +999,10 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
   }
 
   handleReplyCancel() {
-    this.state.showReply = false;
-    this.state.showEdit = false;
-    this.setState(this.state);
+    this.setState({
+      showReply: false,
+      showEdit: false,
+    });
   }
 
   handleCommentUpvote(i: CommentNodeI) {
@@ -1010,48 +1071,38 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     i.setState(i.state);
   }
 
-  handleModRemoveSubmit(i: CommentNode) {
+  handleModRemoveSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    let form: CommentFormI = {
-      content: i.props.node.comment.content,
-      edit_id: i.props.node.comment.id,
-      creator_id: i.props.node.comment.creator_id,
-      post_id: i.props.node.comment.post_id,
-      parent_id: i.props.node.comment.parent_id,
-      removed: !i.props.node.comment.removed,
-      reason: i.state.removeReason,
+    let form: RemoveCommentForm = {
+      edit_id: this.props.node.comment.id,
+      removed: !this.props.node.comment.removed,
+      reason: this.state.removeReason,
       auth: null,
     };
-    WebSocketService.Instance.editComment(form);
+    WebSocketService.Instance.removeComment(form);
 
-    i.state.showRemoveDialog = false;
-    i.setState(i.state);
-  }
+    this.setState({ showRemoveDialog: false });
+  };
 
-  handleMarkRead(i: CommentNode) {
+  handleMarkRead = () => {
     // if it has a user_mention_id field, then its a mention
-    if (i.props.node.comment.user_mention_id) {
+    if (this.props.node.comment.user_mention_id) {
       let form: EditUserMentionForm = {
-        user_mention_id: i.props.node.comment.user_mention_id,
-        read: !i.props.node.comment.read,
+        user_mention_id: this.props.node.comment.user_mention_id,
+        read: !this.props.node.comment.read,
       };
       WebSocketService.Instance.editUserMention(form);
     } else {
-      let form: CommentFormI = {
-        content: i.props.node.comment.content,
-        edit_id: i.props.node.comment.id,
-        creator_id: i.props.node.comment.creator_id,
-        post_id: i.props.node.comment.post_id,
-        parent_id: i.props.node.comment.parent_id,
-        read: !i.props.node.comment.read,
+      let form: MarkCommentReadForm = {
+        edit_id: this.props.node.comment.id,
+        read: !this.props.node.comment.read,
         auth: null,
       };
-      WebSocketService.Instance.editComment(form);
+      WebSocketService.Instance.markCommentAsRead(form);
     }
 
-    i.state.readLoading = true;
-    i.setState(this.state);
-  }
+    this.setState({ readLoading: true });
+  };
 
   handleModBanFromCommunityShow(i: CommentNode) {
     i.state.showBanDialog = !i.state.showBanDialog;
@@ -1151,6 +1202,26 @@ export class CommentNode extends Component<CommentNodeProps, CommentNodeState> {
     };
     WebSocketService.Instance.addAdmin(form);
     i.state.showConfirmAppointAsAdmin = false;
+    i.setState(i.state);
+  }
+
+  handleShowConfirmAppointAsSitemod(i: CommentNode) {
+    i.state.showConfirmAppointAsSitemod = true;
+    i.setState(i.state);
+  }
+
+  handleCancelConfirmAppointAsSitemod(i: CommentNode) {
+    i.state.showConfirmAppointAsSitemod = false;
+    i.setState(i.state);
+  }
+
+  handleAddSitemod(i: CommentNode) {
+    let form: AddSitemodForm = {
+      user_id: i.props.node.comment.creator_id,
+      added: !i.isSitemod,
+    };
+    WebSocketService.Instance.addSitemod(form);
+    i.state.showConfirmAppointAsSitemod = false;
     i.setState(i.state);
   }
 

@@ -1,10 +1,10 @@
-import { Component } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { Post, SortType } from '../interfaces';
 import { postSort } from '../utils';
 import { PostListing } from './post-listing';
 import { i18n } from '../i18next';
-import { T } from 'inferno-i18next';
+import { Trans } from 'react-i18next';
 
 interface PostListingsProps {
   posts: Array<Post>;
@@ -28,26 +28,24 @@ export class PostListings extends Component<
     scrollPos: window.scrollY,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
-
-    this.state = this.emptyState;
-  }
+  state = this.emptyState
 
   //are we getting updated post array? save current scroll pos
-  componentWillReceiveProps() {
-    this.state.scrollPos = window.scrollY;
-    this.setState(this.state);
-  }
+  // UNSAFE_componentWillReceiveProps() {
+  //   this.setState({
+  //     scrollPos: window.scrollY
+  //   });
+  // }
 
+  // @TODO: Check if this bug is in React
   //have we updated? revert scroll to top (bug on inferno side?) - scroll back to previous pos
-  componentDidUpdate() {
-    window.scrollTo(0, this.state.scrollPos);
-  }
+  // componentDidUpdate() {
+  //   window.scrollTo(0, this.state.scrollPos);
+  // }
 
   render() {
     return this.props.posts.length > 0 ? (
-      <div $HasKeyedChildren>
+      <div>
         {this.outer().map(post => (
           <div key={post.id}>
             <PostListing
@@ -56,7 +54,7 @@ export class PostListings extends Component<
               enableDownvotes={this.props.enableDownvotes}
               enableNsfw={this.props.enableNsfw}
             />
-            <hr class="my-2" />
+            <hr className="my-2" />
           </div>
         ))}
       </div>
@@ -64,9 +62,9 @@ export class PostListings extends Component<
       <div>
         <div>{i18n.t('no_posts')}</div>
         {this.props.showCommunity !== undefined && (
-          <T i18nKey="subscribe_to_communities">
+          <Trans i18nKey="subscribe_to_communities">
             #<Link to="/communities">#</Link>
-          </T>
+          </Trans>
         )}
       </div>
     );

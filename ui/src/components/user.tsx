@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -27,8 +27,7 @@ import {
   fetchLimit,
   routeSortTypeToEnum,
   capitalizeFirstLetter,
-  themes,
-  setTheme,
+  // themes,
   languages,
   showAvatars,
   toast,
@@ -45,6 +44,11 @@ import { i18n } from '../i18next';
 import moment from 'moment';
 import { UserDetails } from './user-details';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
+import { changeTheme, ThemeSelector } from '../theme';
+import Button from './elements/Button';
+// import { Button } from 'theme-ui';
+// import { changeTheme } from './ThemeSystemProvider';
 
 interface UserState {
   user: UserView;
@@ -65,6 +69,7 @@ interface UserState {
   site: Site;
   siteModerators: CommunityModsState | null;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
   banUserShow: boolean;
   banReason: string;
   pronouns: string | null;
@@ -85,7 +90,21 @@ interface UrlParams {
   page?: number;
 }
 
-export class User extends Component<any, UserState> {
+function getViewFromProps(view: any): UserDetailsView {
+  return view
+    ? UserDetailsView[capitalizeFirstLetter(view)]
+    : UserDetailsView.Overview;
+}
+
+function getSortTypeFromProps(sort: any): SortType {
+  return sort ? routeSortTypeToEnum(sort) : SortType.New;
+}
+
+function getPageFromProps(page: any): number {
+  return page ? Number(page) : 1;
+}
+
+class BaseUser extends Component<any, UserState> {
   private subscription: Subscription;
   private emptyState: UserState = {
     user: {
@@ -109,9 +128,9 @@ export class User extends Component<any, UserState> {
     moderates: [],
     loading: true,
     avatarLoading: false,
-    view: User.getViewFromProps(this.props.match.view),
-    sort: User.getSortTypeFromProps(this.props.match.sort),
-    page: User.getPageFromProps(this.props.match.page),
+    view: getViewFromProps(this.props.match.view),
+    sort: getSortTypeFromProps(this.props.match.sort),
+    page: getPageFromProps(this.props.match.page),
     userSettingsForm: {
       show_nsfw: null,
       theme: null,
@@ -145,16 +164,18 @@ export class User extends Component<any, UserState> {
     },
     siteModerators: null,
     admins: [],
+    sitemods: [],
     banUserShow: false,
     banReason: null,
     pronouns: 'none',
     additionalPronouns: 'none',
   };
 
+  state = this.emptyState;
+
   constructor(props: any, context: any) {
     super(props, context);
 
-    this.state = this.emptyState;
     this.handleSortChange = this.handleSortChange.bind(this);
     this.handleUserSettingsSortTypeChange = this.handleUserSettingsSortTypeChange.bind(
       this
@@ -168,10 +189,10 @@ export class User extends Component<any, UserState> {
     this.handleAdditionalPronounsChange = this.handleAdditionalPronounsChange.bind(
       this
     );
+    this.handleLogoutClick = this.handleLogoutClick.bind(this);
+  }
 
-    this.state.user_id = Number(this.props.match.params.id) || null;
-    this.state.username = this.props.match.params.username;
-
+  componentDidMount() {
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
       .subscribe(
@@ -187,22 +208,8 @@ export class User extends Component<any, UserState> {
   get isCurrentUser() {
     return (
       UserService.Instance.user &&
-      UserService.Instance.user.id == this.state.user.id
+      UserService.Instance.user.id === this.state.user.id
     );
-  }
-
-  static getViewFromProps(view: any): UserDetailsView {
-    return view
-      ? UserDetailsView[capitalizeFirstLetter(view)]
-      : UserDetailsView.Overview;
-  }
-
-  static getSortTypeFromProps(sort: any): SortType {
-    return sort ? routeSortTypeToEnum(sort) : SortType.New;
-  }
-
-  static getPageFromProps(page: any): number {
-    return page ? Number(page) : 1;
   }
 
   componentWillUnmount() {
@@ -211,9 +218,9 @@ export class User extends Component<any, UserState> {
 
   static getDerivedStateFromProps(props: any): UserProps {
     return {
-      view: this.getViewFromProps(props.match.params.view),
-      sort: this.getSortTypeFromProps(props.match.params.sort),
-      page: this.getPageFromProps(props.match.params.page),
+      view: getViewFromProps(props.match.params.view),
+      sort: getSortTypeFromProps(props.match.params.sort),
+      page: getPageFromProps(props.match.params.page),
       user_id: Number(props.match.params.id) || null,
       username: props.match.params.username,
     };
@@ -233,29 +240,29 @@ export class User extends Component<any, UserState> {
   }
 
   render() {
-    console.log(this.state);
     return (
-      <div class="container">
+      <div className="container">
         <h5>
           {this.state.user.avatar && showAvatars() && (
             <img
               height="80"
               width="80"
               src={this.state.user.avatar}
-              class="rounded-circle mr-2"
+              alt={`Avatar for user ${this.state.username}`}
+              className="rounded-circle mr-2"
             />
           )}
           <span>/u/{this.state.username}</span>
         </h5>
         {this.state.loading && (
           <h5>
-            <svg class="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+            <svg className="icon icon-spinner spin">
+              <use xlinkHref="#icon-spinner" />
             </svg>
           </h5>
         )}
-        <div class="row">
-          <main class="col-12 col-md-8" role="main">
+        <div className="row user-settings-container">
+          <main className="col-12 col-md-8" role="main">
             {!this.state.loading && this.selects()}
             <UserDetails
               user_id={this.state.user_id}
@@ -271,8 +278,8 @@ export class User extends Component<any, UserState> {
             />
           </main>
           {!this.state.loading && (
-            <aside class="col-12 col-md-4 sidebar">
-              {(this.canAdmin || this.isModerator()) &&
+            <aside className="col-12 col-md-4 sidebar">
+              {(this.canAdmin || this.canSitemod || this.isModerator()) &&
                 !this.isCurrentUser &&
                 this.modActions()}
               {this.userInfo()}
@@ -288,59 +295,59 @@ export class User extends Component<any, UserState> {
 
   viewRadios() {
     return (
-      <div class="btn-group btn-group-toggle">
-        <label
-          className={`btn btn-sm btn-secondary pointer btn-outline-light
-            ${this.state.view == UserDetailsView.Overview && 'active'}
-          `}
+      <div className="btn-group btn-group-toggle">
+        <Button
+          as="label"
+          variant={this.state.view == UserDetailsView.Overview ? 'primary' : 'muted'}
         >
           <input
             type="radio"
+            className="visually-hidden"
             value={UserDetailsView.Overview}
             checked={this.state.view === UserDetailsView.Overview}
             onChange={linkEvent(this, this.handleViewChange)}
           />
           {i18n.t('overview')}
-        </label>
-        <label
-          className={`btn btn-sm btn-secondary pointer btn-outline-light
-            ${this.state.view == UserDetailsView.Comments && 'active'}
-          `}
+        </Button>
+        <Button
+          as="label"
+          variant={this.state.view == UserDetailsView.Comments ? 'primary' : 'muted'}
         >
           <input
             type="radio"
+            className="visually-hidden"
             value={UserDetailsView.Comments}
             checked={this.state.view == UserDetailsView.Comments}
             onChange={linkEvent(this, this.handleViewChange)}
           />
           {i18n.t('comments')}
-        </label>
-        <label
-          className={`btn btn-sm btn-secondary pointer btn-outline-light
-            ${this.state.view == UserDetailsView.Posts && 'active'}
-          `}
+        </Button>
+        <Button
+          as="label"
+          variant={this.state.view == UserDetailsView.Posts ? 'primary' : 'muted'}
         >
           <input
             type="radio"
+            className="visually-hidden"
             value={UserDetailsView.Posts}
             checked={this.state.view == UserDetailsView.Posts}
             onChange={linkEvent(this, this.handleViewChange)}
           />
           {i18n.t('posts')}
-        </label>
-        <label
-          className={`btn btn-sm btn-secondary pointer btn-outline-light
-            ${this.state.view == UserDetailsView.Saved && 'active'}
-          `}
+        </Button>
+        <Button
+          as="label"
+          variant={this.state.view == UserDetailsView.Saved ? 'primary' : 'muted'}
         >
           <input
+            className="visually-hidden"
             type="radio"
             value={UserDetailsView.Saved}
             checked={this.state.view == UserDetailsView.Saved}
             onChange={linkEvent(this, this.handleViewChange)}
           />
           {i18n.t('saved')}
-        </label>
+        </Button>
       </div>
     );
   }
@@ -348,7 +355,7 @@ export class User extends Component<any, UserState> {
   selects() {
     return (
       <div className="mb-2">
-        <div class="mr-3 mb-2 user-view-toggle">{this.viewRadios()}</div>
+        <div className="mr-3 mb-2 user-view-toggle">{this.viewRadios()}</div>
         <SortSelect
           sort={this.state.sort}
           onChange={this.handleSortChange}
@@ -372,23 +379,26 @@ export class User extends Component<any, UserState> {
     let user = this.state.user;
     return (
       <div>
-        <div class="card border-secondary mb-3">
-          <div class="card-body">
+        <div className="card border-secondary mb-3">
+          <div className="card-body">
             <h5>
-              <ul class="list-inline mb-0">
+              <ul className="list-inline mb-0">
                 <li className="list-inline-item">
                   <UserListing user={user} realLink />
                 </li>
                 {user.banned && (
-                  <li className="list-inline-item badge badge-danger">
+                  <li
+                    className="list-inline-item badge badge-danger"
+                    key={user.id}
+                  >
                     {i18n.t('banned')}
                   </li>
                 )}
               </ul>
             </h5>
             <div className="d-flex align-items-center mb-2">
-              <svg class="icon">
-                <use xlinkHref="#icon-cake"></use>
+              <svg className="icon">
+                <use xlinkHref="#icon-cake" />
               </svg>
               <span className="ml-2">
                 {i18n.t('cake_day_title')}{' '}
@@ -398,11 +408,11 @@ export class User extends Component<any, UserState> {
             <div>
               {i18n.t('joined')} <MomentTime data={user} showAgo />
             </div>
-            <div class="table-responsive mt-1">
-              <table class="table table-bordered table-sm mt-2 mb-0">
+            <div className="table-responsive mt-1">
+              <table className="table table-bordered table-sm mt-2 mb-0">
                 {/*
                 <tr>
-                  <td class="text-center" colSpan={2}>
+                  <td className="text-center" colSpan={2}>
                     {i18n.t('number_of_points', {
                       count: user.post_score + user.comment_score,
                     })}
@@ -434,12 +444,13 @@ export class User extends Component<any, UserState> {
               </table>
             </div>
             {this.isCurrentUser ? (
-              <button
-                class="btn btn-block btn-secondary mt-3"
-                onClick={linkEvent(this, this.handleLogoutClick)}
+              <Button
+                css={{ width: '100%' }}
+                mt={3}
+                onClick={this.handleLogoutClick}
               >
                 {i18n.t('logout')}
-              </button>
+              </Button>
             ) : (
               <>
                 <a
@@ -453,7 +464,7 @@ export class User extends Component<any, UserState> {
                   {i18n.t('send_secure_message')}
                 </a>
                 <Link
-                  class="btn btn-block btn-secondary mt-3"
+                  className="btn btn-block btn-secondary mt-3"
                   to={`/create_private_message?recipient_id=${this.state.user.id}`}
                 >
                   {i18n.t('send_message')}
@@ -469,19 +480,19 @@ export class User extends Component<any, UserState> {
   userSettings() {
     return (
       <div>
-        <div class="card border-secondary mb-3">
-          <div class="card-body">
+        <div className="card border-secondary mb-3">
+          <div className="card-body">
             <h5>{i18n.t('settings')}</h5>
             <form onSubmit={linkEvent(this, this.handleUserSettingsSubmit)}>
-              {/* <div class="form-group">
+              {/* <div className="form-group">
                 <label>{i18n.t('avatar')}</label>
-                <form class="d-inline">
+                <form className="d-inline">
                   <label
                     htmlFor="file-upload"
-                    class="pointer ml-4 text-muted small font-weight-bold"
+                    className="pointer ml-4 text-muted small font-weight-bold"
                   >
                     {!this.checkSettingsAvatar ? (
-                      <span class="btn btn-sm btn-secondary">
+                      <span className="btn btn-sm btn-secondary">
                         {i18n.t('upload_avatar')}
                       </span>
                     ) : (
@@ -489,7 +500,7 @@ export class User extends Component<any, UserState> {
                         height="80"
                         width="80"
                         src={this.state.userSettingsForm.avatar}
-                        class="rounded-circle"
+                        className="rounded-circle"
                       />
                     )}
                   </label>
@@ -498,16 +509,16 @@ export class User extends Component<any, UserState> {
                     type="file"
                     accept="image/*,video/*"
                     name="file"
-                    class="d-none"
+                    className="d-none"
                     disabled={!UserService.Instance.user}
                     onChange={linkEvent(this, this.handleImageUpload)}
                   />
                 </form>
               </div>
               {this.checkSettingsAvatar && (
-                <div class="form-group">
+                <div className="form-group">
                   <button
-                    class="btn btn-secondary btn-block"
+                    className="btn btn-secondary btn-block"
                     onClick={linkEvent(this, this.removeAvatar)}
                   >
                     {`${capitalizeFirstLetter(i18n.t('remove'))} ${i18n.t(
@@ -516,15 +527,18 @@ export class User extends Component<any, UserState> {
                   </button>
                 </div>
               )} */}
-              <div class="form-group row">
-                <label class="col-lg-5 col-form-label" htmlFor="user-pronouns">
+              <div className="form-group row">
+                <label
+                  className="col-lg-5 col-form-label"
+                  htmlFor="user-pronouns"
+                >
                   {i18n.t('pronouns')}
                 </label>
-                <div class="col-lg-7">
+                <div className="col-lg-7">
                   <select
                     id="user-pronouns"
                     value={this.state.pronouns}
-                    class="custom-select custom-select-sm"
+                    className="custom-select custom-select-sm"
                     onChange={this.handlePronounsChange}
                   >
                     <option value="none">none</option>
@@ -539,18 +553,18 @@ export class User extends Component<any, UserState> {
               {!(
                 this.state.pronouns === '' || this.state.pronouns === 'none'
               ) && (
-                <div class="form-group row">
+                <div className="form-group row">
                   <label
-                    class="col-lg-5 col-form-label"
+                    className="col-lg-5 col-form-label"
                     htmlFor="user-secondary-pronouns"
                   >
                     {i18n.t('additional_pronouns')}
                   </label>
-                  <div class="col-lg-7">
+                  <div className="col-lg-7">
                     <select
                       id="user-secondary-pronouns"
                       value={this.state.additionalPronouns}
-                      class="custom-select custom-select-sm"
+                      className="custom-select custom-select-sm"
                       onChange={this.handleAdditionalPronounsChange}
                     >
                       <option value="none">none</option>
@@ -562,42 +576,33 @@ export class User extends Component<any, UserState> {
                   </div>
                 </div>
               )}
-              <div class="form-group">
+              <div className="form-group">
                 <label>{i18n.t('language')}</label>
                 <select
                   value={this.state.userSettingsForm.lang}
                   onChange={linkEvent(this, this.handleUserSettingsLangChange)}
-                  class="ml-2 custom-select custom-select-sm w-auto"
+                  className="ml-2 custom-select custom-select-sm w-auto"
                 >
                   <option disabled>{i18n.t('language')}</option>
                   <option value="browser">{i18n.t('browser_default')}</option>
                   <option disabled>──</option>
                   {languages.map(lang => (
-                    <option value={lang.code}>{lang.name}</option>
+                    <option key={lang.code} value={lang.code}>
+                      {lang.name}
+                    </option>
                   ))}
                 </select>
               </div>
-              <div class="form-group">
+              <div className="form-group">
                 <label>{i18n.t('theme')}</label>
-                <select
+                <ThemeSelector
                   value={this.state.userSettingsForm.theme}
-                  onChange={linkEvent(this, this.handleUserSettingsThemeChange)}
-                  class="ml-2 custom-select custom-select-sm w-auto"
-                >
-                  <option disabled>{i18n.t('theme')}</option>
-                  {themes.map(theme => (
-                    <option value={theme}>{theme}</option>
-                  ))}
-                </select>
-                <div className="small alert alert-warning my-2">
-                  Stick with Darkly for the best ChapoChat experience. Themes
-                  are bugged right now, but we&apos;ll be rebuilding themes soon
-                  so they&apos;re extra fancy.
-                </div>
+                  onChange={this.handleUserSettingsThemeChange}
+                />
               </div>
               <form className="form-group">
                 <label>
-                  <div class="mr-2">{i18n.t('sort_type')}</div>
+                  <div className="mr-2">{i18n.t('sort_type')}</div>
                 </label>
                 <ListingTypeSelect
                   type_={this.state.userSettingsForm.default_listing_type}
@@ -606,7 +611,7 @@ export class User extends Component<any, UserState> {
               </form>
               <form className="form-group">
                 <label>
-                  <div class="mr-2">{i18n.t('type')}</div>
+                  <div className="mr-2">{i18n.t('type')}</div>
                 </label>
                 <SortSelect
                   sort={parseInt(
@@ -617,15 +622,15 @@ export class User extends Component<any, UserState> {
                   onChange={this.handleUserSettingsSortTypeChange}
                 />
               </form>
-              <div class="form-group row">
-                <label class="col-lg-3 col-form-label" htmlFor="user-email">
+              <div className="form-group row">
+                <label className="col-lg-3 col-form-label" htmlFor="user-email">
                   {i18n.t('email')}
                 </label>
-                <div class="col-lg-9">
+                <div className="col-lg-9">
                   <input
                     type="email"
                     id="user-email"
-                    class="form-control"
+                    className="form-control"
                     placeholder={i18n.t('optional')}
                     value={this.state.userSettingsForm.email}
                     onInput={linkEvent(
@@ -636,8 +641,8 @@ export class User extends Component<any, UserState> {
                   />
                 </div>
               </div>
-              <div class="form-group row">
-                <label class="col-lg-5 col-form-label">
+              <div className="form-group row">
+                <label className="col-lg-5 col-form-label">
                   <a
                     href="https://about.riot.im/"
                     target="_blank"
@@ -646,10 +651,10 @@ export class User extends Component<any, UserState> {
                     {i18n.t('matrix_user_id')}
                   </a>
                 </label>
-                <div class="col-lg-7">
+                <div className="col-lg-7">
                   <input
                     type="text"
-                    class="form-control"
+                    className="form-control"
                     placeholder="@user:example.com"
                     value={this.state.userSettingsForm.matrix_user_id}
                     onInput={linkEvent(
@@ -660,15 +665,18 @@ export class User extends Component<any, UserState> {
                   />
                 </div>
               </div>
-              <div class="form-group row">
-                <label class="col-lg-5 col-form-label" htmlFor="user-password">
+              <div className="form-group row">
+                <label
+                  className="col-lg-5 col-form-label"
+                  htmlFor="user-password"
+                >
                   {i18n.t('new_password')}
                 </label>
-                <div class="col-lg-7">
+                <div className="col-lg-7">
                   <input
                     type="password"
                     id="user-password"
-                    class="form-control"
+                    className="form-control"
                     value={this.state.userSettingsForm.new_password}
                     autoComplete="new-password"
                     onInput={linkEvent(
@@ -678,18 +686,18 @@ export class User extends Component<any, UserState> {
                   />
                 </div>
               </div>
-              <div class="form-group row">
+              <div className="form-group row">
                 <label
-                  class="col-lg-5 col-form-label"
+                  className="col-lg-5 col-form-label"
                   htmlFor="user-verify-password"
                 >
                   {i18n.t('verify_password')}
                 </label>
-                <div class="col-lg-7">
+                <div className="col-lg-7">
                   <input
                     type="password"
                     id="user-verify-password"
-                    class="form-control"
+                    className="form-control"
                     value={this.state.userSettingsForm.new_password_verify}
                     autoComplete="new-password"
                     onInput={linkEvent(
@@ -699,18 +707,18 @@ export class User extends Component<any, UserState> {
                   />
                 </div>
               </div>
-              <div class="form-group row">
+              <div className="form-group row">
                 <label
-                  class="col-lg-5 col-form-label"
+                  className="col-lg-5 col-form-label"
                   htmlFor="user-old-password"
                 >
                   {i18n.t('old_password')}
                 </label>
-                <div class="col-lg-7">
+                <div className="col-lg-7">
                   <input
                     type="password"
                     id="user-old-password"
-                    class="form-control"
+                    className="form-control"
                     value={this.state.userSettingsForm.old_password}
                     autoComplete="new-password"
                     onInput={linkEvent(
@@ -721,10 +729,10 @@ export class User extends Component<any, UserState> {
                 </div>
               </div>
               {this.state.site.enable_nsfw && (
-                <div class="form-group">
-                  <div class="form-check">
+                <div className="form-group">
+                  <div className="form-check">
                     <input
-                      class="form-check-input"
+                      className="form-check-input"
                       id="user-show-nsfw"
                       type="checkbox"
                       checked={this.state.userSettingsForm.show_nsfw}
@@ -733,16 +741,19 @@ export class User extends Component<any, UserState> {
                         this.handleUserSettingsShowNsfwChange
                       )}
                     />
-                    <label class="form-check-label" htmlFor="user-show-nsfw">
+                    <label
+                      className="form-check-label"
+                      htmlFor="user-show-nsfw"
+                    >
                       {i18n.t('show_nsfw')}
                     </label>
                   </div>
                 </div>
               )}
-              <div class="form-group">
-                <div class="form-check">
+              <div className="form-group">
+                <div className="form-check">
                   <input
-                    class="form-check-input"
+                    className="form-check-input"
                     id="user-show-avatars"
                     type="checkbox"
                     checked={this.state.userSettingsForm.show_avatars}
@@ -751,15 +762,18 @@ export class User extends Component<any, UserState> {
                       this.handleUserSettingsShowAvatarsChange
                     )}
                   />
-                  <label class="form-check-label" htmlFor="user-show-avatars">
+                  <label
+                    className="form-check-label"
+                    htmlFor="user-show-avatars"
+                  >
                     {i18n.t('show_avatars')}
                   </label>
                 </div>
               </div>
-              <div class="form-group">
-                <div class="form-check">
+              <div className="form-group">
+                <div className="form-check">
                   <input
-                    class="form-check-input"
+                    className="form-check-input"
                     id="user-send-notifications-to-email"
                     type="checkbox"
                     disabled={!this.state.user.email}
@@ -772,38 +786,38 @@ export class User extends Component<any, UserState> {
                     )}
                   />
                   <label
-                    class="form-check-label"
+                    className="form-check-label"
                     htmlFor="user-send-notifications-to-email"
                   >
                     {i18n.t('send_notifications_to_email')}
                   </label>
                 </div>
               </div>
-              <div class="form-group">
-                <button type="submit" class="btn btn-block btn-secondary mr-4">
-                  {this.state.userSettingsLoading ? (
-                    <svg class="icon icon-spinner spin">
-                      <use xlinkHref="#icon-spinner"></use>
-                    </svg>
-                  ) : (
-                    capitalizeFirstLetter(i18n.t('save'))
-                  )}
-                </button>
+              <div className="form-group">
+                <Button
+                  type="submit"
+                  mr={4}
+                  loading={this.state.userSettingsLoading}
+                  block
+                >
+                  {capitalizeFirstLetter(i18n.t('save'))}
+                </Button>
               </div>
               <hr />
-              <div class="form-group mb-0">
-                <button
-                  class="btn btn-block btn-danger"
+              <div className="form-group mb-0">
+                <Button
+                  variant="danger"
+                  block
                   onClick={linkEvent(
                     this,
                     this.handleDeleteAccountShowConfirmToggle
                   )}
                 >
                   {i18n.t('delete_account')}
-                </button>
+                </Button>
                 {this.state.deleteAccountShowConfirm && (
                   <>
-                    <div class="my-2 alert alert-danger" role="alert">
+                    <div className="my-2 alert alert-danger" role="alert">
                       {i18n.t('delete_account_confirm')}
                     </div>
                     <input
@@ -814,23 +828,24 @@ export class User extends Component<any, UserState> {
                         this,
                         this.handleDeleteAccountPasswordChange
                       )}
-                      class="form-control my-2"
+                      className="form-control my-2"
                     />
-                    <button
-                      class="btn btn-danger mr-4"
+                    <Button
+                      variant="danger"
+                      mr={4}
                       disabled={!this.state.deleteAccountForm.password}
                       onClick={linkEvent(this, this.handleDeleteAccount)}
                     >
                       {this.state.deleteAccountLoading ? (
-                        <svg class="icon icon-spinner spin">
-                          <use xlinkHref="#icon-spinner"></use>
+                        <svg className="icon icon-spinner spin">
+                          <use xlinkHref="#icon-spinner" />
                         </svg>
                       ) : (
                         capitalizeFirstLetter(i18n.t('delete'))
                       )}
-                    </button>
+                    </Button>
                     <button
-                      class="btn btn-secondary"
+                      className="btn btn-secondary"
                       onClick={linkEvent(
                         this,
                         this.handleDeleteAccountShowConfirmToggle
@@ -840,6 +855,12 @@ export class User extends Component<any, UserState> {
                     </button>
                   </>
                 )}
+                {/* <button
+                  className="btn btn-block btn-danger"
+
+                >
+
+                </button> */}
               </div>
             </form>
           </div>
@@ -851,12 +872,12 @@ export class User extends Component<any, UserState> {
   modActions() {
     return (
       <div>
-        <div class="card border-secondary mb-3">
-          <div class="card-body">
+        <div className="card border-secondary mb-3">
+          <div className="card-body">
             <h5>Mod Actions</h5>
-            {(this.canAdmin || this.isModerator()) && (
+            {(this.canAdmin || this.canSitemod || this.isModerator()) && (
               <button
-                class="btn btn-secondary"
+                className="btn btn-secondary"
                 onClick={linkEvent(this, this.handleBanUserShow)}
               >
                 {this.isModerator
@@ -866,14 +887,18 @@ export class User extends Component<any, UserState> {
             )}
             {this.state.banUserShow && (
               <form onSubmit={linkEvent(this, this.handleBan)}>
-                <div style="display: flex">
+                <div
+                  style={{
+                    display: 'flex',
+                  }}
+                >
                   <input
                     id="reason"
                     placeholder="reason"
                     onChange={linkEvent(this, this.handleBanReasonChange)}
-                  ></input>
+                  />
                   <button
-                    class="btn btn-secondary btn-danger ml-2"
+                    className="btn btn-secondary btn-danger ml-2"
                     type="submit"
                   >
                     Ban
@@ -891,12 +916,12 @@ export class User extends Component<any, UserState> {
     return (
       <div>
         {this.state.moderates.length > 0 && (
-          <div class="card border-secondary mb-3">
-            <div class="card-body">
+          <div className="card border-secondary mb-3">
+            <div className="card-body">
               <h5>{i18n.t('moderates')}</h5>
-              <ul class="list-unstyled mb-0">
+              <ul className="list-unstyled mb-0">
                 {this.state.moderates.map(community => (
-                  <li>
+                  <li key={community.id}>
                     <Link to={`/c/${community.community_name}`}>
                       {community.community_name}
                     </Link>
@@ -914,12 +939,12 @@ export class User extends Component<any, UserState> {
     return (
       <div>
         {this.state.follows.length > 0 && (
-          <div class="card border-secondary mb-3">
-            <div class="card-body">
+          <div className="card border-secondary mb-3">
+            <div className="card-body">
               <h5>{i18n.t('subscribed')}</h5>
-              <ul class="list-unstyled mb-0">
+              <ul className="list-unstyled mb-0">
                 {this.state.follows.map(community => (
-                  <li>
+                  <li key={community.id}>
                     <Link to={`/c/${community.community_name}`}>
                       {community.community_name}
                     </Link>
@@ -944,11 +969,22 @@ export class User extends Component<any, UserState> {
     );
   }
 
+  get canSitemod(): boolean {
+    return (
+      this.state.sitemods &&
+      canMod(
+        UserService.Instance.user,
+        this.state.sitemods.map(a => a.id),
+        this.state.user_id
+      )
+    );
+  }
+
   isModerator() {
     return (
       getAllUserModeratedCommunities({
         siteModerators: this.state.siteModerators || {},
-        moderatorId: UserService.Instance.user.id,
+        moderatorId: UserService.Instance.user?.id,
       }).length > 0
     );
   }
@@ -972,36 +1008,37 @@ export class User extends Component<any, UserState> {
     this.updateUrl({ sort: SortType[val].toLowerCase(), page: 1 });
   }
 
-  handleViewChange(i: User, event: any) {
+  handleViewChange(i: BaseUser, event: any) {
     i.updateUrl({
       view: UserDetailsView[Number(event.target.value)].toLowerCase(),
       page: 1,
     });
   }
 
-  handleUserSettingsShowNsfwChange(i: User, event: any) {
+  handleUserSettingsShowNsfwChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.show_nsfw = event.target.checked;
     i.setState(i.state);
   }
 
-  handleUserSettingsShowAvatarsChange(i: User, event: any) {
+  handleUserSettingsShowAvatarsChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.show_avatars = event.target.checked;
     UserService.Instance.user.show_avatars = event.target.checked; // Just for instant updates
     i.setState(i.state);
   }
 
-  handleUserSettingsSendNotificationsToEmailChange(i: User, event: any) {
+  handleUserSettingsSendNotificationsToEmailChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.send_notifications_to_email = event.target.checked;
     i.setState(i.state);
   }
 
-  handleUserSettingsThemeChange(i: User, event: any) {
-    i.state.userSettingsForm.theme = event.target.value;
-    setTheme(event.target.value, true);
-    i.setState(i.state);
-  }
+  handleUserSettingsThemeChange = (value: string) => {
+    changeTheme(value);
+    this.setState({
+      userSettingsForm: { ...this.state.userSettingsForm, theme: value },
+    });
+  };
 
-  handleUserSettingsLangChange(i: User, event: any) {
+  handleUserSettingsLangChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.lang = event.target.value;
     i18n.changeLanguage(i.state.userSettingsForm.lang);
     i.setState(i.state);
@@ -1018,7 +1055,7 @@ export class User extends Component<any, UserState> {
     this.setState(this.state);
   }
 
-  handleUserSettingsEmailChange(i: User, event: any) {
+  handleUserSettingsEmailChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.email = event.target.value;
     if (i.state.userSettingsForm.email == '' && !i.state.user.email) {
       i.state.userSettingsForm.email = undefined;
@@ -1026,7 +1063,7 @@ export class User extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleUserSettingsMatrixUserIdChange(i: User, event: any) {
+  handleUserSettingsMatrixUserIdChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.matrix_user_id = event.target.value;
     if (
       i.state.userSettingsForm.matrix_user_id == '' &&
@@ -1037,7 +1074,7 @@ export class User extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleUserSettingsNewPasswordChange(i: User, event: any) {
+  handleUserSettingsNewPasswordChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.new_password = event.target.value;
     if (i.state.userSettingsForm.new_password == '') {
       i.state.userSettingsForm.new_password = undefined;
@@ -1045,7 +1082,7 @@ export class User extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleUserSettingsNewPasswordVerifyChange(i: User, event: any) {
+  handleUserSettingsNewPasswordVerifyChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.new_password_verify = event.target.value;
     if (i.state.userSettingsForm.new_password_verify == '') {
       i.state.userSettingsForm.new_password_verify = undefined;
@@ -1053,7 +1090,7 @@ export class User extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleUserSettingsOldPasswordChange(i: User, event: any) {
+  handleUserSettingsOldPasswordChange(i: BaseUser, event: any) {
     i.state.userSettingsForm.old_password = event.target.value;
     if (i.state.userSettingsForm.old_password == '') {
       i.state.userSettingsForm.old_password = undefined;
@@ -1061,7 +1098,7 @@ export class User extends Component<any, UserState> {
     i.setState(i.state);
   }
 
-  handleImageUpload(i: User, event: any) {
+  handleImageUpload(i: BaseUser, event: any) {
     event.preventDefault();
     let file = event.target.files[0];
     const imageUploadUrl = `/pictrs/image`;
@@ -1098,7 +1135,7 @@ export class User extends Component<any, UserState> {
       });
   }
 
-  removeAvatar(i: User, event: any) {
+  removeAvatar(i: BaseUser, event: any) {
     event.preventDefault();
     i.state.userSettingsLoading = true;
     i.state.userSettingsForm.avatar = '';
@@ -1114,7 +1151,7 @@ export class User extends Component<any, UserState> {
     );
   }
 
-  handleUserSettingsSubmit(i: User, event: any) {
+  handleUserSettingsSubmit(i: BaseUser, event: any) {
     event.preventDefault();
     i.state.userSettingsLoading = true;
     i.setState(i.state);
@@ -1148,23 +1185,23 @@ export class User extends Component<any, UserState> {
     this.setState({ additionalPronouns: e.target.value });
   }
 
-  handleDeleteAccountShowConfirmToggle(i: User, event: any) {
+  handleDeleteAccountShowConfirmToggle(i: BaseUser, event: any) {
     event.preventDefault();
     i.state.deleteAccountShowConfirm = !i.state.deleteAccountShowConfirm;
     i.setState(i.state);
   }
 
-  handleDeleteAccountPasswordChange(i: User, event: any) {
+  handleDeleteAccountPasswordChange(i: BaseUser, event: any) {
     i.state.deleteAccountForm.password = event.target.value;
     i.setState(i.state);
   }
 
-  handleLogoutClick(i: User) {
+  handleLogoutClick() {
     UserService.Instance.logout();
-    i.context.router.history.push('/');
+    this.props.history.push('/');
   }
 
-  handleDeleteAccount(i: User, event: any) {
+  handleDeleteAccount(i: BaseUser, event: any) {
     event.preventDefault();
     i.state.deleteAccountLoading = true;
     i.setState(i.state);
@@ -1172,19 +1209,19 @@ export class User extends Component<any, UserState> {
     WebSocketService.Instance.deleteAccount(i.state.deleteAccountForm);
   }
 
-  handleBanUserShow(i: User) {
+  handleBanUserShow(i: BaseUser) {
     i.state.banUserShow = !i.state.banUserShow;
     i.setState(i.state);
   }
 
-  handleBanReasonChange(i: User, event: any) {
+  handleBanReasonChange(i: BaseUser, event: any) {
     i.state.banReason = event.target.value;
     i.setState(i.state);
   }
 
-  handleBan(i: User, event: any) {
+  handleBan(i: BaseUser, event: any) {
     event.preventDefault();
-    if (i.canAdmin) {
+    if (i.canAdmin || i.canSitemod) {
       const form: BanUserForm = {
         user_id: i.state.user.id,
         ban: true,
@@ -1221,7 +1258,7 @@ export class User extends Component<any, UserState> {
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
       if (msg.error == 'couldnt_find_that_username_or_email') {
-        this.context.router.history.push('/');
+        this.props.history.push('/');
       }
       this.setState({
         deleteAccountLoading: false,
@@ -1245,7 +1282,7 @@ export class User extends Component<any, UserState> {
             UserService.Instance.user.show_nsfw;
           this.state.userSettingsForm.theme = UserService.Instance.user.theme
             ? UserService.Instance.user.theme
-            : 'darkly';
+            : 'chapo';
           this.state.userSettingsForm.default_sort_type =
             UserService.Instance.user.default_sort_type;
           this.state.userSettingsForm.default_listing_type =
@@ -1273,12 +1310,13 @@ export class User extends Component<any, UserState> {
         deleteAccountLoading: false,
         deleteAccountShowConfirm: false,
       });
-      this.context.router.history.push('/');
+      this.props.history.push('/');
     } else if (res.op == UserOperation.GetSite) {
       const data = res.data as GetSiteResponse;
       this.setState({
         site: data.site,
         admins: data.admins,
+        sitemods: data.sitemods,
       });
     } else if (res.op == UserOperation.GetSiteModerators) {
       const data = res.data as GetSiteModeratorsResponse;
@@ -1298,3 +1336,5 @@ export class User extends Component<any, UserState> {
     }
   }
 }
+
+export const User = withRouter(BaseUser);

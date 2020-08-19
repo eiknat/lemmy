@@ -1,11 +1,11 @@
-import { Component, InfernoNode, linkEvent } from 'inferno';
+import React, { Component, ReactNode } from 'react';
 
 interface ModLogCommentState {
   expanded: boolean;
 }
 
 interface ModLogCommentProps {
-  children: InfernoNode;
+  children: ReactNode;
 }
 
 export class ModlogComment extends Component<

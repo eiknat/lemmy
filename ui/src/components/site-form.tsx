@@ -1,5 +1,6 @@
-import { Component, linkEvent } from 'inferno';
-import { Prompt } from 'inferno-router';
+import React, { Component } from 'react';
+import { Prompt } from 'react-router-dom';
+import isEqual from 'lodash.isequal'
 import { MarkdownTextArea } from './markdown-textarea';
 import { Site, SiteForm as SiteFormI } from '../interfaces';
 import { WebSocketService } from '../services';
@@ -20,42 +21,43 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
   private id = `site-form-${randomStr()}`;
   private emptyState: SiteFormState = {
     siteForm: {
+      name: null,
       enable_downvotes: true,
       enable_create_communities: true,
       open_registration: true,
       enable_nsfw: true,
-      name: null,
     },
     loading: false,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
+  state = this.emptyState;
 
-    this.state = this.emptyState;
-    this.handleSiteDescriptionChange = this.handleSiteDescriptionChange.bind(
-      this
-    );
-    console.log(this.props.site);
+  componentDidMount() {
     if (this.props.site) {
-      this.state.siteForm = {
-        name: this.props.site.name,
-        description: this.props.site.description,
-        enable_downvotes: this.props.site.enable_downvotes,
-        enable_create_communities: this.props.site.enable_create_communities,
-        open_registration: this.props.site.open_registration,
-        enable_nsfw: this.props.site.enable_nsfw,
-      };
+      this.setState({
+        siteForm: {
+          name: this.props.site.name,
+          description: this.props.site.description,
+          enable_downvotes: this.props.site.enable_downvotes,
+          enable_create_communities: this.props.site.enable_create_communities,
+          open_registration: this.props.site.open_registration,
+          enable_nsfw: this.props.site.enable_nsfw,
+        },
+        loading: false
+      });
     }
   }
 
   // Necessary to stop the loading
-  componentWillReceiveProps() {
-    this.state.loading = false;
-    this.setState(this.state);
-  }
+  // UNSAFE_componentWillReceiveProps() {
+  //   this.setState({
+  //     loading: false
+  //   });
+  // }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
+    // console.log({ prevProps, props: this.props });
+    // console.log(JSON.stringify(prevProps) === JSON.stringify(this.props));
     if (
       !this.state.loading &&
       !this.props.site &&
@@ -64,6 +66,11 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
       window.onbeforeunload = () => true;
     } else {
       window.onbeforeunload = undefined;
+    }
+
+    if (!isEqual(prevProps, this.props)) {
+      console.log('NOT EQUAL')
+      this.setState({ loading: false })
     }
   }
 
@@ -78,75 +85,75 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
           when={
             !this.state.loading &&
             !this.props.site &&
-            (this.state.siteForm.name || this.state.siteForm.description)
+            (!!this.state.siteForm.name || !!this.state.siteForm.description)
           }
           message={i18n.t('block_leaving')}
         />
-        <form onSubmit={linkEvent(this, this.handleCreateSiteSubmit)}>
+        <form onSubmit={this.handleCreateSiteSubmit}>
           <h5>{`${
             this.props.site
               ? capitalizeFirstLetter(i18n.t('save'))
               : capitalizeFirstLetter(i18n.t('name'))
           } ${i18n.t('your_site')}`}</h5>
-          <div class="form-group row">
-            <label class="col-12 col-form-label" htmlFor="create-site-name">
+          <div className="form-group row">
+            <label className="col-12 col-form-label" htmlFor="create-site-name">
               {i18n.t('name')}
             </label>
-            <div class="col-12">
+            <div className="col-12">
               <input
                 type="text"
                 id="create-site-name"
-                class="form-control"
+                className="form-control"
                 value={this.state.siteForm.name}
-                onInput={linkEvent(this, this.handleSiteNameChange)}
+                onChange={this.handleSiteNameChange}
                 required
                 minLength={3}
                 maxLength={20}
               />
             </div>
           </div>
-          <div class="form-group row">
-            <label class="col-12 col-form-label" htmlFor={this.id}>
+          <div className="form-group row">
+            <label className="col-12 col-form-label" htmlFor={this.id}>
               {i18n.t('sidebar')}
             </label>
-            <div class="col-12">
+            <div className="col-12">
               <MarkdownTextArea
                 initialContent={this.state.siteForm.description}
                 onContentChange={this.handleSiteDescriptionChange}
               />
             </div>
           </div>
-          <div class="form-group row">
-            <div class="col-12">
-              <div class="form-check">
+          <div className="form-group row">
+            <div className="col-12">
+              <div className="form-check">
                 <input
-                  class="form-check-input"
+                  className="form-check-input"
                   id="create-site-downvotes"
                   type="checkbox"
                   checked={this.state.siteForm.enable_downvotes}
-                  onChange={linkEvent(
-                    this,
-                    this.handleSiteEnableDownvotesChange
-                  )}
+                  onChange={this.handleSiteEnableDownvotesChange}
                 />
-                <label class="form-check-label" htmlFor="create-site-downvotes">
+                <label
+                  className="form-check-label"
+                  htmlFor="create-site-downvotes"
+                >
                   {i18n.t('enable_downvotes')}
                 </label>
               </div>
             </div>
           </div>
-          <div class="form-group row">
-            <div class="col-12">
-              <div class="form-check">
+          <div className="form-group row">
+            <div className="col-12">
+              <div className="form-check">
                 <input
-                  class="form-check-input"
+                  className="form-check-input"
                   id="create-site-enable-nsfw"
                   type="checkbox"
                   checked={this.state.siteForm.enable_nsfw}
-                  onChange={linkEvent(this, this.handleSiteEnableNsfwChange)}
+                  onChange={this.handleSiteEnableNsfwChange}
                 />
                 <label
-                  class="form-check-label"
+                  className="form-check-label"
                   htmlFor="create-site-enable-nsfw"
                 >
                   {i18n.t('enable_nsfw')}
@@ -154,21 +161,18 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
               </div>
             </div>
           </div>
-          <div class="form-group row">
-            <div class="col-12">
-              <div class="form-check">
+          <div className="form-group row">
+            <div className="col-12">
+              <div className="form-check">
                 <input
-                  class="form-check-input"
+                  className="form-check-input"
                   id="create-site-open-registration"
                   type="checkbox"
                   checked={this.state.siteForm.open_registration}
-                  onChange={linkEvent(
-                    this,
-                    this.handleSiteOpenRegistrationChange
-                  )}
+                  onChange={this.handleSiteOpenRegistrationChange}
                 />
                 <label
-                  class="form-check-label"
+                  className="form-check-label"
                   htmlFor="create-site-open-registration"
                 >
                   {i18n.t('open_registration')}
@@ -176,21 +180,18 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
               </div>
             </div>
           </div>
-          <div class="form-group row">
-            <div class="col-12">
-              <div class="form-check">
+          <div className="form-group row">
+            <div className="col-12">
+              <div className="form-check">
                 <input
-                  class="form-check-input"
+                  className="form-check-input"
                   id="create-site-create-communities"
                   type="checkbox"
                   checked={this.state.siteForm.enable_create_communities}
-                  onChange={linkEvent(
-                    this,
-                    this.handleSiteEnableCreateCommunitiesChange
-                  )}
+                  onChange={this.handleSiteEnableCreateCommunitiesChange}
                 />
                 <label
-                  class="form-check-label"
+                  className="form-check-label"
                   htmlFor="create-site-create-communities"
                 >
                   {i18n.t('enable_create_communities')}
@@ -198,16 +199,16 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
               </div>
             </div>
           </div>
-          <div class="form-group row">
-            <div class="col-12">
+          <div className="form-group row">
+            <div className="col-12">
               <button
                 type="submit"
-                class="btn btn-secondary mr-2"
+                className="btn btn-secondary mr-2"
                 disabled={this.state.loading}
               >
                 {this.state.loading ? (
-                  <svg class="icon icon-spinner spin">
-                    <use xlinkHref="#icon-spinner"></use>
+                  <svg className="icon icon-spinner spin">
+                    <use xlinkHref="#icon-spinner" />
                   </svg>
                 ) : this.props.site ? (
                   capitalizeFirstLetter(i18n.t('save'))
@@ -218,8 +219,8 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
               {this.props.site && (
                 <button
                   type="button"
-                  class="btn btn-secondary"
-                  onClick={linkEvent(this, this.handleCancel)}
+                  className="btn btn-secondary"
+                  onClick={this.handleCancel}
                 >
                   {i18n.t('cancel')}
                 </button>
@@ -231,48 +232,73 @@ export class SiteForm extends Component<SiteFormProps, SiteFormState> {
     );
   }
 
-  handleCreateSiteSubmit(i: SiteForm, event: any) {
-    event.preventDefault();
-    i.state.loading = true;
-    if (i.props.site) {
-      WebSocketService.Instance.editSite(i.state.siteForm);
+  handleCreateSiteSubmit = (event: any) => {
+    this.setState({
+      loading: true
+    });
+    if (this.props.site) {
+      WebSocketService.Instance.editSite(this.state.siteForm);
     } else {
-      WebSocketService.Instance.createSite(i.state.siteForm);
+      WebSocketService.Instance.createSite(this.state.siteForm);
     }
-    i.setState(i.state);
   }
 
-  handleSiteNameChange(i: SiteForm, event: any) {
-    i.state.siteForm.name = event.target.value;
-    i.setState(i.state);
+  handleSiteNameChange = (event: any) => {
+    this.setState({
+      siteForm: {
+        ...this.state.siteForm,
+        name: event.target.value
+      }
+    });
   }
 
-  handleSiteDescriptionChange(val: string) {
-    this.state.siteForm.description = val;
-    this.setState(this.state);
+  handleSiteDescriptionChange = (key: any) => {
+    console.log('event', event);
+    this.setState({
+      siteForm: {
+        ...this.state.siteForm,
+        description: key
+      }
+    });
   }
 
-  handleSiteEnableNsfwChange(i: SiteForm, event: any) {
-    i.state.siteForm.enable_nsfw = event.target.checked;
-    i.setState(i.state);
+  handleSiteEnableNsfwChange = (event: any) => {
+    this.setState({
+      siteForm: {
+        ...this.state.siteForm,
+        enable_nsfw: event.target.checked
+      }
+    });
   }
 
-  handleSiteOpenRegistrationChange(i: SiteForm, event: any) {
-    i.state.siteForm.open_registration = event.target.checked;
-    i.setState(i.state);
+  handleSiteOpenRegistrationChange = (event: any) => {
+    this.setState({
+      siteForm: {
+        ...this.state.siteForm,
+        open_registration: event.target.checked
+      }
+    });
   }
 
-  handleSiteEnableDownvotesChange(i: SiteForm, event: any) {
-    i.state.siteForm.enable_downvotes = event.target.checked;
-    i.setState(i.state);
+  handleSiteEnableDownvotesChange = (event: any) => {
+    this.setState({
+      siteForm: {
+        ...this.state.siteForm,
+        enable_downvotes: event.target.checked
+      }
+    });
   }
 
-  handleSiteEnableCreateCommunitiesChange(i: SiteForm, event: any) {
-    i.state.siteForm.enable_create_communities = event.target.checked;
-    i.setState(i.state);
+  handleSiteEnableCreateCommunitiesChange = (event: any) => {
+    this.setState({
+      siteForm: {
+        ...this.state.siteForm,
+        enable_create_communities: event.target.checked
+      }
+    });
   }
 
-  handleCancel(i: SiteForm) {
-    i.props.onCancel();
+  handleCancel = () => {
+    this.props.onCancel();
   }
 }

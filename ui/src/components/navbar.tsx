@@ -1,5 +1,5 @@
-import { Component, linkEvent, createRef, RefObject } from 'inferno';
-import { Link, withRouter } from 'inferno-router';
+import React, { Component, createRef, RefObject } from 'react';
+import { Link, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { WebSocketService, UserService } from '../services';
@@ -30,12 +30,14 @@ import {
   messageToastify,
   md,
   imagesDownsize,
+  setTheme,
 } from '../utils';
+import { BASE_PATH } from '../isProduction';
 import { version } from '../version';
 import { i18n } from '../i18next';
-import { User } from './user';
 import { Icon } from './icon';
 import { CommunityDropdown } from './community-dropdown';
+import { linkEvent } from '../linkEvent';
 
 interface NavbarState {
   isLoggedIn: boolean;
@@ -45,43 +47,50 @@ interface NavbarState {
   messages: Array<PrivateMessage>;
   unreadCount: number;
   siteName: string;
+  version: string;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
   searchParam: string;
   toggleSearch: boolean;
   creatingCommunitiesEnabled: boolean;
   communityDropdownShown: boolean;
+  siteLoading: boolean;
 }
 
 class UnwrappedNavbar extends Component<any, NavbarState> {
   private wsSub: Subscription;
   private userSub: Subscription;
+  private unreadCountSub: Subscription;
   private searchTextField: RefObject<HTMLInputElement>;
   emptyState: NavbarState = {
-    isLoggedIn: UserService.Instance.user !== undefined,
+    isLoggedIn: false,
     unreadCount: 0,
     replies: [],
     mentions: [],
     messages: [],
     expanded: false,
     siteName: undefined,
+    version: undefined,
     admins: [],
+    sitemods: [],
     searchParam: '',
     toggleSearch: false,
     creatingCommunitiesEnabled: false,
     communityDropdownShown: false,
+    siteLoading: true,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
-    this.state = this.emptyState;
+  state = this.emptyState;
 
+  componentDidMount() {
     // Subscribe to user changes
-    this.userSub = UserService.Instance.sub.subscribe(user => {
-      this.state.isLoggedIn = user.user !== undefined;
-      if (this.state.isLoggedIn) {
-        this.state.unreadCount = user.user.unreadCount;
+    this.userSub = UserService.Instance.jwtSub.subscribe(res => {
+      if (res !== undefined) {
         this.requestNotificationPermission();
+      } else {
+        this.state.isLoggedIn = false;
       }
+      WebSocketService.Instance.getSite();
       this.setState(this.state);
     });
 
@@ -93,18 +102,14 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
         () => console.log('complete')
       );
 
-    if (this.state.isLoggedIn) {
-      this.requestNotificationPermission();
-      // TODO couldn't get re-logging in to re-fetch unreads
-      this.fetchUnreads();
-    }
-
-    WebSocketService.Instance.getSite();
+    this.unreadCountSub = UserService.Instance.unreadCountSub.subscribe(res => {
+      this.setState({ unreadCount: res });
+    });
 
     this.searchTextField = createRef();
   }
 
-  handleSearchParam(i: Navbar, event: any) {
+  handleSearchParam(i: UnwrappedNavbar, event: any) {
     i.state.searchParam = event.target.value;
     i.setState(i.state);
   }
@@ -114,20 +119,20 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     this.setState({ searchParam: '' });
     this.setState({ toggleSearch: false });
     if (searchParam === '') {
-      this.context.router.history.push(`/search/`);
+      this.props.history.push(`/search/`);
     } else {
-      this.context.router.history.push(
+      this.props.history.push(
         `/search/q/${searchParam}/type/all/sort/topall/page/1`
       );
     }
   }
 
-  handleSearchSubmit(i: Navbar, event: any) {
+  handleSearchSubmit(i: UnwrappedNavbar, event: any) {
     event.preventDefault();
     i.updateUrl();
   }
 
-  handleSearchBtn(i: Navbar, event: any) {
+  handleSearchBtn(i: UnwrappedNavbar, event: any) {
     event.preventDefault();
     i.setState({ toggleSearch: true });
 
@@ -138,7 +143,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     }
   }
 
-  handleSearchBlur(i: Navbar, event: any) {
+  handleSearchBlur(i: UnwrappedNavbar, event: any) {
     if (!(event.relatedTarget && event.relatedTarget.name !== 'search-btn')) {
       i.state.toggleSearch = false;
       i.setState(i.state);
@@ -159,6 +164,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   componentWillUnmount() {
     this.wsSub.unsubscribe();
     this.userSub.unsubscribe();
+    this.unreadCountSub.unsubscribe();
   }
 
   showCreateCommunityNav() {
@@ -171,47 +177,55 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   navbar() {
     return (
       <>
-        <nav class="container-fluid navbar navbar-expand-md navbar-light main-navbar shadow p-0 px-3">
-          <a class="navbar-brand" href="/">
+        <nav className="container-fluid navbar navbar-expand-md navbar-light main-navbar shadow p-0 px-3">
+          <a className="navbar-brand" href="/">
             <img
-              src="/static/assets/hexbear_head.svg"
-              class="icon icon-navbar"
+              src={`${BASE_PATH}hexbear_head.svg`}
+              className="icon icon-navbar"
               alt="vaporwave hammer and sickle logo, courtesy of ancestral potato"
             />
           </a>
-          <Link title={version} class="navbar-brand" to="/">
-            {this.state.siteName}
-          </Link>
+          {!this.state.siteLoading ? (
+            <Link title={this.state.version} className="navbar-brand" to="/">
+              {this.state.siteName}
+            </Link>
+          ) : (
+            <div className="navbar-item">
+              <svg className="icon icon-spinner spin">
+                <use xlinkHref="#icon-spinner" />
+              </svg>
+            </div>
+          )}
           {this.state.isLoggedIn && (
             <Link
-              class="ml-auto p-0 navbar-toggler nav-link"
+              className="ml-auto p-0 navbar-toggler nav-link"
               to="/inbox"
               title={i18n.t('inbox')}
             >
               <Icon name="notification" />
               {this.state.unreadCount > 0 && (
-                <span class="ml-1 badge badge-light badge-pink">
+                <span className="ml-1 badge badge-light badge-pink">
                   {this.state.unreadCount}
                 </span>
               )}
             </Link>
           )}
           <button
-            class="navbar-toggler"
+            className="navbar-toggler"
             type="button"
             aria-label="menu"
             onClick={linkEvent(this, this.expandNavbar)}
             data-tippy-content={i18n.t('expand_here')}
           >
-            <span class="navbar-toggler-icon"></span>
+            <span className="navbar-toggler-icon" />
           </button>
           <div
             className={`${!this.state.expanded && 'collapse'} navbar-collapse`}
           >
-            <ul class="navbar-nav my-2 mr-auto">
-              <li class="nav-item">
+            <ul className="navbar-nav my-2 mr-auto">
+              <li className="nav-item">
                 <button
-                  class="nav-link btn btn-inline "
+                  className="nav-link btn btn-inline "
                   //to="/communities"
                   title={i18n.t('communities')}
                   id="community-button"
@@ -220,9 +234,9 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                   {i18n.t('communities')}
                 </button>
               </li>
-              <li class="nav-item">
+              <li className="nav-item">
                 <Link
-                  class="nav-link"
+                  className="nav-link"
                   to={{
                     pathname: '/create_post',
                     state: { prevPath: this.currentLocation },
@@ -233,9 +247,9 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                 </Link>
               </li>
               {this.showCreateCommunityNav() && (
-                <li class="nav-item">
+                <li className="nav-item">
                   <Link
-                    class="nav-link"
+                    className="nav-link"
                     to="/create_community"
                     title={i18n.t('create_community')}
                   >
@@ -245,7 +259,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
               )}
               <li className="nav-item">
                 <Link
-                  class="nav-link"
+                  className="nav-link"
                   to="/contributing"
                   title={i18n.t('donate_to_lemmy')}
                 >
@@ -253,46 +267,44 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                 </Link>
               </li>
             </ul>
-            {!this.context.router.history.location.pathname.match(
-              /^\/search/
-            ) && (
+            {!this.props.history.location.pathname.match(/^\/search/) && (
               <form
-                class="form-inline"
+                className="form-inline"
                 onSubmit={linkEvent(this, this.handleSearchSubmit)}
               >
                 <input
-                  class={`form-control mr-0 search-input ${
+                  className={`form-control mr-0 search-input ${
                     this.state.toggleSearch ? 'show-input' : 'hide-input'
                   }`}
-                  onInput={linkEvent(this, this.handleSearchParam)}
+                  onChange={linkEvent(this, this.handleSearchParam)}
                   value={this.state.searchParam}
                   ref={this.searchTextField}
                   type="text"
                   placeholder={i18n.t('search')}
                   onBlur={linkEvent(this, this.handleSearchBlur)}
-                ></input>
+                />
                 <button
                   name="search-btn"
                   onClick={linkEvent(this, this.handleSearchBtn)}
-                  class={`btn btn-link ${
+                  className={`btn btn-link ${
                     this.state.toggleSearch ? 'px-2' : 'px-0'
                   }`}
-                  style="color: var(--gray)"
+                  style={{ color: 'var(--gray)' }}
                 >
                   <Icon name="search" />
                 </button>
               </form>
             )}
-            <ul class="navbar-nav my-2 navbar-right">
+            <ul className="navbar-nav my-2 navbar-right">
               {this.canAdmin && (
                 <li className="nav-item">
                   <Link
                     className="nav-link p-0 px-2 nav-icon"
-                    to={`/admin`}
+                    to="/admin"
                     title={i18n.t('admin_settings')}
                   >
-                    <svg class="icon">
-                      <use xlinkHref="#icon-settings"></use>
+                    <svg className="icon">
+                      <use xlinkHref="#icon-settings" />
                     </svg>
                   </Link>
                 </li>
@@ -300,27 +312,27 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
             </ul>
             {this.state.isLoggedIn ? (
               <>
-                <ul class="navbar-nav my-2">
+                <ul className="navbar-nav my-2">
                   <li className="nav-item">
                     <Link
-                      class="nav-link p-0 px-2 nav-icon"
+                      className="nav-link p-0 px-2 nav-icon"
                       to="/inbox"
                       title={i18n.t('inbox')}
                     >
                       <Icon name="notification" />
                       {this.state.unreadCount > 0 && (
-                        <span class="ml-1 badge badge-light badge-pink">
+                        <span className="ml-1 badge badge-light badge-pink">
                           {this.state.unreadCount}
                         </span>
                       )}
                     </Link>
                   </li>
                 </ul>
-                <ul class="navbar-nav">
+                <ul className="navbar-nav">
                   <li className="nav-item">
                     <Link
-                      class="nav-link"
-                      to={`/u/${UserService.Instance.user.username}`}
+                      className="nav-link"
+                      to={`/u/${UserService.Instance.user.name}`}
                       title={i18n.t('settings')}
                     >
                       <span>
@@ -329,22 +341,23 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
                             src={pictrsAvatarThumbnail(
                               UserService.Instance.user.avatar
                             )}
+                            alt="user avatar"
                             height="32"
                             width="32"
-                            class="rounded-circle mr-2"
+                            className="rounded-circle mr-2"
                           />
                         )}
-                        {UserService.Instance.user.username}
+                        {UserService.Instance.user.name}
                       </span>
                     </Link>
                   </li>
                 </ul>
               </>
             ) : (
-              <ul class="navbar-nav my-2">
+              <ul className="navbar-nav my-2">
                 <li className="nav-item">
                   <Link
-                    class="nav-link"
+                    className="nav-link"
                     to="/login"
                     title={i18n.t('login_sign_up')}
                   >
@@ -358,7 +371,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
             <CommunityDropdown
               posX={this.communityButtonLoc}
               removeDropdown={() => this.showCommunityDropdown(this)}
-            ></CommunityDropdown>
+            />
           )}
         </nav>
         {/* empty space below navbar */}
@@ -367,17 +380,18 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     );
   }
 
-  expandNavbar(i: Navbar) {
+  expandNavbar(i: UnwrappedNavbar) {
     i.state.expanded = !i.state.expanded;
     i.setState(i.state);
   }
 
-  showCommunityDropdown(i: Navbar) {
+  showCommunityDropdown(i: UnwrappedNavbar) {
     i.state.communityDropdownShown = !i.state.communityDropdownShown;
     i.setState(i.state);
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
+    // console.log(msg);
     let res = wsJsonToRes(msg);
     if (msg.error) {
       if (msg.error == 'not_logged_in') {
@@ -443,43 +457,55 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
         this.state.admins = data.admins;
         this.state.creatingCommunitiesEnabled =
           data.site.enable_create_communities;
-        this.setState(this.state);
       }
+
+      if (data.my_user) {
+        UserService.Instance.user = data.my_user;
+
+        if (this.state.isLoggedIn == false) {
+          this.requestNotificationPermission();
+          this.fetchUnreads();
+          setTheme(data.my_user.theme, true);
+        }
+
+        this.state.isLoggedIn = true;
+      }
+
+      this.state.siteLoading = false;
+      this.setState(this.state);
     }
   }
 
   fetchUnreads() {
-    if (this.state.isLoggedIn) {
-      let repliesForm: GetRepliesForm = {
-        sort: SortType[SortType.New],
-        unread_only: true,
-        page: 1,
-        limit: fetchLimit,
-      };
+    let repliesForm: GetRepliesForm = {
+      sort: SortType[SortType.New],
+      unread_only: true,
+      page: 1,
+      limit: fetchLimit,
+    };
 
-      let userMentionsForm: GetUserMentionsForm = {
-        sort: SortType[SortType.New],
-        unread_only: true,
-        page: 1,
-        limit: fetchLimit,
-      };
+    let userMentionsForm: GetUserMentionsForm = {
+      sort: SortType[SortType.New],
+      unread_only: true,
+      page: 1,
+      limit: fetchLimit,
+    };
 
-      let privateMessagesForm: GetPrivateMessagesForm = {
-        unread_only: true,
-        page: 1,
-        limit: fetchLimit,
-      };
+    let privateMessagesForm: GetPrivateMessagesForm = {
+      unread_only: true,
+      page: 1,
+      limit: fetchLimit,
+    };
 
-      if (this.currentLocation !== '/inbox') {
-        WebSocketService.Instance.getReplies(repliesForm);
-        WebSocketService.Instance.getUserMentions(userMentionsForm);
-        WebSocketService.Instance.getPrivateMessages(privateMessagesForm);
-      }
+    if (this.currentLocation !== '/inbox') {
+      WebSocketService.Instance.getReplies(repliesForm);
+      WebSocketService.Instance.getUserMentions(userMentionsForm);
+      WebSocketService.Instance.getPrivateMessages(privateMessagesForm);
     }
   }
 
   get currentLocation() {
-    return this.context.router.history.location.pathname;
+    return this.props.history.location.pathname;
   }
 
   get communityButtonLoc() {
@@ -488,10 +514,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
   }
 
   sendUnreadCount() {
-    UserService.Instance.user.unreadCount = this.state.unreadCount;
-    UserService.Instance.sub.next({
-      user: UserService.Instance.user,
-    });
+    UserService.Instance.unreadCountSub.next(this.state.unreadCount);
   }
 
   calculateUnreadCount(): number {
@@ -527,20 +550,16 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
     let creator_name = reply.creator_name;
     let creator_avatar = reply.creator_avatar
       ? reply.creator_avatar
-      : `${window.location.protocol}//${window.location.host}/static/assets/apple-touch-icon.png`;
+      : `${window.location.protocol}//${window.location.host}/apple-touch-icon.png`;
     let link = isCommentType(reply)
       ? `/post/${reply.post_id}/comment/${reply.id}`
       : `/inbox`;
     let htmlBody = imagesDownsize(md.render(reply.content), true, false);
     let body = reply.content; // Unfortunately the notifications API can't do html
 
-    messageToastify(
-      creator_name,
-      creator_avatar,
-      htmlBody,
-      link,
-      this.context.router
-    );
+    messageToastify(creator_name, creator_avatar, htmlBody, link, {
+      history: this.props.history,
+    });
 
     if (Notification.permission !== 'granted') Notification.requestPermission();
     else {
@@ -551,7 +570,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
 
       notification.onclick = () => {
         event.preventDefault();
-        this.context.router.history.push(link);
+        this.props.history.push(link);
       };
     }
   }

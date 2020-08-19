@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Prompt } from 'inferno-router';
+import React, { Component } from 'react';
+import { Prompt } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -17,6 +17,7 @@ import { i18n } from '../i18next';
 
 import { Community } from '../interfaces';
 import { MarkdownTextArea } from './markdown-textarea';
+import { linkEvent } from '../linkEvent';
 
 interface CommunityFormProps {
   community?: Community; // If a community is given, that means this is an edit
@@ -60,15 +61,17 @@ export class CommunityForm extends Component<
     community_settings: null,
   };
 
+  state = this.emptyState
+
   constructor(props: any, context: any) {
     super(props, context);
-
-    this.state = this.emptyState;
 
     this.handleCommunityDescriptionChange = this.handleCommunityDescriptionChange.bind(
       this
     );
+  }
 
+  componentDidMount() {
     if (this.props.community) {
       this.state.communityForm = {
         name: this.props.community.name,
@@ -124,23 +127,23 @@ export class CommunityForm extends Component<
         <Prompt
           when={
             !this.state.loading &&
-            (this.state.communityForm.name ||
-              this.state.communityForm.title ||
-              this.state.communityForm.description)
+            (!!this.state.communityForm.name ||
+              !!this.state.communityForm.title ||
+              !!this.state.communityForm.description)
           }
           message={i18n.t('block_leaving')}
         />
         <form onSubmit={linkEvent(this, this.handleCreateCommunitySubmit)}>
           {!this.props.community && (
-            <div class="form-group row">
-              <label class="col-12 col-form-label" htmlFor="community-name">
+            <div className="form-group row">
+              <label className="col-12 col-form-label" htmlFor="community-name">
                 {i18n.t('name')}
               </label>
-              <div class="col-12">
+              <div className="col-12">
                 <input
                   type="text"
                   id="community-name"
-                  class="form-control"
+                  className="form-control"
                   value={this.state.communityForm.name}
                   onInput={linkEvent(this, this.handleCommunityNameChange)}
                   required
@@ -152,64 +155,64 @@ export class CommunityForm extends Component<
               </div>
             </div>
           )}
-          <div class="form-group row">
-            <label class="col-12 col-form-label" htmlFor="community-title">
+          <div className="form-group row">
+            <label className="col-12 col-form-label" htmlFor="community-title">
               {i18n.t('title')}
             </label>
-            <div class="col-12">
+            <div className="col-12">
               <input
                 type="text"
                 id="community-title"
                 value={this.state.communityForm.title}
                 onInput={linkEvent(this, this.handleCommunityTitleChange)}
-                class="form-control"
+                className="form-control"
                 required
                 minLength={3}
                 maxLength={100}
               />
             </div>
           </div>
-          <div class="form-group row">
-            <label class="col-12 col-form-label" htmlFor={this.id}>
+          <div className="form-group row">
+            <label className="col-12 col-form-label" htmlFor={this.id}>
               {i18n.t('sidebar')}
             </label>
-            <div class="col-12">
+            <div className="col-12">
               <MarkdownTextArea
                 initialContent={this.state.communityForm.description}
                 onContentChange={this.handleCommunityDescriptionChange}
               />
             </div>
           </div>
-          <div class="form-group row">
-            <label class="col-12 col-form-label" htmlFor="community-category">
+          <div className="form-group row">
+            <label className="col-12 col-form-label" htmlFor="community-category">
               {i18n.t('category')}
             </label>
-            <div class="col-12">
+            <div className="col-12">
               <select
-                class="form-control"
+                className="form-control"
                 id="community-category"
                 value={this.state.communityForm.category_id}
                 onInput={linkEvent(this, this.handleCommunityCategoryChange)}
               >
                 {this.state.categories.map(category => (
-                  <option value={category.id}>{category.name}</option>
+                  <option key={category.id} value={category.id}>{category.name}</option>
                 ))}
               </select>
             </div>
           </div>
 
           {this.props.enableNsfw && (
-            <div class="form-group row">
-              <div class="col-12">
-                <div class="form-check">
+            <div className="form-group row">
+              <div className="col-12">
+                <div className="form-check">
                   <input
-                    class="form-check-input"
+                    className="form-check-input"
                     id="community-nsfw"
                     type="checkbox"
                     checked={this.state.communityForm.nsfw}
                     onChange={linkEvent(this, this.handleCommunityNsfwChange)}
                   />
-                  <label class="form-check-label" htmlFor="community-nsfw">
+                  <label className="form-check-label" htmlFor="community-nsfw">
                     {i18n.t('nsfw')}
                   </label>
                 </div>
@@ -221,16 +224,16 @@ export class CommunityForm extends Component<
             this.state.community_settings &&
             this.communitySettings()}
 
-          <div class="form-group row">
-            <div class="col-12">
+          <div className="form-group row">
+            <div className="col-12">
               <button
                 type="submit"
-                class="btn btn-secondary mr-2"
+                className="btn btn-secondary mr-2"
                 disabled={this.state.loading}
               >
                 {this.state.loading ? (
-                  <svg class="icon icon-spinner spin">
-                    <use xlinkHref="#icon-spinner"></use>
+                  <svg className="icon icon-spinner spin">
+                    <use xlinkHref="#icon-spinner" />
                   </svg>
                 ) : this.props.community ? (
                   capitalizeFirstLetter(i18n.t('save'))
@@ -241,7 +244,7 @@ export class CommunityForm extends Component<
               {this.props.community && (
                 <button
                   type="button"
-                  class="btn btn-secondary"
+                  className="btn btn-secondary"
                   onClick={linkEvent(this, this.handleCancel)}
                 >
                   {i18n.t('cancel')}
@@ -256,69 +259,69 @@ export class CommunityForm extends Component<
 
   communitySettings() {
     return (
-      <section class="my-4">
-        <p class="h5 mb-3">{i18n.t('community_settings')}</p>
-        {/* <p class="text-muted mb-3">
+      <section className="my-4">
+        <p className="h5 mb-3">{i18n.t('community_settings')}</p>
+        {/* <p className="text-muted mb-3">
           <small>{this.state.community_settings.published}</small>
         </p> */}
-        <div class="form-group row">
-          <div class="col-12">
-            <div class="form-check">
+        <div className="form-group row">
+          <div className="col-12">
+            <div className="form-check">
               <input
-                class="form-check-input"
+                className="form-check-input"
                 id="community-read-only"
                 type="checkbox"
                 checked={this.state.community_settings.read_only}
                 onChange={linkEvent(this, this.handleCommunityReadOnlyChange)}
               />
-              <label class="form-check-label" htmlFor="community-read-only">
+              <label className="form-check-label" htmlFor="community-read-only">
                 {i18n.t('community_read_only')}
               </label>
             </div>
           </div>
         </div>
-        <div class="form-group row">
-          <div class="col-12">
-            <div class="form-check">
+        <div className="form-group row">
+          <div className="col-12">
+            <div className="form-check">
               <input
-                class="form-check-input"
+                className="form-check-input"
                 id="community-private"
                 type="checkbox"
                 checked={this.state.community_settings.private}
                 onChange={linkEvent(this, this.handleCommunityPrivateChange)}
               />
-              <label class="form-check-label" htmlFor="community-private">
+              <label className="form-check-label" htmlFor="community-private">
                 {i18n.t('community_private')}
               </label>
             </div>
           </div>
         </div>
-        <div class="form-group row mb-3">
-          <div class="col-12">
-            <div class="form-check">
+        <div className="form-group row mb-3">
+          <div className="col-12">
+            <div className="form-check">
               <input
-                class="form-check-input"
+                className="form-check-input"
                 id="community-post-links"
                 type="checkbox"
                 checked={this.state.community_settings.post_links}
                 onChange={linkEvent(this, this.handleCommunityPostLinksChange)}
               />
-              <label class="form-check-label" htmlFor="community-post-links">
+              <label className="form-check-label" htmlFor="community-post-links">
                 {i18n.t('community_post_links')}
               </label>
             </div>
           </div>
         </div>
-        <div class="form-group row">
+        <div className="form-group row">
           <label
-            class="col-12 col-form-label pt-0"
+            className="col-12 col-form-label pt-0"
             htmlFor="community-comment-images"
           >
             {i18n.t('community_comment_images')}
           </label>
-          <div class="col-12">
+          <div className="col-12">
             <input
-              class="form-control"
+              className="form-control"
               id="community-comment-images"
               type="number"
               value={this.state.community_settings.comment_images}
@@ -401,8 +404,8 @@ export class CommunityForm extends Component<
   }
 
   parseMessage(msg: WebSocketJsonResponse) {
-    let res = wsJsonToRes(msg);
     console.log(msg);
+    let res = wsJsonToRes(msg);
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
       this.state.loading = false;
