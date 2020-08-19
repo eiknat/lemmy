@@ -65,6 +65,7 @@ interface PostListingState {
   upvotes: number;
   downvotes: number;
   localPostSaved: boolean;
+  innerWidth: number;
 }
 
 interface PostListingProps {
@@ -147,7 +148,7 @@ const VoteButtons = ({
   </>
   );
 
-const PostActionButton = props => <Button p={2}variant="muted" bg="transparent" {...props} />
+const PostActionButton = props => <Button p={2} variant="muted" bg="transparent" {...props} />
 
 const MobilePostListing = ({
   post,
@@ -161,13 +162,15 @@ const MobilePostListing = ({
   handleSavePostClick,
   thumbnail,
   handleReportPost,
+  showBody,
+  handleShowAdvanced
 }) => {
   console.log({ post })
   const [actionsVisible, setActionsVisible] = useState(false);
   return (
     <Flex css={{ flexDirection: 'column' }}>
       <Link to={`/post/${post.id}`}>
-        <Heading as="h5" mb={2} color="highlight" css={{ fontWeight: 500, fontSize: '24px' }}>
+        <Heading as="h5" my={2} color="#dedede" css={{ fontWeight: 400, fontSize: '18px' }}>
           {post.name}
         </Heading>
       </Link>
@@ -180,11 +183,10 @@ const MobilePostListing = ({
       {post.body && (
         <Text
           css={{
-            // border: '1px solid rgb(68, 68, 68)',
-            // padding: '8px',
             borderRadius: '4px',
+            fontSize: '14px'
           }}
-          mb={2}
+          my={2}
         >
           {post.body}
         </Text>
@@ -229,7 +231,7 @@ const MobilePostListing = ({
           • <MomentTime data={post} />
         </span>
       </Box>
-      <Flex css={{ alignItems: 'center' }} mt={3}>
+      <Flex css={{ alignItems: 'center' }} mt={1}>
         <PostActionButton
           onClick={handlePostLike}
           color={my_vote === 1 ? '#fffc00' : 'inherit'}
@@ -265,11 +267,11 @@ const MobilePostListing = ({
             {post.number_of_comments}
           </PostActionButton>
         </Box>
-        <PostActionButton onClick={() => setActionsVisible(prev => !prev)} mx={2} css={{ marginLeft: 'auto' }}>
-          <Icon name="more" />
-        </PostActionButton>
+          <PostActionButton onClick={() => showBody ? handleShowAdvanced() : setActionsVisible(prev => !prev)} mx={2} css={{ marginLeft: 'auto' }}>
+            <Icon name="more" />
+          </PostActionButton>
       </Flex>
-      {actionsVisible && (
+      {actionsVisible && !showBody && (
         <Flex my={2}>
           <PostActionButton onClick={handleReportPost}>
             <Icon name="report" />
@@ -305,6 +307,7 @@ class BasePostListing extends Component<
     downvotes: this.props.post.downvotes,
     // @TODO: Debug why this isn't being passed down on update
     localPostSaved: this.props.post.saved,
+    innerWidth: window.innerWidth,
   };
 
   state = this.emptyState;
@@ -312,6 +315,15 @@ class BasePostListing extends Component<
   componentDidMount() {
     // scroll to top of page when loading post listing
     window.scrollTo(0, 0);
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
+  }
+
+  handleResize = () => {
+    this.setState({ innerWidth: window.innerWidth })
   }
 
   // @TODO: Check if this problem still persists
@@ -516,7 +528,7 @@ class BasePostListing extends Component<
   listingActions = () => {
     let post = this.props.post;
 
-    const isMobile = window.innerWidth < 768;
+    const isMobile = this.state.innerWidth < 768;
 
     return (
       <div className="details col-12">
@@ -775,13 +787,14 @@ class BasePostListing extends Component<
   listing = () => {
     let post = this.props.post;
 
-    const isMobile = window.innerWidth < 768;
+    const isMobile = this.state.innerWidth < 768;
 
     // if (isMobile) {
     //   return (
     //     <>
     //     <MobilePostListing
-    //       my_vote={this.state.my_vote}
+    //         my_vote={this.state.my_vote}
+    //         handleShowAdvanced={this.handleShowAdvanced}
     //       post={post}
     //       enableDownvotes={this.props.enableDownvotes}
     //       score={this.state.score}
@@ -791,11 +804,13 @@ class BasePostListing extends Component<
     //       thumbnail={this.thumbnail}
     //       localPostSaved={this.state.localPostSaved}
     //       handleSavePostClick={this.handleSavePostClick}
-    //       handleReportPost={this.handleReportPost}
+    //         handleReportPost={this.handleReportPost}
+    //         showBody={this.props.showBody}
     //       />
-    //       <Box p={2}>
-    //         {this.listingForms()}
-    //       </Box>
+    //       <Flex>
+    //         {this.advancedActions()}
+    //       </Flex>
+    //       {this.listingForms()}
     //     </>
     //   );
     // }
@@ -1026,12 +1041,27 @@ class BasePostListing extends Component<
                   </li>
                 </>
               )}
+              {this.advancedActions()}
+            </>
+          )}
+        </ul>
+        {post.body && this.state.imageExpanded && !this.props.showBody && (
+          <PostBody body={post.body} />
+        )}
+      </div>
+    );
+  };
 
-              {!this.state.showAdvanced && this.props.showBody ? (
-                <li className="list-inline-item">
+  advancedActions = () => {
+    const { post } = this.props;
+
+    return (
+      <>
+        {!this.state.showAdvanced && this.props.showBody ? (
+                <li className="list-inline-item only-desktop">
                   <button
                     className="btn btn-sm btn-link btn-animate text-muted"
-                    onClick={linkEvent(this, this.handleShowAdvanced)}
+                    onClick={this.handleShowAdvanced}
                     data-tippy-content={i18n.t('more')}
                   >
                     <Icon name="more" />
@@ -1041,8 +1071,8 @@ class BasePostListing extends Component<
                 <>
                   {this.props.showBody && post.body && (
                     <li className="list-inline-item">
-                      <button
-                        className="btn btn-sm btn-link btn-animate text-muted"
+                      <PostActionButton
+                        // className="btn btn-sm btn-link btn-animate text-muted"
                         onClick={linkEvent(this, this.handleViewSource)}
                         data-tippy-content={i18n.t('view_source')}
                       >
@@ -1053,14 +1083,14 @@ class BasePostListing extends Component<
                         >
                           <use xlinkHref="#icon-file-text" />
                         </svg>
-                      </button>
+                      </PostActionButton>
                     </li>
                   )}
                   {this.canModOnSelf && (
                     <>
                       <li className="list-inline-item">
-                        <button
-                          className="btn btn-sm btn-link btn-animate text-muted"
+                        <PostActionButton
+                          // className="btn btn-sm btn-link btn-animate text-muted"
                           onClick={this.handleModLock}
                           data-tippy-content={
                             post.locked ? i18n.t('unlock') : i18n.t('lock')
@@ -1073,11 +1103,11 @@ class BasePostListing extends Component<
                           >
                             <use xlinkHref="#icon-lock" />
                           </svg>
-                        </button>
+                        </PostActionButton>
                       </li>
                       <li className="list-inline-item">
-                        <button
-                          className="btn btn-sm btn-link btn-animate text-muted"
+                        <PostActionButton
+                          // className="btn btn-sm btn-link btn-animate text-muted"
                           onClick={this.handleModSticky}
                           data-tippy-content={
                             post.stickied
@@ -1092,7 +1122,7 @@ class BasePostListing extends Component<
                           >
                             <use xlinkHref="#icon-pin" />
                           </svg>
-                        </button>
+                        </PostActionButton>
                       </li>
                     </>
                   )}
@@ -1100,19 +1130,19 @@ class BasePostListing extends Component<
                   {(this.canMod || this.canAdmin) && (
                     <li className="list-inline-item">
                       {!post.removed ? (
-                        <span
+                        <PostActionButton
                           className="pointer"
                           onClick={this.handleModRemoveShow}
                         >
                           {i18n.t('remove')}
-                        </span>
+                        </PostActionButton>
                       ) : (
-                        <span
+                        <PostActionButton
                           className="pointer"
                           onClick={this.handleModRemoveSubmit}
                         >
                           {i18n.t('restore')}
-                        </span>
+                        </PostActionButton>
                       )}
                     </li>
                   )}
@@ -1121,29 +1151,26 @@ class BasePostListing extends Component<
                       {!this.isMod && (
                         <li className="list-inline-item">
                           {!post.banned_from_community ? (
-                            <span
-                              className="pointer"
+                            <PostActionButton
                               onClick={this.handleModBanFromCommunityShow}
                             >
                               {i18n.t('ban')}
-                            </span>
+                            </PostActionButton>
                           ) : (
-                            <span
-                              className="pointer"
+                            <PostActionButton
                               onClick={linkEvent(
                                 this,
                                 this.handleModBanFromCommunitySubmit
                               )}
                             >
                               {i18n.t('unban')}
-                            </span>
+                            </PostActionButton>
                           )}
                         </li>
                       )}
                       {!post.banned_from_community && (
                         <li className="list-inline-item">
-                          <span
-                            className="pointer"
+                          <PostActionButton
                             onClick={linkEvent(
                               this,
                               this.handleAddModToCommunity
@@ -1152,7 +1179,7 @@ class BasePostListing extends Component<
                             {this.isMod
                               ? i18n.t('remove_as_mod')
                               : i18n.t('appoint_as_mod')}
-                          </span>
+                          </PostActionButton>
                         </li>
                       )}
                     </>
@@ -1161,15 +1188,14 @@ class BasePostListing extends Component<
                   {(this.amCommunityCreator || this.canAdmin) && this.isMod && (
                     <li className="list-inline-item">
                       {!this.state.showConfirmTransferCommunity ? (
-                        <span
-                          className="pointer"
+                        <PostActionButton
                           onClick={linkEvent(
                             this,
                             this.handleShowConfirmTransferCommunity
                           )}
                         >
                           {i18n.t('transfer_community')}
-                        </span>
+                        </PostActionButton>
                       ) : (
                         <>
                           <span className="d-inline-block mr-1">
@@ -1203,44 +1229,40 @@ class BasePostListing extends Component<
                       {!this.isAdmin && (
                         <li className="list-inline-item">
                           {!post.banned ? (
-                            <span
-                              className="pointer"
+                            <PostActionButton
                               onClick={this.handleModBanShow}
                             >
                               {i18n.t('ban_from_site')}
-                            </span>
+                            </PostActionButton>
                           ) : (
-                            <span
-                              className="pointer"
+                            <PostActionButton
                               onClick={this.handleModBanSubmit}
                             >
                               {i18n.t('unban_from_site')}
-                            </span>
+                            </PostActionButton>
                           )}
                         </li>
                       )}
                       {!post.banned && (
                         <li className="list-inline-item">
-                          <span
-                            className="pointer"
+                          <PostActionButton
                             onClick={linkEvent(this, this.handleAddAdmin)}
                           >
                             {this.isAdmin
                               ? i18n.t('remove_as_admin')
                               : i18n.t('appoint_as_admin')}
-                          </span>
+                          </PostActionButton>
                         </li>
                       )}
                       {!post.banned && (
                         <li className="list-inline-item">
-                          <span
-                            className="pointer"
+                          <PostActionButton
                             onClick={linkEvent(this, this.handleAddSitemod)}
                           >
                             {this.isSitemod
                               ? i18n.t('remove_as_sitemod')
                               : i18n.t('appoint_as_sitemod')}
-                          </span>
+                          </PostActionButton>
                         </li>
                       )}
                     </>
@@ -1249,15 +1271,14 @@ class BasePostListing extends Component<
                   {this.amSiteCreator && this.isAdmin && (
                     <li className="list-inline-item">
                       {!this.state.showConfirmTransferSite ? (
-                        <span
-                          className="pointer"
+                        <PostActionButton
                           onClick={linkEvent(
                             this,
                             this.handleShowConfirmTransferSite
                           )}
                         >
                           {i18n.t('transfer_site')}
-                        </span>
+                        </PostActionButton>
                       ) : (
                         <>
                           <span className="d-inline-block mr-1">
@@ -1284,15 +1305,9 @@ class BasePostListing extends Component<
                   )}
                 </>
               )}
-            </>
-          )}
-        </ul>
-        {post.body && this.state.imageExpanded && !this.props.showBody && (
-          <PostBody body={post.body} />
-        )}
-      </div>
-    );
-  };
+        </>
+    )
+  }
 
   private get myPost(): boolean {
     return (
@@ -1731,8 +1746,8 @@ class BasePostListing extends Component<
     });
   }
 
-  handleShowAdvanced(i: BasePostListing) {
-    i.setState(
+  handleShowAdvanced = () => {
+    this.setState(
       prevState => ({
         showAdvanced: !prevState.showAdvanced,
       }),

@@ -77,6 +77,7 @@ const defaultTheme: ThemeProviderProps<Theme> = {
     // primary: '#DA1B9A',
     primary: '#A4288B',
     secondary: '#2030DF',
+    text: '#DEDEDE',
     accent: '#F3B90C',
     danger: '#dc3545',
     muted: '#303030',
