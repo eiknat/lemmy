@@ -815,3 +815,16 @@ button:hover [type="button"]:hover {
   border-bottom-left-radius: 0.25rem !important;
   border-top-right-radius: 0.25rem !important;
 }
+
+.mod-log-filter-label {
+  text-transform: capitalize;
+}
+
+.flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.post-title-link {
+  display: flex;
+}

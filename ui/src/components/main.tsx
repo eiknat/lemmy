@@ -742,6 +742,7 @@ class Main extends Component<MainProps & RouteComponentProps, MainState> {
             ...this.state.siteRes,
             site: data.site,
           },
+          showEditSite: false,
         },
         () => {
           toast(i18n.t('site_saved'));

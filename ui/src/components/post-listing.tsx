@@ -921,7 +921,7 @@ class BasePostListing extends Component<
                   <h5 className="mb-0 d-inline">
                     {this.props.showBody && post.url ? (
                       <a
-                        className="text-body"
+                        className="text-body post-title-link"
                         href={post.url}
                         target="_blank"
                         title={post.url}
