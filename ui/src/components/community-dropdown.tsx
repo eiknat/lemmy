@@ -20,8 +20,7 @@ import { i18n } from '../i18next';
 import { Link } from 'react-router-dom';
 import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import { linkEvent } from '../linkEvent';
-import matchSorter from 'match-sorter'
-
+import matchSorter from 'match-sorter';
 
 interface CommunityDropdownState {
   favorites: Array<Community> /*not used right now */;
@@ -57,7 +56,7 @@ export class CommunityDropdown extends Component<
 
   state = this.emptyState;
 
-  componentDidMount() {
+  async componentDidMount() {
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
       .subscribe(
@@ -71,6 +70,10 @@ export class CommunityDropdown extends Component<
     this.handleClickOutside = this.handleClickOutside.bind(this);
 
     document.addEventListener('mousedown', this.handleClickOutside);
+
+    // @TODO Refactor into an HTTP call when CORS issues are resolved
+    // const res = await fetch('http://localhost:8536/api/v1/community/list?sort=TopAll', { mode: 'no-cors', method: 'GET', headers: { 'Content-Type': 'application/json' } });
+    // const data = await res.text();
   }
 
   componentWillUnmount() {
@@ -105,8 +108,31 @@ export class CommunityDropdown extends Component<
                   </svg>
                 </button>
               </div>
-              {this.sortedCommunities.length > 0 ? (
+              {this.sortedCommunities.length > 0 ||
+              this.sortedSubscriptions.length > 0 ? (
                 <div className="dropdown-categories">
+                  <div className="dropdown-category">
+                    <h6>Communities</h6>
+                    {this.sortedCommunities.map(community => (
+                      <div key={community.id}>
+                        <div className="community-listing">
+                          <span
+                            className="community-icon"
+                            style={{
+                              background: this.generateColor(community.name),
+                            }}
+                          />
+                          <Link
+                            className="community-listing-title"
+                            to={`/c/${community.name}`}
+                            onClick={linkEvent(this, this.handleDropdownClose)}
+                          >
+                            {community.name}
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                   {this.state.subscriptions !== null &&
                     this.sortedSubscriptions.length > 0 && (
                       <div className="dropdown-category">
@@ -135,28 +161,6 @@ export class CommunityDropdown extends Component<
                         ))}
                       </div>
                     )}
-                  <div className="dropdown-category">
-                    <h6>Communities</h6>
-                    {this.sortedCommunities.map(community => (
-                      <div key={community.id}>
-                        <div className="community-listing">
-                          <span
-                            className="community-icon"
-                            style={{
-                              background: this.generateColor(community.name),
-                            }}
-                          />
-                          <Link
-                            className="community-listing-title"
-                            to={`/c/${community.name}`}
-                            onClick={linkEvent(this, this.handleDropdownClose)}
-                          >
-                            {community.name}
-                          </Link>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               ) : (
                 <div>
@@ -212,21 +216,23 @@ export class CommunityDropdown extends Component<
   get sortedSubscriptions(): Array<CommunityUser> {
     if (this.state.subscriptions) {
       return matchSorter(this.state.subscriptions, this.state.filter, {
-        keys: ['name']
-      })
+        keys: ['name'],
+      });
     }
   }
 
   get sortedCommunities(): Array<Community> {
     // don't show subscribed communities twice
-    const communities = !this.state.subscriptions ? this.state.communities : this.state.communities.filter(community => {
-      const isSubscribed = this.state.subscriptions.some(
-          subscription => subscription.community_id === community.id
-      );
-      return !isSubscribed
-    })
+    const communities = !this.state.subscriptions
+      ? this.state.communities
+      : this.state.communities.filter(community => {
+          const isSubscribed = this.state.subscriptions.some(
+            subscription => subscription.community_id === community.id
+          );
+          return !isSubscribed;
+        });
     return matchSorter(communities, this.state.filter, {
-      keys: ['name']
+      keys: ['name'],
     });
   }
 
@@ -294,15 +300,18 @@ export class CommunityDropdown extends Component<
       let data = res.data as ListCommunitiesResponse;
       this.setState({
         communities: data.communities,
-        loading: false
+        loading: false,
       });
     } else if (res.op == UserOperation.GetUserDetails) {
       let data = res.data as UserDetailsResponse;
-      this.setState({
-        subscriptions: data.follows,
-      }, () => {
-        this.onLoadingComplete();
-      });
+      this.setState(
+        {
+          subscriptions: data.follows,
+        },
+        () => {
+          this.onLoadingComplete();
+        }
+      );
     }
   }
 }

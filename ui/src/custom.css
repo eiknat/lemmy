@@ -581,7 +581,7 @@ a.text-body {
 .main-navbar {
   position: fixed;
   top: 0;
-  background-color: #222;
+  /* background-color: #222; */
   /* padding: 0.5rem 1rem !important; */
   margin-top: 0 !important;
   z-index: 50;
