@@ -769,6 +769,7 @@ class BasePostListing extends Component<
   };
 
   listingForms = () => {
+    const { post } = this.props;
     return (
       <>
         {this.state.showRemoveDialog && (

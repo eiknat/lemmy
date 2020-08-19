@@ -45,6 +45,7 @@ export class MarkdownTextArea extends Component<
 > {
   private id = `comment-textarea-${randomStr()}`;
   private formId = `comment-form-${randomStr()}`;
+  // @ts-ignore
   private tribute: Tribute;
   private emptyState: MarkdownTextAreaState = {
     content: this.props.initialContent || '',

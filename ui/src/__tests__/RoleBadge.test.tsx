@@ -1,10 +1,11 @@
 import React from 'react';
-import { render, fireEvent, waitFor, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
 import { RoleBadge } from '../components/RoleBadge';
 
 // import { RoleBadge } from '../components/comment-node';
 
-test('<RoleBadge /> to render', async () => {
+test('<RoleBadge /> to render', () => {
   const { container } = render(
     <RoleBadge tooltipText="admin" role="admin">
       Admin
@@ -24,5 +25,5 @@ test('<RoleBadge /> to render', async () => {
 
   expect(container).toHaveTextContent('Admin');
   expect(container.firstChild).toHaveClass('admin-badge');
-  expect(container.firstChild).toHaveAttribute('data-tippy-content', 'admin')
+  expect(container.firstChild).toHaveAttribute('data-tippy-content', 'admin');
 });

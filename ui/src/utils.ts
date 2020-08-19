@@ -600,6 +600,7 @@ export function testMessageToast() {
   );
 }
 
+// @ts-ignore
 export function setupTribute(): Tribute {
   return new Tribute({
     noMatchTemplate: function () {
@@ -1099,8 +1100,8 @@ export const getAllUserModeratedCommunities = ({
   moderatorId,
   siteModerators,
 }: {
-  moderatorId: number
-  siteModerators: CommunityModsState | null
+  moderatorId: number;
+  siteModerators: CommunityModsState | null;
 }) => {
   return Object.keys(siteModerators).reduce((agg, communityId) => {
     if (
