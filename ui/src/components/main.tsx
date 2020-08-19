@@ -719,7 +719,6 @@ class Main extends Component<MainProps & RouteComponentProps, MainState> {
         this.props.history.push('/setup');
       } else {
         console.log('data.site is missing', data.site);
-        console.log({ siteData: data.site });
         this.setState(
           {
             siteRes: {

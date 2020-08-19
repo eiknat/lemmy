@@ -11,7 +11,6 @@ interface ThemeSystemState {
 const ThemeSystem = createContext({} as ThemeSystemState);
 
 function ThemeSystemProvider({ children, initialTheme = 'chapo' }: { children: React.ReactNode,initialTheme?: string }) {
-  console.log({ initialTheme });
   const [currentTheme, setCurrentTheme] = useState(initialTheme);
 
   const theme = Object.keys(themes).includes(currentTheme)
