@@ -730,15 +730,15 @@ export interface PostForm {
   url?: string;
   body?: string;
   community_id: number;
-  updated?: number;
+  // updated?: number;
   edit_id?: number;
   creator_id: number;
-  removed?: boolean;
-  deleted?: boolean;
+  // removed?: boolean;
+  // deleted?: boolean;
   nsfw: boolean;
-  locked?: boolean;
-  stickied?: boolean;
-  reason?: string;
+  // locked?: boolean;
+  // stickied?: boolean;
+  // reason?: string;
   auth: string;
 }
 
@@ -805,10 +805,16 @@ export interface CommentForm {
   parent_id?: number;
   edit_id?: number;
   creator_id?: number;
-  removed?: boolean;
-  deleted?: boolean;
-  reason?: string;
-  read?: boolean;
+  // removed?: boolean;
+  // deleted?: boolean;
+  // reason?: string;
+  // read?: boolean;
+  auth: string;
+}
+
+export interface EditCommentForm {
+  content: string;
+  edit_id?: number;
   auth: string;
 }
 
