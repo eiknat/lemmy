@@ -20,13 +20,7 @@ import {
 import { UserService, WebSocketService } from '../services';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import {
-  wsJsonToRes,
-  toast,
-  isCommentChanged,
-  isPostChanged,
-  api,
-} from '../utils';
+import { wsJsonToRes, toast, isCommentChanged, isPostChanged } from '../utils';
 import { i18n } from '../i18next';
 import { MomentTime } from './moment-time';
 import { Link, withRouter } from 'react-router-dom';
@@ -104,7 +98,6 @@ export class BaseReports extends Component<any, ReportsState> {
   }
 
   componentDidMount() {
-    this.fetchUserData();
     WebSocketService.Instance.getSite();
   }
 
@@ -150,18 +143,6 @@ export class BaseReports extends Component<any, ReportsState> {
       id: communityId,
       name: communityName,
     });
-  }
-
-  async fetchUserData() {
-    const res = await api.get('site');
-    console.log(res.data);
-    // const user_id = UserService.Instance.user.id;
-
-    // WebSocketService.Instance.getUserDetails({
-    //   user_id,
-    //   saved_only: false,
-    //   sort: 'New',
-    // });
   }
 
   render() {
