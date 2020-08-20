@@ -16,6 +16,7 @@ import {
   Community as CommunityI,
   RemovePostForm,
   GetSiteResponse,
+  RemoveCommentForm,
 } from '../interfaces';
 import { UserService, WebSocketService } from '../services';
 import { retryWhen, delay, take } from 'rxjs/operators';
@@ -471,17 +472,14 @@ export class BaseReports extends Component<any, ReportsState> {
       id,
     } = this.state.currentRemoveDialog as CommentReport;
 
-    const form: CommentForm = {
-      content: comment_text,
+    const form: RemoveCommentForm = {
       edit_id: comment_id,
-      creator_id,
-      post_id,
       removed: true,
       reason: this.state.removeReason,
       auth: null,
     };
 
-    WebSocketService.Instance.editComment(form);
+    WebSocketService.Instance.removeComment(form);
 
     if (this.state.autoResolve) {
       this.handleResolveCommentReport(id, community_id);

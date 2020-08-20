@@ -56,8 +56,16 @@ export const MAX_POST_TITLE_LENGTH = 160;
 export const MAX_POST_BODY_LENGTH = 20000;
 export const MAX_COMMENT_LENGTH = 10000;
 
-function CommunityInput({ communities, onSelect }: any) {
-  const [value, setValue] = useState('');
+function CommunityInput({
+  communities,
+  onSelect,
+  initialValue,
+}: {
+  communities: Array<Community>;
+  onSelect: (community_id: number) => void;
+  initialValue?: string;
+}) {
+  const [value, setValue] = useState(initialValue);
   const results = matchSorter(communities, value, {
     keys: [(item: Community) => `${item.name}`],
   });
@@ -132,7 +140,13 @@ interface PostFormState {
   crosspostCommunityId?: number;
 }
 
-export const TextAreaWithCounter = ({ maxLength, value = '', ...props }: { value: string, maxLength: number } & React.HTMLProps<HTMLTextAreaElement>) => {
+export const TextAreaWithCounter = ({
+  maxLength,
+  value = '',
+  ...props
+}: { value: string; maxLength: number } & React.HTMLProps<
+  HTMLTextAreaElement
+>) => {
   const characterLimitExceeded = value && value.length > maxLength;
   return (
     <>
@@ -463,6 +477,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                     ))}
                 </select> */}
                 <CommunityInput
+                  initialValue={this.props.params?.community}
                   onSelect={this.handlePostCommunityChange}
                   communities={communities}
                 />

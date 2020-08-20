@@ -28,6 +28,7 @@ import {
   GetSiteResponse,
   GetCommunityResponse,
   WebSocketJsonResponse,
+  MarkCommentReadForm,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import {
@@ -188,19 +189,15 @@ export class Post extends Component<any, PostState> {
       UserService.Instance.user &&
       UserService.Instance.user.id == parent_user_id
     ) {
-      let form: CommentFormI = {
-        content: found.content,
+      let form: MarkCommentReadForm = {
         edit_id: found.id,
-        creator_id: found.creator_id,
-        post_id: found.post_id,
-        parent_id: found.parent_id,
         read: true,
         auth: null,
       };
-      WebSocketService.Instance.editComment(form);
+      WebSocketService.Instance.markCommentAsRead(form);
       UserService.Instance.user.unreadCount--;
       // @ts-ignore
-      UserService.Instance.sub.next({
+      UserService.Instance?.sub?.next({
         user: UserService.Instance.user,
       });
     }
