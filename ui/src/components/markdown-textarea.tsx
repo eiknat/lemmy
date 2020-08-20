@@ -106,23 +106,24 @@ export class MarkdownTextArea extends Component<
   }
 
   // @TODO:This was likely introducing the bug that cleared your replies, but keep an eye on it
-  // UNSAFE_componentWillReceiveProps(nextProps: MarkdownTextAreaProps) {
-  //   if (nextProps.finished) {
-  //     this.state.previewMode = false;
-  //     this.state.loading = false;
-  //     this.state.content = '';
-  //     this.setState(this.state);
-  //     if (this.props.replyType) {
-  //       this.props.onReplyCancel();
-  //     }
+  UNSAFE_componentWillReceiveProps(nextProps: MarkdownTextAreaProps) {
+    if (nextProps.finished) {
+      this.setState({
+        previewMode: false,
+        loading: false,
+        content: '',
+      });
+      if (this.props.replyType) {
+        this.props.onReplyCancel();
+      }
 
-  //     let textarea: any = document.getElementById(this.id);
-  //     let form: any = document.getElementById(this.formId);
-  //     form.reset();
-  //     setTimeout(() => autosize.update(textarea), 10);
-  //     this.setState(this.state);
-  //   }
-  // }
+      let textarea: any = document.getElementById(this.id);
+      let form: any = document.getElementById(this.formId);
+      form.reset();
+      setTimeout(() => autosize.update(textarea), 10);
+      // this.setState(this.state);
+    }
+  }
 
   componentWillUnmount() {
     window.onbeforeunload = null;

@@ -15,14 +15,22 @@ import {
   GetCommunityResponse,
   Community as CommunityI,
   RemovePostForm,
+  GetSiteResponse,
 } from '../interfaces';
 import { UserService, WebSocketService } from '../services';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { wsJsonToRes, toast, isCommentChanged, isPostChanged } from '../utils';
+import {
+  wsJsonToRes,
+  toast,
+  isCommentChanged,
+  isPostChanged,
+  api,
+} from '../utils';
 import { i18n } from '../i18next';
 import { MomentTime } from './moment-time';
 import { Link, withRouter } from 'react-router-dom';
+import { Flex, Spinner } from 'theme-ui';
 
 interface ReportsState {
   moderates: Array<CommunityUser>;
@@ -47,6 +55,7 @@ interface ReportsState {
     [communityId: number]: CommunityI;
   };
   autoResolve: boolean;
+  loading: boolean;
 }
 
 export class BaseReports extends Component<any, ReportsState> {
@@ -66,6 +75,7 @@ export class BaseReports extends Component<any, ReportsState> {
       currentRemoveDialog: null,
       communitiesById: {},
       autoResolve: false,
+      loading: true,
     };
 
     this.handleToggleCommunityDisclosure = this.handleToggleCommunityDisclosure.bind(
@@ -95,6 +105,7 @@ export class BaseReports extends Component<any, ReportsState> {
 
   componentDidMount() {
     this.fetchUserData();
+    WebSocketService.Instance.getSite();
   }
 
   componentDidUpdate(_, lastState) {
@@ -141,14 +152,16 @@ export class BaseReports extends Component<any, ReportsState> {
     });
   }
 
-  fetchUserData() {
-    const user_id = UserService.Instance.user.id;
+  async fetchUserData() {
+    const res = await api.get('site');
+    console.log(res.data);
+    // const user_id = UserService.Instance.user.id;
 
-    WebSocketService.Instance.getUserDetails({
-      user_id,
-      saved_only: false,
-      sort: 'New',
-    });
+    // WebSocketService.Instance.getUserDetails({
+    //   user_id,
+    //   saved_only: false,
+    //   sort: 'New',
+    // });
   }
 
   render() {
@@ -163,7 +176,16 @@ export class BaseReports extends Component<any, ReportsState> {
       removeReason,
       reportCountByCommunity,
       communitiesById,
+      loading,
     } = this.state;
+
+    if (loading) {
+      return (
+        <Flex css={{ justifyContent: 'center' }}>
+          <Spinner />
+        </Flex>
+      );
+    }
 
     return (
       <div className="container">
@@ -429,7 +451,7 @@ export class BaseReports extends Component<any, ReportsState> {
     this.setState({ currentBanDialog: report, banReason: '' });
   }
 
-  handleBanSubmit() {
+  handleBanSubmit(event) {
     event.preventDefault();
 
     const form: BanFromCommunityForm = {
@@ -633,10 +655,20 @@ export class BaseReports extends Component<any, ReportsState> {
         this.props.history.push('/');
       }
       return;
+    } else if (res.op === UserOperation.GetSite) {
+      const data = res.data as GetSiteResponse;
+      if (data.my_user) {
+        WebSocketService.Instance.getUserDetails({
+          user_id: data.my_user.id,
+          saved_only: false,
+          sort: 'New',
+        });
+      }
     } else if (res.op === UserOperation.GetUserDetails) {
       const data = res.data as UserDetailsResponse;
       this.setState({
         moderates: data.moderates,
+        loading: false,
       });
     } else if (res.op === UserOperation.ListCommentReports) {
       const data = res.data as ListCommentReportsResponse;

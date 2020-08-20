@@ -1480,7 +1480,7 @@ class BasePostListing extends Component<
 
     let form: CreatePostLikeForm = {
       post_id: this.props.post.id,
-      score: this.state.my_vote,
+      score: newState.my_vote,
     };
 
     WebSocketService.Instance.likePost(form);
@@ -1512,7 +1512,7 @@ class BasePostListing extends Component<
 
     let form: CreatePostLikeForm = {
       post_id: this.props.post.id,
-      score: this.state.my_vote,
+      score: newState.my_vote,
     };
 
     WebSocketService.Instance.likePost(form);
