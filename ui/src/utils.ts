@@ -1151,4 +1151,9 @@ export function isMessageChanged(operation: UserOperation): boolean {
 
 export const api = axios.create({
   baseURL: isProduction ? '/api/v1/' : 'http://localhost:8536/api/v1/',
+  withCredentials: true,
+  headers: {
+    'Access-Control-Allow-Origin': 'http://localhost:4444',
+    'Content-Type': 'application/json',
+  },
 });
