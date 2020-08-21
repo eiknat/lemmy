@@ -466,7 +466,7 @@ class UnwrappedNavbar extends Component<any, NavbarState> {
       }
 
       if (data.my_user) {
-        UserService.Instance.user = data.my_user;
+        UserService.Instance.setUser(data.my_user);
 
         if (this.state.isLoggedIn == false) {
           this.requestNotificationPermission();
