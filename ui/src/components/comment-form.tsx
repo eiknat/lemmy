@@ -68,10 +68,17 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
   componentDidMount() {
     if (this.props.node) {
       if (this.props.edit) {
-        this.state.commentForm.edit_id = this.props.node.comment.id;
-        this.state.commentForm.parent_id = this.props.node.comment.parent_id;
-        this.state.commentForm.content = this.props.node.comment.content;
-        this.state.commentForm.creator_id = this.props.node.comment.creator_id;
+        const commentForm: any = {}
+        commentForm.edit_id = this.props.node.comment.id;
+        commentForm.parent_id = this.props.node.comment.parent_id;
+        commentForm.content = this.props.node.comment.content;
+        commentForm.creator_id = this.props.node.comment.creator_id;
+        this.setState({
+          commentForm: {
+            ...this.state.commentForm,
+            ...commentForm,
+          }
+        })
       } else {
         // A reply gets a new parent id
         this.state.commentForm.parent_id = this.props.node.comment.id;

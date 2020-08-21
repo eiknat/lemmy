@@ -55,15 +55,10 @@ export class MarkdownTextArea extends Component<
     showEmojiPicker: false,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
-
-    this.tribute = setupTribute();
-    // this.setupEmojiPicker();
-    this.state = this.emptyState;
-  }
+  state = this.emptyState;
 
   componentDidMount() {
+    this.tribute = setupTribute();
     let textarea: any = document.getElementById(this.id);
     if (textarea) {
       autosize(textarea);
@@ -102,6 +97,11 @@ export class MarkdownTextArea extends Component<
       if (this.props.replyType) {
         this.props.onReplyCancel();
       }
+    }
+
+    // if initial content is passed down and there is no current content, update it
+    if (this.props.initialContent && this.state.content === '') {
+      this.setState({ content: this.props.initialContent })
     }
   }
 
