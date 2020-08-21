@@ -1,49 +1,68 @@
 import Cookies from 'js-cookie';
-import { User, LoginResponse } from '../interfaces';
+import { User, LoginResponse, Claims } from '../interfaces';
 import { setTheme } from '../utils';
 import jwt_decode from 'jwt-decode';
-import { Subject } from 'rxjs';
+import { Subject, BehaviorSubject } from 'rxjs';
+
+type InternalValues = {
+  unreadCount?: number;
+};
+
+const USER_KEY = 'user-details';
 
 export class UserService {
   private static _instance: UserService;
-  public user: User;
-  public sub: Subject<{ user: User }> = new Subject<{
-    user: User;
-  }>();
+  public user: User & InternalValues;
+  public claims: Claims;
+  public jwtSub: Subject<string> = new Subject<string>();
+  public unreadCountSub: BehaviorSubject<number> = new BehaviorSubject<number>(
+    0
+  );
 
   private constructor() {
     let jwt = Cookies.get('jwt');
     if (jwt) {
-      this.setUser(jwt);
+      this.setClaims(jwt);
     } else {
       setTheme();
       console.log('No JWT cookie found.');
     }
+
+    // store and fetch user details in local storage to avoid waiting for async GetSite call
+    const savedUser = localStorage.getItem(USER_KEY);
+    if (savedUser) {
+      this.user = JSON.parse(savedUser);
+    }
   }
 
   public login(res: LoginResponse) {
-    this.setUser(res.jwt);
+    this.setClaims(res.jwt);
     Cookies.set('jwt', res.jwt, { expires: 365 });
     console.log('jwt cookie set');
   }
 
   public logout() {
+    this.claims = undefined;
     this.user = undefined;
     Cookies.remove('jwt');
     setTheme();
-    this.sub.next({ user: undefined });
+    this.jwtSub.next();
+    localStorage.removeItem(USER_KEY);
     console.log('Logged out.');
+  }
+
+  public setUser(data: User) {
+    this.user = data;
+    localStorage.setItem(USER_KEY, JSON.stringify(data));
   }
 
   public get auth(): string {
     return Cookies.get('jwt');
   }
 
-  private setUser(jwt: string) {
-    this.user = jwt_decode(jwt);
-    setTheme(this.user.theme, true);
-    this.sub.next({ user: this.user });
-    console.log(this.user);
+  private setClaims(jwt: string) {
+    this.claims = jwt_decode(jwt);
+    this.jwtSub.next(jwt);
   }
 
   public static get Instance() {

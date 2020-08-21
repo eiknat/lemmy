@@ -4,6 +4,9 @@ const port = `${
 }`;
 const endpoint = `${host}:${port}`;
 
+// for testing against prod endpoint
+// const endpoint = 'www.chapo.chat';
+
 export const wsUri = `${
   window.location.protocol == 'https:' ? 'wss://' : 'ws://'
 }${endpoint}/api/v1/ws`;

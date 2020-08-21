@@ -1,4 +1,4 @@
-import { Component } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { PrivateMessageForm } from './private-message-form';
@@ -11,8 +11,9 @@ import {
 } from '../interfaces';
 import { toast, wsJsonToRes } from '../utils';
 import { i18n } from '../i18next';
+import { withRouter } from 'react-router-dom';
 
-export class CreatePrivateMessage extends Component<any, any> {
+export class BaseCreatePrivateMessage extends Component<any, any> {
   private subscription: Subscription;
   constructor(props: any, context: any) {
     super(props, context);
@@ -22,7 +23,7 @@ export class CreatePrivateMessage extends Component<any, any> {
 
     if (!UserService.Instance.user) {
       toast(i18n.t('not_logged_in'), 'danger');
-      this.context.router.history.push(`/login`);
+      this.props.history.push(`/login`);
     }
 
     this.subscription = WebSocketService.Instance.subject
@@ -42,9 +43,9 @@ export class CreatePrivateMessage extends Component<any, any> {
 
   render() {
     return (
-      <div class="container">
-        <div class="row">
-          <div class="col-12 col-lg-6 offset-lg-3 mb-4">
+      <div className="container">
+        <div className="row">
+          <div className="col-12 col-lg-6 offset-lg-3 mb-4">
             <h5>{i18n.t('create_private_message')}</h5>
             <PrivateMessageForm
               onCreate={this.handlePrivateMessageCreate}
@@ -86,3 +87,5 @@ export class CreatePrivateMessage extends Component<any, any> {
     }
   }
 }
+
+export const CreatePrivateMessage = withRouter(BaseCreatePrivateMessage);

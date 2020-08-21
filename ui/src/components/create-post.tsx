@@ -1,5 +1,6 @@
-import { Component } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
+import { withRouter } from 'react-router-dom';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { PostForm } from './post-form';
 import { toast, wsJsonToRes } from '../utils';
@@ -17,7 +18,7 @@ interface CreatePostState {
   site: Site;
 }
 
-export class CreatePost extends Component<any, CreatePostState> {
+export class BaseCreatePost extends Component<any, CreatePostState> {
   private subscription: Subscription;
   private emptyState: CreatePostState = {
     site: {
@@ -31,19 +32,23 @@ export class CreatePost extends Component<any, CreatePostState> {
       number_of_comments: undefined,
       number_of_communities: undefined,
       enable_downvotes: undefined,
+      enable_create_communities: undefined,
       open_registration: undefined,
       enable_nsfw: undefined,
     },
   };
 
+  state = this.emptyState
+
   constructor(props: any, context: any) {
     super(props, context);
     this.handlePostCreate = this.handlePostCreate.bind(this);
-    this.state = this.emptyState;
+  }
 
+  componentDidMount() {
     if (!UserService.Instance.user) {
       toast(i18n.t('not_logged_in'), 'danger');
-      this.context.router.history.push(`/login`);
+      this.props.history.push(`/login`);
     }
 
     this.subscription = WebSocketService.Instance.subject
@@ -63,9 +68,9 @@ export class CreatePost extends Component<any, CreatePostState> {
 
   render() {
     return (
-      <div class="container">
-        <div class="row">
-          <div class="col-12 col-lg-6 offset-lg-3 mb-4">
+      <div className="container">
+        <div className="row">
+          <div className="col-12 col-lg-6 offset-lg-3 mb-4">
             <h5>{i18n.t('create_post')}</h5>
             <PostForm
               onCreate={this.handlePostCreate}
@@ -115,9 +120,12 @@ export class CreatePost extends Component<any, CreatePostState> {
       return;
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-      this.state.site = data.site;
-      this.setState(this.state);
+      this.setState({
+        site: data.site
+      });
       document.title = `${i18n.t('create_post')} - ${data.site.name}`;
     }
   }
 }
+
+export const CreatePost = withRouter(BaseCreatePost);

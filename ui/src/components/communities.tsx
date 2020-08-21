@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -16,8 +16,7 @@ import { WebSocketService } from '../services';
 import { wsJsonToRes, toast, getPageFromProps } from '../utils';
 import { CommunityLink } from './community-link';
 import { i18n } from '../i18next';
-
-declare const Sortable: any;
+import { linkEvent } from '../linkEvent';
 
 const communityLimit = 100;
 
@@ -73,54 +72,54 @@ export class Communities extends Component<any, CommunitiesState> {
 
   render() {
     return (
-      <div class="container">
+      <div className="container">
         {this.state.loading ? (
-          <h5 class="">
-            <svg class="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+          <h5>
+            <svg className="icon icon-spinner spin">
+              <use xlinkHref="#icon-spinner" />
             </svg>
           </h5>
         ) : (
           <div>
             <h5>{i18n.t('list_of_communities')}</h5>
-            <div class="table-responsive">
-              <table id="community_table" class="table table-sm table-hover">
-                <thead class="pointer">
+            <div className="table-responsive">
+              <table id="community_table" className="table table-sm table-hover">
+                <thead className="pointer">
                   <tr>
                     <th>{i18n.t('name')}</th>
-                    <th class="d-none d-lg-table-cell">{i18n.t('title')}</th>
+                    <th className="d-none d-lg-table-cell">{i18n.t('title')}</th>
                     <th>{i18n.t('category')}</th>
-                    <th class="text-right">{i18n.t('subscribers')}</th>
-                    <th class="text-right d-none d-lg-table-cell">
+                    <th className="text-right">{i18n.t('subscribers')}</th>
+                    <th className="text-right d-none d-lg-table-cell">
                       {i18n.t('posts')}
                     </th>
-                    <th class="text-right d-none d-lg-table-cell">
+                    <th className="text-right d-none d-lg-table-cell">
                       {i18n.t('comments')}
                     </th>
-                    <th></th>
+                    <th />
                   </tr>
                 </thead>
                 <tbody>
                   {this.state.communities.map(community => (
-                    <tr>
+                    <tr key={community.id}>
                       <td>
                         <CommunityLink community={community} />
                       </td>
-                      <td class="d-none d-lg-table-cell">{community.title}</td>
+                      <td className="d-none d-lg-table-cell">{community.title}</td>
                       <td>{community.category_name}</td>
-                      <td class="text-right">
+                      <td className="text-right">
                         {community.number_of_subscribers}
                       </td>
-                      <td class="text-right d-none d-lg-table-cell">
+                      <td className="text-right d-none d-lg-table-cell">
                         {community.number_of_posts}
                       </td>
-                      <td class="text-right d-none d-lg-table-cell">
+                      <td className="text-right d-none d-lg-table-cell">
                         {community.number_of_comments}
                       </td>
-                      <td class="text-right">
+                      <td className="text-right">
                         {community.subscribed ? (
                           <span
-                            class="pointer btn-link"
+                            className="pointer btn-link"
                             onClick={linkEvent(
                               community.id,
                               this.handleUnsubscribe
@@ -130,7 +129,7 @@ export class Communities extends Component<any, CommunitiesState> {
                           </span>
                         ) : (
                           <span
-                            class="pointer btn-link"
+                            className="pointer btn-link"
                             onClick={linkEvent(
                               community.id,
                               this.handleSubscribe
@@ -154,10 +153,10 @@ export class Communities extends Component<any, CommunitiesState> {
 
   paginator() {
     return (
-      <div class="mt-2">
+      <div className="mt-2">
         {this.state.page > 1 && (
           <button
-            class="btn btn-sm btn-secondary mr-1"
+            className="btn btn-sm btn-secondary mr-1"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
@@ -166,7 +165,7 @@ export class Communities extends Component<any, CommunitiesState> {
 
         {this.state.communities.length > 0 && (
           <button
-            class="btn btn-sm btn-secondary"
+            className="btn btn-sm btn-secondary"
             onClick={linkEvent(this, this.nextPage)}
           >
             {i18n.t('next')}
@@ -223,15 +222,16 @@ export class Communities extends Component<any, CommunitiesState> {
       return;
     } else if (res.op == UserOperation.ListCommunities) {
       let data = res.data as ListCommunitiesResponse;
-      this.state.communities = data.communities;
-      this.state.communities.sort(
-        (a, b) => b.number_of_subscribers - a.number_of_subscribers
-      );
-      this.state.loading = false;
-      window.scrollTo(0, 0);
-      this.setState(this.state);
-      let table = document.querySelector('#community_table');
-      Sortable.initTable(table);
+      this.setState({
+        communities: data.communities.sort(
+          (a, b) => b.number_of_subscribers - a.number_of_subscribers),
+        loading: false,
+      }, () => {
+        window.scrollTo(0, 0);
+        // XXX: Sort this table?
+        let table = document.querySelector('#community_table');
+        return table;
+      });
     } else if (res.op == UserOperation.FollowCommunity) {
       let data = res.data as CommunityResponse;
       let found = this.state.communities.find(c => c.id == data.community.id);

@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -23,6 +23,7 @@ import {
   GetCommentsResponse,
   CommentResponse,
   AddAdminResponse,
+  AddSitemodResponse,
   BanUserResponse,
   WebSocketJsonResponse,
 } from '../interfaces';
@@ -52,11 +53,18 @@ import {
   editPostFindRes,
   commentsToFlatNodes,
   setupTippy,
+  isCommentChanged,
+  isPostChanged,
 } from '../utils';
+import { BASE_PATH } from '../isProduction';
 import { i18n } from '../i18next';
-import { T } from 'inferno-i18next';
+import { Trans, withTranslation } from 'react-i18next';
 import { PATREON_URL } from '../constants';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
+import { Box, Flex } from 'theme-ui';
+import Button from './elements/Button';
+import Card from './elements/Card';
 
 interface MainState {
   subscribedCommunities: Array<CommunityUser>;
@@ -98,7 +106,7 @@ interface UrlParams {
   page?: number;
 }
 
-export class Main extends Component<any, MainState> {
+class Main extends Component<MainProps & RouteComponentProps, MainState> {
   private subscription: Subscription;
   private emptyState: MainState = {
     subscribedCommunities: [],
@@ -108,18 +116,19 @@ export class Main extends Component<any, MainState> {
         id: null,
         name: null,
         creator_id: null,
-        creator_name: null,
         published: null,
+        creator_name: null,
         number_of_users: null,
         number_of_posts: null,
         number_of_comments: null,
         number_of_communities: null,
-        enable_create_communities: null,
         enable_downvotes: null,
+        enable_create_communities: null,
         open_registration: null,
         enable_nsfw: null,
       },
       admins: [],
+      sitemods: [],
       banned: [],
       online: null,
     },
@@ -127,9 +136,9 @@ export class Main extends Component<any, MainState> {
     loading: true,
     posts: [],
     comments: [],
-    listingType: getListingTypeFromProps(this.props),
-    dataType: getDataTypeFromProps(this.props),
-    sort: getSortTypeFromProps(this.props),
+    listingType: getListingTypeFromProps(this.props) || ListingType.Subscribed,
+    dataType: getDataTypeFromProps(this.props) || DataType.Post,
+    sort: getSortTypeFromProps(this.props) || SortType.Hot,
     page: getPageFromProps(this.props),
     filtersOpen: false,
   };
@@ -142,7 +151,9 @@ export class Main extends Component<any, MainState> {
     this.handleSortChange = this.handleSortChange.bind(this);
     this.handleListingTypeChange = this.handleListingTypeChange.bind(this);
     this.handleDataTypeChange = this.handleDataTypeChange.bind(this);
+  }
 
+  componentDidMount() {
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
       .subscribe(
@@ -150,20 +161,15 @@ export class Main extends Component<any, MainState> {
         err => console.error(err),
         () => console.log('complete')
       );
-
     WebSocketService.Instance.getSite();
-
     if (UserService.Instance.user) {
       WebSocketService.Instance.getFollowedCommunities();
     }
-
     let listCommunitiesForm: ListCommunitiesForm = {
       sort: SortType[SortType.Hot],
       limit: 6,
     };
-
     WebSocketService.Instance.listCommunities(listCommunitiesForm);
-
     this.fetchData();
   }
 
@@ -194,12 +200,12 @@ export class Main extends Component<any, MainState> {
 
   render() {
     return (
-      <div class="container" style={{ 'max-width': '100%' }}>
-        <div class="row">
-          <main role="main" class="col-12 col-md-8">
+      <div className="container" style={{ maxWidth: '100%' }}>
+        <div className="row">
+          <main role="main" className="col-12 col-md-8">
             {this.posts()}
           </main>
-          <aside class="col-12 col-md-4 sidebar">{this.my_sidebar()}</aside>
+          <aside className="col-12 col-md-4 sidebar">{this.my_sidebar()}</aside>
         </div>
       </div>
     );
@@ -210,23 +216,23 @@ export class Main extends Component<any, MainState> {
       <div>
         {!this.state.loading && (
           <div>
-            <div class="card border-secondary mb-3">
-              <div class="card-body">
+            <Card>
+              <div className="card-body">
                 {this.trendingCommunities()}
                 {UserService.Instance.user &&
                   this.state.subscribedCommunities.length > 0 && (
                     <div>
                       <h5>
-                        <T i18nKey="subscribed_to_communities">
+                        <Trans i18nKey="subscribed_to_communities">
                           #
-                          <Link class="text-body" to="/communities">
+                          <Link className="text-body" to="/communities">
                             #
                           </Link>
-                        </T>
+                        </Trans>
                       </h5>
-                      <ul class="list-inline">
+                      <ul className="list-inline">
                         {this.state.subscribedCommunities.map(community => (
-                          <li class="list-inline-item">
+                          <li key={community.id} className="list-inline-item">
                             <CommunityLink
                               community={{
                                 name: community.community_name,
@@ -241,15 +247,19 @@ export class Main extends Component<any, MainState> {
                     </div>
                   )}
                 {this.showCreateCommunity() && (
-                  <Link
-                    class="btn btn-sm btn-secondary btn-block"
-                    to="/create_community"
-                  >
-                    {i18n.t('create_a_community')}
-                  </Link>
+                  <Flex>
+                    <Button
+                      css={{ width: '100%', color: '#fff !important' }}
+                      as={Link}
+                      // @ts-ignore
+                      to="/create_community"
+                    >
+                      {i18n.t('create_a_community')}
+                    </Button>
+                  </Flex>
                 )}
               </div>
-            </div>
+            </Card>
             {this.sidebar()}
             {this.donations()}
             {this.landing()}
@@ -263,16 +273,16 @@ export class Main extends Component<any, MainState> {
     return (
       <div>
         <h5>
-          <T i18nKey="trending_communities">
+          <Trans i18nKey="trending_communities">
             #
-            <Link class="text-body" to="/communities">
+            <Link className="text-body" to="/communities">
               #
             </Link>
-          </T>
+          </Trans>
         </h5>
-        <ul class="list-inline">
+        <ul className="list-inline">
           {this.state.trendingCommunities.map(community => (
-            <li class="list-inline-item">
+            <li key={community.id} className="list-inline-item">
               <CommunityLink community={community} />
             </li>
           ))}
@@ -313,25 +323,26 @@ export class Main extends Component<any, MainState> {
   siteInfo() {
     return (
       <div>
-        <div class="card border-secondary mb-3">
-          <div class="card-body">
-            <h5 class="mb-4 text-center h3">{`${this.state.siteRes.site.name}`}</h5>
+        <div className="card border-secondary mb-3">
+          <div className="card-body">
+            <h5 className="mb-4 text-center h3">{`${this.state.siteRes.site.name}`}</h5>
             <img
               className="img-fluid mb-2"
-              src="/static/assets/hexbear-logo.png"
+              src={`${BASE_PATH}hexbear-logo.png`}
               alt="hexbear logo"
             />
             <img
-              src="/static/assets/welcome.gif"
+              src={`${BASE_PATH}welcome.gif`}
               className="img-fluid"
               style={{ width: '100%' }}
+              alt="welcome sign"
             />
             {this.canAdmin && (
-              <ul class="list-inline mb-1 text-muted font-weight-bold">
+              <ul className="list-inline mb-1 text-muted font-weight-bold">
                 <li className="list-inline-item-action">
                   <span
-                    class="pointer"
-                    onClick={linkEvent(this, this.handleEditClick)}
+                    className="pointer"
+                    onClick={this.handleEditClick}
                     data-tippy-content={i18n.t('edit')}
                   >
                     <Icon name="edit" />
@@ -342,11 +353,11 @@ export class Main extends Component<any, MainState> {
             <div className="my-2">
               It is currently {getMoscowTime()} in Moscow
             </div>
-            <ul class="my-2 list-inline">
-              <li className="list-inline-item badge badge-secondary chapo-bg-secondary">
+            <ul className="my-2 list-inline">
+              <li className="list-inline-item user-online-badge mb-1">
+                <Icon name="hexbear" className="mr-2" />{' '}
                 {i18n.t('number_online', { count: this.state.siteRes.online })}
               </li>
-              <br />
               <li className="list-inline-item badge badge-secondary">
                 {i18n.t('number_of_users', {
                   count: this.state.siteRes.site.number_of_users,
@@ -373,10 +384,10 @@ export class Main extends Component<any, MainState> {
                 </Link>
               </li>
             </ul>
-            <ul class="mt-1 list-inline small mb-0">
-              <li class="list-inline-item">{i18n.t('admins')}:</li>
+            <ul className="mt-1 list-inline small mb-0">
+              <li className="list-inline-item">{i18n.t('admins')}:</li>
               {this.state.siteRes.admins.map(admin => (
-                <li class="list-inline-item">
+                <li key={admin.id} className="list-inline-item">
                   <UserListing
                     user={{
                       name: admin.name,
@@ -389,11 +400,27 @@ export class Main extends Component<any, MainState> {
                 </li>
               ))}
             </ul>
+            <ul className="mt-1 list-inline small mb-0">
+              <li className="list-inline-item">{i18n.t('sitemods')}:</li>
+              {this.state.siteRes.sitemods.map(sitemod => (
+                <li key={sitemod.id} className="list-inline-item">
+                  <UserListing
+                    user={{
+                      name: sitemod.name,
+                      avatar: sitemod.avatar,
+                      local: sitemod.local,
+                      actor_id: sitemod.actor_id,
+                      id: sitemod.id,
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
         {this.state.siteRes.site.description && (
-          <div class="card border-secondary mb-3">
-            <div class="card-body">
+          <div className="card border-secondary mb-3">
+            <div className="card-body">
               <div
                 className="md-div"
                 dangerouslySetInnerHTML={mdToHtml(
@@ -409,8 +436,8 @@ export class Main extends Component<any, MainState> {
 
   donations() {
     return (
-      <div class="card border-secondary mb-3">
-        <div class="card-body">
+      <div className="card border-secondary mb-3">
+        <div className="card-body">
           <p>Our Soros stipend only gets us so far.</p>
 
           <a href={PATREON_URL}>
@@ -423,38 +450,38 @@ export class Main extends Component<any, MainState> {
 
   landing() {
     return (
-      <div class="card border-secondary">
-        <div class="card-body">
+      <div className="card border-secondary">
+        <div className="card-body">
           <h5>
             {i18n.t('powered_by')}
-            <svg class="icon mx-2">
+            <svg className="icon mx-2">
               <use xlinkHref="#icon-mouse">#</use>
             </svg>
             <a href={repoUrl}>Lemmy</a>
           </h5>
-          <p class="mb-0">
-            <T i18nKey="landing_0">
+          <p className="mb-0">
+            <Trans i18nKey="landing_0">
               #
               <a href="https://en.wikipedia.org/wiki/Social_network_aggregation">
                 #
               </a>
               <a href="https://en.wikipedia.org/wiki/Fediverse">#</a>
-              <br class="big"></br>
+              <br className="big" />
               <code>#</code>
-              <br></br>
+              <br />
               <b>#</b>
-              <br class="big"></br>
+              <br className="big" />
               <a href={repoUrl}>#</a>
-              <br class="big"></br>
+              <br className="big" />
               <a href="https://www.rust-lang.org">#</a>
               <a href="https://actix.rs/">#</a>
               <a href="https://infernojs.org">#</a>
               <a href="https://www.typescriptlang.org/">#</a>
-              <br class="big"></br>
+              <br className="big" />
               <a href="https://github.com/LemmyNet/lemmy/graphs/contributors?type=a">
                 #
               </a>
-            </T>
+            </Trans>
           </p>
         </div>
       </div>
@@ -463,12 +490,12 @@ export class Main extends Component<any, MainState> {
 
   posts() {
     return (
-      <div class="main-content-wrapper">
+      <div className="main-content-wrapper">
         {this.selects()}
         {this.state.loading ? (
           <h5>
-            <svg class="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+            <svg className="icon icon-spinner spin">
+              <use xlinkHref="#icon-spinner" />
             </svg>
           </h5>
         ) : (
@@ -508,7 +535,7 @@ export class Main extends Component<any, MainState> {
     return (
       <div className="mb-3 filter-row">
         <span>
-          <span class="mr-2 sort-select">
+          <span className="mr-2 sort-select">
             <SortSelect
               sort={this.state.sort}
               onChange={this.handleSortChange}
@@ -550,13 +577,13 @@ export class Main extends Component<any, MainState> {
         </span>
         {(!isMobile || (isMobile && this.state.filtersOpen)) && (
           <span className="listing-select-group my-3 ml-2">
-            <span class="mr-3">
+            <span className="mr-3">
               <ListingTypeSelect
                 type_={this.state.listingType}
                 onChange={this.handleListingTypeChange}
               />
             </span>
-            <span class="mr-3 data-type-select">
+            <span className="mr-3 data-type-select">
               <DataTypeSelect
                 type_={this.state.dataType}
                 onChange={this.handleDataTypeChange}
@@ -570,22 +597,20 @@ export class Main extends Component<any, MainState> {
 
   paginator() {
     return (
-      <div class="my-2">
+      <div className="my-2">
         {this.state.page > 1 && (
-          <button
-            class="btn btn-sm btn-secondary mr-1"
+          <Button
+            mr={1}
+            variant="muted"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
-          </button>
+          </Button>
         )}
         {this.state.posts.length > 0 && (
-          <button
-            class="btn btn-sm btn-secondary"
-            onClick={linkEvent(this, this.nextPage)}
-          >
+          <Button variant="muted" onClick={linkEvent(this, this.nextPage)}>
             {i18n.t('next')}
-          </button>
+          </Button>
         )}
       </div>
     );
@@ -601,18 +626,21 @@ export class Main extends Component<any, MainState> {
   }
 
   toggleMobileFilters(i: Main) {
-    i.state.filtersOpen = !i.state.filtersOpen;
-    i.setState(i.state);
+    i.setState(prevState => ({
+      filtersOpen: !prevState.filtersOpen,
+    }));
   }
 
-  handleEditClick(i: Main) {
-    i.state.showEditSite = true;
-    i.setState(i.state);
-  }
+  handleEditClick = () => {
+    this.setState({
+      showEditSite: true,
+    });
+  };
 
   handleEditCancel() {
-    this.state.showEditSite = false;
-    this.setState(this.state);
+    this.setState({
+      showEditSite: false,
+    });
   }
 
   nextPage(i: Main) {
@@ -674,44 +702,68 @@ export class Main extends Component<any, MainState> {
       return;
     } else if (msg.reconnect) {
       this.fetchData();
-    } else if (res.op == UserOperation.GetFollowedCommunities) {
+    } else if (res.op === UserOperation.GetFollowedCommunities) {
       let data = res.data as GetFollowedCommunitiesResponse;
-      this.state.subscribedCommunities = data.communities;
-      this.setState(this.state);
-    } else if (res.op == UserOperation.ListCommunities) {
+      this.setState({
+        subscribedCommunities: data.communities,
+      });
+    } else if (res.op === UserOperation.ListCommunities) {
       let data = res.data as ListCommunitiesResponse;
-      this.state.trendingCommunities = data.communities;
-      this.setState(this.state);
-    } else if (res.op == UserOperation.GetSite) {
+      this.setState({
+        trendingCommunities: data.communities,
+      });
+    } else if (res.op === UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-
       // This means it hasn't been set up yet
       if (!data.site) {
-        this.context.router.history.push('/setup');
+        this.props.history.push('/setup');
+      } else {
+        console.log('data.site is missing', data.site);
+        this.setState(
+          {
+            siteRes: {
+              admins: data.admins,
+              sitemods: data.sitemods,
+              site: data.site,
+              banned: data.banned,
+              online: data.online,
+            },
+          },
+          () => {
+            document.title = `${this.state.siteRes.site.name}`;
+          }
+        );
       }
-      this.state.siteRes.admins = data.admins;
-      this.state.siteRes.site = data.site;
-      this.state.siteRes.banned = data.banned;
-      this.state.siteRes.online = data.online;
-      this.setState(this.state);
-      document.title = `${this.state.siteRes.site.name}`;
-    } else if (res.op == UserOperation.EditSite) {
+    } else if (res.op === UserOperation.EditSite) {
       let data = res.data as SiteResponse;
-      this.state.siteRes.site = data.site;
-      this.state.showEditSite = false;
-      this.setState(this.state);
-      toast(i18n.t('site_saved'));
-    } else if (res.op == UserOperation.GetPosts) {
+      this.setState(
+        {
+          siteRes: {
+            ...this.state.siteRes,
+            site: data.site,
+          },
+          showEditSite: false,
+        },
+        () => {
+          toast(i18n.t('site_saved'));
+        }
+      );
+    } else if (res.op === UserOperation.GetPosts) {
       let data = res.data as GetPostsResponse;
-      this.state.posts = data.posts;
-      this.state.loading = false;
-      this.setState(this.state);
-      setupTippy();
-    } else if (res.op == UserOperation.CreatePost) {
+      this.setState(
+        {
+          posts: data.posts,
+          loading: false,
+        },
+        () => {
+          setupTippy();
+        }
+      );
+    } else if (res.op === UserOperation.CreatePost) {
       let data = res.data as PostResponse;
 
       // If you're on subscribed, only push it if you're subscribed.
-      if (this.state.listingType == ListingType.Subscribed) {
+      if (this.state.listingType === ListingType.Subscribed) {
         if (
           this.state.subscribedCommunities
             .map(c => c.community_id)
@@ -734,19 +786,31 @@ export class Main extends Component<any, MainState> {
         }
       }
       this.setState(this.state);
-    } else if (res.op == UserOperation.EditPost) {
+    } else if (isPostChanged(res.op)) {
       let data = res.data as PostResponse;
       editPostFindRes(data, this.state.posts);
       this.setState(this.state);
-    } else if (res.op == UserOperation.CreatePostLike) {
+    } else if (res.op === UserOperation.CreatePostLike) {
       let data = res.data as PostResponse;
       createPostLikeFindRes(data, this.state.posts);
       this.setState(this.state);
-    } else if (res.op == UserOperation.AddAdmin) {
+    } else if (res.op === UserOperation.AddAdmin) {
       let data = res.data as AddAdminResponse;
-      this.state.siteRes.admins = data.admins;
-      this.setState(this.state);
-    } else if (res.op == UserOperation.BanUser) {
+      this.setState({
+        siteRes: {
+          ...this.state.siteRes,
+          admins: data.admins,
+        },
+      });
+    } else if (res.op === UserOperation.AddSitemod) {
+      let data = res.data as AddSitemodResponse;
+      this.setState({
+        siteRes: {
+          ...this.state.siteRes,
+          sitemods: data.sitemods,
+        },
+      });
+    } else if (res.op === UserOperation.BanUser) {
       let data = res.data as BanUserResponse;
       let found = this.state.siteRes.banned.find(u => (u.id = data.user.id));
 
@@ -764,12 +828,13 @@ export class Main extends Component<any, MainState> {
         .forEach(p => (p.banned = data.banned));
 
       this.setState(this.state);
-    } else if (res.op == UserOperation.GetComments) {
+    } else if (res.op === UserOperation.GetComments) {
       let data = res.data as GetCommentsResponse;
-      this.state.comments = data.comments;
-      this.state.loading = false;
-      this.setState(this.state);
-    } else if (res.op == UserOperation.EditComment) {
+      this.setState({
+        comments: data.comments,
+        loading: false,
+      });
+    } else if (isCommentChanged(res.op)) {
       let data = res.data as CommentResponse;
       editCommentRes(data, this.state.comments);
       this.setState(this.state);
@@ -803,3 +868,6 @@ export class Main extends Component<any, MainState> {
     }
   }
 }
+
+// @ts-ignore
+export default withTranslation()(withRouter(Main));

@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -19,6 +19,7 @@ import {
   BanUserResponse,
   AddModToCommunityResponse,
   AddAdminResponse,
+  AddSitemodResponse,
   SearchType,
   SortType,
   SearchForm,
@@ -27,6 +28,7 @@ import {
   GetSiteResponse,
   GetCommunityResponse,
   WebSocketJsonResponse,
+  MarkCommentReadForm,
 } from '../interfaces';
 import { WebSocketService, UserService } from '../services';
 import {
@@ -38,9 +40,10 @@ import {
   createPostLikeRes,
   commentsToFlatNodes,
   setupTippy,
-  testMessageToast,
   commentFetchLimit,
   debounce,
+  isCommentChanged,
+  isPostChanged,
 } from '../utils';
 import { PostListing } from './post-listing';
 import { Sidebar } from './sidebar';
@@ -48,6 +51,7 @@ import { CommentForm } from './comment-form';
 import { CommentNodes } from './comment-nodes';
 import autosize from 'autosize';
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
 
 interface PostState {
   post: PostI;
@@ -82,6 +86,7 @@ export class Post extends Component<any, PostState> {
     crossPosts: [],
     siteRes: {
       admins: [],
+      sitemods: [],
       banned: [],
       site: {
         id: undefined,
@@ -93,6 +98,7 @@ export class Post extends Component<any, PostState> {
         number_of_posts: undefined,
         number_of_comments: undefined,
         number_of_communities: undefined,
+        enable_create_communities: undefined,
         enable_downvotes: undefined,
         open_registration: undefined,
         enable_nsfw: undefined,
@@ -101,11 +107,21 @@ export class Post extends Component<any, PostState> {
     },
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
+  state = this.emptyState;
 
-    this.state = this.emptyState;
+  // constructor(props: any, context: any) {
+  //   super(props, context);
 
+  //   this.state = this.emptyState;
+
+  // }
+
+  componentWillUnmount() {
+    this.subscription.unsubscribe();
+    window.removeEventListener('scroll', this.debouncedScroll);
+  }
+
+  componentDidMount() {
     let postId = Number(this.props.match.params.id);
     if (this.props.match.params.comment_id) {
       this.state.scrolled_comment_id = this.props.match.params.comment_id;
@@ -126,14 +142,7 @@ export class Post extends Component<any, PostState> {
 
     this.debouncedScroll = debounce(this.updateScroll(this), 500);
     WebSocketService.Instance.getSite();
-  }
 
-  componentWillUnmount() {
-    this.subscription.unsubscribe();
-    window.removeEventListener('scroll', this.debouncedScroll);
-  }
-
-  componentDidMount() {
     autosize(document.querySelectorAll('textarea'));
     //testMessageToast();
     window.addEventListener('scroll', this.debouncedScroll, false);
@@ -180,18 +189,15 @@ export class Post extends Component<any, PostState> {
       UserService.Instance.user &&
       UserService.Instance.user.id == parent_user_id
     ) {
-      let form: CommentFormI = {
-        content: found.content,
+      let form: MarkCommentReadForm = {
         edit_id: found.id,
-        creator_id: found.creator_id,
-        post_id: found.post_id,
-        parent_id: found.parent_id,
         read: true,
         auth: null,
       };
-      WebSocketService.Instance.editComment(form);
+      WebSocketService.Instance.markCommentAsRead(form);
       UserService.Instance.user.unreadCount--;
-      UserService.Instance.sub.next({
+      // @ts-ignore
+      UserService.Instance?.sub?.next({
         user: UserService.Instance.user,
       });
     }
@@ -199,22 +205,23 @@ export class Post extends Component<any, PostState> {
 
   render() {
     return (
-      <div class="container">
+      <div className="container">
         {this.state.loading ? (
           <h5>
-            <svg class="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+            <svg className="icon icon-spinner spin">
+              <use xlinkHref="#icon-spinner" />
             </svg>
           </h5>
         ) : (
-          <div class="row">
-            <div class="col-12 col-md-8 mb-3 main-content">
+          <div className="row">
+            <div className="col-12 col-md-8 mb-3 main-content">
               <PostListing
                 post={this.state.post}
                 showBody
                 showCommunity
                 moderators={this.state.moderators}
                 admins={this.state.siteRes.admins}
+                sitemods={this.state.siteRes.sitemods}
                 enableDownvotes={this.state.siteRes.site.enable_downvotes}
                 enableNsfw={this.state.siteRes.site.enable_nsfw}
               />
@@ -229,7 +236,7 @@ export class Post extends Component<any, PostState> {
               {this.state.commentViewType == CommentViewType.Chat &&
                 this.commentsFlat()}
             </div>
-            <div class="flex-1 post-sidebar-container">
+            <div className="flex-1 post-sidebar-container">
               {/* {this.state.comments.length > 0 && this.newComments()} */}
               {this.sidebar()}
             </div>
@@ -242,7 +249,7 @@ export class Post extends Component<any, PostState> {
   sortRadios() {
     return (
       <>
-        <div class="btn-group btn-group-toggle mr-3 mb-2">
+        <div className="btn-group btn-group-toggle mr-3 mb-2">
           <label
             className={`btn btn-sm btn-secondary pointer ${
               this.state.commentSort === CommentSortType.Hot && 'active'
@@ -296,7 +303,7 @@ export class Post extends Component<any, PostState> {
             />
           </label>
         </div>
-        {/* <div class="btn-group btn-group-toggle mb-2">
+        {/* <div className="btn-group btn-group-toggle mb-2">
           <label
             className={`btn btn-sm btn-secondary pointer ${
               this.state.commentViewType === CommentViewType.Chat && 'active'
@@ -317,8 +324,8 @@ export class Post extends Component<any, PostState> {
 
   commentsFlat() {
     return (
-      <div class="d-none d-md-block new-comments mb-3 card border-secondary sidebar-content">
-        <div class="card-body small">
+      <div className="d-none d-md-block new-comments mb-3 card border-secondary sidebar-content">
+        <div className="card-body small">
           <h6>{i18n.t('recent_comments')}</h6>
           <CommentNodes
             nodes={commentsToFlatNodes(this.state.comments)}
@@ -326,6 +333,7 @@ export class Post extends Component<any, PostState> {
             locked={this.state.post.locked}
             moderators={this.state.moderators}
             admins={this.state.siteRes.admins}
+            sitemods={this.state.siteRes.sitemods}
             postCreatorId={this.state.post.creator_id}
             showContext
             enableDownvotes={this.state.siteRes.site.enable_downvotes}
@@ -338,11 +346,12 @@ export class Post extends Component<any, PostState> {
 
   sidebar() {
     return (
-      <div class="mb-3">
+      <div className="mb-3">
         <Sidebar
           community={this.state.community}
           moderators={this.state.moderators}
           admins={this.state.siteRes.admins}
+          sitemods={this.state.siteRes.sitemods}
           online={this.state.online}
           enableNsfw={this.state.siteRes.site.enable_nsfw}
         />
@@ -389,7 +398,7 @@ export class Post extends Component<any, PostState> {
     return tree;
   }
 
-  setDepth(node: CommentNodeI, i: number = 0): void {
+  setDepth(node: CommentNodeI, i = 0): void {
     for (let child of node.children) {
       child.comment.depth = i;
       this.setDepth(child, i + 1);
@@ -405,6 +414,7 @@ export class Post extends Component<any, PostState> {
           locked={this.state.post.locked}
           moderators={this.state.moderators}
           admins={this.state.siteRes.admins}
+          sitemods={this.state.siteRes.sitemods}
           postCreatorId={this.state.post.creator_id}
           sort={this.state.commentSort}
           maxView={this.state.commentLoadTo}
@@ -447,6 +457,7 @@ export class Post extends Component<any, PostState> {
       this.state.community = data.community;
       this.state.moderators = data.moderators;
       this.state.siteRes.admins = data.admins;
+      this.state.siteRes.sitemods = data.sitemods;
       this.state.online = data.online;
       this.state.loading = false;
       document.title = `${this.state.post.name} - ${this.state.siteRes.site.name}`;
@@ -473,7 +484,7 @@ export class Post extends Component<any, PostState> {
         this.state.comments.unshift(data.comment);
         this.setState(this.state);
       }
-    } else if (res.op == UserOperation.EditComment) {
+    } else if (isCommentChanged(res.op)) {
       let data = res.data as CommentResponse;
       editCommentRes(data, this.state.comments);
       this.setState(this.state);
@@ -490,7 +501,7 @@ export class Post extends Component<any, PostState> {
       let data = res.data as PostResponse;
       createPostLikeRes(data, this.state.post);
       this.setState(this.state);
-    } else if (res.op == UserOperation.EditPost) {
+    } else if (isPostChanged(res.op)) {
       let data = res.data as PostResponse;
       this.state.post = data.post;
       this.setState(this.state);
@@ -538,6 +549,10 @@ export class Post extends Component<any, PostState> {
       let data = res.data as AddAdminResponse;
       this.state.siteRes.admins = data.admins;
       this.setState(this.state);
+    } else if (res.op == UserOperation.AddSitemod) {
+      let data = res.data as AddSitemodResponse;
+      this.state.siteRes.sitemods = data.sitemods;
+      this.setState(this.state);
     } else if (res.op == UserOperation.Search) {
       let data = res.data as SearchResponse;
       this.state.crossPosts = data.posts.filter(
@@ -559,6 +574,7 @@ export class Post extends Component<any, PostState> {
       this.state.community = data.community;
       this.state.moderators = data.moderators;
       this.state.siteRes.admins = data.admins;
+      this.state.siteRes.sitemods = data.sitemods;
       this.setState(this.state);
     }
   }

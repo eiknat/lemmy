@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { WebSocketService, UserService } from '../services';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take, last } from 'rxjs/operators';
@@ -17,6 +17,7 @@ import {
   BanUserResponse,
   PostResponse,
   AddAdminResponse,
+  AddSitemodResponse,
   CommunityModsState,
 } from '../interfaces';
 import {
@@ -28,9 +29,12 @@ import {
   saveCommentRes,
   createCommentLikeRes,
   createPostLikeFindRes,
+  isCommentChanged,
 } from '../utils';
 import { PostListing } from './post-listing';
 import { CommentNodes } from './comment-nodes';
+import { linkEvent } from '../linkEvent';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 interface UserDetailsProps {
   username?: string;
@@ -52,9 +56,13 @@ interface UserDetailsState {
   posts: Array<Post>;
   saved?: Array<Post>;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
 }
 
-export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
+class BaseUserDetails extends Component<
+  UserDetailsProps & RouteComponentProps,
+  UserDetailsState
+> {
   private subscription: Subscription;
   constructor(props: any, context: any) {
     super(props, context);
@@ -66,6 +74,7 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
       posts: [],
       saved: [],
       admins: [],
+      sitemods: [],
     };
 
     this.subscription = WebSocketService.Instance.subject
@@ -147,14 +156,17 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
       combined.sort((a, b) => b.data.score - a.data.score);
     }
 
+    console.log({ combined });
+
     return (
       <div>
         {combined.map(i => (
-          <div>
+          <div key={`${i.type}-${i.data.id}`}>
             {i.type === 'posts' ? (
               <PostListing
                 post={i.data as Post}
                 admins={this.state.admins}
+                sitemods={this.state.sitemods}
                 showCommunity
                 enableDownvotes={this.props.enableDownvotes}
                 enableNsfw={this.props.enableNsfw}
@@ -163,6 +175,7 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
               <CommentNodes
                 nodes={[{ comment: i.data as Comment }]}
                 admins={this.state.admins}
+                sitemods={this.state.sitemods}
                 noIndent
                 showContext
                 enableDownvotes={this.props.enableDownvotes}
@@ -180,6 +193,7 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
         <CommentNodes
           nodes={commentsToFlatNodes(this.state.comments)}
           admins={this.state.admins}
+          sitemods={this.state.sitemods}
           noIndent
           showContext
           enableDownvotes={this.props.enableDownvotes}
@@ -193,8 +207,10 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
       <div>
         {this.state.posts.map(post => (
           <PostListing
+            key={post.id}
             post={post}
             admins={this.state.admins}
+            sitemods={this.state.sitemods}
             showCommunity
             enableDownvotes={this.props.enableDownvotes}
             enableNsfw={this.props.enableNsfw}
@@ -206,10 +222,10 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
 
   paginator() {
     return (
-      <div class="my-2">
+      <div className="my-2">
         {this.props.page > 1 && (
           <button
-            class="btn btn-sm btn-secondary mr-1"
+            className="btn btn-sm btn-secondary mr-1"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
@@ -217,7 +233,7 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
         )}
         {this.state.comments.length + this.state.posts.length > 0 && (
           <button
-            class="btn btn-sm btn-secondary"
+            className="btn btn-sm btn-secondary"
             onClick={linkEvent(this, this.nextPage)}
           >
             {i18n.t('next')}
@@ -227,11 +243,11 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
     );
   }
 
-  nextPage(i: UserDetails) {
+  nextPage(i: BaseUserDetails) {
     i.props.onPageChange(i.props.page + 1);
   }
 
-  prevPage(i: UserDetails) {
+  prevPage(i: BaseUserDetails) {
     i.props.onPageChange(i.props.page - 1);
   }
 
@@ -242,7 +258,7 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
       if (msg.error == 'couldnt_find_that_username_or_email') {
-        this.context.router.history.push('/');
+        this.props.history.push('/');
       }
       return;
     } else if (msg.reconnect) {
@@ -255,6 +271,7 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
         moderates: data.moderates,
         posts: data.posts,
         admins: data.admins,
+        sitemods: data.sitemods,
       });
     } else if (res.op == UserOperation.CreateCommentLike) {
       const data = res.data as CommentResponse;
@@ -262,7 +279,7 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
       this.setState({
         comments: this.state.comments,
       });
-    } else if (res.op == UserOperation.EditComment) {
+    } else if (isCommentChanged(res.op)) {
       const data = res.data as CommentResponse;
       editCommentRes(data, this.state.comments);
       this.setState({
@@ -305,6 +322,13 @@ export class UserDetails extends Component<UserDetailsProps, UserDetailsState> {
       this.setState({
         admins: data.admins,
       });
+    } else if (res.op == UserOperation.AddSitemod) {
+      const data = res.data as AddSitemodResponse;
+      this.setState({
+        sitemods: data.sitemods,
+      });
     }
   }
 }
+
+export const UserDetails = withRouter(BaseUserDetails);

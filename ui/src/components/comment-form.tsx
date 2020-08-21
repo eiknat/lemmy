@@ -1,5 +1,5 @@
-import { Component } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -9,10 +9,15 @@ import {
   UserOperation,
   CommentResponse,
 } from '../interfaces';
-import { capitalizeFirstLetter, wsJsonToRes, toast } from '../utils';
+import {
+  capitalizeFirstLetter,
+  wsJsonToRes,
+  toast,
+  isCommentChanged,
+} from '../utils';
 import { WebSocketService, UserService } from '../services';
 import { i18n } from '../i18next';
-import { T } from 'inferno-i18next';
+import { Trans } from 'react-i18next';
 import { MarkdownTextArea } from './markdown-textarea';
 
 interface CommentFormProps {
@@ -51,20 +56,29 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
     finished: false,
   };
 
+  state = this.emptyState;
+
   constructor(props: any, context: any) {
     super(props, context);
 
     this.handleCommentSubmit = this.handleCommentSubmit.bind(this);
     this.handleReplyCancel = this.handleReplyCancel.bind(this);
+  }
 
-    this.state = this.emptyState;
-
+  componentDidMount() {
     if (this.props.node) {
       if (this.props.edit) {
-        this.state.commentForm.edit_id = this.props.node.comment.id;
-        this.state.commentForm.parent_id = this.props.node.comment.parent_id;
-        this.state.commentForm.content = this.props.node.comment.content;
-        this.state.commentForm.creator_id = this.props.node.comment.creator_id;
+        const commentForm: any = {}
+        commentForm.edit_id = this.props.node.comment.id;
+        commentForm.parent_id = this.props.node.comment.parent_id;
+        commentForm.content = this.props.node.comment.content;
+        commentForm.creator_id = this.props.node.comment.creator_id;
+        this.setState({
+          commentForm: {
+            ...this.state.commentForm,
+            ...commentForm,
+          }
+        })
       } else {
         // A reply gets a new parent id
         this.state.commentForm.parent_id = this.props.node.comment.id;
@@ -91,7 +105,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
         this.state.commentForm.content.trim() === '') ||
       this.state.commentForm.content === null;
     return (
-      <div class="mb-3">
+      <div className="mb-3">
         {UserService.Instance.user ? (
           <MarkdownTextArea
             initialContent={this.state.commentForm.content}
@@ -104,16 +118,16 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
             onReplyCancel={this.handleReplyCancel}
           />
         ) : (
-          <div class="alert alert-light" role="alert">
-            <svg class="icon icon-inline mr-2">
-              <use xlinkHref="#icon-alert-triangle"></use>
+          <div className="alert alert-light" role="alert">
+            <svg className="icon icon-inline mr-2">
+              <use xlinkHref="#icon-alert-triangle" />
             </svg>
-            <T i18nKey="must_login" class="d-inline">
+            <Trans i18nKey="must_login" className="d-inline">
               #
-              <Link class="alert-link" to="/login">
+              <Link className="alert-link" to="/login">
                 #
               </Link>
-            </T>
+            </Trans>
           </div>
         )}
       </div>
@@ -138,11 +152,12 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
       // text edit only
 
       (data.comment.creator_id == UserService.Instance.user.id &&
-        op == UserOperation.EditComment &&
+        isCommentChanged(op) &&
         data.comment.content)
     ) {
-      this.state.finished = true;
-      this.setState(this.state);
+      this.setState({
+        finished: true,
+      });
     }
   }
 
@@ -170,8 +185,9 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
     let res = wsJsonToRes(msg);
 
     if (msg.error) {
-      this.state.finished = true;
-      this.setState(this.state);
+      this.setState({
+        finished: true,
+      });
       return;
     }
     // Only do the showing and hiding if logged in
@@ -179,7 +195,7 @@ export class CommentForm extends Component<CommentFormProps, CommentFormState> {
       if (res.op == UserOperation.CreateComment) {
         let data = res.data as CommentResponse;
         this.handleFinished(res.op, data);
-      } else if (res.op == UserOperation.EditComment) {
+      } else if (isCommentChanged(res.op)) {
         let data = res.data as CommentResponse;
         this.handleFinished(res.op, data);
       }

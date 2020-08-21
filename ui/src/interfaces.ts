@@ -9,12 +9,19 @@ export enum UserOperation {
   GetCommunity,
   CreateComment,
   EditComment,
+  DeleteComment,
+  RemoveComment,
   SaveComment,
+  MarkCommentAsRead,
   CreateCommentLike,
   GetPosts,
   CreatePostLike,
   EditPost,
+  RemovePost,
+  DeletePost,
   SavePost,
+  LockPost,
+  StickyPost,
   EditCommunity,
   FollowCommunity,
   GetFollowedCommunities,
@@ -29,6 +36,7 @@ export enum UserOperation {
   EditSite,
   GetSite,
   AddAdmin,
+  AddSitemod,
   BanUser,
   Search,
   MarkAllAsRead,
@@ -41,6 +49,8 @@ export enum UserOperation {
   CreatePrivateMessage,
   EditPrivateMessage,
   GetPrivateMessages,
+  MarkPrivateMessageAsRead,
+  DeletePrivateMessage,
   UserJoin,
   GetComments,
   GetSiteConfig,
@@ -58,6 +68,31 @@ export enum UserOperation {
   GetSiteModerators,
   GetUserTag,
   SetUserTag,
+  GetCaptcha,
+  GetCaptchaResponse,
+  MarkPrivateMessageReadForm,
+  DeletePrivateMessageForm,
+  DeleteCommentForm,
+  RemoveCommentForm,
+  DeletePostForm,
+  RemovePostForm,
+  StickyPostForm,
+  LockPostForm,
+  MarkCommentReadForm,
+}
+
+export interface GetCaptcha {}
+
+export interface GetCaptchaResponse {
+  ok?: {
+    png: string;
+    wav?: string;
+    uuid: string;
+  };
+  hcaptcha?: {
+    site_key: string;
+    verify_url: string;
+  };
 }
 
 export enum CommentSortType {
@@ -102,18 +137,33 @@ export enum SearchType {
   Url,
 }
 
-export interface User {
+export interface Claims {
   id: number;
   iss: string;
-  username: string;
+}
+
+export interface User {
+  id: number;
+  name: string;
+  preferred_username?: string;
+  email?: string;
+  avatar?: string;
+  admin: boolean;
+  banned: boolean;
+  published: string;
+  updated?: string;
   show_nsfw: boolean;
   theme: string;
   default_sort_type: SortType;
   default_listing_type: ListingType;
   lang: string;
-  avatar?: string;
   show_avatars: boolean;
-  unreadCount?: number;
+  send_notifications_to_email: boolean;
+  matrix_user_id: string;
+  actor_id: string;
+  bio?: string;
+  local: boolean;
+  last_refreshed_at: string;
 }
 
 export interface UserView {
@@ -382,6 +432,7 @@ export interface UserDetailsResponse {
   comments: Array<Comment>;
   posts: Array<Post>;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
 }
 
 export interface GetRepliesForm {
@@ -590,7 +641,6 @@ export interface ModAdd {
 export interface LoginForm {
   username_or_email: string;
   password: string;
-  captcha_id: string;
 }
 
 export interface RegisterForm {
@@ -599,8 +649,11 @@ export interface RegisterForm {
   password: string;
   password_verify: string;
   admin: boolean;
+  sitemod: boolean;
   show_nsfw: boolean;
-  captcha_id: string;
+  captcha_uuid?: string;
+  captcha_answer?: string;
+  hcaptcha_id?: string;
   pronouns?: string;
 }
 
@@ -649,6 +702,7 @@ export interface GetCommunityResponse {
   community: Community;
   moderators: Array<CommunityUser>;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
   online: number;
 }
 
@@ -676,15 +730,15 @@ export interface PostForm {
   url?: string;
   body?: string;
   community_id: number;
-  updated?: number;
+  // updated?: number;
   edit_id?: number;
   creator_id: number;
-  removed?: boolean;
-  deleted?: boolean;
+  // removed?: boolean;
+  // deleted?: boolean;
   nsfw: boolean;
-  locked?: boolean;
-  stickied?: boolean;
-  reason?: string;
+  // locked?: boolean;
+  // stickied?: boolean;
+  // reason?: string;
   auth: string;
 }
 
@@ -700,12 +754,38 @@ export interface GetPostForm {
   auth?: string;
 }
 
+export interface RemovePostForm {
+  edit_id: number;
+  removed: boolean;
+  reason?: string;
+  auth?: string;
+}
+
+export interface DeletePostForm {
+  edit_id: number;
+  deleted: boolean;
+  auth?: string;
+}
+
+export interface LockPostForm {
+  edit_id: number;
+  locked: boolean;
+  auth?: string;
+}
+
+export interface StickyPostForm {
+  edit_id: number;
+  stickied: boolean;
+  auth?: string;
+}
+
 export interface GetPostResponse {
   post: Post;
   comments: Array<Comment>;
   community: Community;
   moderators: Array<CommunityUser>;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
   online: number;
 }
 
@@ -725,16 +805,41 @@ export interface CommentForm {
   parent_id?: number;
   edit_id?: number;
   creator_id?: number;
-  removed?: boolean;
-  deleted?: boolean;
-  reason?: string;
-  read?: boolean;
+  // removed?: boolean;
+  // deleted?: boolean;
+  // reason?: string;
+  // read?: boolean;
   auth: string;
+}
+
+export interface EditCommentForm {
+  content: string;
+  edit_id?: number;
+  auth: string;
+}
+
+export interface DeleteCommentForm {
+  edit_id: number;
+  deleted: boolean;
+  auth?: string;
+}
+
+export interface RemoveCommentForm {
+  edit_id: number;
+  removed: boolean;
+  reason?: string;
+  auth?: string;
 }
 
 export interface SaveCommentForm {
   comment_id: number;
   save: boolean;
+  auth?: string;
+}
+
+export interface MarkCommentReadForm {
+  edit_id: number;
+  read: boolean;
   auth?: string;
 }
 
@@ -797,6 +902,10 @@ export interface SiteForm {
   auth?: string;
 }
 
+export interface GetSiteForm {
+  auth?: string;
+}
+
 export interface GetSiteConfig {
   auth?: string;
 }
@@ -813,8 +922,11 @@ export interface SiteConfigForm {
 export interface GetSiteResponse {
   site: Site;
   admins: Array<UserView>;
+  sitemods: Array<UserView>;
   banned: Array<UserView>;
   online: number;
+  version?: string;
+  my_user?: User;
 }
 
 export interface SiteResponse {
@@ -842,6 +954,16 @@ export interface AddAdminForm {
 
 export interface AddAdminResponse {
   admins: Array<UserView>;
+}
+
+export interface AddSitemodForm {
+  user_id: number;
+  added: boolean;
+  auth?: string;
+}
+
+export interface AddSitemodResponse {
+  sitemods: Array<UserView>;
 }
 
 export interface SearchForm {
@@ -894,6 +1016,18 @@ export interface EditPrivateMessageForm {
   content?: string;
   deleted?: boolean;
   read?: boolean;
+  auth?: string;
+}
+
+export interface MarkPrivateMessageReadForm {
+  edit_id: number;
+  read: boolean;
+  auth?: string;
+}
+
+export interface DeletePrivateMessageForm {
+  edit_id: number;
+  deleted: boolean;
   auth?: string;
 }
 
@@ -1011,12 +1145,12 @@ export type MessageType =
   | CreatePostLikeForm
   | BanFromCommunityForm
   | AddAdminForm
+  | AddSitemodForm
   | AddModToCommunityForm
   | TransferCommunityForm
   | TransferSiteForm
   | SaveCommentForm
   | BanUserForm
-  | AddAdminForm
   | GetUserDetailsForm
   | GetRepliesForm
   | GetUserMentionsForm
@@ -1041,7 +1175,8 @@ export type MessageType =
   | CreateCommentReportForm
   | CreatePostReportForm
   | GetUserTagForm
-  | SetUserTagForm;
+  | SetUserTagForm
+  | GetCaptcha;
 
 type ResponseType =
   | SiteResponse
@@ -1062,9 +1197,11 @@ type ResponseType =
   | AddModToCommunityResponse
   | BanUserResponse
   | AddAdminResponse
+  | AddSitemodResponse
   | PrivateMessageResponse
   | PrivateMessagesResponse
   | GetSiteConfigResponse
+  | GetSiteResponse
   | VerifyCaptchaResponse
   | ListCommentReportsResponse
   | ListPostReportsResponse
@@ -1075,7 +1212,8 @@ type ResponseType =
   | CreatePostReportResponse
   | CommunitySettingsResponse
   | GetSiteModeratorsResponse
-  | UserTagResponse;
+  | UserTagResponse
+  | GetCaptchaResponse;
 
 export interface WebSocketResponse {
   op: UserOperation;
@@ -1145,4 +1283,16 @@ export enum UserDetailsView {
   Comments,
   Posts,
   Saved,
+}
+
+export enum ModLogFilter {
+  removed_posts = 'removed_posts',
+  locked_posts = 'locked_posts',
+  stickied_posts = 'stickied_posts',
+  removed_comments = 'removed_comments',
+  removed_communities = 'removed_communities',
+  banned_from_community = 'banned_from_community',
+  added_to_community = 'added_to_community',
+  added = 'added',
+  banned = 'banned',
 }

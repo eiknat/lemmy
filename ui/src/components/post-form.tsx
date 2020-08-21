@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Prompt } from 'inferno-router';
+import React, { Component, useState } from 'react';
+import { Prompt } from 'react-router-dom';
 import { PostListings } from './post-listings';
 import { MarkdownTextArea } from './markdown-textarea';
 import { Subscription } from 'rxjs';
@@ -31,18 +31,92 @@ import {
   toast,
   randomStr,
   setupTippy,
-  hostname,
+  // hostname,
   pictrsDeleteToast,
   validTitle,
+  isPostChanged,
 } from '../utils';
-import Choices from 'choices.js';
 import { i18n } from '../i18next';
 import { cleanURL } from '../clean-url';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
+import matchSorter from 'match-sorter';
+
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxPopover,
+  ComboboxList,
+  ComboboxOption,
+} from '@reach/combobox';
+import '@reach/combobox/styles.css';
+import { Button } from 'theme-ui';
 
 export const MAX_POST_TITLE_LENGTH = 160;
 export const MAX_POST_BODY_LENGTH = 20000;
 export const MAX_COMMENT_LENGTH = 10000;
+
+function CommunityInput({
+  communities,
+  onSelect,
+  initialValue,
+}: {
+  communities: Array<Community>;
+  onSelect: (community_id: number) => void;
+  initialValue?: string;
+}) {
+  const [value, setValue] = useState(initialValue);
+  const results = matchSorter(communities, value, {
+    keys: [(item: Community) => `${item.name}`],
+  });
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setValue(e.target.value);
+  }
+
+  function validateInput() {
+    // if the current value does not equal a valid community, clear it
+    if (!communities.some(community => community.name === value)) {
+      setValue('');
+    }
+  }
+
+  return (
+    <Combobox
+      aria-label="Communities"
+      openOnFocus
+      onSelect={name => {
+        const community = communities.find(comm => comm.name === name);
+        setValue(community.name);
+        onSelect(community.id);
+      }}
+      onBlur={validateInput}
+    >
+      <ComboboxInput
+        className="community-search-input form-control"
+        onChange={handleChange}
+        value={value}
+        placeholder={i18n.t('select_a_community')}
+      />
+      <ComboboxPopover className="shadow-popup">
+        {results.length > 0 ? (
+          <ComboboxList persistSelection>
+            {results.slice(0, 10).map((result, index) => (
+              <ComboboxOption key={index} value={result.name} />
+            ))}
+          </ComboboxList>
+        ) : (
+          <div
+            data-reach-combobox-popover
+            style={{ fontSize: '16px', padding: 8, paddingTop: 0 }}
+          >
+            No results found
+          </div>
+        )}
+      </ComboboxPopover>
+    </Combobox>
+  );
+}
 
 interface PostFormProps {
   post?: Post; // If a post is given, that means this is an edit
@@ -66,17 +140,23 @@ interface PostFormState {
   crosspostCommunityId?: number;
 }
 
-export const TextAreaWithCounter = ({ maxLength, ...props }) => {
-  const characterLimitExceeded = props.value && props.value.length > maxLength;
+export const TextAreaWithCounter = ({
+  maxLength,
+  value = '',
+  ...props
+}: { value: string; maxLength: number } & React.HTMLProps<
+  HTMLTextAreaElement
+>) => {
+  const characterLimitExceeded = value && value.length > maxLength;
   return (
     <>
-      <textarea {...props} />
-      {props.value && (
-        <div class="mt-2">
+      <textarea value={value || ''} {...props} />
+      {value && (
+        <div className="mt-2">
           <span
             style={{ color: characterLimitExceeded ? 'var(--red)' : 'inherit' }}
           >
-            {props.value.length.toLocaleString()}{' '}
+            {value.length.toLocaleString()}{' '}
           </span>{' '}
           / {maxLength.toLocaleString()}
         </div>
@@ -88,7 +168,7 @@ export const TextAreaWithCounter = ({ maxLength, ...props }) => {
 export class PostForm extends Component<PostFormProps, PostFormState> {
   private id = `post-form-${randomStr()}`;
   private subscription: Subscription;
-  private choices: Choices;
+  // private choices: Choices;
   private emptyState: PostFormState = {
     postForm: {
       name: null,
@@ -108,14 +188,16 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     crossPosts: [],
   };
 
+  state = this.emptyState;
+
   constructor(props: any, context: any) {
     super(props, context);
     this.fetchSimilarPosts = debounce(this.fetchSimilarPosts).bind(this);
     this.fetchPageTitle = debounce(this.fetchPageTitle).bind(this);
     this.handlePostBodyChange = this.handlePostBodyChange.bind(this);
+  }
 
-    this.state = this.emptyState;
-
+  componentDidMount() {
     if (this.props.post) {
       this.state.postForm = {
         body: this.props.post.body,
@@ -162,9 +244,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     };
 
     WebSocketService.Instance.listCommunities(listCommunitiesForm);
-  }
 
-  componentDidMount() {
     setupTippy();
   }
 
@@ -182,8 +262,8 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
   }
 
   componentWillUnmount() {
+    // this.choices && this.choices.destroy();
     this.subscription.unsubscribe();
-    this.choices && this.choices.destroy();
     window.onbeforeunload = null;
   }
 
@@ -191,31 +271,45 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     const postTitleBlank =
       this.state.postForm.name === null ||
       this.state.postForm.name.trim() === '';
+
+    const communities = this.state.communities.filter(community => {
+      // don't allow crossposting to same community as original
+      if (this.state.crosspostCommunityId) {
+        // remove main community
+        const MAIN_COMMUNITY_ID = 2;
+        return (
+          community.id !== this.state.crosspostCommunityId &&
+          community.id != MAIN_COMMUNITY_ID
+        );
+      }
+
+      return true;
+    });
     return (
       <div>
         <Prompt
           when={
             !this.state.loading &&
-            (this.state.postForm.name ||
-              this.state.postForm.url ||
-              this.state.postForm.body)
+            (!!this.state.postForm.name ||
+              !!this.state.postForm.url ||
+              !!this.state.postForm.body)
           }
           message={i18n.t('block_leaving')}
         />
         <form onSubmit={linkEvent(this, this.handlePostSubmit)}>
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label" htmlFor="post-url">
+          <div className="form-group row">
+            <label className="col-sm-2 col-form-label" htmlFor="post-url">
               {i18n.t('url')}
             </label>
-            <div class="col-sm-10">
+            <div className="col-sm-10">
               {/* don't allow URL field to be edited after publishing */}
               {!this.props.onEdit ? (
                 <input
                   type="url"
                   id="post-url"
-                  class="form-control"
+                  className="form-control"
                   value={this.state.postForm.url}
-                  onInput={linkEvent(this, this.handlePostUrlChange)}
+                  onChange={this.handlePostUrlChange}
                   onPaste={linkEvent(this, this.handleImageUploadPaste)}
                 />
               ) : (
@@ -223,7 +317,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               )}
               {this.state.suggestedTitle && (
                 <div
-                  class="mt-1 text-muted small font-weight-bold pointer"
+                  className="mt-1 text-muted small font-weight-bold pointer"
                   onClick={linkEvent(this, this.copySuggestedTitle)}
                 >
                   {i18n.t('copy_suggested_title', {
@@ -247,7 +341,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                     type="file"
                     accept="image/*"
                     name="file"
-                    class="d-none"
+                    className="d-none"
                     disabled={!UserService.Instance.user}
                     onChange={linkEvent(this, this.handleImageUpload)}
                   />
@@ -259,23 +353,27 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                     this.state.postForm.url
                   )}`}
                   target="_blank"
-                  class="mr-2 d-inline-block float-right text-muted small font-weight-bold"
+                  className="mr-2 d-inline-block float-right text-muted small font-weight-bold"
                   rel="noopener"
                 >
                   {i18n.t('archive_link')}
                 </a>
               )}
               {this.state.imageLoading && (
-                <svg class="icon icon-spinner spin">
-                  <use xlinkHref="#icon-spinner"></use>
+                <svg className="icon icon-spinner spin">
+                  <use xlinkHref="#icon-spinner" />
                 </svg>
               )}
               {isImage(this.state.postForm.url) && (
-                <img src={this.state.postForm.url} class="img-fluid" />
+                <img
+                  src={this.state.postForm.url}
+                  alt="post form thumbnail"
+                  className="img-fluid"
+                />
               )}
               {this.state.crossPosts.length > 0 && (
                 <>
-                  <div class="my-1 text-muted small font-weight-bold">
+                  <div className="my-1 text-muted small font-weight-bold">
                     {i18n.t('cross_posts')}
                   </div>
                   <PostListings
@@ -288,25 +386,25 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               )}
             </div>
           </div>
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label" htmlFor="post-title">
+          <div className="form-group row">
+            <label className="col-sm-2 col-form-label" htmlFor="post-title">
               {i18n.t('title')}
             </label>
-            <div class="col-sm-10">
+            <div className="col-sm-10">
               {!this.props.onEdit ? (
                 <>
                   <TextAreaWithCounter
                     value={this.state.postForm.name}
                     id="post-title"
                     onInput={linkEvent(this, this.handlePostNameChange)}
-                    class="form-control"
+                    className="form-control"
                     required
                     rows={2}
                     minLength={3}
                     maxLength={MAX_POST_TITLE_LENGTH}
                   />
                   {!validTitle(this.state.postForm.name) && (
-                    <div class="invalid-feedback">
+                    <div className="invalid-feedback">
                       {i18n.t('invalid_post_title')}
                     </div>
                   )}
@@ -316,7 +414,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
               )}
               {this.state.suggestedPosts.length > 0 && (
                 <>
-                  <div class="my-1 text-muted small font-weight-bold">
+                  <div className="my-1 text-muted small font-weight-bold">
                     {i18n.t('related_posts')}
                   </div>
                   <PostListings
@@ -329,11 +427,11 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
             </div>
           </div>
 
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label" htmlFor={this.id}>
+          <div className="form-group row">
+            <label className="col-sm-2 col-form-label" htmlFor={this.id}>
               {i18n.t('body')}
             </label>
-            <div class="col-sm-10">
+            <div className="col-sm-10">
               <MarkdownTextArea
                 initialContent={this.state.postForm.body}
                 onContentChange={this.handlePostBodyChange}
@@ -341,13 +439,16 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
             </div>
           </div>
           {!this.props.post && (
-            <div class="form-group row">
-              <label class="col-sm-2 col-form-label" htmlFor="post-community">
+            <div className="form-group row">
+              <label
+                className="col-sm-2 col-form-label"
+                htmlFor="post-community"
+              >
                 {i18n.t('community')}
               </label>
-              <div class="col-sm-10">
-                <select
-                  class="form-control"
+              <div className="col-sm-10">
+                {/* <select
+                  className="form-control"
                   id="post-community"
                   value={this.state.postForm.community_id}
                   onInput={linkEvent(this, this.handlePostCommunityChange)}
@@ -368,63 +469,67 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
                       return true;
                     })
                     .map(community => (
-                      <option value={community.id}>
+                      <option key={community.id} value={community.id}>
                         {community.local
                           ? community.name
                           : `${hostname(community.actor_id)}/${community.name}`}
                       </option>
                     ))}
-                </select>
+                </select> */}
+                <CommunityInput
+                  initialValue={this.props.params?.community}
+                  onSelect={this.handlePostCommunityChange}
+                  communities={communities}
+                />
               </div>
             </div>
           )}
           {this.props.enableNsfw && (
-            <div class="form-group row">
-              <div class="col-sm-10">
-                <div class="form-check">
+            <div className="form-group row">
+              <div className="col-sm-10">
+                <div className="form-check">
                   <input
-                    class="form-check-input"
+                    className="form-check-input"
                     id="post-nsfw"
                     type="checkbox"
                     checked={this.state.postForm.nsfw}
                     onChange={linkEvent(this, this.handlePostNsfwChange)}
                   />
-                  <label class="form-check-label" htmlFor="post-nsfw">
+                  <label className="form-check-label" htmlFor="post-nsfw">
                     {i18n.t('nsfw')}
                   </label>
                 </div>
               </div>
             </div>
           )}
-          <div class="form-group row">
-            <div class="col-sm-10">
-              <button
+          <div className="form-group row">
+            <div className="col-sm-10">
+              <Button
+                mr={2}
                 disabled={
                   !this.state.postForm.community_id ||
                   this.state.loading ||
                   postTitleBlank
                 }
                 type="submit"
-                class="btn btn-secondary mr-2"
               >
                 {this.state.loading ? (
-                  <svg class="icon icon-spinner spin">
-                    <use xlinkHref="#icon-spinner"></use>
+                  <svg className="icon icon-spinner spin">
+                    <use xlinkHref="#icon-spinner" />
                   </svg>
                 ) : this.props.post ? (
                   capitalizeFirstLetter(i18n.t('save'))
                 ) : (
                   capitalizeFirstLetter(i18n.t('create'))
                 )}
-              </button>
+              </Button>
               {this.props.post && (
-                <button
+                <Button
                   type="button"
-                  class="btn btn-secondary"
                   onClick={linkEvent(this, this.handleCancel)}
                 >
                   {i18n.t('cancel')}
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -472,11 +577,13 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     i.setState(i.state);
   }
 
-  handlePostUrlChange(i: PostForm, event: any) {
-    i.state.postForm.url = event.target.value;
-    i.setState(i.state);
-    i.fetchPageTitle();
-  }
+  handlePostUrlChange = (event: any) => {
+    // i.state.postForm.url = event.target.value;
+    this.setState({
+      postForm: { ...this.state.postForm, url: event.target.value },
+    });
+    this.fetchPageTitle();
+  };
 
   async fetchPageTitle() {
     if (validURL(this.state.postForm.url)) {
@@ -527,15 +634,13 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     this.setState(this.state);
   }
 
-  handlePostBodyChange(val: string) {
-    this.state.postForm.body = val;
-    this.setState(this.state);
+  handlePostBodyChange = (val: string) => {
+    this.setState({ postForm: {...this.state.postForm, body: val} });
   }
 
-  handlePostCommunityChange(i: PostForm, event: any) {
-    i.state.postForm.community_id = Number(event.target.value);
-    i.setState(i.state);
-  }
+  handlePostCommunityChange = (community_id: number) => {
+    this.setState({ postForm: { ...this.state.postForm, community_id } });
+  };
 
   handlePostNsfwChange(i: PostForm, event: any) {
     i.state.postForm.nsfw = event.target.checked;
@@ -553,6 +658,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
   }
 
   handleImageUploadPaste(i: PostForm, event: any) {
+    console.log('PASTING');
     let image = event.clipboardData.files[0];
     if (image) {
       i.handleImageUpload(i, image);
@@ -608,6 +714,49 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       });
   }
 
+  // initChoices = (selectId: any) => {
+  //   setTimeout(() => {
+  //     this.choices = new Choices(selectId, {
+  //         shouldSort: false,
+  //         classNames: {
+  //           containerOuter: 'choices',
+  //           containerInner: 'choices__inner bg-secondary border-0',
+  //           input: 'form-control',
+  //           inputCloned: 'choices__input--cloned',
+  //           list: 'choices__list',
+  //           listItems: 'choices__list--multiple',
+  //           listSingle: 'choices__list--single',
+  //           listDropdown: 'choices__list--dropdown',
+  //           item: 'choices__item bg-secondary',
+  //           itemSelectable: 'choices__item--selectable',
+  //           itemDisabled: 'choices__item--disabled',
+  //           itemChoice: 'choices__item--choice',
+  //           placeholder: 'choices__placeholder',
+  //           group: 'choices__group',
+  //           groupHeading: 'choices__heading',
+  //           button: 'choices__button',
+  //           activeState: 'is-active',
+  //           focusState: 'is-focused',
+  //           openState: 'is-open',
+  //           disabledState: 'is-disabled',
+  //           highlightedState: 'text-info',
+  //           selectedState: 'text-info',
+  //           flippedState: 'is-flipped',
+  //           loadingState: 'is-loading',
+  //           noResults: 'has-no-results',
+  //           noChoices: 'has-no-choices',
+  //         },
+  //       });
+  //       this.choices.passedElement.element.addEventListener(
+  //         'choice',
+  //         (e: any) => {
+  //           this.setState({ postForm: { ...this.state.postForm, community_id: Number(e.detail.choice.value) } });
+  //         },
+  //         false
+  //       );
+  //   }, 10)
+  // }
+
   parseMessage(msg: WebSocketJsonResponse) {
     let res = wsJsonToRes(msg);
     if (msg.error) {
@@ -617,61 +766,31 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
       return;
     } else if (res.op == UserOperation.ListCommunities) {
       let data = res.data as ListCommunitiesResponse;
-      this.state.communities = data.communities;
+      // this.state.communities = data.communities;
+      this.setState({ communities: data.communities });
       if (this.props.post) {
-        this.state.postForm.community_id = this.props.post.community_id;
+        this.setState({
+          postForm: {
+            ...this.state.postForm,
+            community_id: this.props.post.community_id,
+          },
+        });
       } else if (this.props.params && this.props.params.community) {
         let foundCommunityId = data.communities.find(
           r => r.name == this.props.params.community
         ).id;
-        this.state.postForm.community_id = foundCommunityId;
+        this.setState({
+          postForm: { ...this.state.postForm, community_id: foundCommunityId },
+        });
       } else {
         // By default, the null valued 'Select a Community'
       }
-      this.setState(this.state);
+      // this.setState(this.state);
 
       // Set up select searching
-      let selectId: any = document.getElementById('post-community');
+      let selectId = document.getElementById('post-community');
       if (selectId) {
-        this.choices = new Choices(selectId, {
-          shouldSort: false,
-          classNames: {
-            containerOuter: 'choices',
-            containerInner: 'choices__inner bg-secondary border-0',
-            input: 'form-control',
-            inputCloned: 'choices__input--cloned',
-            list: 'choices__list',
-            listItems: 'choices__list--multiple',
-            listSingle: 'choices__list--single',
-            listDropdown: 'choices__list--dropdown',
-            item: 'choices__item bg-secondary',
-            itemSelectable: 'choices__item--selectable',
-            itemDisabled: 'choices__item--disabled',
-            itemChoice: 'choices__item--choice',
-            placeholder: 'choices__placeholder',
-            group: 'choices__group',
-            groupHeading: 'choices__heading',
-            button: 'choices__button',
-            activeState: 'is-active',
-            focusState: 'is-focused',
-            openState: 'is-open',
-            disabledState: 'is-disabled',
-            highlightedState: 'text-info',
-            selectedState: 'text-info',
-            flippedState: 'is-flipped',
-            loadingState: 'is-loading',
-            noResults: 'has-no-results',
-            noChoices: 'has-no-choices',
-          },
-        });
-        this.choices.passedElement.element.addEventListener(
-          'choice',
-          (e: any) => {
-            this.state.postForm.community_id = Number(e.detail.choice.value);
-            this.setState(this.state);
-          },
-          false
-        );
+        // this.initChoices(selectId);
       }
     } else if (res.op == UserOperation.CreatePost) {
       let data = res.data as PostResponse;
@@ -679,7 +798,7 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
         this.state.loading = false;
         this.props.onCreate(data.post.id);
       }
-    } else if (res.op == UserOperation.EditPost) {
+    } else if (isPostChanged(res.op)) {
       let data = res.data as PostResponse;
       if (data.post.creator_id == UserService.Instance.user.id) {
         this.state.loading = false;

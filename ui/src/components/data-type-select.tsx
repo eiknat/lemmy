@@ -1,7 +1,9 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import { DataType } from '../interfaces';
 
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
+import Button from './elements/Button';
 
 interface DataTypeSelectProps {
   type_: DataType;
@@ -33,33 +35,35 @@ export class DataTypeSelect extends Component<
 
   render() {
     return (
-      <div class="btn-group btn-group-toggle">
-        <label
-          className={`pointer btn btn-sm btn-secondary 
-            ${this.state.type_ == DataType.Post && 'active'}
-          `}
+      <div className="btn-group btn-group-toggle">
+        <Button
+          as="label"
+          variant={this.state.type_ == DataType.Post ? 'primary' : 'muted'}
         >
           <input
             type="radio"
+            className="visually-hidden"
             value={DataType.Post}
             checked={this.state.type_ == DataType.Post}
             onChange={linkEvent(this, this.handleTypeChange)}
           />
           {i18n.t('posts')}
-        </label>
-        <label
-          className={`pointer btn btn-sm btn-secondary ${
-            this.state.type_ == DataType.Comment && 'active'
-          }`}
+        </Button>
+        <Button
+          as="label"
+          variant={
+            this.state.type_ == DataType.Comment ? 'primary' : 'muted'
+          }
         >
           <input
             type="radio"
+            className="visually-hidden"
             value={DataType.Comment}
             checked={this.state.type_ == DataType.Comment}
             onChange={linkEvent(this, this.handleTypeChange)}
           />
           {i18n.t('comments')}
-        </label>
+        </Button>
       </div>
     );
   }

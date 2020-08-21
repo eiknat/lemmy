@@ -1,14 +1,12 @@
-import { Component, linkEvent } from 'inferno';
-import { Prompt } from 'inferno-router';
+import React, { Component } from 'react';
+import { Prompt } from 'react-router-dom';
 import {
   mdToHtml,
   randomStr,
   markdownHelpUrl,
-  toast,
   setupTribute,
-  pictrsDeleteToast,
   setupTippy,
-  emojiPicker,
+  // emojiPicker,
 } from '../utils';
 import { UserService } from '../services';
 import autosize from 'autosize';
@@ -16,6 +14,10 @@ import Tribute from 'tributejs/src/Tribute.js';
 import { i18n } from '../i18next';
 import emojiShortName from 'emoji-short-name';
 import { Icon } from './icon';
+import { linkEvent } from '../linkEvent';
+import 'emoji-mart/css/emoji-mart.css';
+import { Picker } from 'emoji-mart';
+import { customEmojis } from '../custom-emojis';
 
 interface MarkdownTextAreaProps {
   initialContent: string;
@@ -34,6 +36,7 @@ interface MarkdownTextAreaState {
   previewMode: boolean;
   loading: boolean;
   imageLoading: boolean;
+  showEmojiPicker: boolean;
 }
 
 export class MarkdownTextArea extends Component<
@@ -42,31 +45,27 @@ export class MarkdownTextArea extends Component<
 > {
   private id = `comment-textarea-${randomStr()}`;
   private formId = `comment-form-${randomStr()}`;
+  // @ts-ignore
   private tribute: Tribute;
   private emptyState: MarkdownTextAreaState = {
-    content: this.props.initialContent,
+    content: this.props.initialContent || '',
     previewMode: false,
     loading: false,
     imageLoading: false,
+    showEmojiPicker: false,
   };
 
-  constructor(props: any, context: any) {
-    super(props, context);
-
-    this.tribute = setupTribute();
-    this.setupEmojiPicker();
-    this.state = this.emptyState;
-  }
+  state = this.emptyState;
 
   componentDidMount() {
+    this.tribute = setupTribute();
     let textarea: any = document.getElementById(this.id);
     if (textarea) {
       autosize(textarea);
 
       this.tribute.attach(textarea);
       textarea.addEventListener('tribute-replaced', () => {
-        this.state.content = textarea.value;
-        this.setState(this.state);
+        this.setState({ content: textarea.value });
         autosize.update(textarea);
       });
 
@@ -82,20 +81,38 @@ export class MarkdownTextArea extends Component<
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     if (this.state.content) {
       window.onbeforeunload = () => true;
     } else {
       window.onbeforeunload = undefined;
     }
+
+    if (this.props.finished && !prevProps.finished) {
+      let prevState = { ...this.state };
+      prevState.content = '';
+      prevState.loading = false;
+      prevState.previewMode = false;
+      this.setState(prevState);
+      if (this.props.replyType) {
+        this.props.onReplyCancel();
+      }
+    }
+
+    // if initial content is passed down and there is no current content, update it
+    if (this.props.initialContent && this.state.content === '') {
+      this.setState({ content: this.props.initialContent })
+    }
   }
 
-  componentWillReceiveProps(nextProps: MarkdownTextAreaProps) {
+  // @TODO:This was likely introducing the bug that cleared your replies, but keep an eye on it
+  UNSAFE_componentWillReceiveProps(nextProps: MarkdownTextAreaProps) {
     if (nextProps.finished) {
-      this.state.previewMode = false;
-      this.state.loading = false;
-      this.state.content = '';
-      this.setState(this.state);
+      this.setState({
+        previewMode: false,
+        loading: false,
+        content: '',
+      });
       if (this.props.replyType) {
         this.props.onReplyCancel();
       }
@@ -104,7 +121,7 @@ export class MarkdownTextArea extends Component<
       let form: any = document.getElementById(this.formId);
       form.reset();
       setTimeout(() => autosize.update(textarea), 10);
-      this.setState(this.state);
+      // this.setState(this.state);
     }
   }
 
@@ -114,16 +131,16 @@ export class MarkdownTextArea extends Component<
 
   render() {
     return (
-      <form id={this.formId} onSubmit={linkEvent(this, this.handleSubmit)}>
-        <Prompt when={this.state.content} message={i18n.t('block_leaving')} />
-        <div class="form-group row">
-          <div className={`col-sm-12`}>
+      <form id={this.formId} onSubmit={this.handleSubmit}>
+        <Prompt when={!!this.state.content} message={i18n.t('block_leaving')} />
+        <div className="form-group row">
+          <div className="col-sm-12">
             <textarea
               id={this.id}
               className={`form-control ${this.state.previewMode && 'd-none'}`}
               value={this.state.content}
-              onInput={linkEvent(this, this.handleContentChange)}
-              onKeyDown={linkEvent(this, this.handleKeydown)}
+              onChange={this.handleContentChange}
+              onKeyDown={this.handleKeydown}
               // onPaste={linkEvent(this, this.handleImageUploadPaste)}
               required
               disabled={this.props.disabled}
@@ -138,17 +155,17 @@ export class MarkdownTextArea extends Component<
             )}
           </div>
         </div>
-        <div class="row">
-          <div class="col-sm-12 d-flex flex-wrap">
+        <div className="row">
+          <div className="col-sm-12 d-flex flex-wrap">
             {this.props.buttonTitle && (
               <button
                 type="submit"
-                class="btn btn-sm btn-secondary mr-2"
+                className="btn btn-sm btn-secondary mr-2"
                 disabled={this.props.disabled || this.state.loading}
               >
                 {this.state.loading ? (
-                  <svg class="icon icon-spinner spin">
-                    <use xlinkHref="#icon-spinner"></use>
+                  <svg className="icon icon-spinner spin">
+                    <use xlinkHref="#icon-spinner" />
                   </svg>
                 ) : (
                   <span>{this.props.buttonTitle}</span>
@@ -158,7 +175,7 @@ export class MarkdownTextArea extends Component<
             {this.props.replyType && (
               <button
                 type="button"
-                class="btn btn-sm btn-secondary mr-2"
+                className="btn btn-sm btn-secondary mr-2"
                 onClick={linkEvent(this, this.handleReplyCancel)}
               >
                 {i18n.t('cancel')}
@@ -169,52 +186,52 @@ export class MarkdownTextArea extends Component<
                 className={`btn btn-sm btn-secondary mr-2 ${
                   this.state.previewMode && 'active'
                 }`}
-                onClick={linkEvent(this, this.handlePreviewToggle)}
+                onClick={this.handlePreviewToggle}
               >
                 {i18n.t('preview')}
               </button>
             )}
             {/* A flex expander */}
-            <div class="flex-grow-1"></div>
+            <div className="flex-grow-1" />
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('bold')}
               onClick={linkEvent(this, this.handleInsertBold)}
             >
-              <svg class="icon icon-inline">
-                <use xlinkHref="#icon-bold"></use>
+              <svg className="icon icon-inline">
+                <use xlinkHref="#icon-bold" />
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('italic')}
               onClick={linkEvent(this, this.handleInsertItalic)}
             >
-              <svg class="icon icon-inline">
-                <use xlinkHref="#icon-italic"></use>
+              <svg className="icon icon-inline">
+                <use xlinkHref="#icon-italic" />
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('link')}
-              onClick={linkEvent(this, this.handleInsertLink)}
+              onClick={this.handleInsertLink}
             >
-              <svg class="icon icon-inline">
-                <use xlinkHref="#icon-link"></use>
+              <svg className="icon icon-inline">
+                <use xlinkHref="#icon-link" />
               </svg>
             </button>
-            {/* <form class="btn btn-sm text-muted font-weight-bold">
+            {/* <form className="btn btn-sm text-muted font-weight-bold">
               <label
                 htmlFor={`file-upload-${this.id}`}
                 className={`mb-0 ${UserService.Instance.user && 'pointer'}`}
                 data-tippy-content={i18n.t('upload_image')}
               >
                 {this.state.imageLoading ? (
-                  <svg class="icon icon-spinner spin">
+                  <svg className="icon icon-spinner spin">
                     <use xlinkHref="#icon-spinner"></use>
                   </svg>
                 ) : (
-                  <svg class="icon icon-inline">
+                  <svg className="icon icon-inline">
                     <use xlinkHref="#icon-image"></use>
                   </svg>
                 )}
@@ -224,78 +241,96 @@ export class MarkdownTextArea extends Component<
                 type="file"
                 accept="image/*,video/*"
                 name="file"
-                class="d-none"
+                className="d-none"
                 disabled={!UserService.Instance.user}
                 // onChange={linkEvent(this, this.handleImageUpload)}
               />
             </form> */}
+            <span style={{ position: 'relative' }}>
+              <button
+                onClick={this.toggleEmojiPicker}
+                className="btn btn-sm text-muted"
+                data-tippy-content={i18n.t('emoji_picker')}
+                type="button"
+              >
+                <svg className="icon icon-inline">
+                  <use xlinkHref="#icon-smile" />
+                </svg>
+              </button>
+              {this.state.showEmojiPicker && (
+                <>
+                  <div className="emoji-picker-container">
+                    <Picker
+                      custom={customEmojis}
+                      onSelect={this.handleInsertEmoji}
+                      theme="auto"
+                    />
+                  </div>
+                  <div
+                    onClick={this.toggleEmojiPicker}
+                    className="click-away-container"
+                  />
+                </>
+              )}
+            </span>
             <button
-              onClick={linkEvent(this, this.handleEmojiPickerClick)}
-              class="btn btn-sm text-muted"
-              data-tippy-content={i18n.t('emoji_picker')}
-            >
-              <svg class="icon icon-inline">
-                <use xlinkHref="#icon-smile"></use>
-              </svg>
-            </button>
-            <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('header')}
               onClick={linkEvent(this, this.handleInsertHeader)}
             >
-              <svg class="icon icon-inline">
-                <use xlinkHref="#icon-header"></use>
+              <svg className="icon icon-inline">
+                <use xlinkHref="#icon-header" />
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('strikethrough')}
               onClick={linkEvent(this, this.handleInsertStrikethrough)}
             >
-              <svg class="icon icon-inline">
-                <use xlinkHref="#icon-strikethrough"></use>
+              <svg className="icon icon-inline">
+                <use xlinkHref="#icon-strikethrough" />
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('quote')}
               onClick={linkEvent(this, this.handleInsertQuote)}
             >
-              <svg class="icon icon-inline">
-                <use xlinkHref="#icon-format_quote"></use>
+              <svg className="icon icon-inline">
+                <use xlinkHref="#icon-format_quote" />
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('list')}
               onClick={linkEvent(this, this.handleInsertList)}
             >
-              <svg class="icon icon-inline">
-                <use xlinkHref="#icon-list"></use>
+              <svg className="icon icon-inline">
+                <use xlinkHref="#icon-list" />
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('code')}
               onClick={linkEvent(this, this.handleInsertCode)}
             >
-              <svg class="icon icon-inline">
-                <use xlinkHref="#icon-code"></use>
+              <svg className="icon icon-inline">
+                <use xlinkHref="#icon-code" />
               </svg>
             </button>
             <button
-              class="btn btn-sm text-muted"
+              className="btn btn-sm text-muted"
               data-tippy-content={i18n.t('spoiler')}
-              onClick={linkEvent(this, this.handleInsertSpoiler)}
+              onClick={this.handleInsertSpoiler}
             >
-              <svg class="icon icon-inline">
-                <use xlinkHref="#icon-alert-triangle"></use>
+              <svg className="icon icon-inline">
+                <use xlinkHref="#icon-alert-triangle" />
               </svg>
             </button>
             <a
               href={markdownHelpUrl}
               target="_blank"
-              class="btn btn-sm text-muted font-weight-bold"
+              className="btn btn-sm text-muted font-weight-bold"
               title={i18n.t('formatting_help')}
               rel="noopener"
             >
@@ -307,20 +342,20 @@ export class MarkdownTextArea extends Component<
     );
   }
 
-  setupEmojiPicker() {
-    emojiPicker.on('emoji', twemojiHtmlStr => {
-      if (this.state.content == null) {
-        this.state.content = '';
-      }
-      var el = document.createElement('div');
-      el.innerHTML = twemojiHtmlStr;
-      let nativeUnicode = (el.childNodes[0] as HTMLElement).getAttribute('alt');
-      let shortName = `:${emojiShortName[nativeUnicode]}:`;
+  // setupEmojiPicker() {
+  //   emojiPicker.on('emoji', twemojiHtmlStr => {
+  //     if (this.state.content == null) {
+  //       this.state.content = '';
+  //     }
+  //     var el = document.createElement('div');
+  //     el.innerHTML = twemojiHtmlStr;
+  //     let nativeUnicode = (el.childNodes[0] as HTMLElement).getAttribute('alt');
+  //     let shortName = `:${emojiShortName[nativeUnicode]}:`;
 
-      this.state.content += shortName;
-      this.setState(this.state);
-    });
-  }
+  //     this.state.content += shortName;
+  //     this.setState(this.state);
+  //   });
+  // }
 
   // handleImageUploadPaste(i: MarkdownTextArea, event: any) {
   //   let image = event.clipboardData.files[0];
@@ -385,102 +420,106 @@ export class MarkdownTextArea extends Component<
   //     });
   // }
 
-  handleEmojiPickerClick(_i: MarkdownTextArea, event: any) {
-    event.preventDefault();
-    emojiPicker.togglePicker(event.target);
-  }
+  // handleEmojiPickerClick(_i: MarkdownTextArea, event: any) {
+  //   event.preventDefault();
+  //   emojiPicker.togglePicker(event.target);
+  // }
 
-  handleContentChange(i: MarkdownTextArea, event: any) {
-    i.state.content = event.target.value;
-    i.setState(i.state);
-    if (i.props.onContentChange) {
-      i.props.onContentChange(i.state.content);
+  toggleEmojiPicker = () => {
+    this.setState({ showEmojiPicker: !this.state.showEmojiPicker });
+  };
+
+  handleContentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    this.setState({ content: event.target.value });
+    if (this.props.onContentChange) {
+      this.props.onContentChange(event.target.value);
     }
-  }
+  };
 
-  handlePreviewToggle(i: MarkdownTextArea, event: any) {
+  handlePreviewToggle = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    i.state.previewMode = !i.state.previewMode;
-    i.setState(i.state);
-  }
+    this.setState({ previewMode: !this.state.previewMode });
+  };
 
-  handleSubmit(i: MarkdownTextArea, event: any) {
+  handleSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    i.state.loading = true;
-    i.setState(i.state);
-    i.props.onSubmit(i.state.content);
-  }
+    this.setState({ loading: true });
+    this.props.onSubmit(this.state.content, event);
+  };
 
-  handleKeydown(i: MarkdownTextArea, event: any) {
+  handleKeydown = (event: React.KeyboardEvent) => {
     // if enter was pressed
     if (event.keyCode === 13) {
       // while command (mac) or ctrl is pressed
       if (event.metaKey || event.ctrlKey) {
         // submit comment
-        i.state.loading = true;
-        i.setState(i.state);
-        i.props.onSubmit(i.state.content);
+        this.setState({ loading: true });
+        this.props.onSubmit(this.state.content, event);
       }
     }
-  }
+  };
 
   handleReplyCancel(i: MarkdownTextArea) {
     i.props.onReplyCancel();
   }
 
-  handleInsertLink(i: MarkdownTextArea, event: any) {
+  handleInsertEmoji = ({ colons: shortcode }: { colons: string }) => {
+    const { content } = this.state;
+    // pad the emoji with spaces
+    this.setState({ content: `${content} ${shortcode} ` });
+    this.toggleEmojiPicker();
+  };
+
+  handleInsertLink = (event: any) => {
     event.preventDefault();
-    if (!i.state.content) {
-      i.state.content = '';
-    }
-    let textarea: any = document.getElementById(i.id);
-    let start: number = textarea.selectionStart;
-    let end: number = textarea.selectionEnd;
 
-    if (start !== end) {
-      let selectedText = i.state.content.substring(start, end);
-      i.state.content = `${i.state.content.substring(
-        0,
-        start
-      )} [${selectedText}]() ${i.state.content.substring(end)}`;
-      textarea.focus();
-      setTimeout(() => (textarea.selectionEnd = end + 4), 10);
-    } else {
-      i.state.content += '[]()';
-      textarea.focus();
-      setTimeout(() => (textarea.selectionEnd -= 1), 10);
-    }
-    i.setState(i.state);
-  }
-
-  simpleSurround(chars: string) {
-    this.simpleSurroundBeforeAfter(chars, chars);
-  }
-
-  simpleSurroundBeforeAfter(beforeChars: string, afterChars: string) {
-    if (!this.state.content) {
-      this.state.content = '';
-    }
+    let content = this.state.content || '';
     let textarea: any = document.getElementById(this.id);
     let start: number = textarea.selectionStart;
     let end: number = textarea.selectionEnd;
 
     if (start !== end) {
       let selectedText = this.state.content.substring(start, end);
-      this.state.content = `${this.state.content.substring(
+      content = `${this.state.content.substring(
+        0,
+        start
+      )} [${selectedText}]() ${this.state.content.substring(end)}`;
+      textarea.focus();
+      setTimeout(() => (textarea.selectionEnd = end + 4), 10);
+    } else {
+      content += '[]()';
+      textarea.focus();
+      setTimeout(() => (textarea.selectionEnd -= 1), 10);
+    }
+    this.setState({ content });
+  };
+
+  simpleSurround = (chars: string) => {
+    this.simpleSurroundBeforeAfter(chars, chars);
+  };
+
+  simpleSurroundBeforeAfter = (beforeChars: string, afterChars: string) => {
+    let content = this.state.content || '';
+    let textarea: any = document.getElementById(this.id);
+    let start: number = textarea.selectionStart;
+    let end: number = textarea.selectionEnd;
+
+    if (start !== end) {
+      let selectedText = this.state.content.substring(start, end);
+      content = `${this.state.content.substring(
         0,
         start - 1
       )} ${beforeChars}${selectedText}${afterChars} ${this.state.content.substring(
         end + 1
       )}`;
     } else {
-      this.state.content += `${beforeChars}___${afterChars}`;
+      content += `${beforeChars}___${afterChars}`;
     }
-    this.setState(this.state);
+    this.setState({ content });
     setTimeout(() => {
       autosize.update(textarea);
     }, 10);
-  }
+  };
 
   handleInsertBold(i: MarkdownTextArea, event: any) {
     event.preventDefault();
@@ -517,27 +556,23 @@ export class MarkdownTextArea extends Component<
     i.simpleInsert('#');
   }
 
-  simpleInsert(chars: string) {
-    if (!this.state.content) {
-      this.state.content = `${chars} `;
-    } else {
-      this.state.content += `\n${chars} `;
-    }
+  simpleInsert = (chars: string) => {
+    const content = !this.state.content ? `${chars} ` : `\n${chars} `;
 
     let textarea: any = document.getElementById(this.id);
     textarea.focus();
     setTimeout(() => {
       autosize.update(textarea);
     }, 10);
-    this.setState(this.state);
-  }
+    this.setState({ content });
+  };
 
-  handleInsertSpoiler(i: MarkdownTextArea, event: any) {
+  handleInsertSpoiler = (event: React.SyntheticEvent) => {
     event.preventDefault();
     let beforeChars = `\n::: spoiler ${i18n.t('spoiler')}\n`;
     let afterChars = '\n:::\n';
-    i.simpleSurroundBeforeAfter(beforeChars, afterChars);
-  }
+    this.simpleSurroundBeforeAfter(beforeChars, afterChars);
+  };
 
   quoteInsert() {
     let textarea: any = document.getElementById(this.id);
@@ -548,8 +583,9 @@ export class MarkdownTextArea extends Component<
           .split('\n')
           .map(t => `> ${t}`)
           .join('\n') + '\n\n';
-      this.state.content = quotedText;
-      this.setState(this.state);
+      this.setState({
+        content: quotedText,
+      });
       // Not sure why this needs a delay
       setTimeout(() => autosize.update(textarea), 10);
     }

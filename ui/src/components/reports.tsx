@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno';
+import React, { Component } from 'react';
 import {
   WebSocketJsonResponse,
   UserOperation,
@@ -14,14 +14,18 @@ import {
   GetReportCountResponse,
   GetCommunityResponse,
   Community as CommunityI,
+  RemovePostForm,
+  GetSiteResponse,
+  RemoveCommentForm,
 } from '../interfaces';
 import { UserService, WebSocketService } from '../services';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { wsJsonToRes, toast } from '../utils';
+import { wsJsonToRes, toast, isCommentChanged, isPostChanged } from '../utils';
 import { i18n } from '../i18next';
 import { MomentTime } from './moment-time';
-import { Link } from 'inferno-router';
+import { Link, withRouter } from 'react-router-dom';
+import { Flex, Spinner } from 'theme-ui';
 
 interface ReportsState {
   moderates: Array<CommunityUser>;
@@ -45,9 +49,11 @@ interface ReportsState {
   communitiesById: {
     [communityId: number]: CommunityI;
   };
+  autoResolve: boolean;
+  loading: boolean;
 }
 
-export class Reports extends Component<{}, ReportsState> {
+export class BaseReports extends Component<any, ReportsState> {
   private subscription: Subscription;
   constructor(props: any, context: any) {
     super(props);
@@ -63,6 +69,8 @@ export class Reports extends Component<{}, ReportsState> {
       removeReason: '',
       currentRemoveDialog: null,
       communitiesById: {},
+      autoResolve: false,
+      loading: true,
     };
 
     this.handleToggleCommunityDisclosure = this.handleToggleCommunityDisclosure.bind(
@@ -74,6 +82,12 @@ export class Reports extends Component<{}, ReportsState> {
     this.handleResolveCommentReport = this.handleResolveCommentReport.bind(
       this
     );
+    this.handleBanReasonChange = this.handleBanReasonChange.bind(this);
+    this.handleRemoveCommentSubmit = this.handleRemoveCommentSubmit.bind(this);
+    this.handleRemovePostSubmit = this.handleRemovePostSubmit.bind(this);
+    this.handleAutoResolveChange = this.handleAutoResolveChange.bind(this);
+    this.handleBanSubmit = this.handleBanSubmit.bind(this);
+    this.handleRemoveReasonChange = this.handleRemoveReasonChange.bind(this);
 
     this.subscription = WebSocketService.Instance.subject
       .pipe(retryWhen(errors => errors.pipe(delay(3000), take(10))))
@@ -85,7 +99,7 @@ export class Reports extends Component<{}, ReportsState> {
   }
 
   componentDidMount() {
-    this.fetchUserData();
+    WebSocketService.Instance.getSite();
   }
 
   componentDidUpdate(_, lastState) {
@@ -119,26 +133,16 @@ export class Reports extends Component<{}, ReportsState> {
     });
   }
 
-  fetchReportCount(communityId) {
+  fetchReportCount(communityId: number) {
     WebSocketService.Instance.getReportCount({
       community: communityId,
     });
   }
 
-  fetchCommunity(communityId, communityName) {
+  fetchCommunity(communityId: number, communityName: string) {
     WebSocketService.Instance.getCommunity({
       id: communityId,
       name: communityName,
-    });
-  }
-
-  fetchUserData() {
-    const user_id = UserService.Instance.user.id;
-
-    WebSocketService.Instance.getUserDetails({
-      user_id,
-      saved_only: false,
-      sort: 'New',
     });
   }
 
@@ -154,10 +158,36 @@ export class Reports extends Component<{}, ReportsState> {
       removeReason,
       reportCountByCommunity,
       communitiesById,
+      loading,
     } = this.state;
 
+    if (loading) {
+      return (
+        <Flex css={{ justifyContent: 'center' }}>
+          <Spinner />
+        </Flex>
+      );
+    }
+
     return (
-      <div class="container">
+      <div className="container">
+        <div className="card p-2 mb-3">
+          <div>
+            <label
+              style={{ display: 'flex', alignItems: 'center', marginBottom: 0 }}
+              htmlFor="autoresolve-checkbox"
+            >
+              <input
+                type="checkbox"
+                checked={this.state.autoResolve}
+                onChange={this.handleAutoResolveChange}
+                id="autoresolve-checkbox"
+                className="mr-2"
+              />
+              Auto Resolve
+            </label>
+          </div>
+        </div>
         {moderates.map(communityUser => {
           const { community_id, community_name } = communityUser;
 
@@ -173,13 +203,13 @@ export class Reports extends Component<{}, ReportsState> {
           }
 
           return (
-            <div class="mx-3">
-              <div class="row mb-2">
+            <div className="mx-3" key={communityUser.id}>
+              <div className="row mb-2">
                 <h4>
                   <Link to={`/c/${community_name}`}>{community_name}</Link>
                 </h4>
                 <button
-                  class="btn btn-success ml-4"
+                  className="btn btn-success ml-4"
                   onClick={() => {
                     this.fetchReports(community_id);
                     this.handleToggleCommunityDisclosure(community_id);
@@ -201,38 +231,42 @@ export class Reports extends Component<{}, ReportsState> {
                   : 0}
               </p>
               {open.includes(community_id) && (
-                <div class="container">
-                  <div class="row">
-                    <div class="col">
+                <div className="container">
+                  <div className="row">
+                    <div className="col">
                       <h5>Post reports</h5>
                       {postReportsByCommunity[community_id] == null ? (
                         <p>no reports</p>
                       ) : (
                         postReportsByCommunity[community_id].map(report => (
-                          <div class="mb-4">
+                          <div className="mb-4" key={report.id}>
                             <div
                               style={{
                                 width: '100%',
                                 display: 'flex',
-                                'justify-content': 'space-between',
+                                justifyContent: 'space-between',
                               }}
                             >
-                              <p class="small my-0">
+                              <p className="small my-0">
                                 {report.user_name} submitted{' '}
                                 <MomentTime
                                   data={{ published: report.time }}
-                                  showAgo={true}
+                                  showAgo
                                 />
                               </p>
                               <Link to={`/post/${report.post_id}`}>
                                 View Context
                               </Link>
                             </div>
-                            <p class="my-0">{report.reason}</p>
-                            <div class="card p-1">
-                              <p class="mb-0">Post Title: {report.post_name}</p>
-                              <p class="mb-0">Post Body: {report.post_body}</p>
-                              <p class="mb-0">
+                            <p className="my-0">{report.reason}</p>
+                            <div className="card p-1">
+                              <p className="mb-0">
+                                Post Title: {report.post_name}
+                              </p>
+                              <p className="mb-0">
+                                Post Body: {report.post_body}
+                              </p>
+                              <p className="mb-0">
                                 Submitted by:{' '}
                                 <Link to={`/u/${report.creator_name}`}>
                                   {report.creator_name}
@@ -248,13 +282,13 @@ export class Reports extends Component<{}, ReportsState> {
                                   onClick={() =>
                                     this.handleOpenBanDialog(report)
                                   }
-                                  class="btn"
+                                  className="btn"
                                 >
                                   ban
                                 </button>
                               )}
                               <button
-                                class="btn"
+                                className="btn"
                                 onClick={() =>
                                   this.handleOpenRemoveDialog(report)
                                 }
@@ -262,7 +296,7 @@ export class Reports extends Component<{}, ReportsState> {
                                 remove
                               </button>
                               <button
-                                class="btn"
+                                className="btn"
                                 onClick={() =>
                                   this.handleResolvePostReport(
                                     report.id,
@@ -288,25 +322,25 @@ export class Reports extends Component<{}, ReportsState> {
                         ))
                       )}
                     </div>
-                    <div class="col">
+                    <div className="col">
                       <h5>Comment reports</h5>
                       {commentReportsByCommunity[community_id] == null ? (
                         <p>no reports</p>
                       ) : (
                         commentReportsByCommunity[community_id].map(report => (
-                          <div class="mb-4">
+                          <div className="mb-4" key={report.id}>
                             <div
                               style={{
                                 width: '100%',
                                 display: 'flex',
-                                'justify-content': 'space-between',
+                                justifyContent: 'space-between',
                               }}
                             >
-                              <p class="small my-0">
+                              <p className="small my-0">
                                 {report.user_name} submitted{' '}
                                 <MomentTime
                                   data={{ published: report.time }}
-                                  showAgo={true}
+                                  showAgo
                                 />
                               </p>
                               <Link
@@ -315,12 +349,12 @@ export class Reports extends Component<{}, ReportsState> {
                                 View Context
                               </Link>
                             </div>
-                            <p class="my-0">{report.reason}</p>
-                            <div class="card p-1">
-                              <p class="mb-0">
+                            <p className="my-0">{report.reason}</p>
+                            <div className="card p-1">
+                              <p className="mb-0">
                                 Comment Text: {report.comment_text}
                               </p>
-                              <p class="mb-0">
+                              <p className="mb-0">
                                 Submitted by:{' '}
                                 <Link to={`/u/${report.creator_name}`}>
                                   {report.creator_name}
@@ -333,13 +367,13 @@ export class Reports extends Component<{}, ReportsState> {
                                   onClick={() =>
                                     this.handleOpenBanDialog(report)
                                   }
-                                  class="btn"
+                                  className="btn"
                                 >
                                   ban
                                 </button>
                               )}
                               <button
-                                class="btn"
+                                className="btn"
                                 onClick={() =>
                                   this.handleOpenRemoveDialog(report)
                                 }
@@ -347,7 +381,7 @@ export class Reports extends Component<{}, ReportsState> {
                                 remove
                               </button>
                               <button
-                                class="btn"
+                                className="btn"
                                 onClick={() =>
                                   this.handleResolveCommentReport(
                                     report.id,
@@ -386,105 +420,104 @@ export class Reports extends Component<{}, ReportsState> {
 
   handleToggleCommunityDisclosure(communityId: number) {
     if (this.state.open.includes(communityId)) {
-      this.setState({
-        open: [...this.state.open].filter(id => id !== communityId),
-      });
+      this.setState(state => ({
+        open: [...state.open].filter(id => id !== communityId),
+      }));
       return;
     }
 
-    this.setState({ open: [...this.state.open, communityId] });
+    this.setState(state => ({ open: [...state.open, communityId] }));
   }
 
   handleOpenBanDialog(report: PostReport | CommentReport) {
     this.setState({ currentBanDialog: report, banReason: '' });
   }
 
-  handleBanSubmit(i: Reports, event: any) {
+  handleBanSubmit(event) {
     event.preventDefault();
 
     const form: BanFromCommunityForm = {
-      user_id: i.state.currentBanDialog.creator_id,
-      community_id: i.state.currentBanDialog.community_id,
+      user_id: this.state.currentBanDialog.creator_id,
+      community_id: this.state.currentBanDialog.community_id,
       ban: true,
-      reason: i.state.banReason,
+      reason: this.state.banReason,
       expires: null,
     };
 
     WebSocketService.Instance.banFromCommunity(form);
 
-    i.setState({
+    this.setState({
       currentBanDialog: null,
       banReason: '',
     });
   }
 
-  handleBanReasonChange(i: Reports, event: any) {
-    i.state.banReason = event.target.value;
-    i.setState(i.state);
+  handleBanReasonChange(event: any) {
+    this.setState({ banReason: event.target.value });
   }
 
   handleOpenRemoveDialog(report: PostReport | CommentReport) {
     this.setState({ currentRemoveDialog: report, removeReason: '' });
   }
 
-  handleRemoveCommentSubmit(i: Reports, event: any) {
+  handleRemoveCommentSubmit() {
     event.preventDefault();
 
     const {
       comment_text,
       comment_id,
       creator_id,
+      community_id,
       post_id,
-    } = i.state.currentRemoveDialog;
+      id,
+    } = this.state.currentRemoveDialog as CommentReport;
 
-    const form: CommentForm = {
-      content: comment_text,
+    const form: RemoveCommentForm = {
       edit_id: comment_id,
-      creator_id,
-      post_id,
       removed: true,
-      reason: i.state.removeReason,
+      reason: this.state.removeReason,
       auth: null,
     };
 
-    WebSocketService.Instance.editComment(form);
+    WebSocketService.Instance.removeComment(form);
 
-    i.setState({
+    if (this.state.autoResolve) {
+      this.handleResolveCommentReport(id, community_id);
+    }
+
+    this.setState({
       currentRemoveDialog: null,
       removeReason: '',
     });
   }
 
-  handleRemovePostSubmit(i: Reports, event: any) {
+  handleRemovePostSubmit() {
     event.preventDefault();
 
-    const {
-      post_name,
-      community_id,
-      creator_id,
-      post_id,
-    } = i.state.currentRemoveDialog;
+    const { post_name, community_id, creator_id, post_id, id } = this.state
+      .currentRemoveDialog as PostReport;
 
-    let form: PostForm = {
-      name: post_name,
-      community_id,
+    let form: RemovePostForm = {
       edit_id: post_id,
-      creator_id,
       removed: true,
-      reason: i.state.removeReason,
-      nsfw: true,
+      reason: this.state.removeReason,
       auth: null,
     };
 
-    WebSocketService.Instance.editPost(form);
-    i.state.currentRemoveDialog = null;
-    i.state.removeReason = null;
-    i.setState(i.state);
+    if (this.state.autoResolve) {
+      this.handleResolvePostReport(id, community_id);
+    }
+
+    WebSocketService.Instance.removePost(form);
+
+    this.setState({
+      currentRemoveDialog: null,
+      removeReason: null,
+    });
   }
 
-  handleRemoveReasonChange(i: Reports, event: any) {
-    i.state.removeReason = event.target.value;
-    i.setState(i.state);
+  handleRemoveReasonChange(event: any) {
+    this.setState({ removeReason: event.target.value });
   }
 
   handleResolvePostReport(reportId: string, communityId: number) {
@@ -492,14 +525,14 @@ export class Reports extends Component<{}, ReportsState> {
       report: reportId,
     });
 
-    this.setState({
+    this.setState(state => ({
       postReportsByCommunity: {
-        ...this.state.postReportsByCommunity,
-        [communityId]: this.state.postReportsByCommunity[communityId].filter(
+        ...state.postReportsByCommunity,
+        [communityId]: state.postReportsByCommunity[communityId].filter(
           report => report.id !== reportId
         ),
       },
-    });
+    }));
 
     this.fetchReportCount(communityId);
   }
@@ -509,16 +542,20 @@ export class Reports extends Component<{}, ReportsState> {
       report: reportId,
     });
 
-    this.setState({
+    this.setState(state => ({
       commentReportsByCommunity: {
-        ...this.state.commentReportsByCommunity,
-        [communityId]: this.state.commentReportsByCommunity[communityId].filter(
+        ...state.commentReportsByCommunity,
+        [communityId]: state.commentReportsByCommunity[communityId].filter(
           report => report.id !== reportId
         ),
       },
-    });
+    }));
 
     this.fetchReportCount(communityId);
+  }
+
+  handleAutoResolveChange(e: React.ChangeEvent<HTMLInputElement>) {
+    this.setState({ autoResolve: e.target.checked });
   }
 
   banDialog({
@@ -534,15 +571,15 @@ export class Reports extends Component<{}, ReportsState> {
       currentBanDialog &&
       currentBanDialog.id === report.id && (
         <div style={{ display: 'flex' }}>
-          <form onSubmit={linkEvent(this, this.handleBanSubmit)}>
+          <form onSubmit={this.handleBanSubmit}>
             <textarea
               placeholder={i18n.t('reason')}
-              class="form-control report-handle-form"
+              className="form-control report-handle-form"
               id="ban-reason"
-              onInput={linkEvent(this, this.handleBanReasonChange)}
+              onChange={this.handleBanReasonChange}
               value={banReason}
             />
-            <button class="btn btn-danger mt-1" type="submit">
+            <button className="btn btn-danger mt-1" type="submit">
               {i18n.t('ban')} {this.state.currentBanDialog.creator_name}
             </button>
           </form>
@@ -560,21 +597,21 @@ export class Reports extends Component<{}, ReportsState> {
     currentRemoveDialog: PostReport | CommentReport | null;
     report: PostReport | CommentReport;
     removeReason: string;
-    cb: (i: Reports, event: any) => void;
+    cb: () => void;
   }) {
     return (
       currentRemoveDialog &&
       currentRemoveDialog.id === report.id && (
         <div style={{ display: 'flex' }}>
-          <form onSubmit={linkEvent(this, cb)}>
+          <form onSubmit={cb}>
             <textarea
               placeholder={i18n.t('reason')}
-              class="form-control report-handle-form"
+              className="form-control report-handle-form"
               id="remove-reason"
-              onInput={linkEvent(this, this.handleRemoveReasonChange)}
+              onChange={this.handleRemoveReasonChange}
               value={removeReason}
             />
-            <button class="btn btn-danger mt-1" type="submit">
+            <button className="btn btn-danger mt-1" type="submit">
               {i18n.t('remove')}
             </button>
           </form>
@@ -594,13 +631,23 @@ export class Reports extends Component<{}, ReportsState> {
     if (msg.error) {
       toast(i18n.t(msg.error), 'danger');
       if (msg.error === 'couldnt_find_that_username_or_email') {
-        this.context.router.history.push('/');
+        this.props.history.push('/');
       }
       return;
+    } else if (res.op === UserOperation.GetSite) {
+      const data = res.data as GetSiteResponse;
+      if (data.my_user) {
+        WebSocketService.Instance.getUserDetails({
+          user_id: data.my_user.id,
+          saved_only: false,
+          sort: 'New',
+        });
+      }
     } else if (res.op === UserOperation.GetUserDetails) {
       const data = res.data as UserDetailsResponse;
       this.setState({
         moderates: data.moderates,
+        loading: false,
       });
     } else if (res.op === UserOperation.ListCommentReports) {
       const data = res.data as ListCommentReportsResponse;
@@ -611,12 +658,12 @@ export class Reports extends Component<{}, ReportsState> {
 
       const community_id = data.reports[0].community_id;
 
-      this.setState({
+      this.setState(state => ({
         commentReportsByCommunity: {
-          ...this.state.commentReportsByCommunity,
+          ...state.commentReportsByCommunity,
           [community_id]: data.reports,
         },
-      });
+      }));
     } else if (res.op === UserOperation.ListPostReports) {
       const data = res.data as ListPostReportsResponse;
 
@@ -626,39 +673,41 @@ export class Reports extends Component<{}, ReportsState> {
 
       const community_id = data.reports[0].community_id;
 
-      this.setState({
+      this.setState(state => ({
         postReportsByCommunity: {
-          ...this.state.postReportsByCommunity,
+          ...state.postReportsByCommunity,
           [community_id]: data.reports,
         },
-      });
-    } else if (res.op === UserOperation.EditComment) {
+      }));
+    } else if (isCommentChanged(res.op)) {
       toast(i18n.t('comment_removed'));
-    } else if (res.op === UserOperation.EditPost) {
+    } else if (isPostChanged(res.op)) {
       toast(i18n.t('post_removed'));
     } else if (res.op === UserOperation.BanFromCommunity) {
       toast(i18n.t('user_banned'));
     } else if (res.op === UserOperation.GetReportCount) {
       const data = res.data as GetReportCountResponse;
 
-      this.setState({
+      this.setState(state => ({
         reportCountByCommunity: {
-          ...this.state.reportCountByCommunity,
+          ...state.reportCountByCommunity,
           [data.community]: {
             commentReports: data.comment_reports,
             postReports: data.post_reports,
           },
         },
-      });
+      }));
     } else if (res.op === UserOperation.GetCommunity) {
       const data = res.data as GetCommunityResponse;
 
-      this.setState({
+      this.setState(state => ({
         communitiesById: {
-          ...this.state.communitiesById,
+          ...state.communitiesById,
           [data.community.id]: data.community,
         },
-      });
+      }));
     }
   }
 }
+
+export const Reports = withRouter(BaseReports);

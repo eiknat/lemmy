@@ -1,5 +1,5 @@
-import { Component, linkEvent } from 'inferno';
-import { Link } from 'inferno-router';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
@@ -36,6 +36,8 @@ import { CommunityLink } from './community-link';
 import { SortSelect } from './sort-select';
 import { CommentNodes } from './comment-nodes';
 import { i18n } from '../i18next';
+import { linkEvent } from '../linkEvent';
+import { Box, Select } from 'theme-ui';
 
 interface SearchState {
   q: string;
@@ -89,6 +91,7 @@ export class Search extends Component<any, SearchState> {
       number_of_comments: undefined,
       number_of_communities: undefined,
       enable_downvotes: undefined,
+      enable_create_communities: undefined,
       open_registration: undefined,
       enable_nsfw: undefined,
     },
@@ -158,7 +161,7 @@ export class Search extends Component<any, SearchState> {
 
   render() {
     return (
-      <div class="container">
+      <div className="container">
         <h5>{i18n.t('search')}</h5>
         {this.selects()}
         {this.searchForm()}
@@ -176,22 +179,22 @@ export class Search extends Component<any, SearchState> {
   searchForm() {
     return (
       <form
-        class="form-inline"
+        className="form-inline"
         onSubmit={linkEvent(this, this.handleSearchSubmit)}
       >
         <input
           type="text"
-          class="form-control mr-2"
+          className="form-control mr-2"
           value={this.state.searchText}
           placeholder={`${i18n.t('search')}...`}
           onInput={linkEvent(this, this.handleQChange)}
           required
           minLength={3}
         />
-        <button type="submit" class="btn btn-secondary mr-2">
+        <button type="submit" className="btn btn-secondary mr-2">
           {this.state.loading ? (
-            <svg class="icon icon-spinner spin">
-              <use xlinkHref="#icon-spinner"></use>
+            <svg className="icon icon-spinner spin">
+              <use xlinkHref="#icon-spinner" />
             </svg>
           ) : (
             <span>{i18n.t('search')}</span>
@@ -204,21 +207,28 @@ export class Search extends Component<any, SearchState> {
   selects() {
     return (
       <div className="mb-2">
-        <select
-          value={this.state.type_}
-          onChange={linkEvent(this, this.handleTypeChange)}
-          class="custom-select custom-select-sm w-auto"
-        >
-          <option disabled>{i18n.t('type')}</option>
-          <option value={SearchType.All}>{i18n.t('all')}</option>
-          <option value={SearchType.Comments}>{i18n.t('comments')}</option>
-          <option value={SearchType.Posts}>{i18n.t('posts')}</option>
-          <option value={SearchType.Communities}>
-            {i18n.t('communities')}
-          </option>
-          <option value={SearchType.Users}>{i18n.t('users')}</option>
-        </select>
-        <span class="ml-2">
+        <Box css={{ display: 'inline-block' }} mr={2}>
+          <Select
+            value={this.state.type_}
+            onChange={linkEvent(this, this.handleTypeChange)}
+            css={{
+              display: 'inline-block',
+            }}
+            style={{
+              display: 'inline-block',
+            }}
+          >
+            <option disabled>{i18n.t('type')}</option>
+            <option value={SearchType.All}>{i18n.t('all')}</option>
+            <option value={SearchType.Comments}>{i18n.t('comments')}</option>
+            <option value={SearchType.Posts}>{i18n.t('posts')}</option>
+            <option value={SearchType.Communities}>
+              {i18n.t('communities')}
+            </option>
+            <option value={SearchType.Users}>{i18n.t('users')}</option>
+          </Select>
+        </Box>
+        <span>
           <SortSelect
             sort={this.state.sort}
             onChange={this.handleSortChange}
@@ -270,8 +280,8 @@ export class Search extends Component<any, SearchState> {
     return (
       <div>
         {combined.map(i => (
-          <div class="row">
-            <div class="col-12">
+          <div className="row" key={i.data.id}>
+            <div className="col-12">
               {i.type_ == 'posts' && (
                 <PostListing
                   post={i.data as Post}
@@ -329,8 +339,8 @@ export class Search extends Component<any, SearchState> {
     return (
       <>
         {this.state.searchResponse.posts.map(post => (
-          <div class="row">
-            <div class="col-12">
+          <div className="row" key={post.id}>
+            <div className="col-12">
               <PostListing
                 post={post}
                 showCommunity
@@ -349,8 +359,8 @@ export class Search extends Component<any, SearchState> {
     return (
       <>
         {this.state.searchResponse.communities.map(community => (
-          <div class="row">
-            <div class="col-12">{this.communityListing(community)}</div>
+          <div className="row" key={community.id}>
+            <div className="col-12">{this.communityListing(community)}</div>
           </div>
         ))}
       </>
@@ -363,7 +373,7 @@ export class Search extends Component<any, SearchState> {
         <span>
           <CommunityLink community={community} />
         </span>
-        <span>{` - ${community.title} - 
+        <span>{` - ${community.title} -
         ${i18n.t('number_of_subscribers', {
           count: community.number_of_subscribers,
         })}
@@ -376,8 +386,8 @@ export class Search extends Component<any, SearchState> {
     return (
       <>
         {this.state.searchResponse.users.map(user => (
-          <div class="row">
-            <div class="col-12">
+          <div className="row" key={user.id}>
+            <div className="col-12">
               <span>
                 @
                 <UserListing
@@ -399,10 +409,10 @@ export class Search extends Component<any, SearchState> {
 
   paginator() {
     return (
-      <div class="mt-2">
+      <div className="mt-2">
         {this.state.page > 1 && (
           <button
-            class="btn btn-sm btn-secondary mr-1"
+            className="btn btn-sm btn-secondary mr-1"
             onClick={linkEvent(this, this.prevPage)}
           >
             {i18n.t('prev')}
@@ -411,7 +421,7 @@ export class Search extends Component<any, SearchState> {
 
         {this.resultsCount() > 0 && (
           <button
-            class="btn btn-sm btn-secondary"
+            className="btn btn-sm btn-secondary"
             onClick={linkEvent(this, this.nextPage)}
           >
             {i18n.t('next')}
@@ -498,13 +508,18 @@ export class Search extends Component<any, SearchState> {
       return;
     } else if (res.op == UserOperation.Search) {
       let data = res.data as SearchResponse;
-      this.state.searchResponse = data;
-      this.state.loading = false;
-      document.title = `${i18n.t('search')} - ${this.state.q} - ${
-        this.state.site.name
-      }`;
-      window.scrollTo(0, 0);
-      this.setState(this.state);
+      this.setState(
+        {
+          searchResponse: data,
+          loading: false,
+        },
+        () => {
+          document.title = `${i18n.t('search')} - ${this.state.q} - ${
+            this.state.site.name
+          }`;
+          window.scrollTo(0, 0);
+        }
+      );
     } else if (res.op == UserOperation.CreateCommentLike) {
       let data = res.data as CommentResponse;
       createCommentLikeRes(data, this.state.searchResponse.comments);
@@ -515,9 +530,14 @@ export class Search extends Component<any, SearchState> {
       this.setState(this.state);
     } else if (res.op == UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
-      this.state.site = data.site;
-      this.setState(this.state);
-      document.title = `${i18n.t('search')} - ${data.site.name}`;
+      this.setState(
+        {
+          site: data.site,
+        },
+        () => {
+          document.title = `${i18n.t('search')} - ${data.site.name}`;
+        }
+      );
     }
   }
 }

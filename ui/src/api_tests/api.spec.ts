@@ -1,3 +1,4 @@
+// @ts-ignore
 import fetch from 'node-fetch';
 
 import {
@@ -9,12 +10,10 @@ import {
   FollowCommunityForm,
   CommunityResponse,
   GetFollowedCommunitiesResponse,
-  GetPostForm,
   GetPostResponse,
   CommentForm,
   CommentResponse,
   CommunityForm,
-  GetCommunityForm,
   GetCommunityResponse,
   CommentLikeForm,
   CreatePostLikeForm,

@@ -73,6 +73,8 @@
     "admins": "admins",
     "remove_as_admin": "remove as admin",
     "appoint_as_admin": "appoint as admin",
+    "remove_as_sitemod": "remove as sitemod",
+    "appoint_as_sitemod": "appoint as sitemod",
     "remove": "remove",
     "removed": "removed by mod",
     "locked": "locked",
@@ -193,7 +195,7 @@
     "lemmy_instance_setup": "Lemmy Instance Setup",
     "setup_admin": "Set Up Site Administrator",
     "your_site": "your site",
-    "modified": "modified",
+    "modified": "edited",
     "nsfw": "NSFW",
     "show_nsfw": "Show NSFW content",
     "theme": "Theme",
@@ -303,5 +305,6 @@
     "enable_create_communities": "Enable community creation",
     "pronouns": "Pronouns",
     "additional_pronouns": "Additional Pronouns",
-    "submit_report": "Submit Report"
+    "submit_report": "Submit Report",
+    "enter_code": "Enter Code"
 }
