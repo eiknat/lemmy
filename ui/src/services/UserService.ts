@@ -8,6 +8,8 @@ type InternalValues = {
   unreadCount?: number;
 };
 
+const USER_KEY = 'user-details';
+
 export class UserService {
   private static _instance: UserService;
   public user: User & InternalValues;
@@ -25,6 +27,12 @@ export class UserService {
       setTheme();
       console.log('No JWT cookie found.');
     }
+
+    // store and fetch user details in local storage to avoid waiting for async GetSite call
+    const savedUser = localStorage.getItem(USER_KEY);
+    if (savedUser) {
+      this.user = JSON.parse(savedUser);
+    }
   }
 
   public login(res: LoginResponse) {
@@ -39,7 +47,13 @@ export class UserService {
     Cookies.remove('jwt');
     setTheme();
     this.jwtSub.next();
+    localStorage.removeItem(USER_KEY);
     console.log('Logged out.');
+  }
+
+  public setUser(data: User) {
+    this.user = data;
+    localStorage.setItem(USER_KEY, JSON.stringify(data));
   }
 
   public get auth(): string {
