@@ -634,9 +634,8 @@ export class PostForm extends Component<PostFormProps, PostFormState> {
     this.setState(this.state);
   }
 
-  handlePostBodyChange(val: string) {
-    this.state.postForm.body = val;
-    this.setState(this.state);
+  handlePostBodyChange = (val: string) => {
+    this.setState({ postForm: {...this.state.postForm, body: val} });
   }
 
   handlePostCommunityChange = (community_id: number) => {

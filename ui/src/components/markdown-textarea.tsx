@@ -432,7 +432,7 @@ export class MarkdownTextArea extends Component<
   handleContentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     this.setState({ content: event.target.value });
     if (this.props.onContentChange) {
-      this.props.onContentChange(this.state.content);
+      this.props.onContentChange(event.target.value);
     }
   };
 
