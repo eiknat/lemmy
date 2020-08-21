@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { repoUrl } from '../utils';
 import { version } from '../version';
+import { VERSION as git_version } from '../git-version';
 import { i18n } from '../i18next';
 
 export class Footer extends Component<any, any> {
@@ -15,7 +16,7 @@ export class Footer extends Component<any, any> {
         <div className="navbar-collapse">
           <ul className="navbar-nav ml-auto">
             <li className="nav-item">
-              <span className="navbar-text">{version}</span>
+              <span className="navbar-text">{git_version.raw}</span>
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/about">

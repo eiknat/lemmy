@@ -64,5 +64,13 @@
     "jsx-a11y/aria-role": 1,
     "jsx-a11y/click-events-have-key-events": 1,
     "react/no-did-update-set-state": 0
-  }
+  },
+  "overrides": [
+    {
+      "files": ["*.js"],
+      "rules": {
+        "@typescript-eslint/no-var-requires": 0
+      }
+    }
+  ]
 }

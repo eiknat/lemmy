@@ -24,3 +24,5 @@ test/data/result.json
 
 package-lock.json
 *.orig
+
+src/git-version.ts

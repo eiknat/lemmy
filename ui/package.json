@@ -6,7 +6,7 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "api-test": "jest src/api_tests/api.spec.ts",
-    "build": "node generate_translations.js && tsc --noEmit && NODE_ENV=production vite build --base=/static/",
+    "build": "node generate_translations.js && node generate_git_verison.js && tsc --noEmit && NODE_ENV=production vite build --base=/static/",
     "lint": "tsc --noEmit && eslint --report-unused-disable-directives --ext .js,.ts,.tsx src",
     "start": "node generate_translations.js && vite --port 4444 --open",
     "storybook": "start-storybook -p 9009",
@@ -40,6 +40,7 @@
     "classcat": "^4.1.0",
     "emoji-mart": "^3.0.0",
     "emoji-short-name": "^1.0.0",
+    "git-describe": "^4.0.4",
     "husky": "^4.2.5",
     "i18next": "^19.6.3",
     "js-cookie": "^2.2.1",

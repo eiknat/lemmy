@@ -34,6 +34,7 @@ import {
 } from '../utils';
 import { BASE_PATH } from '../isProduction';
 import { version } from '../version';
+import { VERSION as git_version } from '../git-version';
 import { i18n } from '../i18next';
 import { Icon } from './icon';
 import { CommunityDropdown } from './community-dropdown';
